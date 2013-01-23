@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http-conf="http://cxf.apache.org/transports/http/configuration" xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
   <!-- activate the load time weaver for weaving aspects into classes and also accessing private mehtods -->
   <context:load-time-weaver />
@@ -301,6 +301,19 @@
     <property name="storageService" ref="vgr.storageService" />
   </bean>
 
+  <!--  Content Retrieval -->
+  <bean id="webscript.org.alfresco.cmis.content.get" class="se.vgregion.alfresco.repo.web.scripts.content.ContentGet" parent="webscript">
+    <property name="referenceFactory" ref="CMISReferenceFactory" />
+    <property name="namespaceService" ref="NamespaceService" />
+    <property name="permissionService" ref="PermissionService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="contentService" ref="ContentService" />
+    <property name="dictionaryService" ref="DictionaryService" />
+    <property name="mimetypeService" ref="MimetypeService" />
+    <property name="CMISRenditionService" ref="CMISRenditionService" />
+    <property name="serviceUtils" ref="vgr.serviceUtils" />
+  </bean>
+
   <!-- ********************************************* -->
   <!-- Bean for the VGR specific content.get service -->
   <!-- ********************************************* -->
@@ -344,6 +357,8 @@
 
   <bean id="pdfa" class="se.vgregion.alfresco.repo.rendition.executer.PdfaRenderingEngine" parent="baseRenderingAction" />
 
+  <bean id="pdfapilot" class="se.vgregion.alfresco.repo.rendition.executer.PdfaPilotRenderingEngine" parent="baseRenderingAction" />
+
   <!-- *************************************************** -->
   <!-- Rendering engine for rendering PDF/A compliant PDFs -->
   <!-- *************************************************** -->
@@ -385,6 +400,18 @@
   <!-- Thumbnail definition that is actually a PDF preview :) -->
   <!-- ****************************************************** -->
 
+  <bean name="pdfaPilot.pdfOptions" class="se.vgregion.alfresco.repo.content.transform.PdfaPilotTransformationOptions">
+    <property name="readLimitTimeMs" value="-1" />
+    <property name="maxSourceSizeKBytes" value="-1" />
+    <property name="readLimitKBytes" value="-1" />
+    <property name="pageLimit" value="-1" />
+    <property name="maxPages" value="-1" />
+    <property name="includeEmbedded" value="true" />
+    <property name="optimize" value="true" />
+    <property name="level" value="" />
+    <property name="timeoutMs" value="300000" />
+  </bean>
+
   <bean id="thumbnail.register.pdf" class="org.alfresco.repo.thumbnail.ThumbnailDefinitionSpringRegisterer">
     <property name="thumbnailRegistry" ref="thumbnailRegistry" />
     <property name="thumbnailDefinition">
@@ -393,16 +420,7 @@
         <property name="mimetype" value="application/pdf" />
         <property name="runAs" value="System" />
         <property name="failureHandlingOptions" ref="standardFailureOptions" />
-        <property name="transformationOptions">
-          <bean class="org.alfresco.repo.content.transform.RuntimeExecutableContentTransformerOptions">
-            <property name="readLimitTimeMs" value="-1" />
-            <property name="maxSourceSizeKBytes" value="-1" />
-            <property name="readLimitKBytes" value="-1" />
-            <property name="pageLimit" value="-1" />
-            <property name="maxPages" value="-1" />
-            <property name="includeEmbedded" value="true" />
-          </bean>
-        </property>
+        <property name="transformationOptions" ref="pdfaPilot.pdfOptions" />
       </bean>
     </property>
   </bean>
@@ -410,6 +428,18 @@
   <!-- ********************************************************** -->
   <!-- Thumbnail definition that is actually a PDF/A rendition :) -->
   <!-- ********************************************************** -->
+
+  <bean name="pdfaPilot.pdfaOptions" class="se.vgregion.alfresco.repo.content.transform.PdfaPilotTransformationOptions">
+    <property name="readLimitTimeMs" value="-1" />
+    <property name="maxSourceSizeKBytes" value="-1" />
+    <property name="readLimitKBytes" value="-1" />
+    <property name="pageLimit" value="-1" />
+    <property name="maxPages" value="-1" />
+    <property name="includeEmbedded" value="true" />
+    <property name="optimize" value="false" />
+    <property name="level" value="1b" />
+    <property name="timeoutMs" value="300000" />
+  </bean>
 
   <bean id="thumbnail.register.pdfa" class="org.alfresco.repo.thumbnail.ThumbnailDefinitionSpringRegisterer">
     <property name="thumbnailRegistry" ref="thumbnailRegistry" />
@@ -419,17 +449,7 @@
         <property name="mimetype" value="application/pdf" />
         <property name="runAs" value="System" />
         <property name="failureHandlingOptions" ref="standardFailureOptions" />
-        <property name="transformationOptions">
-          <bean class="se.vgregion.alfresco.repo.content.transform.OpenOfficeTransformationOptions">
-            <property name="pdfVersion" value="1" />
-            <property name="readLimitTimeMs" value="-1" />
-            <property name="maxSourceSizeKBytes" value="-1" />
-            <property name="readLimitKBytes" value="-1" />
-            <property name="pageLimit" value="-1" />
-            <property name="maxPages" value="-1" />
-            <property name="includeEmbedded" value="true" />
-          </bean>
-        </property>
+        <property name="transformationOptions" ref="pdfaPilot.pdfaOptions" />
       </bean>
     </property>
   </bean>
@@ -449,6 +469,19 @@
       <value>customPreferenceService</value>
     </property>
     <property name="preferenceService" ref="vgr.customPreferenceService" />
+  </bean>
+  
+  <!-- ***************************************************************************************************** -->
+  <!-- Report site statistics web script and utility classes																	 -->
+  <!-- ***************************************************************************************************** -->
+
+  <bean id="webscript.reports.sites.sites.get" class="se.vgregion.alfresco.repo.scripts.SitesReport" parent="webscript">
+    <property name="serviceRegistry" ref="ServiceRegistry" />
+  </bean>
+  
+  <bean id="reportSiteUsage" class="se.vgregion.alfresco.repo.report.ReportSiteUsage">
+    <property name="serviceRegistry" ref="ServiceRegistry" />
+    <property name="activityService" ref="activityService" />
   </bean>
 
 </beans>

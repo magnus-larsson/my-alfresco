@@ -86,3 +86,9 @@ div.web-preview span.refresh-button img {
     background-color: #eee;
     position: relative;
 }
+
+div.web-preview span.title-note {
+    color: #606060;
+    font-weight: normal;
+    padding-left: 5px;
+}

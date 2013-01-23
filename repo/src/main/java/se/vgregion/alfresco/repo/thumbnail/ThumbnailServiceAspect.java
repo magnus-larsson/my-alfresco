@@ -5,6 +5,8 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import se.vgregion.alfresco.repo.content.transform.OpenOfficeTransformationOptions;
+import se.vgregion.alfresco.repo.content.transform.PdfaPilotTransformationOptions;
+import se.vgregion.alfresco.repo.rendition.executer.PdfaPilotRenderingEngine;
 import se.vgregion.alfresco.repo.rendition.executer.PdfaRenderingEngine;
 
 @Aspect
@@ -28,11 +30,15 @@ public class ThumbnailServiceAspect {
       return pjp.proceed();
     }
 
-    if (!(args[0] instanceof OpenOfficeTransformationOptions)) {
-      return pjp.proceed();
+    if (args[0] instanceof OpenOfficeTransformationOptions) {
+      return PdfaRenderingEngine.NAME;
     }
 
-    return PdfaRenderingEngine.NAME;
+    if (args[0] instanceof PdfaPilotTransformationOptions) {
+      return PdfaPilotRenderingEngine.NAME;
+    }
+
+    return pjp.proceed();
   }
 
   public static ThumbnailServiceAspect aspectOf() {

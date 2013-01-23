@@ -303,7 +303,7 @@
          this.widgets.titleImg = Dom.get(this.id + "-title-img");
 
          // Set title and icon
-         this.widgets.titleText.innerHTML = $html(this.options.name);
+         this.widgets.titleText.innerHTML = "<span><span>" + $html(this.options.name) + "</span><span class='title-note'>(förhandsgranskning som PDF)</span></span>";
          this.widgets.titleImg.src = Alfresco.constants.URL_RESCONTEXT + this.options.icon.substring(1);
 
          // Parameter nodeRef is mandatory

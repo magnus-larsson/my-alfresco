@@ -10,13 +10,11 @@
         <value>alfresco/module/vgr-repo/context/model/vgrModel.xml</value>
       </list>
     </property>
-    <!-- 
     <property name="labels">
       <list>
-        <value>alfresco.module.vgr-repo.context.messages.data-list-model</value>
+        <value>alfresco.module.vgr-repo.context.model.dataTypeAnalyzers</value>
       </list>
     </property>
-    -->
   </bean>
 
 </beans>
