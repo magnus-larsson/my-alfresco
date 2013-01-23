@@ -1,0 +1,7 @@
+<webscript>
+  <shortname>Confirm pre uploaded file for Upload</shortname>
+  <url>/vgr/preupload/confirm</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

@@ -1,0 +1,10 @@
+<webscript>
+  <shortname>Get Apelon values</shortname>
+  <description>
+    Get a list of apelon values based on a node type 
+   </description>
+  <url>/vgr/apelon/nodes?nodeType={nodeType}</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction allow="readonly">required</transaction>
+</webscript>

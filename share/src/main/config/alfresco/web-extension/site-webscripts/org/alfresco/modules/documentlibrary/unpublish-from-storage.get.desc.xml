@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>upublish-from-storage</shortname>
+  <description>Revokes a publication to storage</description>
+  <url>/modules/documentlibrary/unpublish-from-storage</url>
+</webscript>

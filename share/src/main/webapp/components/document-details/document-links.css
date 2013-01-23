@@ -1,0 +1,49 @@
+/* @overridden projects/slingshot/source/web/components/document-details/document-links.css */
+
+.document-links
+{
+   background-color: #fafafa;
+	padding: 1.5em 1em 2em 2em;
+	border-left: 1px solid #ccc;
+	margin-right: -10px;
+}
+
+.document-links .heading
+{
+   color: #333333;
+   font-size: 131%;
+}
+
+.document-links .url-title
+{
+   color: #333333;
+   font-size: 100%;
+   padding-top: 1.5em;
+   padding-bottom: 0.4em;
+}
+
+.document-links .url-text
+{
+  border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+	padding: 5px 0;
+	word-wrap: break-word;
+}
+
+.document-links .link-value
+{
+   width: 178px;
+   margin-bottom: 1em;
+   padding: 0.4em;
+}
+
+.document-links .copy-button
+{
+	 margin-top: 5px;
+   display: none;
+}
+
+.document-links .cb-copy-button
+{
+   margin-top: 5px;
+}

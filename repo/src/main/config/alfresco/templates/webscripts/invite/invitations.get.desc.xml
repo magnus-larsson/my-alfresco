@@ -1,0 +1,7 @@
+<webscript>
+  <shortname>List pending invitations for current user</shortname>
+  <url>/vgr/invite/invitations</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

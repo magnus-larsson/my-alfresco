@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>auto-publish</shortname>
+  <description>Auto Publish</description>
+  <url>/modules/documentlibrary/auto-publish</url>
+</webscript>

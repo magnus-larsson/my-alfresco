@@ -1,0 +1,6 @@
+<webscript>
+  <shortname>Admin Console PuSH Console</shortname>
+  <description>Administration Console - PuSH Console</description>
+  <url>/components/console/push-console</url>
+  <family>admin-console</family>
+</webscript>

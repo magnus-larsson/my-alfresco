@@ -1,0 +1,1 @@
+Number of documents migrated: ${migrated}

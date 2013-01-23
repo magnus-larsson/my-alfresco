@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rdf:RDF [
+    <!ENTITY rdfns 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'>
+    <!ENTITY rdfsns 'http://www.w3.org/2000/01/rdf-schema#'>
+    <!ENTITY dctermsns 'http://purl.org/dc/terms/'>
+    <!ENTITY vgrns 'http://purl.org/vgregion/elements/1.0/'>
+]>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vgr="http://purl.org/vgregion/elements/1.0/">
+
+  <rdf:Description rdf:about="http://purl.org/vgregion/elements/1.0/">
+    <dcterms:title xml:lang="en-US">VGR Superset of Dublin Core Metadata Element Set, Version 1.0</dcterms:title>
+    <dcterms:publisher rdf:resource="http://purl.org/dc/aboutdcmi#DCMI" />
+    <dcterms:modified>2011-05-24</dcterms:modified>
+  </rdf:Description>
+
+  <rdf:Property rdf:about="http://purl.org/vgregion/elements/1.0/status">
+    <rdfs:label xml:lang="en-US">Status</rdfs:label>
+    <rdfs:comment xml:lang="en-US">The status of a document.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="http://purl.org/vgregion/elements/1.0/" />
+    <dcterms:issued>2011-05-24</dcterms:issued>
+    <dcterms:modified>2011-05-24</dcterms:modified>
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property" />
+  </rdf:Property>
+
+</rdf:RDF>

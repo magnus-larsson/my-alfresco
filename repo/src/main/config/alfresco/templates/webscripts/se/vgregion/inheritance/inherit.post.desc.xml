@@ -1,0 +1,7 @@
+<webscript>
+  <shortname>Copy properties from one to several nodes, ie. folder inheritance</shortname>
+  <url>/vgr/inheritance/inherit</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

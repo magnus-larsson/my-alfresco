@@ -1,0 +1,9 @@
+<webscript>
+  <shortname>Data sources getting node data</shortname>
+  <description>
+        Data sources getting node data, arguments depends on resource.
+        i.e. for KIV its a list of hsaidentity
+  </description>
+  <url template="/components/nodes/{resource}"/>
+  <format default="json">extension</format>
+</webscript>

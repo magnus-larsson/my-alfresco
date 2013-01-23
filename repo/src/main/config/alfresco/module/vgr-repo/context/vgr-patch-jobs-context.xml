@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <!-- ********************************** -->
+  <!-- Job for fixing the status property -->
+  <!-- ********************************** -->
+  
+  <bean id="vgr.patch.fixVgrStatusJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <property name="jobClass" value="se.vgregion.alfresco.repo.admin.patch.impl.FixVgrStatusJob" />
+    <property name="jobDataAsMap">
+      <map>
+        <entry key="searchService" value-ref="SearchService" />
+        <entry key="nodeService" value-ref="NodeService" />
+        <entry key="behaviourFilter" value-ref="policyBehaviourFilter" />
+        <entry key="retryingTransactionHelper" value-ref="retryingTransactionHelper" />
+        <entry key="appliedPatchDAO" value-ref="appliedPatchDAO" />
+        <entry key="descriptorService" value-ref="descriptorComponent" />
+        <entry key="patchId" value="vgr.patch.fixVgrStatus" />
+        <entry key="description" value="vgr.patch.fixVgrStatus.description" />
+      </map>
+    </property>
+  </bean>
+
+  <bean id="vgr.patch.fixVgrStatusTrigger" class="org.alfresco.util.CronTriggerBean">
+    <property name="jobDetail" ref="vgr.patch.fixVgrStatusJobDetail" />
+    <property name="scheduler" ref="schedulerFactory" />
+    <property name="cronExpression" value="0 0 1 * * ?" />
+  </bean>
+  
+  <!-- ************************************* -->
+  <!-- Job for fixing the ID fields property -->
+  <!-- ************************************* -->
+  
+  <bean id="vgr.patch.fixMissingIdValuesJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <property name="jobClass" value="se.vgregion.alfresco.repo.admin.patch.impl.FixMissingIdValuesJob" />
+    <property name="jobDataAsMap">
+      <map>
+        <entry key="searchService" value-ref="SearchService" />
+        <entry key="nodeService" value-ref="NodeService" />
+        <entry key="behaviourFilter" value-ref="policyBehaviourFilter" />
+        <entry key="retryingTransactionHelper" value-ref="retryingTransactionHelper" />
+        <entry key="appliedPatchDAO" value-ref="appliedPatchDAO" />
+        <entry key="descriptorService" value-ref="descriptorComponent" />
+        <entry key="patchId" value="vgr.patch.fixMissingIdValues" />
+        <entry key="description" value="vgr.patch.fixMissingIdValues.description" />
+      </map>
+    </property>
+  </bean>
+
+  <bean id="vgr.patch.fixMissingIdValuesTrigger" class="org.alfresco.util.CronTriggerBean">
+    <property name="jobDetail" ref="vgr.patch.fixMissingIdValuesJobDetail" />
+    <property name="scheduler" ref="schedulerFactory" />
+    <property name="cronExpression" value="0 0 1 * * ?" />
+  </bean>
+  
+  <!-- ***************************************************************** -->
+  <!-- Job for fixing the vgr:dc.source and vgr:dc.identifier properties -->
+  <!-- ***************************************************************** -->
+  
+  <bean id="vgr.patch.fixDcSourceAndIdentifierJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <property name="jobClass" value="se.vgregion.alfresco.repo.admin.patch.impl.FixDcSourceAndIdentifierJob" />
+    <property name="jobDataAsMap">
+      <map>
+        <entry key="searchService" value-ref="SearchService" />
+        <entry key="nodeService" value-ref="NodeService" />
+        <entry key="behaviourFilter" value-ref="policyBehaviourFilter" />
+        <entry key="retryingTransactionHelper" value-ref="retryingTransactionHelper" />
+        <entry key="appliedPatchDAO" value-ref="appliedPatchDAO" />
+        <entry key="descriptorService" value-ref="descriptorComponent" />
+        <entry key="patchId" value="vgr.patch.fixDcSourceAndIdentifierJobDetail" />
+        <entry key="description" value="vgr.patch.fixDcSourceAndIdentifier.description" />
+        <entry key="serviceUtils" value-ref="vgr.serviceUtils" />
+      </map>
+    </property>
+  </bean>
+
+  <bean id="vgr.patch.fixDcSourceAndIdentifierTrigger" class="org.alfresco.util.CronTriggerBean">
+    <property name="jobDetail" ref="vgr.patch.fixDcSourceAndIdentifierJobDetail" />
+    <property name="scheduler" ref="schedulerFactory" />
+    <property name="cronExpression" value="0 0 1 * * ?" />
+  </bean>
+  
+</beans>

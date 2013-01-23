@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <import resource="classpath:META-INF/cxf/cxf-all.xml" />
+
+  <bean id="vgr.bus" class="se.vgregion.alfresco.repo.security.EsbSecurityInit" lazy-init="false" />
+
+  <bean id="jaxbElementProvider" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
+    <property name="consumeMediaTypes">
+      <list>
+        <value>text/plain</value>
+        <value>text/xml</value>
+        <value>application/xml</value>
+      </list>
+    </property>
+  </bean>
+
+  <bean id="vgr.esbExternalUserCreate" class="org.apache.cxf.jaxrs.client.WebClient" factory-method="create">
+    <constructor-arg type="java.lang.String" value="https://esbtest.vgregion.se:40103/portal/services/users/create" />
+    <constructor-arg>
+      <list>
+        <ref bean="jaxbElementProvider" />
+      </list>
+    </constructor-arg>
+  </bean>
+
+  <bean id="vgr.esbExternalUserInvite" class="org.apache.cxf.jaxrs.client.WebClient" factory-method="create">
+    <constructor-arg type="java.lang.String" value="https://esbtest.vgregion.se:40103/portal/services/users/invite" />
+    <constructor-arg>
+      <list>
+        <ref bean="jaxbElementProvider" />
+      </list>
+    </constructor-arg>
+  </bean>
+
+  <bean id="vgr.externalUsers" class="se.vgregion.alfresco.repo.security.impl.ExternalUsersServiceImpl" depends-on="vgr.bus">
+    <property name="createClient" ref="vgr.esbExternalUserCreate" />
+    <property name="inviteClient" ref="vgr.esbExternalUserInvite" />
+  </bean>
+
+</beans>

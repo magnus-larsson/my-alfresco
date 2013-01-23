@@ -1,0 +1,19 @@
+<!DOCTYPE aspectj PUBLIC "-//AspectJ//DTD//EN" "http://www.eclipse.org/aspectj/dtd/aspectj.dtd">
+
+<aspectj>
+
+  <!--
+  <weaver options="-verbose -showWeaveInfo -Xreweavable">
+  -->
+  <weaver options="-verbose -showWeaveInfo">
+    <include within="org.alfresco.repo.thumbnail.ThumbnailServiceImpl" />
+    <!--
+    <include within="se.vgregion.alfresco.repo.thumbnail.ThumbnailServiceAspect" />
+    -->
+  </weaver>
+
+  <aspects>
+    <aspect name="se.vgregion.alfresco.repo.thumbnail.ThumbnailServiceAspect" />
+  </aspects>
+
+</aspectj>

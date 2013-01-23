@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>Published documents</shortname>
+  <description>Searches for published documents modified within given time</description>
+  <url>/vgr/feed/document/published?from={from}&amp;to={to}</url>
+  <format default="atom">argument</format>
+  <transaction allow="readonly">required</transaction>
+  <authentication>guest</authentication>
+</webscript>

@@ -1,0 +1,9 @@
+/* IE6/7 specific fixes */
+.publish-to-storage-tree .ygtvitem table { 
+    width: 97% !important;
+}
+
+.publish-to-storage-tree .pub_date {
+    padding-right: 3px !important;
+}
+

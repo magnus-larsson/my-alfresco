@@ -1,0 +1,7 @@
+<webscript>
+  <shortname>Moves VGR dok documents under it's correct version</shortname>
+  <description>Moves the VGR dok documents to it's correct version hierarchy.</description>
+  <url>/vgr/vgrdok/migrate?archive={archive}&amp;site={site}&amp;limit={limit?}</url>
+  <transaction>required</transaction>
+  <authentication>admin</authentication>
+</webscript>

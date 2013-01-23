@@ -1,0 +1,7 @@
+<webscript>
+  <shortname>Site Cleanup Service</shortname>
+  <description>Cleans up a site</description>
+  <url>/vgr/siteCleanup</url>
+  <authentication>admin</authentication>
+  <transaction>required</transaction>
+</webscript>

@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>Get children of a keyword in apelon</shortname>
+  <description>Get children of a keyword in our locally cached Apelon.</description>
+  <url>/vgr/apelon/keywordChildren</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction allow="readonly">required</transaction>
+</webscript>

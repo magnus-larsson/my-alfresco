@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>publish-to-storage</shortname>
+  <description>Publish to storage</description>
+  <url>/modules/documentlibrary/publish-to-storage</url>
+</webscript>

@@ -1,0 +1,6 @@
+<webscript>
+  <shortname>Data sources for tree view widget</shortname>
+  <description>Data sources for tree view widget, lazy loades nodes</description>
+  <url template="/components/treeview/{resource}"/>
+  <format default="json">extension</format>
+</webscript>

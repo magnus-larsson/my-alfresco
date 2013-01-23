@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+         http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+  <bean id="migratorService" class="se.vgregion.alfresco.migration.MigratorServiceImpl">
+    <property name="migratorTasks">
+      <list>
+        <!-- <ref bean="sitesPresetsMigration" /> -->
+        <!-- <ref bean="sitesMembershipMigration" /> -->
+        <!-- <ref bean="createSiteMigration" /> -->
+        <!-- <ref bean="vgrDokMigration" /> -->
+        <ref bean="externalUsersMigration" />
+      </list>
+    </property>
+  </bean>
+
+  <bean id="abstractMigratorTask" class="se.vgregion.alfresco.migration.AbstractMigratorTask" abstract="true">
+    <property name="destinationAlfrescoHost" value="localhost" />
+    <property name="destinationAlfrescoPort" value="8080" />
+    <property name="destinationShareHost" value="localhost" />
+    <property name="destinationSharePort" value="8081" />
+    <property name="sourceAlfrescoHost" value="localhost" />
+    <property name="sourceAlfrescoPort" value="8080" />
+    <property name="username" value="admin" />
+    <property name="password" value="admin" />
+  </bean>
+
+  <bean id="sitesPresetsMigration" class="se.vgregion.alfresco.migration.SitesPresetsMigration" parent="abstractMigratorTask" />
+
+  <bean id="sitesMembershipMigration" class="se.vgregion.alfresco.migration.SitesMembershipMigration" parent="abstractMigratorTask" />
+
+  <bean id="createSiteMigration" class="se.vgregion.alfresco.migration.CreateSiteMigration" parent="abstractMigratorTask" />
+
+  <bean id="vgrDokMigration" class="se.vgregion.alfresco.migration.vgrdok.VgrDokMigration" parent="abstractMigratorTask" />
+
+  <bean id="externalUsersMigration" class="se.vgregion.alfresco.migration.ExternalUsersMigration" parent="abstractMigratorTask">
+    <property name="externalUsersService" ref="vgr.externalUsers" />
+  </bean>
+
+  <bean id="cmisSessionFactory" class="se.vgregion.alfresco.migration.VgrCmisSessionFactory">
+    <property name="username" value="admin" />
+    <property name="password" value="admin" />
+    <property name="url" value="http://localhost:8080/alfresco/service/cmis" />
+    <property name="objectFactoryClass" value="org.alfresco.cmis.client.impl.AlfrescoObjectFactoryImpl" />
+  </bean>
+
+  <bean id="cmisSession" class="org.apache.chemistry.opencmis.client.api.Session" factory-bean="cmisSessionFactory" factory-method="createSession"
+    scope="prototype" />
+
+</beans>

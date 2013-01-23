@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>Datalist move dialog</shortname>
+  <description>Dialog for moving datalists rows</description>
+  <url>/modules/data-lists/move</url>
+</webscript>

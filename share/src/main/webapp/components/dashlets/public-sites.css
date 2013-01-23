@@ -1,0 +1,120 @@
+.public-sites .scrollableList
+{
+   padding-top: 2px;
+}
+
+/* Data Table */
+.public-sites .yui-dt table
+{
+   border: medium none;
+   width: 100%;
+}
+
+.public-sites .yui-dt thead
+{
+   display: none;
+}
+
+.public-sites .yui-dt tbody
+{
+   outline: none;
+}
+
+.public-sites .yui-dt tr.yui-dt-even,
+.public-sites .yui-dt tr.yui-dt-odd
+{
+   background-color: #ffffff;
+}
+
+.public-sites .yui-dt td
+{
+   border-bottom: 1px dashed #d9d9d9;
+   border-right: medium none;
+   vertical-align: top;
+}
+
+.public-sites .yui-dt td .yui-dt-liner
+{
+   padding: 4px 6px;
+}
+
+.public-sites .yui-dt .yui-dt-message td
+{
+   border: medium none;
+}
+
+/**
+ * Favourite document indicator.
+ * Note: We can't use the same "enabled" class on normal and IMAP favourites because IE6 can't cope
+ *       with the selector. No, really. Nice work, Microsoft muppets.
+*/
+.public-sites a.favourite-site,
+.public-sites a.imap-favourite-site
+{
+   background-image: url(../images/star-deselected_16x16.png);
+   background-position: center;
+   background-repeat: no-repeat;
+   cursor: pointer;
+   padding: 6px 8px;
+}
+.public-sites a.imap-favourite-site
+{
+   background-image: url(../images/imap-fav-deselected-16.png);
+}
+.public-sites a.favourite-site.enabled
+{
+   background-image: url(../images/star-selected_16x16.png);
+}
+.public-sites a.imap-favourite-site.imap-enabled
+{
+   background-image: url(../images/imap-fav-selected-16.png);
+}
+.public-sites a.favourite-site:active,
+.public-sites a.favourite-site:hover,
+.public-sites a.imap-favourite-site:active,
+.public-sites a.imap-favourite-site:hover
+{
+   text-decoration: none;
+}
+
+.public-sites div.site-favourites
+{
+   
+}
+
+.public-sites div.site-title
+{
+   background-image: url(../images/site-24.png);
+   background-repeat: no-repeat;
+   background-position: 0 0;
+   min-height: 24px;
+   padding-left: 32px;
+   padding-top: 0.2em;
+}
+
+.public-sites div.site-description
+{
+   margin-left: 32px;
+   position: relative;
+   top: -4px;
+}
+
+.public-sites a.delete-site
+{
+   background-image: url(../images/remove-icon-16.png);
+   background-repeat: no-repeat;
+   background-position: center;
+   cursor: pointer;
+   padding: 1em;
+   visibility: hidden;
+}
+.public-sites a.delete-site:active,
+.public-sites a.delete-site:hover
+{
+   text-decoration: none;
+}
+
+.public-sites .yui-dt-highlighted a.delete-site
+{
+   visibility: visible;
+}

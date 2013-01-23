@@ -1,0 +1,18 @@
+<webscript>
+  <shortname>Remove dashlet from users dashboard</shortname>
+  <description>Removes a dashlet for all users</description>
+  <url>/se/vgregion/alfresco/patch/removedashlet?dashletname={dashletname}&amp;username={username?}</url>
+
+  <args>
+    <arg>
+      <shortname>dashletname</shortname>
+      <description>The dashlet to remove</description>
+    </arg>
+    <arg>
+      <shortname>username</shortname>
+      <description>The user to remove the dashlet for</description>
+    </arg>
+  </args>
+
+  <authentication>admin</authentication>
+</webscript>

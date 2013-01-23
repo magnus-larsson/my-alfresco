@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:p="http://www.springframework.org/schema/p" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+		http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd">
+
+  <!-- A Jax WS proxy factory for the Vocabulary Service -->
+  <jaxws:client id="vgr.VocabularyService" serviceClass="vocabularyservices.wsdl.metaservice_vgr_se.v2.VocabularyService" address="http://metadataservice.vgregion.se/vocabularyservice/VocabularyService" />
+
+  <!-- A Jax WS proxy factory for the Keyword Service -->
+  <jaxws:client id="vgr.KeywordService" serviceClass="keywordservices.wsdl.metaservice_vgr_se.v2.KeywordService" address="http://metadataservice.vgregion.se/keywordservice/KeywordService" />
+
+  <bean id="vgr.apelonService" class="se.vgregion.alfresco.repo.constraints.impl.ApelonServiceImpl">
+    <property name="vocabularyService" ref="vgr.VocabularyService" />
+    <property name="searchService" ref="SearchService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="cache" ref="apelonCache" />
+    <property name="keywordService" ref="vgr.KeywordService" />
+  </bean>
+
+  <!-- A spring bean that's accessed from the reflection instantiated (Alfresco does that) constraint class -->
+  <bean id="vgr.VocabularyConstraint" class="se.vgregion.alfresco.repo.constraints.VocabularyConstraintBean" p:apelonService-ref="vgr.apelonService" />
+
+  <bean id="vgr.hsaCodeConstraint" class="se.vgregion.alfresco.repo.constraints.HsaCodeConstraintBean" parent="vgr.abstractConstraint" p:apelonService-ref="vgr.apelonService" />
+
+  <bean id="vgr.documentStructureConstraint" class="se.vgregion.alfresco.repo.constraints.DocumentStructureConstraintBean" parent="vgr.abstractConstraint" p:apelonService-ref="vgr.apelonService" />
+
+  <bean id="vgr.statusDocumentConstraint" class="se.vgregion.alfresco.repo.constraints.StatusDocumentConstraintBean" parent="vgr.abstractConstraint" p:apelonService-ref="vgr.apelonService" />
+
+  <bean id="vgr.ApelonFindNodesConstraint" class="se.vgregion.alfresco.repo.constraints.ApelonFindNodesConstraintBean" p:apelonService-ref="vgr.apelonService" />
+
+  <bean id="vgr.ApelonNodeTypeConstraint" class="se.vgregion.alfresco.repo.constraints.ApelonNodeTypeConstraintBean" parent="vgr.abstractConstraint" p:apelonService-ref="vgr.apelonService" />
+
+  <bean id="vgr.apelonScript" parent="baseJavaScriptExtension" class="se.vgregion.alfresco.repo.scripts.ScriptApelonService">
+    <property name="synchronisations">
+      <list>
+        <ref bean="vgr.apelonRecordTypeSynchronisation" />
+        <ref bean="vgr.apelonDocumentTypeSynchronisation" />
+        <ref bean="vgr.apelonDocumentStatusSynchronisation" />
+        <ref bean="vgr.apelonLanguageSynchronisation" />
+        <ref bean="vgr.apelonHsacodeSynchronisation" />
+        <ref bean="vgr.apelonDocumentTypeStructureSynchronisation" />
+      </list>
+    </property>
+    <property name="extensionName" value="apelon" />
+    <property name="apelonService" ref="vgr.apelonService" />
+    <property name="contentService" ref="ContentService" />
+    <property name="serviceRegistry" ref="ServiceRegistry" />
+  </bean>
+
+  <bean id="vgr.apelonSynchronisation" class="se.vgregion.alfresco.repo.constraints.sync.ApelonSynchronisationImpl" abstract="true">
+    <property name="apelonService" ref="vgr.apelonService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="searchService" ref="SearchService" />
+    <property name="transactionService" ref="TransactionService" />
+  </bean>
+
+  <bean id="vgr.apelonDocumentTypeSynchronisation" parent="vgr.apelonSynchronisation" class="se.vgregion.alfresco.repo.constraints.sync.ApelonSynchronisationImpl">
+    <property name="apelonNodeType" value="documentType" />
+    <property name="apelonNodeTitle" value="Dokumenttyp" />
+    <property name="path" value="Dokumenttyp VGR/Dokumenttyp VGR" />
+  </bean>
+
+  <bean id="vgr.apelonDocumentTypeStructureSynchronisation" parent="vgr.apelonSynchronisation" class="se.vgregion.alfresco.repo.constraints.sync.ApelonSynchronisationImpl">
+    <property name="apelonNodeType" value="documentStructure" />
+    <property name="apelonNodeTitle" value="Dokumentstruktur" />
+    <property name="path" value="Dokumentstruktur VGR/Dokumentstruktur VGR" />
+  </bean>
+
+  <bean id="vgr.apelonRecordTypeSynchronisation" parent="vgr.apelonSynchronisation" class="se.vgregion.alfresco.repo.constraints.sync.ApelonSynchronisationImpl">
+    <property name="apelonNodeType" value="recordType" />
+    <property name="apelonNodeTitle" value="Handlingstyp" />
+    <property name="path" value="Handlingstyp" />
+  </bean>
+
+  <bean id="vgr.apelonDocumentStatusSynchronisation" parent="vgr.apelonSynchronisation" class="se.vgregion.alfresco.repo.constraints.sync.ApelonSynchronisationImpl">
+    <property name="apelonNodeType" value="documentStatus" />
+    <property name="apelonNodeTitle" value="Dokumentstatus" />
+    <property name="path" value="Dokumentstatus" />
+  </bean>
+
+  <bean id="vgr.apelonLanguageSynchronisation" parent="vgr.apelonSynchronisation" class="se.vgregion.alfresco.repo.constraints.sync.ApelonSynchronisationImpl">
+    <property name="apelonNodeType" value="language" />
+    <property name="apelonNodeTitle" value="Språk" />
+    <property name="path" value="Språk/Språk" />
+  </bean>
+
+  <bean id="vgr.apelonHsacodeSynchronisation" parent="vgr.apelonSynchronisation" class="se.vgregion.alfresco.repo.constraints.sync.ApelonSynchronisationImpl">
+    <property name="apelonNodeType" value="hsacode" />
+    <property name="apelonNodeTitle" value="Verksamhetskod" />
+    <property name="path" value="Verksamhetskod/Verksamhetskod" />
+  </bean>
+
+  <bean id="vgr.apelonSweMeSHSynchronisation" parent="vgr.apelonSynchronisation" class="se.vgregion.alfresco.repo.constraints.sync.ApelonSweMeSHSynchronisationImpl">
+    <property name="apelonNodeType" value="swemesh" />
+    <property name="apelonNodeTitle" value="SweMeSH" />
+    <property name="path" value="SweMeSH/SweMeSH" />
+  </bean>
+
+  <bean name="apelonCache" class="org.alfresco.repo.cache.EhCacheAdapter">
+    <property name="cache">
+      <bean class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheManager-ref="internalEHCacheManager" p:cacheName="se.vgregion.alfresco.repo.cache.APELON_CACHE" />
+    </property>
+  </bean>
+
+</beans>

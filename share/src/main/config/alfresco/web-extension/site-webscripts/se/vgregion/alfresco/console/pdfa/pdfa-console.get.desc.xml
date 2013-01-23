@@ -1,0 +1,6 @@
+<webscript>
+  <shortname>Admin Console PDF/A Console</shortname>
+  <description>Administration Console - PDF/A Console</description>
+  <url>/components/console/pdfa-console</url>
+  <family>admin-console</family>
+</webscript>

@@ -1,0 +1,7 @@
+<webscript>
+   <shortname>Get a list of users that have logged in once and therefor has a dashboard</shortname>
+   <url>/vgr/peoplewithdashboard?filter={filter?}</url>
+   <format default="json">argument</format>
+   <authentication>admin</authentication>
+   <transaction allow="readonly">required</transaction>
+</webscript>

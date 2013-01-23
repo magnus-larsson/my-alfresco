@@ -1,0 +1,19 @@
+.ajaxselectone {
+   width: 780px !important; /* min-widht doesn't work on selects in ie7 */
+}
+
+.ajaxselectone-properties table {
+    background: none repeat scroll 0 0 #fffffa;
+    border: 1px solid #C5D6E2;
+    border-top: none;
+    padding: 3px;
+    width: 100%;
+}
+.ajaxselectone-properties td {
+    font-size: 80% !important;
+    vertical-align: top;
+}
+
+.ajaxselectone-properties td strong {
+    width: 112px;
+}

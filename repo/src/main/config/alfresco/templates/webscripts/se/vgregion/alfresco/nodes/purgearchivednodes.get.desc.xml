@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>Purges archived nodes</shortname>
+  <description>Purges a number of archived nodes.</description>
+  <url>/se/vgregion/alfresco/nodes/purgearchivednodes?maxItems={maxItems?}&amp;days={days?}&amp;user={user?}</url>
+  <format default="json">argument</format>
+  <authentication>admin</authentication>
+  <transaction>required</transaction>
+</webscript>

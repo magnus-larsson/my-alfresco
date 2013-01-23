@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<page>
+   <title>Default Site Page Redirect</title>
+   <description>Redirects to the sites default page, i.e. it's dashboard in most cases'</description>
+   <template-instance>default-redirect</template-instance>
+   <authentication>user</authentication>
+</page>

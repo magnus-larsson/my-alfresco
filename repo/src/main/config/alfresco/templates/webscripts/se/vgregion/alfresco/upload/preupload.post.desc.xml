@@ -1,0 +1,7 @@
+<webscript>
+  <shortname>Pre File Upload</shortname>
+  <url>/vgr/preupload</url>
+  <format default="json"/>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

@@ -1,0 +1,24 @@
+<webscript>
+  <shortname>WebDok URL rewriting stuff</shortname>
+  <description>Rewrites an old WebDok URL to the corresponding file in Alfresco</description>
+  <url>/vgr/webdok?id={id}&amp;version={version?}&amp;a={attach?}</url>
+  
+  <args>
+    <arg>
+      <shortname>id</shortname>
+      <description>the node id of the object</description>
+    </arg>
+    <arg>
+      <shortname>version</shortname>
+      <description>the version of the object</description>
+    </arg>
+    <arg>
+        <shortname>attach</shortname>
+        <description>if true, force download of content as attachment</description>
+        <default>false</default>
+    </arg>
+  </args>
+  
+  <transaction>required</transaction>
+  <authentication>guest</authentication>
+</webscript>

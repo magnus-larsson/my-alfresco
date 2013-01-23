@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+  <!-- Override the config source to include Web Framework Commons and Share config -->
+  <bean id="webframework.configsource" class="org.springframework.extensions.config.source.UrlConfigSource">
+    <constructor-arg>
+      <list>
+        <!-- Spring Web Scripts -->
+        <value>classpath:org/springframework/extensions/webscripts/spring-webscripts-config.xml</value>
+        <value>classpath:META-INF/spring-webscripts-config-custom.xml</value>
+        <value>jar:*!/META-INF/spring-webscripts-config-custom.xml</value>
+
+        <!-- Spring Surf -->
+        <value>classpath:org/springframework/extensions/surf/spring-surf-config.xml</value>
+        <value>classpath:org/springframework/extensions/surf/spring-surf-config-remote.xml</value>
+        <value>classpath:META-INF/spring-surf-config-custom.xml</value>
+        <value>jar:*!/META-INF/spring-surf-config-custom.xml</value>
+
+        <!-- Surf Autowire Support -->
+        <value>webapp:WEB-INF/surf.xml</value>
+
+        <!-- Common form config -->
+        <value>classpath:alfresco/form-config.xml</value>
+
+        <!-- Share default config -->
+        <value>classpath:alfresco/share-config.xml</value>
+
+        <!-- Share help url config -->
+        <value>classpath:alfresco/share-help-config.xml</value>
+
+        <!-- Share form config -->
+        <value>classpath:alfresco/share-form-config.xml</value>
+
+        <!-- Share Data List form config -->
+        <value>classpath:alfresco/share-datalist-form-config.xml</value>
+
+        <!-- Share workflow form config -->
+        <value>classpath:alfresco/share-workflow-form-config.xml</value>
+
+        <!-- Share custom config -->
+        <value>classpath:alfresco/web-extension/share-config-custom.xml</value>
+        <value>jar:*!/META-INF/share-config-custom.xml</value>
+
+        <!-- Share config for VGR -->
+        <value>classpath:alfresco/web-extension/share-config-vgr.xml</value>
+      </list>
+    </constructor-arg>
+  </bean>
+
+  <bean id="webscripts.resources" class="org.springframework.extensions.surf.util.ResourceBundleBootstrapComponent">
+    <property name="resourceBundles">
+      <list>
+        <value>webscripts.messages.webscripts</value>
+        <value>alfresco.messages.common</value>
+        <value>alfresco.messages.slingshot</value>
+        <value>alfresco.messages.vgr</value>
+      </list>
+    </property>
+  </bean>
+
+  <bean id="webscript.org.alfresco.components.form.form.get" class="se.vgregion.web.scripts.forms.VgrFormUIGet" parent="webscript">
+    <property name="configService" ref="web.config" />
+  </bean>
+
+  <bean id="webscript.probe.probe.get" class="com.redpill.alfresco.clusterprobe.share.ProbeScript" parent="webscript">
+    <property name="configService" ref="web.config" />
+  </bean>
+
+  <!-- Controller for the web script Clear Cache -->
+  <bean id="webscript.se.vgregion.alfresco.patch.removedashlet.get" class="se.vgregion.web.scripts.patch.RemoveDashlet" parent="webscript">
+    <property name="modelObjectService" ref="webframework.service.modelobject" />
+  </bean>
+  
+  <bean id="webframework.factory.user.vgr" class="se.vgregion.web.site.VgrUserFactory" parent="webframework.factory.base" />
+
+</beans>

@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<Audit xmlns="http://www.alfresco.org/repo/audit/model/3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.alfresco.org/repo/audit/model/3.2 alfresco-audit-3.2.xsd">
+
+  <DataExtractors>
+    <DataExtractor name="simpleValue" registeredName="auditModel.extractor.simpleValue" />
+  </DataExtractors>
+
+  <PathMappings>
+    <PathMap source="/alfresco-access" target="/vgr" />
+  </PathMappings>
+
+  <Application name="vgr" key="vgr">
+    <RecordValue key="action" dataExtractor="simpleValue" dataSource="/vgr/transaction/action" dataTrigger="/vgr/transaction/action" />
+    <RecordValue key="user" dataExtractor="simpleValue" dataSource="/vgr/transaction/user" dataTrigger="/vgr/transaction/user" />
+    <RecordValue key="path" dataExtractor="simpleValue" dataSource="/vgr/transaction/path" dataTrigger="/vgr/transaction/path" />
+    <RecordValue key="nodeRef" dataExtractor="simpleValue" dataSource="/vgr/transaction/node" dataTrigger="/vgr/transaction/node" />
+  </Application>
+
+</Audit>

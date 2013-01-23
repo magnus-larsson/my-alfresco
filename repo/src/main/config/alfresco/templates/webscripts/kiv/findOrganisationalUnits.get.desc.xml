@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>Get Organisational Units from KIV</shortname>
+  <description>Get Organisational Units from KIV</description>
+  <url>/vgr/kiv/findOrganisationalUnits</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction allow="readonly">required</transaction>
+</webscript>

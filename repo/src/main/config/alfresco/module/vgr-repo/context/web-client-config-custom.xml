@@ -1,0 +1,25 @@
+<alfresco-config>
+
+  <config evaluator="aspect-name" condition="vgr:cleanable">
+    <property-sheet>
+      <separator name="sep0" display-label="Städningsregler" component-generator="HeaderSeparatorGenerator" />
+      <show-property name="vgr:startDate" display-label="Startdatum för nedräkning för utrensning" />
+      <show-property name="vgr:firstMessageSent" display-label="Första påminnelse skickad" />
+      <show-property name="vgr:secondMessageSent" display-label="Andra påminnelse skickad" />
+    </property-sheet>
+  </config>
+
+  <config evaluator="string-compare" condition="Action Wizards">
+    <aspects>
+      <aspect name="vgr:cleanable" />
+      <aspect name="vgr:watched" />
+    </aspects>
+  </config>
+
+  <config evaluator="string-compare" condition="Content Wizards">
+    <content-types>
+      <type name="vgr:document" />
+    </content-types>
+  </config>
+
+</alfresco-config>

@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>Delete all folders from user home that is not a user home folder</shortname>
+  <description></description>
+  <url>/vgr/deletefolders</url>
+  <format default="json">argument</format>
+  <authentication>admin</authentication>
+  <transaction>required</transaction>
+</webscript>

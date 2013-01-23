@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>Get a list of current system notifications</shortname>
+  <description></description>
+  <url>/vgr/invite/accept</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

@@ -1,0 +1,6 @@
+<webscript>
+  <shortname>Data sources for auto complete widget</shortname>
+  <description>Data sources for auto complete widget</description>
+  <url template="/components/recordType/{documentTypeId}"/>
+  <format default="json">extension</format>
+</webscript>

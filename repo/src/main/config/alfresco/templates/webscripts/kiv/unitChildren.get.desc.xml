@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>Get children of a unit in KIV</shortname>
+  <description>Get children of a unit in our locally cached KIV.</description>
+  <url>/vgr/kiv/unitChildren</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction allow="readonly">required</transaction>
+</webscript>

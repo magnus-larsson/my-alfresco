@@ -1,0 +1,7 @@
+<webscript>
+  <shortname>PuSH documents</shortname>
+  <url>/se/vgregion/alfresco/console/push/send?fromDate={fromDate}&amp;fromTime={fromTime}&amp;toDate={toDate}&amp;toTime={toTime}</url>
+  <format default="json">extension</format>
+  <authentication>admin</authentication>
+  <transaction>required</transaction>
+</webscript>

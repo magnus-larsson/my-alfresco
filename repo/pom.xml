@@ -1,0 +1,273 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>se.vgregion.alfresco</groupId>
+    <artifactId>alfresco-vgr</artifactId>
+    <version>1.3.10</version>
+  </parent>
+
+  <artifactId>alfresco-vgr-repo</artifactId>
+  <packaging>amp</packaging>
+  <name>VGR Alfresco Repo AMP Project</name>
+
+  <properties>
+    <module.id>vgr-repo</module.id>
+    <webapp.name>alfresco</webapp.name>
+    <tomcat.home>${tomcat.repo.home}</tomcat.home>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>se.vgregion</groupId>
+      <artifactId>metadata-client</artifactId>
+      <version>1.0.5</version>
+    </dependency>
+
+    <dependency>
+      <groupId>se.vgregion</groupId>
+      <artifactId>kiv-client</artifactId>
+      <version>1.0.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock</artifactId>
+      <version>2.6.0-RC2</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock-legacy</artifactId>
+      <version>2.6.0-RC2</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock-junit4</artifactId>
+      <version>2.6.0-RC2</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-net</groupId>
+      <artifactId>commons-net</artifactId>
+      <version>2.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.alfresco.cmis.client</groupId>
+      <artifactId>alfresco-opencmis-extension</artifactId>
+      <version>0.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.ldap</groupId>
+      <artifactId>spring-ldap-core-tiger</artifactId>
+      <version>1.3.1.RELEASE</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>spring-tx</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-core</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-beans</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>commons-logging</artifactId>
+          <groupId>commons-logging</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>commons-lang</artifactId>
+          <groupId>commons-lang</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.redpill-linpro.alfresco.module</groupId>
+      <artifactId>metadatawriter</artifactId>
+      <version>3.4.11</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.redpill-linpro.alfresco</groupId>
+      <artifactId>alfresco-cluster-probe</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.alfresco</groupId>
+      <artifactId>jodconverter-core-3.0-beta-3-patched</artifactId>
+      <version>3.4.6.17-enterprise</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.alfresco</groupId>
+      <artifactId>alfresco-enterprise-repo</artifactId>
+      <version>3.4.6.17-enterprise</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>se.vgregion.icc.sd.portal</groupId>
+      <artifactId>portal-schemas</artifactId>
+      <version>1.0.16</version>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>jsr311-api</artifactId>
+      <version>1.1.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjrt</artifactId>
+      <version>1.7.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjweaver</artifactId>
+      <version>1.7.1</version>
+    </dependency>
+
+    <!--
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+      <version>2.6.0</version>
+    </dependency>
+    -->
+  </dependencies>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+      </testResource>
+    </testResources>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>dev</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-clean-plugin</artifactId>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>default</id>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>copy-dependencies</id>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>copy-web-resources</id>
+                <phase>package</phase>
+              </execution>
+              <execution>
+                <id>copy-config-resources-repo</id>
+                <phase>package</phase>
+              </execution>
+              <execution>
+                <id>copy-jrebel-config</id>
+                <phase>package</phase>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>com.redpill-linpro.alfresco</groupId>
+            <artifactId>maven-refresh-webscripts-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>webscripts</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>refresh</goal>
+                </goals>
+                <configuration>
+                  <url>http://localhost:8080/alfresco/service/</url>
+                  <password>admin</password>
+                </configuration>
+              </execution>
+              <execution>
+                <id>clearcache</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>refresh</goal>
+                </goals>
+                <configuration>
+                  <url>http://localhost:8080/alfresco/service/vgr/clearcache</url>
+                  <method>get</method>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.zeroturnaround</groupId>
+            <artifactId>jrebel-maven-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>test</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>wagon-maven-plugin</artifactId>
+            <configuration>
+              <url>scp://alfrescolab01.redpill-linpro.com/opt/alfresco/vgr-3.3.2/amps</url>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+</project>

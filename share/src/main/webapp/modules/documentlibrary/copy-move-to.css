@@ -1,0 +1,50 @@
+
+#copy-move-to {
+  width: 900px;
+}
+
+#copy-move-intersectionlist .copy-move-intersecting {
+  background: white;
+  margin: 5px;
+  border: 1px solid #c4c5c5;
+  text-align: left;
+  width: 100%;
+  padding: 0px;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+}
+ 
+
+#copy-move-intersectionlist .copy-move-intersecting thead tr.labels th {
+  border-bottom: 1px solid #c4c5c5;
+  padding: 6px;
+}
+
+
+#copy-move-intersectionlist .copy-move-intersecting thead tr.name th {
+  background-color: #e3ebec;
+  padding: 6px;
+  border-bottom: 1px solid #c4c5c5;
+}
+
+#copy-move-intersectionlist .copy-move-intersecting thead tr th.label-name {
+  width: 150px;
+  border: none;
+}
+
+#copy-move-intersectionlist .copy-move-intersecting thead th.label-old {
+  width: 350px;
+}
+
+
+
+#copy-move-intersectionlist .copy-move-intersecting tbody td {
+  padding:6px;
+}
+
+
+#copy-move-intersectionlist .copy-move-intersecting  .metadata {
+  background-color: #eee;
+}
+
+

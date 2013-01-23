@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>Utility Service for creating site programmatically</shortname>
+  <description>Utility Service for creating site programmatically</description>
+  <url>/modules/custom-site</url>
+</webscript>

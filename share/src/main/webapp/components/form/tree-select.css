@@ -1,0 +1,95 @@
+
+.treeselect {
+    width: 750px;
+    border: 1px solid #C5D6E2;
+}
+
+
+.treeselect-left {
+    width:  400px;
+    background-color: white;
+    vertical-align: top;
+    text-align: left;
+}
+
+.treeselect-left .treeview {
+    height: 150px;
+    overflow: auto;
+}
+
+.treeselect-left .treeview a,.treeselect-left .treeview a:hover {
+    text-decoration: none;
+}
+
+.treeselect-middle {
+    width:  50px;
+    border-left: 1px solid #C5D6E2;
+    border-right: 1px solid #C5D6E2;
+}
+
+.treeselect-middle button {
+    display: block;
+    margin: 0px auto;
+}
+
+
+.treeselect-right {
+    height: 100%;
+    background-color: white;
+    vertical-align: top;
+    text-align: left;
+}
+
+.treeselect-right ul {
+    width: 300px;
+    height: 150px;
+    overflow: auto;
+    padding: 0px;
+}
+
+.treeselect-right ul li {
+    padding: 2px 3px;
+}
+
+.treeselect-right ul li.even {
+    background-color: #f4faff;
+}
+
+.treeselect-right ul li.odd {
+    background-color: #fdfdfd;
+}
+
+
+.treeselect .ygtvfocus,.treeselect .ygtvfocus .ygtvlabel {
+    background-color: white;
+}
+
+/* highlight */
+.treeselect .ygtv-highlight1 .ygtvcontent,.treeselect .ygtv-highlight1 .ygtvcontent .ygtvlabel,.treeselect-right ul li.selected {
+    background-color: #C5D6E2;
+}
+
+/* disable */
+.treeselect-disabled .treeview {
+    display: none;
+}
+
+.treeselect-full .treeselect-right,.treeselect-full .treeselect-right .odd,.treeselect-full .treeselect-right .even {
+    background-color: #eee;
+}
+
+.treeselect-disabled .treeselect-left,.treeselect-disabled .treeselect-right,.treeselect-disabled .treeselect-right .odd,.treeselect-disabled .treeselect-right .even, .treeselect-disabled .treeselect-middle {
+    background-color: #eee;
+}
+
+.treeselect-disabled .treeselect-middle img {
+    visibility: hidden;
+}
+
+.treeselect-disabled .treeselect-right {
+    color: #aaa;
+}
+
+.fetch-keywords-button {
+    margin: 5px 0 0 0;
+}

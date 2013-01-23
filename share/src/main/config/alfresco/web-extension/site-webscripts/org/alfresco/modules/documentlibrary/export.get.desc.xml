@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>Export dialog</shortname>
+  <description>Export module for Document Library</description>
+  <url>/modules/documentlibrary/export</url>
+</webscript>

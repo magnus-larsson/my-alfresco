@@ -1,0 +1,88 @@
+div.web-preview.shadow {
+    margin-left: -10px;
+    border-right: 1px solid #CCCCCC;
+    border-bottom: 1px solid #CCCCCC;
+}
+
+div.web-preview.shadow span,
+div.web-preview.shadow div {
+    color: #000000;
+}
+
+div.web-preview.shadow .hd {
+    background-color: #FAFAFA;
+    line-height: 40px;
+}
+
+div.web-preview.shadow img,
+div.web-preview.shadow span,
+div.web-preview.shadow input {
+    vertical-align: middle;
+}
+
+div.web-preview.shadow .bd {
+    text-align: center;
+}
+
+div.web-preview.shadow .bd {
+    background-color: #FAFAFA;
+}
+
+div.web-preview.shadow .bd .preview-swf {
+    width: 100%;
+    height: 100px;
+}
+
+div.web-preview.shadow .bd .preview-swf div {
+    padding-top: 30px;
+}
+
+div.web-preview.shadow .bd .preview-swf.has-content {
+    height: 670px;
+}
+
+div.web-preview .bd .image {
+    height: 500px;
+    line-height: 500px;
+    padding-bottom: 1em;
+    z-index: 100;
+}
+
+div.web-preview .bd .image .message {
+    text-align: center;
+    padding-top: 220px;
+    line-height: 1em;
+}
+
+div.web-preview .bd .image img {
+    max-height: 100%;
+    max-width: 100%;
+    overflow: auto;
+}
+
+div.web-preview.shadow .bd .preview-swf.no-preview div {
+    padding-top: 200px;
+}
+
+div.web-preview.real.no-content {
+    visibility: hidden;
+}
+
+div.web-preview.real {
+    z-index: 0;
+}
+
+div.web-preview span.refresh-button {
+    margin: 0 15px 0 10px;
+}
+
+div.web-preview span.refresh-button img {
+    border: 1px solid #bbbbbb;
+    padding: 2px;
+    margin: 0px;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    cursor: pointer;
+    background-color: #eee;
+    position: relative;
+}

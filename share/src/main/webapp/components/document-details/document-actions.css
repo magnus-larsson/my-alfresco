@@ -1,0 +1,60 @@
+/* @overridden projects/slingshot/source/web/components/document-details/document-actions.css */
+
+.document-actions
+{
+   background-color: #fafafa;
+	padding: 1.5em 1em 1.5em 1.5em;
+	border-bottom: 1px solid #cccccc;
+	border-left: 1px solid #cccccc;
+	margin-right: -10px;
+}
+
+.document-actions .heading
+{
+   color: #333333;
+   font-size: 131%;
+   padding-bottom: 1.0em;
+}
+
+.document-actions .doclist
+{
+   visibility: visible;
+}
+
+.document-actions .doclist .action-set a,
+.document-actions .doclist .action-set a:visited
+{
+   border: 1px solid #fafafa;
+}
+
+.document-actions .doclist .action-set a:active,
+.document-actions .doclist .action-set a:hover
+{
+   background-color: #fafafa;
+   text-decoration: none;
+}
+
+.document-actions .doclist .action-set div
+{
+   padding: 0.3em;
+}
+
+.document-actions .doclist .action-set a.action-label,
+.document-actions .doclist .action-set a.action-label:hover, 
+.document-actions .doclist .action-set a.action-label:active,
+.document-actions .doclist .action-set a.action-label:visited
+{
+      background-image: none;
+      border: none;
+      background-color: transparent;
+      color: #333;
+      cursor: default;
+}
+
+.document-actions .doclist .action-set div.action-label 
+{
+   margin-top: 1em;
+   font-size: 110%;
+   cursor: default;
+}
+}

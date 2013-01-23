@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<wsdl:definitions name="KeywordServiceIntServiceImplService" targetNamespace="http://intsvc.keywordservice.metaservice.vgregion.se/"
+  xmlns:ns1="urn:KeywordServices:wsdl:metaservice.vgr.se:v2" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:tns="http://intsvc.keywordservice.metaservice.vgregion.se/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  
+  <wsdl:import location="http://metadataservice.vgregion.se/keywordservice/KeywordService?wsdl=KeywordService.wsdl"
+    namespace="urn:KeywordServices:wsdl:metaservice.vgr.se:v2">
+  </wsdl:import>
+  
+  <wsdl:binding name="KeywordServiceIntServiceImplServiceSoapBinding" type="ns1:KeywordService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="BookmarkKeywords">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="BookmarkKeywords">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="BookmarkKeywordsResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetKeywords">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="GetKeywords">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="GetKeywordsResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetNodeByInternalId">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="GetNodeByInternalId">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="GetNodeByInternalIdResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TagKeywords">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="TagKeywords">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="TagKeywordsResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="KeywordServiceIntServiceImplService">
+    <wsdl:port binding="tns:KeywordServiceIntServiceImplServiceSoapBinding" name="KeywordServiceIntServiceImplPort">
+      <soap:address location="http://metadataservice.vgregion.se/keywordservice/KeywordService" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

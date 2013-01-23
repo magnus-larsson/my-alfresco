@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>Data source getting people</shortname>
+  <description>
+    This data source gets people from from Alfresco which in it's turn may get it from multiple sources.
+  </description>
+  <url template="/components/people?filter={filterQuery?}"/>
+  <format default="json">argument</format>
+</webscript>
