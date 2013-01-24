@@ -8,3 +8,4 @@ webpreviewer/target/**
 *.launch
 .springBeans
 /share/src/main/webapp/components/preview/WebPreviewer.swf
+documentlibrary-actions.js
