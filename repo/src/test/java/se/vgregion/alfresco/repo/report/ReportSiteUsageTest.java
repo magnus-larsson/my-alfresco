@@ -2,14 +2,12 @@ package se.vgregion.alfresco.repo.report;
 
 import static org.junit.Assert.*;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.repo.model.filefolder.FileInfoImpl;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.activities.ActivityService;
 import org.alfresco.service.cmr.model.FileFolderService;
@@ -35,9 +33,9 @@ public class ReportSiteUsageTest {
 	ActivityService activityService;
 	FileInfo fileInfo;
 	SiteInfo siteInfo;
-	String workspaceAndStore = "workspace://SpacesStore/";
-	String dummyNodeId1 = "cafebabe-cafe-babe-cafe-babecafebab1";
-	String dummyNodeId2 = "cafebabe-cafe-babe-cafe-babecafebab2";
+	private static final String WORKSPACE_AND_STORE = "workspace://SpacesStore/";
+	private static final String DUMMY_NODE_ID_1 = "cafebabe-cafe-babe-cafe-babecafebab1";
+	private static final String DUMMY_NODE_ID_2 = "cafebabe-cafe-babe-cafe-babecafebab2";
 
 	@Before
 	public void setUp() throws Exception {
@@ -56,8 +54,8 @@ public class ReportSiteUsageTest {
 	@Test
 	public void testGetSiteSizeSuccess() {
 		ReportSiteUsage rsu = new ReportSiteUsage();
-		final NodeRef siteNodeRef1 = new NodeRef(workspaceAndStore + dummyNodeId1);
-		final NodeRef siteNodeRef2 = new NodeRef(workspaceAndStore + dummyNodeId2);
+		final NodeRef siteNodeRef1 = new NodeRef(WORKSPACE_AND_STORE + DUMMY_NODE_ID_1);
+		final NodeRef siteNodeRef2 = new NodeRef(WORKSPACE_AND_STORE + DUMMY_NODE_ID_2);
 		final List<FileInfo> listFolderInfoEmpty = new ArrayList<FileInfo>();
 		final List<FileInfo> listFolderInfoNonEmpty = new ArrayList<FileInfo>();
 		listFolderInfoNonEmpty.add(fileInfo);
@@ -110,11 +108,11 @@ public class ReportSiteUsageTest {
 	}
 
 	@Test
-	public void testGetSiteSizeFail() {
+	public void testGetSiteSizeFailIfNodeDoesNotExist() {
 		ReportSiteUsage rsu = new ReportSiteUsage();
-		NodeRef siteNodeRef1 = new NodeRef(workspaceAndStore + dummyNodeId1);
-		NodeRef siteNodeRef2 = new NodeRef("fail" + workspaceAndStore
-				+ dummyNodeId2);
+		NodeRef siteNodeRef1 = new NodeRef(WORKSPACE_AND_STORE + DUMMY_NODE_ID_1);
+		NodeRef siteNodeRef2 = new NodeRef("fail" + WORKSPACE_AND_STORE
+				+ DUMMY_NODE_ID_2);
 		rsu.setServiceRegistry(serviceRegistry);
 		context.checking(new Expectations() {
 			{
@@ -132,24 +130,71 @@ public class ReportSiteUsageTest {
 
 		try {
 			rsu.getSiteSize(siteNodeRef1);
-			assertTrue(false);
+			fail();
 		} catch (InvalidNodeRefException e) {
 
 		}
 		try {
 			rsu.getSiteSize(siteNodeRef2);
-			assertTrue(false);
+			fail();
 		} catch (InvalidNodeRefException e) {
 
 		}
 	}
 
+  @Test
+  public void testGetSiteSizeSuccessIfContentIsNull() {
+    ReportSiteUsage rsu = new ReportSiteUsage();
+
+    final NodeRef siteNodeRef = new NodeRef(WORKSPACE_AND_STORE + DUMMY_NODE_ID_1);
+
+    rsu.setServiceRegistry(serviceRegistry);
+
+    final List<FileInfo> listFolderInfoNonEmpty = new ArrayList<FileInfo>();
+    listFolderInfoNonEmpty.add(fileInfo);
+
+    context.checking(new Expectations() {
+      {
+        allowing(serviceRegistry).getNodeService();
+        will(returnValue(nodeService));
+
+        allowing(nodeService).exists(with(any(NodeRef.class)));
+        will(returnValue(true));
+
+        allowing(serviceRegistry).getFileFolderService();
+        will(returnValue(fileFolderService));
+
+        allowing(fileFolderService).searchSimple(siteNodeRef, ReportSiteUsage.DOCUMENT_LIBRARY);
+        will(returnValue(siteNodeRef));
+
+        allowing(fileFolderService).listFiles(siteNodeRef);
+        will(returnValue(listFolderInfoNonEmpty));
+
+        allowing(fileInfo).getContentData();
+        will(returnValue(null));
+
+        allowing(fileFolderService).listDeepFolders(siteNodeRef, null);
+        will(returnValue(listFolderInfoNonEmpty));
+
+        allowing(fileInfo).getNodeRef();
+        will(returnValue(siteNodeRef));
+
+        allowing(fileFolderService).listFiles(siteNodeRef);
+        will(returnValue(listFolderInfoNonEmpty));
+      }
+    });
+
+    long size = rsu.getSiteSize(siteNodeRef);
+
+    assertEquals(0, size);
+  }
+
 	@Test
 	public void testGetNumberOfSiteMembersSuccess() throws Exception {
 		ReportSiteUsage rsu = new ReportSiteUsage();
 		
-		final NodeRef siteNodeRef1 = new NodeRef(workspaceAndStore + dummyNodeId1);
-		final NodeRef siteNodeRef2 = new NodeRef(workspaceAndStore + dummyNodeId2);
+		final NodeRef siteNodeRef1 = new NodeRef(WORKSPACE_AND_STORE + DUMMY_NODE_ID_1);
+		final NodeRef siteNodeRef2 = new NodeRef(WORKSPACE_AND_STORE + DUMMY_NODE_ID_2);
 		final String shortname1 = "site1";
 		final String shortname2 = "site2";
 		rsu.setServiceRegistry(serviceRegistry);
@@ -213,7 +258,7 @@ public class ReportSiteUsageTest {
 	public void testGetNumberOfSiteMembersFail() {
 		ReportSiteUsage rsu = new ReportSiteUsage();
 		
-		final NodeRef siteNodeRef1 = new NodeRef(workspaceAndStore + dummyNodeId1);
+		final NodeRef siteNodeRef1 = new NodeRef(WORKSPACE_AND_STORE + DUMMY_NODE_ID_1);
 		rsu.setServiceRegistry(serviceRegistry);
 		context.checking(new Expectations() {
 			{

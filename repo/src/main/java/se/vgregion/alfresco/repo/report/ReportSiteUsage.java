@@ -10,6 +10,7 @@ import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.activities.ActivityService;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -30,47 +31,63 @@ public class ReportSiteUsage {
 
 	/**
 	 * Get the total size for all files and folders in a site in bytes
-	 * 
+	 *
 	 * @param siteNodeRef
 	 * @return
 	 */
 	public long getSiteSize(NodeRef siteNodeRef) {
 		NodeService nodeService = serviceRegistry.getNodeService();
-		FileFolderService fileFolderService = serviceRegistry
-				.getFileFolderService();
+
+		FileFolderService fileFolderService = serviceRegistry.getFileFolderService();
+
 		long size = 0;
+
 		if (nodeService.exists(siteNodeRef)) {
-			NodeRef dlNodeRef = fileFolderService.searchSimple(siteNodeRef,
-					DOCUMENT_LIBRARY);
+			NodeRef dlNodeRef = fileFolderService.searchSimple(siteNodeRef, DOCUMENT_LIBRARY);
+
 			if (nodeService.exists(dlNodeRef)) {
 				// List files in document library root and calculate size
-				List<FileInfo> listFiles = fileFolderService
-						.listFiles(dlNodeRef);
+				List<FileInfo> listFiles = fileFolderService.listFiles(dlNodeRef);
+
 				for (FileInfo fileInfo : listFiles) {
-					size = size + fileInfo.getContentData().getSize();
+          ContentData contentData = fileInfo.getContentData();
+
+          if (contentData == null) {
+            continue;
+          }
+
+					size = size + contentData.getSize();
 				}
+
 				// List all folders and calculate site for all files
-				List<FileInfo> allFolders = fileFolderService.listDeepFolders(
-						dlNodeRef, null);
+				List<FileInfo> allFolders = fileFolderService.listDeepFolders(dlNodeRef, null);
+
 				for (FileInfo folderInfo : allFolders) {
 					NodeRef folderNodeRef = folderInfo.getNodeRef();
+
 					listFiles = fileFolderService.listFiles(folderNodeRef);
+
 					for (FileInfo fileInfo : listFiles) {
-						size = size + fileInfo.getContentData().getSize();
+            ContentData contentData = fileInfo.getContentData();
+
+            if (contentData == null) {
+              continue;
+            }
+
+            size = size + contentData.getSize();
 					}
 				}
 			}
+
 			return size;
 		} else {
-			throw new InvalidNodeRefException("Site could not be found",
-					siteNodeRef);
+			throw new InvalidNodeRefException("Site could not be found", siteNodeRef);
 		}
-
 	}
 
 	/**
 	 * Get the number of members of a site
-	 * 
+	 *
 	 * @param site
 	 * @return
 	 */
@@ -89,7 +106,7 @@ public class ReportSiteUsage {
 
 	/**
 	 * Get last activity on site (date)
-	 * 
+	 *
 	 * @param siteNodeRef
 	 * @return
 	 * @throws Exception
