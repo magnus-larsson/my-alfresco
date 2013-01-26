@@ -8,7 +8,7 @@ function main() {
       return;
    }
 
-   var query = "TYPE:\"cm:person\" AND email:'" + email + "'";
+   var query = 'TYPE:"cm:person" AND email:"' + email + '"';
 
    var def = {
       query: query,
