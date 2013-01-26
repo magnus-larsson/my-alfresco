@@ -1,8 +1,12 @@
 cmisclient/target/**
+cmisclient/tomcat-home/**
 migration/target/**
+migration/tomcat-home/**
 repo/target/**
 share/target/**
 webpreviewer/target/**
+pdfa-pilot-converter/target/**
+pdfa-pilot-converter/tomcat-home/**
 .idea
 *.iml
 *.launch
