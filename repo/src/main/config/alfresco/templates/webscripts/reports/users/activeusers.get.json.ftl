@@ -4,15 +4,25 @@
 "totalRecords": ${totalRecords?c},
 "startIndex": ${startIndex?c},
 "pageSize": ${pageSize?c},
-"documents": [
-    <#list sites as site>
+"documents": [],
+"internalUsers": [
+    <#list users.internal as user>
     {
-    "title": "${site.title}",
-    "shortName": "${site.shortName}",
-    "size": "${((site.size/1024)/1024)?round}",
-    "members": "${site.members?round}",
-    "lastActivity": "${site.lastActivity}"
-    }<#if site_has_next>,</#if>
+    "userName": "${user.userName}",
+    "fullName": "${user.fullName}",
+    "logins": "${user.logins?round}",
+    "lastActivity": "${user.lastActivity?datetime}"
+    }<#if user_has_next>,</#if>
+    </#list>
+],
+"externalUsers": [
+    <#list users.external as user>
+    {
+    "userName": "${user.userName}",
+    "fullName": "${user.fullName}",
+    "logins": "${user.logins?round}",
+    "lastActivity": "${user.lastActivity?datetime}"
+    }<#if user_has_next>,</#if>
     </#list>
 ]
 }
