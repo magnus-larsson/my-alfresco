@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<page>
+   <title>PDF Maximise</title>
+   <description>Page for maximising a PDF with Adobe Reader Plugin (Windows + IE or Mac + Safari)</description>
+   <template-instance>pdf-maximise</template-instance>
+   <authentication>user</authentication>
+</page>

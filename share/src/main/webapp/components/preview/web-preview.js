@@ -396,9 +396,13 @@
 
                this._setupPdfViewing(previewCtx, swfId);
 
-               // add a refresh button too, this is in the flash viewer but as we
-               // don't have that we have to add it ourselves
-               this._addRefreshButton();
+               if (this.options.mimeType === 'application/pdf' || this.options.hasPdfRendition) {
+                  // add a refresh button too, this is in the flash viewer but as we
+                  // don't have that we have to add it ourselves
+                  this._addRefreshButton();
+
+                  this._addMaximiseButton();
+               }
 
                /**
                 * FF3 and SF4 hides the browser cursor if the flashmovie uses a custom cursor
@@ -430,7 +434,13 @@
                var url = Alfresco.constants.PROXY_URI + "api/node/content/" + this.options.nodeRef.replace(":/", "") + "/" + encodeURIComponent(this.options.name) + "?a=true";
                this.widgets.swfPlayerMessage.innerHTML = this.msg("label.noPreview", url);
 
-               this._addRefreshButton();
+               if (this.options.mimeType === 'application/pdf' || this.options.hasPdfRendition) {
+                  // add a refresh button too, this is in the flash viewer but as we
+                  // don't have that we have to add it ourselves
+                  this._addRefreshButton();
+
+                  this._addMaximiseButton();
+               }
             }
          } else {
             // Shrink the web previewers real estate and tell user that no sufficient flash player is installed
@@ -438,7 +448,13 @@
             this.widgets.realSwfDivEl.addClass("no-content");
             this.widgets.swfPlayerMessage.innerHTML = this.msg("label.noFlash");
 
-            this._addRefreshButton();
+            if (this.options.mimeType === 'application/pdf' || this.options.hasPdfRendition) {
+               // add a refresh button too, this is in the flash viewer but as we
+               // don't have that we have to add it ourselves
+               this._addRefreshButton();
+
+               this._addMaximiseButton();
+            }
          }
 
          // Place the real flash preview div on top of the shadow div
@@ -476,6 +492,27 @@
          Event.addListener("refresh-button-" + this.id, "click", function (e) {
             var newurl = self._updateUrl(document.location.href, "refresh", Math.floor((Math.random() * 10000) + 1));
             document.location = newurl;
+         });
+      },
+
+      _addMaximiseButton: function() {
+         var maximise_button = new Element(document.createElement("span"));
+         maximise_button.appendTo(this.widgets.titleText.parentNode);
+         maximise_button.addClass("maximise-button");
+
+         Dom.setAttribute(maximise_button, "id", "maximise-button-" + this.id);
+         Dom.setAttribute(maximise_button, "alt", this.msg("button.maximisePage"));
+         Dom.setAttribute(maximise_button, "title", this.msg("button.maximisePage"));
+
+         var maximise_button_image = new Element(document.createElement("img"));
+         maximise_button_image.appendTo(maximise_button);
+
+         Dom.setAttribute(maximise_button_image, "src", Alfresco.constants.URL_RESCONTEXT + "components/preview/maximise.png");
+
+         var self = this;
+
+         Event.addListener("maximise-button-" + this.id, "click", function (e) {
+            window.open(Alfresco.constants.URL_PAGECONTEXT + "pdf-maximise?nodeRef=" + self.options.nodeRef, "_blank");
          });
       },
 
@@ -517,7 +554,7 @@
          so.addVariable("i18n_fullwindow_escape", this.msg("preview.fullwindowEscape"));
          so.addVariable("i18n_page", this.msg("preview.page"));
          so.addVariable("i18n_pageOf", this.msg("preview.pageOf"));
-         so.addVariable("show_fullscreen_button", true);
+         so.addVariable("show_maximise_button", true);
          so.addVariable("show_fullwindow_button", true);
          so.addVariable("disable_i18n_input_fix", this.disableI18nInputFix());
          so.addParam("allowScriptAccess", "sameDomain");
