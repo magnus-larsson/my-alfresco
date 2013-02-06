@@ -13,7 +13,7 @@
          <tr>
          	<th colspan="4">Internal Users</th>
          </tr>
-         <#list users.internal as user>
+         <#list internal.users as user>
          <tr>
             <td>${user.userName}</td>
             <td>${user.fullName}</td>
@@ -24,7 +24,7 @@
          <tr>
          	<th colspan="4">External Users</th>
          </tr>
-         <#list users.external as user>
+         <#list external.users as user>
          <tr>
             <td>${user.userName}</td>
             <td>${user.fullName}</td>

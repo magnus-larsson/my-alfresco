@@ -24,12 +24,13 @@ public class ActiveUsers {
 	private final static Logger LOG = Logger.getLogger(ActiveUsers.class);
 	private static final String FULL_NAME_PATH = "/vgr-authentication/login/no-error/fullName";
 	private static final String INTERNAL_ZONE_NAME = "AUTH.EXT.ldapPersonal";
-	
+
 	public static final String INTERNAL_USERS = "internal";
 	public static final String EXTERNAL_USERS = "external";
 
 	private static final int NUM_LOGINS_LIMIT = 5;
-	
+	private static final int ACTIVE_DAYS_BACK = 30;
+
 	public Map<String, List<UserLoginDetails>> getActiveUsersByZone() {
 		Map<String, List<UserLoginDetails>> activeUsersByZone = new HashMap<String, List<UserLoginDetails>>();
 		List<UserLoginDetails> internalUsers = new ArrayList<UserLoginDetails>();
@@ -44,27 +45,28 @@ public class ActiveUsers {
 					.getParentAssocs(person);
 			boolean isInternalUser = false;
 			for (ChildAssociationRef parentAssoc : parentAssocs) {
-				if (ContentModel.ASSOC_IN_ZONE.equals(parentAssoc.getTypeQName())) {
+				if (ContentModel.ASSOC_IN_ZONE.equals(parentAssoc
+						.getTypeQName())) {
 					NodeRef parentRef = parentAssoc.getParentRef();
 					String property = (String) nodeService.getProperty(
 							parentRef, ContentModel.PROP_NAME);
 					if (LOG.isDebugEnabled()) {
-					LOG.debug("User: " + user.getUserName()
-							+ " belongs to zone: " + property);
+						LOG.debug("User: " + user.getUserName()
+								+ " belongs to zone: " + property);
 					}
-					
+
 					if (INTERNAL_ZONE_NAME.equalsIgnoreCase(property)) {
-						//Internal user (ldap user)
-						isInternalUser = true;	
+						// Internal user (ldap user)
+						isInternalUser = true;
 					}
 				}
 			}
-			
+
 			if (isInternalUser) {
-				//Internal user (ldap user)
+				// Internal user (ldap user)
 				internalUsers.add(user);
 			} else {
-				//External user (alfresco internal user)
+				// External user (alfresco internal user)
 				externalUsers.add(user);
 			}
 		}
@@ -137,11 +139,22 @@ public class ActiveUsers {
 
 		AuditQueryParameters parameters = new AuditQueryParameters();
 		parameters.setApplicationName("vgr-authentication");
+		Date now = new Date();
+		long startTime = now.getTime() - ACTIVE_DAYS_BACK * 24 * 3600
+				* 1000;
+		parameters.setFromTime(startTime);
+		parameters.setToTime(now.getTime());
 		auditService.auditQuery(callback, parameters, 0);
-		
-		//Filter out users who are not active
+		if (resultMap.size() == 0) {
+			// If starttime is before logging started the above query will
+			// return 0 results for some reason, so if 0 results are returned,
+			// then search without a limit
+			parameters.setFromTime(null);
+			auditService.auditQuery(callback, parameters, 0);
+		}
+		// Filter out users who are not active
 		for (UserLoginDetails user : resultMap.values()) {
-			if (user.getLogins()>=NUM_LOGINS_LIMIT) {
+			if (user.getLogins() >= NUM_LOGINS_LIMIT) {
 				resultList.add(user);
 			}
 		}

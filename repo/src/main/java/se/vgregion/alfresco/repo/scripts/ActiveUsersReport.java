@@ -31,12 +31,26 @@ public class ActiveUsersReport extends DeclarativeWebScript {
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
-		int size = activeUsersByZone.get(ActiveUsers.INTERNAL_USERS).size()+activeUsersByZone.get(ActiveUsers.EXTERNAL_USERS).size();
-		model.put("users", activeUsersByZone);
-		model.put("recordsReturned", size);
-		model.put("totalRecords", size);
-		model.put("startIndex", 0);
-		model.put("pageSize", size);
+		int size = activeUsersByZone.get(ActiveUsers.INTERNAL_USERS).size();
+		Map<String, Object> internalModel = new HashMap<String, Object>();
+		
+		internalModel.put("users", activeUsersByZone.get(ActiveUsers.INTERNAL_USERS));
+		internalModel.put("recordsReturned", size);
+		internalModel.put("totalRecords", size);
+		internalModel.put("startIndex", 0);
+		internalModel.put("pageSize", size);
+		
+		size = activeUsersByZone.get(ActiveUsers.EXTERNAL_USERS).size();
+		Map<String, Object> externalModel = new HashMap<String, Object>();
+		
+		externalModel.put("users", activeUsersByZone.get(ActiveUsers.EXTERNAL_USERS));
+		externalModel.put("recordsReturned", size);
+		externalModel.put("totalRecords", size);
+		externalModel.put("startIndex", 0);
+		externalModel.put("pageSize", size);
+		
+		model.put(ActiveUsers.INTERNAL_USERS, internalModel);
+		model.put(ActiveUsers.EXTERNAL_USERS, externalModel);
 		/*
 		String sites = req.getParameter("sites");
 

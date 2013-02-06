@@ -4,7 +4,7 @@
 
 <script type="text/javascript">
     //<![CDATA[
-        new RL.StatisticsConsole("${el}").setMessages(${messages});
+        new RL.SiteStatisticsConsole("${el}").setMessages(${messages});
     //]]>
 </script>
 
@@ -20,17 +20,6 @@
             <div class="button-bar">
                 <button type="button" name="${el}-refresh-button-sites" id="${el}-refresh-button-sites">${msg("button.refresh-sites")}</button>
             </div>
-            <!--
-            <div class="header-bar">${msg("statistics-users.label")}</div>
-            
-            <div>
-                <div id="${el}-statistics-users-list" class="-statistics-users-list"></div>
-            </div>
-
-            <div class="button-bar">
-                <button type="button" name="${el}-refresh-button-users" id="${el}-refresh-button-users">${msg("button.refresh-users")}</button>
-            </div>
-            -->
         </div>
     </div>
 </div>
