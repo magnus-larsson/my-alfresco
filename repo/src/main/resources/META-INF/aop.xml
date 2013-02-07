@@ -6,7 +6,16 @@
   <weaver options="-verbose -showWeaveInfo -Xreweavable">
   -->
   <weaver options="-verbose -showWeaveInfo">
+    <!--
     <include within="org.alfresco.repo.thumbnail.ThumbnailServiceImpl" />
+    -->
+
+    <!--
+    <include within="se.vgregion.alfresco.repo.scripts.StorageContentGet" />
+    <include within="se.vgregion.alfresco.repo.web.scripts.content.ContentGet" />
+    <include within="org.alfresco.repo.web.scripts.content.ContentGet" />
+    -->
+
     <!--
     <include within="se.vgregion.alfresco.repo.thumbnail.ThumbnailServiceAspect" />
     -->
@@ -14,6 +23,7 @@
 
   <aspects>
     <aspect name="se.vgregion.alfresco.repo.thumbnail.ThumbnailServiceAspect" />
+    <aspect name="se.vgregion.alfresco.repo.interceptors.RestrictAccessAspect" />
   </aspects>
 
 </aspectj>
