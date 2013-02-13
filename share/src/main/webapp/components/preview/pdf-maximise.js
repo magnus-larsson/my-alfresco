@@ -116,7 +116,7 @@
                toolbar: "1",
                statusbar: "0",
                message: "0",
-               navpanes: "0",
+               navpanes: "0"
             }
          }).embed("pdf");
       }
