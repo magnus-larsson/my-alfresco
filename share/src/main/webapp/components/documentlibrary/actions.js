@@ -372,8 +372,9 @@
       _launchOnlineEditorDisplayPrompt: function (callback) {
          Alfresco.util.PopupManager.displayPrompt({
             title: this.msg("actions.document.edit-online"),
-            text: this.msg("actions.document.edit-online.information"),
+            text: "<span style='color: red'>" + this.msg("actions.document.edit-online.information") + "</span>",
             modal: true,
+            noEscape: true,
             buttons: [
                {
                   text: this.msg("button.ok"),

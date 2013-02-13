@@ -17,8 +17,13 @@
 //]]></script>
 
 <div id="${el}-body" class="people-finder list">
-   
-   <div class="title"><label for="${el}-search-text">${msg("title")}</label></div>
+
+   <div class="title">
+      <label for="${el}-search-text">
+         ${msg("title")}<br/>
+         <span class="title-explanation">${msg("people-finder.title.explanation")}</span>
+      </label>
+   </div>
    
    <div class="finder-wrapper">
       <div class="search-bar theme-bg-color-3">

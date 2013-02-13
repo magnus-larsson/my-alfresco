@@ -73,7 +73,7 @@ div.web-preview.real {
 }
 
 div.web-preview span.refresh-button {
-    margin: 0 15px 0 10px;
+    margin: 0 5px 0 10px;
 }
 
 div.web-preview span.refresh-button img {
@@ -85,4 +85,25 @@ div.web-preview span.refresh-button img {
     cursor: pointer;
     background-color: #eee;
     position: relative;
+}
+
+div.web-preview span.maximise-button {
+    margin: 0;
+}
+
+div.web-preview span.maximise-button img {
+    border: 1px solid #bbbbbb;
+    padding: 2px;
+    margin: 0px;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    cursor: pointer;
+    background-color: #eee;
+    position: relative;
+}
+
+div.web-preview span.title-note {
+    color: #606060;
+    font-weight: normal;
+    padding-left: 5px;
 }

@@ -4,6 +4,8 @@ import org.alfresco.repo.thumbnail.ThumbnailRenditionConvertor;
 import org.alfresco.service.cmr.repository.TransformationOptions;
 import org.alfresco.service.cmr.thumbnail.ThumbnailParentAssociationDetails;
 import se.vgregion.alfresco.repo.content.transform.OpenOfficeTransformationOptions;
+import se.vgregion.alfresco.repo.content.transform.PdfaPilotTransformationOptions;
+import se.vgregion.alfresco.repo.rendition.executer.PdfaPilotRenderingEngine;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -21,6 +23,11 @@ public class CustomThumbnailRenditionConvertor extends ThumbnailRenditionConvert
       parameters.put(OpenOfficeTransformationOptions.OPT_EXPORT_NOTES_PAGES, ooTransformationOptions.getExportNotesPages());
       parameters.put(OpenOfficeTransformationOptions.OPT_PDF_VERSION, ooTransformationOptions.getPdfVersion());
       parameters.put(OpenOfficeTransformationOptions.OPT_USE_LOSSLESS_COMPRESSION, ooTransformationOptions.getUseLosslessCompression());
+    } else if (transformationOptions instanceof PdfaPilotTransformationOptions) {
+      PdfaPilotTransformationOptions pdfaPilotTransformationOptions = (PdfaPilotTransformationOptions) transformationOptions;
+
+      parameters.put(PdfaPilotRenderingEngine.PARAM_LEVEL, pdfaPilotTransformationOptions.getLevel());
+      parameters.put(PdfaPilotRenderingEngine.PARAM_OPTIMIZE, pdfaPilotTransformationOptions.isOptimize());
     }
 
     return parameters;

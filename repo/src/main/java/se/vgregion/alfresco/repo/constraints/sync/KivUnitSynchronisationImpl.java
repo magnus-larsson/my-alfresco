@@ -4,6 +4,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.service.cmr.model.FileFolderService;
+import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -22,6 +23,7 @@ import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.utils.ServiceUtils;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -53,7 +55,8 @@ public class KivUnitSynchronisationImpl implements InitializingBean, KivUnitSync
     _nodeService = nodeService;
   }
 
-  public void setRetryingTransactionHelper(final RetryingTransactionHelper retryingTransactionHelper) {
+  public void setRetryingTransactionHelper(
+          final RetryingTransactionHelper retryingTransactionHelper) {
     _retryingTransactionHelper = retryingTransactionHelper;
   }
 
@@ -67,7 +70,16 @@ public class KivUnitSynchronisationImpl implements InitializingBean, KivUnitSync
 
       @Override
       public Void doWork() throws Exception {
-        doSynchronise();
+        _retryingTransactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>() {
+
+          public Object execute() throws Throwable {
+            List<NodeRef> actualNodes = new ArrayList<NodeRef>();
+
+            doSynchronise(actualNodes);
+
+            return null;
+          }
+        }, false, false);
 
         LOG.info("Finished synchronising KIV units.");
 
@@ -77,61 +89,98 @@ public class KivUnitSynchronisationImpl implements InitializingBean, KivUnitSync
     }, AuthenticationUtil.getSystemUserName());
   }
 
-  private void doSynchronise() {
-    final Date start = new Date();
+  private void doSynchronise(final List<NodeRef> actualNodes) {
 
     final List<KivUnit> units = _kivService.findOrganisationalUnits();
 
     if (units.size() > 0) {
-      synchroniseUnits(units);
+      synchroniseUnits(actualNodes, units);
     }
 
-    deleteRemovedUnits(start);
+    // deleteRemovedUnits();
   }
 
-  private void deleteRemovedUnits(final Date start) {
-    final Long startTime = start.getTime();
+  private void deleteRemovedUnits() {
+    /*
+     * final Long startTime = start.getTime();
+		 *
+		 * final String query =
+		 * "TYPE:\"kiv:unit\" AND  @kiv\\:accessed:[MIN TO " + startTime + "]";
+		 *
+		 * final ResultSet nodeRefs = search(query);
+		 *
+		 * try { LOG.info("Query to find removed KIV units:"); LOG.info(query);
+		 * LOG.info("Number of deleted KIV units: " + nodeRefs.length()); }
+		 * finally { ServiceUtils.closeQuietly(nodeRefs); }
+		 */
 
-    final String query = "TYPE:\"kiv:unit\" AND  @kiv\\:accessed:[MIN TO " + startTime + "]";
+    LOG.debug("Starting processing of deleted Units");
+    List<FileInfo> listDeepFolders = _fileFolderService.listDeepFolders(getKivStorageNode(), null);
 
-    final ResultSet nodeRefs = search(query);
+    for (FileInfo folder : listDeepFolders) {
 
-    try {
-      LOG.info("Query to find removed KIV units:");
-      LOG.info(query);
-      LOG.info("Number of deleted KIV units: " + nodeRefs.length());
-    } finally {
-      ServiceUtils.closeQuietly(nodeRefs);
     }
+
+    LOG.info("Processing of deleted KIV units complete");
+    // TODO
   }
 
-  private void synchroniseUnits(final List<KivUnit> units) {
-    synchroniseUnits(units, null);
+  private void synchroniseUnits(final List<NodeRef> actualNodes, final List<KivUnit> units) {
+    synchroniseUnits(actualNodes, units, null);
   }
 
-  private void synchroniseUnits(final List<KivUnit> units, final KivUnit parentUnit) {
+  private void synchroniseUnits(final List<NodeRef> actualNodes, final List<KivUnit> units,
+                                final KivUnit parentUnit) {
     for (final KivUnit unit : units) {
+
       final NodeRef parentNodeRef = findNodeRef(parentUnit);
 
-      synchroniseUnit(unit, parentNodeRef);
+      _retryingTransactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>() {
+
+        public Object execute() throws Throwable {
+          synchroniseUnit(actualNodes, unit, parentNodeRef);
+          return null;
+        }
+
+      }, false, true);
 
       final List<KivUnit> subunits = _kivService.findOrganisationalUnits(unit.getDistinguishedName());
 
       if (subunits.size() > 0) {
-        synchroniseUnits(subunits, unit);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Processing " + subunits.size() + " subunits for " + unit.getDistinguishedName());
+        }
+
+        synchroniseUnits(actualNodes, subunits, unit);
       }
     }
   }
 
-  private void synchroniseUnit(final KivUnit unit, final NodeRef parentNodeRef) {
-    final NodeRef nodeRef = findNodeRef(unit);
+  private void synchroniseUnit(final List<NodeRef> actualNodes, final KivUnit unit, final NodeRef parentNodeRef) {
+    NodeRef nodeRef = findNodeRef(unit);
+
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("# of nodes processed: " + actualNodes.size());
+    }
 
     if (nodeRef == null) {
-      createNode(unit, parentNodeRef);
+      nodeRef = createNode(unit, parentNodeRef);
 
-      LOG.info("Created: node '" + unit.getOrganisationalUnit() + "' created");
+      LOG.info("Created: node '" + unit.getOrganisationalUnit()
+              + "' created");
+      if (actualNodes.contains(nodeRef)) {
+        LOG.warn("Node " + nodeRef + " already processed");
+      } else {
+        actualNodes.add(nodeRef);
+      }
 
       return;
+    }
+
+    if (actualNodes.contains(nodeRef)) {
+      LOG.warn("Node " + nodeRef + " already processed");
+    } else {
+      actualNodes.add(nodeRef);
     }
 
     final boolean updated = updateNode(unit, nodeRef);
@@ -150,7 +199,8 @@ public class KivUnitSynchronisationImpl implements InitializingBean, KivUnitSync
       return;
     }
 
-    // last but not the least, if neither created nor updated at least update
+    // last but not the least, if neither created nor updated at least
+    // update
     // the accessed date...
     markUnitAsAccessed(nodeRef);
   }
@@ -198,6 +248,7 @@ public class KivUnitSynchronisationImpl implements InitializingBean, KivUnitSync
     final Map<QName, Serializable> updatedValues = new HashMap<QName, Serializable>();
 
     final String liveHsaIdentity = unit.getHsaIdentity();
+
     final Serializable savedHsaIdentity = _nodeService.getProperty(nodeRef, VgrModel.PROP_KIV_HSAIDENTITY);
 
     if (isChanged(liveHsaIdentity, savedHsaIdentity)) {
@@ -205,6 +256,7 @@ public class KivUnitSynchronisationImpl implements InitializingBean, KivUnitSync
     }
 
     final String liveOu = unit.getOrganisationalUnit();
+
     final Serializable savedOu = _nodeService.getProperty(nodeRef, VgrModel.PROP_KIV_OU);
 
     if (isChanged(liveOu, savedOu)) {
@@ -223,7 +275,8 @@ public class KivUnitSynchronisationImpl implements InitializingBean, KivUnitSync
     return updated;
   }
 
-  private void createNode(final KivUnit unit, final NodeRef parentUnitNodeRef) {
+  private NodeRef createNode(final KivUnit unit,
+                             final NodeRef parentUnitNodeRef) {
     final NodeRef parent = parentUnitNodeRef != null ? parentUnitNodeRef : getKivTypeNode();
 
     final String name = getValidName(unit.getOrganisationalUnit()) + " - " + unit.getHsaIdentity();
@@ -237,12 +290,14 @@ public class KivUnitSynchronisationImpl implements InitializingBean, KivUnitSync
     properties.put(VgrModel.PROP_KIV_ACCESSED, new Date().getTime());
 
     final String uri = _nodeService.getPrimaryParent(parent).getQName().getNamespaceURI();
+
     final String validLocalName = QName.createValidLocalName(unit.getOrganisationalUnit());
 
-    final NodeRef unitNodeRef = _nodeService.createNode(parent, ContentModel.ASSOC_CONTAINS, QName.createQName(uri, validLocalName),
-            VgrModel.TYPE_KIV_UNIT).getChildRef();
+    final NodeRef unitNodeRef = _nodeService.createNode(parent, ContentModel.ASSOC_CONTAINS, QName.createQName(uri, validLocalName), VgrModel.TYPE_KIV_UNIT).getChildRef();
 
     _nodeService.addProperties(unitNodeRef, properties);
+
+    return unitNodeRef;
   }
 
   private NodeRef getKivTypeNode() {
@@ -261,10 +316,10 @@ public class KivUnitSynchronisationImpl implements InitializingBean, KivUnitSync
     final NodeRef kivStorageNode = getKivStorageNode();
 
     final String uri = _nodeService.getPrimaryParent(kivStorageNode).getQName().getNamespaceURI();
+
     final String validLocalName = QName.createValidLocalName("units");
 
-    final NodeRef kivTypeNode = _nodeService.createNode(kivStorageNode, ContentModel.ASSOC_CONTAINS, QName.createQName(uri, validLocalName),
-            ContentModel.TYPE_FOLDER).getChildRef();
+    final NodeRef kivTypeNode = _nodeService.createNode(kivStorageNode, ContentModel.ASSOC_CONTAINS, QName.createQName(uri, validLocalName), ContentModel.TYPE_FOLDER).getChildRef();
 
     _nodeService.setProperty(kivTypeNode, ContentModel.PROP_NAME, "Units");
 
@@ -292,10 +347,10 @@ public class KivUnitSynchronisationImpl implements InitializingBean, KivUnitSync
     final NodeRef dataDictionaryNode = getDataDictionaryNode();
 
     final String uri = _nodeService.getPrimaryParent(dataDictionaryNode).getQName().getNamespaceURI();
+
     final String validLocalName = QName.createValidLocalName("kiv");
 
-    final NodeRef kivStorageNode = _nodeService.createNode(dataDictionaryNode, ContentModel.ASSOC_CONTAINS, QName.createQName(uri, validLocalName),
-            ContentModel.TYPE_FOLDER).getChildRef();
+    final NodeRef kivStorageNode = _nodeService.createNode(dataDictionaryNode, ContentModel.ASSOC_CONTAINS, QName.createQName(uri, validLocalName), ContentModel.TYPE_FOLDER).getChildRef();
 
     _nodeService.setProperty(kivStorageNode, ContentModel.PROP_NAME, "Kiv");
 

@@ -710,9 +710,11 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     final String sourceMimetype = _serviceUtils.getMimetype(nodeRef);
 
     // this process does not yet support the conversion of PDF -> PDF...
+    /*
     if (sourceMimetype.equalsIgnoreCase(MimetypeMap.MIMETYPE_PDF)) {
       return false;
     }
+    */
 
     // must first check whether the nodeRef can be transformed into a PDF or
     // not...

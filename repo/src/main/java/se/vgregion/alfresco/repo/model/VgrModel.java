@@ -122,6 +122,8 @@ public interface VgrModel {
 
   public static final String DEFAULT_LANGUAGE = "Svenska";
   public static final String DEFAULT_ACCESS_RIGHT = "Intranät";
+  public static final String ACCESS_RIGHT_INTRANET = "Intranät";
+  public static final String ACCESS_RIGHT_INTERNET = "Internet";
 
   public static final QName RD_PDF = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "pdf");
 

@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<template-instance>
+  <template-type>org/alfresco/pdf-maximise</template-type>
+  <components>
+    <component>
+      <region-id>pdf-maximise</region-id>
+      <url>/components/preview/pdf-maximise</url>
+      <properties>
+        <nodeRef>{nodeRef}</nodeRef>
+      </properties>
+    </component>
+  </components>
+</template-instance>

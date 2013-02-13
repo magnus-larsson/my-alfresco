@@ -4,7 +4,7 @@
   <parent>
     <groupId>se.vgregion.alfresco</groupId>
     <artifactId>alfresco-vgr</artifactId>
-    <version>1.3.10</version>
+    <version>1.3.11</version>
   </parent>
 
   <artifactId>alfresco-vgr-repo</artifactId>
@@ -153,6 +153,12 @@
       <version>2.6.0</version>
     </dependency>
     -->
+
+    <dependency>
+      <groupId>se.vgregion.alfresco.repo.content.transform</groupId>
+      <artifactId>pdfa-pilot-converter</artifactId>
+      <version>1.0.0</version>
+    </dependency>
   </dependencies>
 
   <build>
