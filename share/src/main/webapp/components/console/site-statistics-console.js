@@ -9,10 +9,10 @@ if (typeof RL == "undefined" || !RL) {
 }
 
 /**
- * Admin Console Statistics Console
+ * Admin Console Site Statistics Console
  *
  * @namespace Alfresco
- * @class RL.StatisticsConsole
+ * @class RL.SiteStatisticsConsole
  */
 (function () {
    /**
@@ -25,17 +25,17 @@ if (typeof RL == "undefined" || !RL) {
    var Bubbling = YAHOO.Bubbling;
 
    /**
-    * StatisticsConsole constructor.
+    * SiteStatisticsConsole constructor.
     *
     * @param {String}
       *           htmlId The HTML id of the parent element
-    * @return {RL.StatisticsConsole} The new StatisticsConsole instance
+    * @return {RL.SiteStatisticsConsole} The new SiteStatisticsConsole instance
     * @constructor
     */
-   RL.StatisticsConsole = function (htmlId) {
-      this.name = "RL.StatisticsConsole";
+   RL.SiteStatisticsConsole = function (htmlId) {
+      this.name = "RL.SiteStatisticsConsole";
 
-      RL.StatisticsConsole.superclass.constructor.call(this, htmlId);
+      RL.SiteStatisticsConsole.superclass.constructor.call(this, htmlId);
 
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
@@ -96,7 +96,7 @@ if (typeof RL == "undefined" || !RL) {
 
             var renderCellLastActivity = function (cell, record, column, data) {
             	if (data=="") {
-            		data = Alfresco.util.message("statistics-console.noactivity", "RL.StatisticsConsole");
+            		data = Alfresco.util.message("statistics-console.noactivity", "RL.SiteStatisticsConsole");
             	}
             	cell.innerHTML = $html(data);
             };
@@ -147,7 +147,7 @@ if (typeof RL == "undefined" || !RL) {
       return this;
    };
 
-   YAHOO.extend(RL.StatisticsConsole, Alfresco.ConsoleTool, {
+   YAHOO.extend(RL.SiteStatisticsConsole, Alfresco.ConsoleTool, {
 
       /**
        * Fired by YUI when parent element is available for scripting. Component initialisation, including instantiation of YUI widgets and event listener binding.
@@ -158,7 +158,7 @@ if (typeof RL == "undefined" || !RL) {
          var self = this;
 
          // Call super-class onReady() method
-         RL.StatisticsConsole.superclass.onReady.call(this);
+         RL.SiteStatisticsConsole.superclass.onReady.call(this);
 
          // Hook action events
          var fnActionHandler = function (layer, args) {
@@ -193,7 +193,7 @@ if (typeof RL == "undefined" || !RL) {
        * @private
        */
       _msg: function (messageId) {
-         return Alfresco.util.message.call(this, messageId, "RL.StatisticsConsole", Array.prototype.slice.call(arguments).slice(1));
+         return Alfresco.util.message.call(this, messageId, "RL.SiteStatisticsConsole", Array.prototype.slice.call(arguments).slice(1));
       },
 
       doSearch: function () {
@@ -201,7 +201,7 @@ if (typeof RL == "undefined" || !RL) {
          this._setDefaultDataTableErrors(this.widgets.dataTable);
 
          // Display loading message
-         this.widgets.dataTable.set("MSG_EMPTY", Alfresco.util.message("statistics-console.searching", "RL.StatisticsConsole"));
+         this.widgets.dataTable.set("MSG_EMPTY", Alfresco.util.message("statistics-console.searching", "RL.SiteStatisticsConsole"));
 
          // empty results table
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
@@ -273,8 +273,8 @@ if (typeof RL == "undefined" || !RL) {
        */
       _setDefaultDataTableErrors: function (dataTable) {
          var msg = Alfresco.util.message;
-         dataTable.set("MSG_EMPTY", msg("message.empty", "RL.StatisticsConsole"));
-         dataTable.set("MSG_ERROR", msg("message.error", "RL.StatisticsConsole"));
+         dataTable.set("MSG_EMPTY", msg("message.empty", "RL.SiteStatisticsConsole"));
+         dataTable.set("MSG_ERROR", msg("message.error", "RL.SiteStatisticsConsole"));
       }
 
    });

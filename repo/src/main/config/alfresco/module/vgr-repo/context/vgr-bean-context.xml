@@ -483,5 +483,17 @@
     <property name="serviceRegistry" ref="ServiceRegistry" />
     <property name="activityService" ref="activityService" />
   </bean>
+  
+  <!-- ***************************************************************************************************** -->
+  <!-- Report active users statistics web script and utility classes																	 -->
+  <!-- ***************************************************************************************************** -->
+
+  <bean id="webscript.reports.users.activeusers.get" class="se.vgregion.alfresco.repo.scripts.ActiveUsersReport" parent="webscript">
+    <property name="serviceRegistry" ref="ServiceRegistry" />
+  </bean>
+  
+  <bean id="reportActiveUsers" class="se.vgregion.alfresco.repo.report.ActiveUsers">
+    <property name="serviceRegistry" ref="ServiceRegistry" />
+  </bean>
 
 </beans>
