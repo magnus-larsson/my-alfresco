@@ -14,6 +14,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -222,7 +223,8 @@ public class PdfaPilotContentTransformerWorker extends ContentTransformerHelper 
 
     RuntimeExec.ExecutionResult result = _executer.execute(properties, timeoutMs);
 
-    if (result.getExitValue() != 0) {
+    // everything from pdfaPilot that's equal to or above 100 is an error
+    if (result.getExitValue() >= 100) {
       throw new ContentIOException("Failed to perform pdfaPilot transformation: \n" + result);
     }
 
@@ -276,8 +278,9 @@ public class PdfaPilotContentTransformerWorker extends ContentTransformerHelper 
   public boolean pingServer() {
     boolean result;
 
+    final TelnetClient telnetClient = new TelnetClient();
+
     try {
-      final TelnetClient telnetClient = new TelnetClient();
 
       telnetClient.setDefaultTimeout(1000);
       telnetClient.setConnectTimeout(1000);
@@ -287,6 +290,12 @@ public class PdfaPilotContentTransformerWorker extends ContentTransformerHelper 
       result = true;
     } catch (final Exception ex) {
       result = false;
+    } finally {
+      try {
+        telnetClient.disconnect();
+      } catch (IOException e) {
+        LOG.error(e.getMessage(), e);
+      }
     }
 
     return result;
