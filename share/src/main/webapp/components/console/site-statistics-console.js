@@ -28,7 +28,7 @@ if (typeof RL == "undefined" || !RL) {
     * SiteStatisticsConsole constructor.
     *
     * @param {String}
-      *           htmlId The HTML id of the parent element
+    *           htmlId The HTML id of the parent element
     * @return {RL.SiteStatisticsConsole} The new SiteStatisticsConsole instance
     * @constructor
     */
@@ -87,18 +87,56 @@ if (typeof RL == "undefined" || !RL) {
             };
 
             var renderCellSize = function (cell, record, column, data) {
-               cell.innerHTML = $html(data);
+               var shortName = record.getData('shortName');
+
+               Alfresco.util.Ajax.jsonGet({
+                  url : Alfresco.constants.PROXY_URI + "vgr/reports/siteSize?shortName=" + shortName,
+                  successCallback : {
+                     fn : function(res) {
+                        cell.innerHTML = $html(Math.round(res.json.siteSize / 1024 / 1024));
+                     },
+                     scope : this
+                  }
+               });
             };
 
             var renderCellMembers = function (cell, record, column, data) {
-               cell.innerHTML = $html(data);
+               var shortName = record.getData('shortName');
+
+               Alfresco.util.Ajax.jsonGet({
+                  url : Alfresco.constants.PROXY_URI + "vgr/reports/numberOfSiteMembers?shortName=" + shortName,
+                  successCallback : {
+                     fn : function(res) {
+                        cell.innerHTML = $html(res.json.numberOfSiteMembers);
+                     },
+                     scope : this
+                  }
+               });
             };
 
             var renderCellLastActivity = function (cell, record, column, data) {
-            	if (data=="") {
-            		data = Alfresco.util.message("statistics-console.noactivity", "RL.SiteStatisticsConsole");
-            	}
-            	cell.innerHTML = $html(data);
+               var shortName = record.getData('shortName');
+
+               Alfresco.util.Ajax.jsonGet({
+                  url : Alfresco.constants.PROXY_URI + "vgr/reports/lastActivityOnSite?shortName=" + shortName,
+                  successCallback : {
+                     fn : function(res) {
+                        var lastActivityOnSite = res.json.lastActivityOnSite;
+
+                        if (lastActivityOnSite == "") {
+                           lastActivityOnSite = Alfresco.util.message("statistics-console.noactivity", "RL.SiteStatisticsConsole");
+                        }
+
+                        cell.innerHTML = $html(lastActivityOnSite);
+                     },
+                     scope : this
+                  },
+                  failureCallback : {
+                     fn : function(res) {
+                     },
+                     scope : this
+                  }
+               });
             };
 
             var columnDefinitions = [
@@ -128,10 +166,7 @@ if (typeof RL == "undefined" || !RL) {
                MSG_EMPTY: parent._msg("message.empty"),
                dynamicData: true,
                generateRequest: generateRequest,
-               initialRequest: generateRequest()/*,
-               paginator: new YAHOO.widget.Paginator({
-                  rowsPerPage: 1000000
-               })*/
+               initialRequest: generateRequest()
             });
 
             parent.widgets.dataTable.doBeforeLoadData = function (request, response, payload) {
@@ -176,10 +211,6 @@ if (typeof RL == "undefined" || !RL) {
          Bubbling.addDefaultAction("action-link", fnActionHandler);
       },
 
-      onActionCreate: function(asset) {
-        this.onPdfaClick(asset.nodeRef);
-      },
-
       onRefreshClick: function () {
          this.doSearch();
       },
@@ -215,8 +246,8 @@ if (typeof RL == "undefined" || !RL) {
                noEscape: true
             });
          };
-         
-         
+
+
          // slow data webscript message
          var timerShowLoadingMessage = YAHOO.lang.later(2000, this, fnShowLoadingMessage);
 
