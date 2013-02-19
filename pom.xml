@@ -15,6 +15,7 @@
   <name>VGR Alfresco Base Project</name>
 
   <modules>
+    <module>sharepoint</module>
     <module>webpreviewer</module>
     <module>pdfa-pilot-converter</module>
     <module>repo</module>
