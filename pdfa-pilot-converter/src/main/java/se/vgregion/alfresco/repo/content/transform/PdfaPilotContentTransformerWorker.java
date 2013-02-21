@@ -180,9 +180,9 @@ public class PdfaPilotContentTransformerWorker extends ContentTransformerHelper 
     transformInternal(sourceFile, targetFile, options);
 
     // upload the output document
-    if (finalTargetFile.exists()) {
+    if (finalTargetFile.exists() && finalTargetFile.length() > 0) {
       writer.putContent(finalTargetFile);
-    } else if (targetFile.exists()) {
+    } else if (targetFile.exists() && targetFile.length() > 0) {
       writer.putContent(targetFile);
     } else {
       throw new ContentIOException("pdfaPilot transformation failed to write output file");
