@@ -1,6 +1,8 @@
 package se.vgregion.alfresco.repo.scripts;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -23,10 +25,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 
 import se.vgregion.alfresco.repo.utils.ServiceUtils;
-import de.schlichtherle.io.FileInputStream;
-import de.schlichtherle.io.FileOutputStream;
-
-
 
 public class ScriptServiceUtils extends BaseScopableProcessorExtension implements InitializingBean {
 

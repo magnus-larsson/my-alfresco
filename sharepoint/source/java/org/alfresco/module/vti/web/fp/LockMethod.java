@@ -19,8 +19,6 @@
 
 package org.alfresco.module.vti.web.fp;
 
-import java.io.IOException;
-
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.model.FileNotFoundException;
@@ -28,7 +26,6 @@ import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
 import org.springframework.extensions.surf.util.URLDecoder;
 
 /**
@@ -46,7 +43,7 @@ public class LockMethod extends org.alfresco.repo.webdav.LockMethod
     }
 
     /** 
-     * @see org.alfresco.repo.webdav.WebDAVMethod#getNodeForPath(org.alfresco.service.cmr.repository.NodeRef, String, String)
+     * @see org.alfresco.repo.webdav.WebDAVMethod#getNodeForPath(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, java.lang.String)
      */    
     @Override
     protected FileInfo getNodeForPath(NodeRef rootNodeRef, String path, String servletPath) throws FileNotFoundException
@@ -57,7 +54,7 @@ public class LockMethod extends org.alfresco.repo.webdav.LockMethod
     }
 
     /**
-     * @see org.alfresco.repo.webdav.LockMethod#createNode(org.alfresco.service.cmr.repository.NodeRef, String, org.alfresco.service.namespace.QName)
+     * @see org.alfresco.repo.webdav.LockMethod#createNode(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, org.alfresco.service.namespace.QName)
      */
     @Override
     protected FileInfo createNode(NodeRef parentNodeRef, String name, QName typeQName)
@@ -100,25 +97,26 @@ public class LockMethod extends org.alfresco.repo.webdav.LockMethod
     }
 
     /**
-     * @see org.alfresco.repo.webdav.WebDAVMethod#flushXML(org.dom4j.io.XMLWriter)
+     * @see org.alfresco.repo.webdav.WebDAVMethod#shouldFlushXMLWriter()
      */
     @Override
-    protected void flushXML(XMLWriter xml) throws IOException
+    protected boolean shouldFlushXMLWriter()
     {
-        // Do nothing, related to specific Office behaviour
+        // Do not flush, related to specific Office behaviour
+    	return false;
     }
 
     /**
      * @see org.alfresco.repo.webdav.WebDAVMethod#createXMLWriter()
      */
     @Override
-    protected XMLWriter createXMLWriter() throws IOException
+    protected OutputFormat getXMLOutputFormat()
     {
         OutputFormat outputFormat = new OutputFormat();
         outputFormat.setNewLineAfterDeclaration(false);
         outputFormat.setNewlines(false);
         outputFormat.setIndent(false);
-        return new XMLWriter(m_response.getWriter(), outputFormat);
+        return outputFormat;
     }
 
 }

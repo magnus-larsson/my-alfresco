@@ -18,7 +18,6 @@
  */
 package org.alfresco.module.vti.web.fp;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -165,7 +164,7 @@ public class PropfindMethod extends WebDAVMethod
         m_response.setContentType(WebDAV.XML_CONTENT_TYPE);
 
         // Create multistatus response
-        XMLWriter xml = createMSWebDavXmlWriter();
+        XMLWriter xml = createXMLWriter();
 
         xml.startDocument();
 
@@ -308,7 +307,7 @@ public class PropfindMethod extends WebDAVMethod
         xml.endElement(WebDAV.DAV_NS, WebDAV.XML_MULTI_STATUS, WebDAV.XML_NS_MULTI_STATUS);
 
         // Send remaining data
-        xml.flush();
+        flushXML(xml);
     }
 
     /**
@@ -610,7 +609,7 @@ public class PropfindMethod extends WebDAVMethod
     /**
      * Parse the request headers
      * 
-     * @exception org.alfresco.repo.webdav.WebDAVServerException
+     * @exception WebDAVServerException
      */
     protected void parseRequestHeaders() throws WebDAVServerException
     {
@@ -637,7 +636,7 @@ public class PropfindMethod extends WebDAVMethod
     /**
      * Parse the request body
      * 
-     * @exception org.alfresco.repo.webdav.WebDAVServerException
+     * @exception WebDAVServerException
      */
     protected void parseRequestBody() throws WebDAVServerException
     {
@@ -666,13 +665,14 @@ public class PropfindMethod extends WebDAVMethod
         }
     }
 
-    private XMLWriter createMSWebDavXmlWriter() throws IOException
+    @Override
+    protected OutputFormat getXMLOutputFormat()
     {
         OutputFormat outputFormat = new OutputFormat();
         outputFormat.setNewLineAfterDeclaration(false);
         outputFormat.setNewlines(false);
         outputFormat.setIndent(false);
-        return new XMLWriter(m_response.getWriter(), outputFormat);
+        return outputFormat;
     }
 
     public static String convertDateToVersion(Date date)
