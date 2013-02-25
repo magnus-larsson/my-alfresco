@@ -262,6 +262,7 @@
     <property name="nodeService" ref="nodeService" />
     <property name="retryingTransactionHelper" ref="retryingTransactionHelper" />
     <property name="fileFolderService" ref="FileFolderService" />
+    <property name="jobLockService" ref="JobLockService" />
   </bean>
 
   <!-- ***************************** -->
