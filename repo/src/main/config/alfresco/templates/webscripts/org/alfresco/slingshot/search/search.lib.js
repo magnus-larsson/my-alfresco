@@ -23,7 +23,7 @@
 const DEFAULT_MAX_RESULTS = 250;
 const SITES_SPACE_QNAME_PATH = "/app:company_home/st:sites/";
 const DISCUSSION_QNAMEPATH = "/fm:discussion";
-const COMMENT_QNAMEPATH = DISCUSSION_QNAMEPATH + "/cm:Comments/";
+const COMMENT_QNAMEPATH = DISCUSSION_QNAMEPATH + "/cm:Comments";
 const QUERY_TEMPLATES = [
    {field: "keywords", template: "%(cm:name cm:title cm:description ia:whatEvent ia:descriptionEvent lnk:title lnk:description TEXT TAG)"}];
 
@@ -773,7 +773,7 @@ function getSearchResults(params)
                            // work out if "from" and/or "to" are specified - use MIN and MAX otherwise;
                            // we only want the "YYYY-MM-DD" part of the ISO date value - so crop the strings
                            from = (sepindex === 0 ? "MIN" : propValue.substr(0, 10));
-                           to = (sepindex === propValue.length - 1 ? "MAX" : propValue.substr(sepindex + 1, sepindex + 10));
+                           to = (sepindex === propValue.length - 1 ? "MAX" : propValue.substr(sepindex + 1, 10));
                         }
                         else
                         {

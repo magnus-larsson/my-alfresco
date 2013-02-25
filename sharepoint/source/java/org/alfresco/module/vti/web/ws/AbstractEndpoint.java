@@ -152,14 +152,6 @@ public abstract class AbstractEndpoint implements VtiEndpoint
      */ 
     public static String getHost(VtiSoapRequest request)
     {
-        Enumeration headers = request.getHeaderNames();
-        while (headers.hasMoreElements()) {
-          String headerName = headers.nextElement().toString();
-          String headerValue = request.getHeader(headerName);
-
-          System.out.println(headerName + " = " + headerValue);
-        }
-
         return request.getScheme() + "://" + request.getHeader("Host");
     }
 

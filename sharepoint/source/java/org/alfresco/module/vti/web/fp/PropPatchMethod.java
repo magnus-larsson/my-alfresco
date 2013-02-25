@@ -18,8 +18,6 @@
 */
 package org.alfresco.module.vti.web.fp;
 
-import java.io.IOException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
@@ -27,7 +25,6 @@ import org.alfresco.repo.webdav.WebDAV;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.model.FileNotFoundException;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.dom4j.io.XMLWriter;
 import org.springframework.extensions.surf.util.URLDecoder;
 
 /**
@@ -45,7 +42,7 @@ public class PropPatchMethod extends org.alfresco.repo.webdav.PropPatchMethod
     }
     
     /**
-     * @see org.alfresco.repo.webdav.WebDAVMethod#getNodeForPath(org.alfresco.service.cmr.repository.NodeRef, String, String)
+     * @see org.alfresco.repo.webdav.WebDAVMethod#getNodeForPath(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, java.lang.String)
      */
     @Override
     protected FileInfo getNodeForPath(NodeRef rootNodeRef, String path, String servletPath) throws FileNotFoundException
@@ -56,7 +53,7 @@ public class PropPatchMethod extends org.alfresco.repo.webdav.PropPatchMethod
     }
     
     /**
-     * @see org.alfresco.repo.webdav.WebDAVMethod#getURLForPath(javax.servlet.http.HttpServletRequest, String, boolean)
+     * @see org.alfresco.repo.webdav.WebDAVMethod#getURLForPath(javax.servlet.http.HttpServletRequest, java.lang.String, boolean)
      */
     @Override
     protected String getURLForPath(HttpServletRequest request, String path, boolean isFolder)
@@ -72,12 +69,13 @@ public class PropPatchMethod extends org.alfresco.repo.webdav.PropPatchMethod
     }    
     
     /**
-     * @see org.alfresco.repo.webdav.WebDAVMethod#flushXML(org.dom4j.io.XMLWriter)
+     * @see org.alfresco.repo.webdav.WebDAVMethod#shouldFlushXMLWriter()
      */
     @Override
-    protected void flushXML(XMLWriter xml) throws IOException
+    protected boolean shouldFlushXMLWriter()
     {
-        // Do nothing, related to specific Office behaviour
+        // Do not flush, related to specific Office behaviour
+    	return false;
     }
     
 }

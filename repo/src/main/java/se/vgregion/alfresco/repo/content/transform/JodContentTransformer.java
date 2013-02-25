@@ -7,12 +7,6 @@
  */
 package se.vgregion.alfresco.repo.content.transform;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.alfresco.enterprise.repo.content.JodConverter;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
@@ -38,8 +32,13 @@ import org.artofsolving.jodconverter.document.DocumentFormatRegistry;
 import org.artofsolving.jodconverter.office.OfficeException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.DefaultResourceLoader;
-
 import se.vgregion.alfresco.repo.model.VgrModel;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Makes use of the {@link http://code.google.com/p/jodconverter/} library and
@@ -67,6 +66,16 @@ public class JodContentTransformer extends OOoContentTransformerHelper implement
     this.documentFormatsConfiguration = path;
   }
 
+  @Override
+  protected Log getLogger() {
+    return logger;
+  }
+
+  @Override
+  protected String getTempFilePrefix() {
+    return "JodContentTransformer";
+  }
+
   public void setJodConverter(final JodConverter jodc) {
     this.jodconverter = jodc;
   }
@@ -78,6 +87,13 @@ public class JodContentTransformer extends OOoContentTransformerHelper implement
   @Override
   public boolean isAvailable() {
     return jodconverter.isAvailable();
+  }
+
+  @Override
+  protected void convert(File tempFromFile, net.sf.jooreports.converter.DocumentFormat sourceFormat, File tempToFile, net.sf.jooreports.converter.DocumentFormat targetFormat) {
+    OfficeDocumentConverter converter = new OfficeDocumentConverter(jodconverter.getOfficeManager());
+
+    converter.convert(tempFromFile, tempToFile);
   }
 
   @Override

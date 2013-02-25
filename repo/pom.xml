@@ -248,17 +248,6 @@
                   <password>admin</password>
                 </configuration>
               </execution>
-              <execution>
-                <id>clearcache</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>refresh</goal>
-                </goals>
-                <configuration>
-                  <url>http://localhost:8080/alfresco/service/vgr/clearcache</url>
-                  <method>get</method>
-                </configuration>
-              </execution>
             </executions>
           </plugin>
 

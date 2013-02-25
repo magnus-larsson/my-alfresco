@@ -43,10 +43,10 @@
     </arg>
   </args>
 
-  <format default="">argument</format>
+  <format default="text">argument</format>
 
-  <authentication>guest</authentication>
-  <transaction>required</transaction>
+  <authentication>none</authentication>
+  <transaction>none</transaction>
   <family>VGR</family>
   <lifecycle>public_api</lifecycle>
 </webscript>

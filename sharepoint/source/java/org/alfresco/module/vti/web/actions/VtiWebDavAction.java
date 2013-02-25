@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2012 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -18,6 +18,8 @@
  */
 package org.alfresco.module.vti.web.actions;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -28,13 +30,15 @@ import org.alfresco.repo.webdav.WebDAVMethod;
 import org.alfresco.repo.webdav.WebDAVServerException;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
 * <p>VtiWebDavAction is processor of WebDAV protocol. It provides 
 * the back-end controller for dispatching among set of WebDAVMethods. 
-* It selects and invokes a realization of {@link org.alfresco.repo.webdav.WebDAVMethod}
+* It selects and invokes a realization of {@link WebDAVMethod}
 * to perform the requested method of WebDAV protocol.</p>
 *
 * @author Stas Sokolovsky
@@ -42,21 +46,15 @@ import org.apache.commons.logging.LogFactory;
 */
 public abstract class VtiWebDavAction implements VtiAction
 {
-    private static final long serialVersionUID = 8916126506309290108L;
-
     protected VtiPathHelper pathHelper;
 
     protected WebDAVHelper webDavHelper;
-
-    protected ServiceRegistry serviceRegistry;
-
-    protected AuthenticationService authenticationService;
 
     private static Log logger = LogFactory.getLog(VtiWebDavAction.class);
 
     /**
      * <p>Process WebDAV protocol request, dispatch among set of 
-     * WebDAVMethods, selects and invokes a realization of {@link org.alfresco.repo.webdav.WebDAVMethod}
+     * WebDAVMethods, selects and invokes a realization of {@link WebDAVMethod}
      * to perform the requested method of WebDAV protocol.</p> 
      *
      * @param request HTTP request
@@ -64,11 +62,6 @@ public abstract class VtiWebDavAction implements VtiAction
      */
     public void execute(HttpServletRequest request, HttpServletResponse response)
     {
-        if (webDavHelper == null)
-        {
-            webDavHelper = new VtiWebDavHelper(serviceRegistry, authenticationService);
-        }
-
         WebDAVMethod method = getWebDAVMethod();
         method.setDetails(request, response, webDavHelper, pathHelper.getRootNodeRef());
         try
@@ -77,9 +70,22 @@ public abstract class VtiWebDavAction implements VtiAction
         }
         catch (WebDAVServerException e)
         {
-            if (logger.isDebugEnabled())
+            logger.debug(e);
+
+            if (response.isCommitted())
             {
-                logger.debug("Exception while executing WebDAV method", e);
+                logger.warn("Could not return the status code to the client as the response has already been committed!", e);
+            }
+            else
+            {
+                try
+                {
+                    response.sendError(e.getHttpStatusCode());
+                }
+                catch (IOException e1)
+                {
+                    throw new RuntimeException(e1);
+                }
             }
         }
     }
@@ -104,29 +110,22 @@ public abstract class VtiWebDavAction implements VtiAction
     /**
      * <p>ServiceRegistry setter.</p>
      *
-     * @param serviceRegistry {@link org.alfresco.service.ServiceRegistry}.
+     * @param serviceRegistry {@link ServiceRegistry}
+     * 
+     * TODO: A dependency on the service registry is bad - change to setWebDavHelper
      */
     public void setServiceRegistry(ServiceRegistry serviceRegistry)
     {
-        this.serviceRegistry = serviceRegistry;
+        this.webDavHelper = (WebDAVHelper) serviceRegistry.getService(QName.createQName(NamespaceService.ALFRESCO_URI, WebDAVHelper.BEAN_NAME));
     }
 
     /**
      * <p>AuthenticationService setter.</p>
      *
-     * @param authenticationService {@link org.alfresco.service.cmr.security.AuthenticationService}.
+     * @param authenticationService {@link AuthenticationService}.    
      */
     public void setAuthenticationService(AuthenticationService authenticationService)
     {
-        this.authenticationService = authenticationService;
+        // Not used anymore
     }
-
-    protected class VtiWebDavHelper extends WebDAVHelper
-    {
-        public VtiWebDavHelper(ServiceRegistry serviceRegistry, AuthenticationService authenticationService)
-        {
-            super(serviceRegistry, authenticationService);
-        }
-    };
-
 }
