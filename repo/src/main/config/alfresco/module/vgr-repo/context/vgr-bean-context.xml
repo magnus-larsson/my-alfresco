@@ -78,6 +78,7 @@
     <property name="resourceBundles">
       <list>
         <value>alfresco.module.vgr-repo.context.messages.vgr-patches</value>
+        <value>alfresco.module.vgr-repo.context.messages.vgr-mail</value>
       </list>
     </property>
   </bean>
@@ -501,6 +502,32 @@
   
   <bean id="reportActiveUsers" class="se.vgregion.alfresco.repo.report.ActiveUsers">
     <property name="serviceRegistry" ref="ServiceRegistry" />
+  </bean>
+  
+  <!-- ***************************************************************************************************** -->
+  <!-- Reset password service and webscript definitions																											 -->
+  <!-- ***************************************************************************************************** -->
+
+	<bean id="vgr.resetPasswordService" class="se.vgregion.alfresco.repo.resetpassword.impl.ResetPasswordServiceImpl">
+    <property name="siteService" ref="SiteService" />
+    <property name="personService" ref="PersonService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="authorityService" ref="AuthorityService" />
+    <property name="mutableAuthenticationService" ref="AuthenticationService" />
+    <property name="sendMailService" ref="vgr.sendMailService" />
+    <property name="globalProperties" ref="global-properties" />
+  </bean>
+  
+  <bean id="webscript.resetpassword.resetpassword.put" class="se.vgregion.alfresco.repo.scripts.SiteAdminResetUserPassword" parent="webscript">
+    <property name="resetPasswordService" ref="vgr.resetPasswordService" />
+  </bean>
+  
+  <!-- ***************************************************************************************************** -->
+  <!-- Send mail service																																										 -->
+  <!-- ***************************************************************************************************** -->
+
+	<bean id="vgr.sendMailService" class="se.vgregion.alfresco.repo.mail.impl.SendMailServiceImpl">
+    <property name="actionService" ref="ActionService" />
   </bean>
 
 </beans>

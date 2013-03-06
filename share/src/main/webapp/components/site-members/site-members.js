@@ -559,7 +559,7 @@
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
             var userName = oRecord.getData("userName");
-            
+            //TODO add check for which zone the user is a member of, only external (alfresco internal) users can have their passowords reset
             if (me.isCurrentUserSiteAdmin &&
             		me.options.currentUser!==userName)
             {
@@ -729,9 +729,7 @@
                text: this._msg("site-members.reset-password-success", user)
             });
          
-            // remove the entry
-            var recordIndex = this.widgets.dataTable.getRecordIndex(event.target.id);
-            this.widgets.dataTable.deleteRow(recordIndex);
+            
          };
          
          // request failure handler
@@ -744,7 +742,7 @@
          // make ajax call to site service to remove user
          Alfresco.util.Ajax.request(
          {
-            url: Alfresco.constants.PROXY_URI + "api/vgr/resetpassword/" + this.options.siteId + "/" + encodeURIComponent(user),
+            url: Alfresco.constants.PROXY_URI + "vgr/resetpassword/" + this.options.siteId + "/" + encodeURIComponent(user),
             method: "PUT",
             successCallback:
             {
