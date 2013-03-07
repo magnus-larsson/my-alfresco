@@ -7,12 +7,15 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.site.SiteModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AuthorityService;
+import org.alfresco.service.cmr.security.MutableAuthenticationService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.cmr.site.SiteInfo;
@@ -24,6 +27,7 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.extensions.surf.util.I18NUtil;
 
 import se.vgregion.alfresco.repo.mail.SendMailService;
 import se.vgregion.alfresco.repo.resetpassword.ResetPasswordService;
@@ -127,7 +131,7 @@ public class ResetPasswordServiceImplTest {
 	AuthorityService authorityService;
 	SendMailService sendMailService;
 	NodeService nodeService;
-	
+	MutableAuthenticationService authenticationService;
 	SiteInfo siteInfo = new TestSiteInfo("site");
 	SiteInfo siteInfoOther = new TestSiteInfo("othersite");
 	Set<String> internalUserZones = new HashSet<String>();
@@ -154,17 +158,18 @@ public class ResetPasswordServiceImplTest {
 		authorityService = context.mock(AuthorityService.class);
 		sendMailService = context.mock(SendMailService.class);
 		nodeService = context.mock(NodeService.class);
+		authenticationService = context.mock(MutableAuthenticationService.class);
 		
 		rps.setSiteService(siteService);
 		rps.setPersonService(personService);
 		rps.setAuthorityService(authorityService);
 		rps.setSendMailService(sendMailService);
 		rps.setNodeService(nodeService);
-		
+		rps.setMutableAuthenticationService(authenticationService);
 		
 		internalUserZones.add("TEST_ZONE");
+		internalUserZones.add(AuthorityService.ZONE_AUTH_ALFRESCO); 
 		externalUserZones.add("TEST_ZONE");
-		externalUserZones.add(ResetPasswordService.VGR_LDAP_ZONE_NAME);
 		
 		authoritiesForUser.add("TEST_AUTHORITY");
 		authoritiesForAdmin.add("TEST_AUTHORITY");
@@ -255,7 +260,11 @@ public class ResetPasswordServiceImplTest {
 	public void testResetPassword() {
 		final NodeRef nr = new NodeRef(WORKSPACE_AND_STORE+DUMMY_NODE_ID_1);
 		final Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
-		
+		properties.put(ContentModel.PROP_EMAIL, "to@email.com");
+		final Properties globalProperties = new Properties();
+		globalProperties.put("mail.from.default", "from@mail.com");
+		rps.setGlobalProperties(globalProperties);
+		I18NUtil.registerResourceBundle("vgr-mail");
 		context.checking(new Expectations() {
 			{
 				//personService.personExists
@@ -267,7 +276,7 @@ public class ResetPasswordServiceImplTest {
 				allowing(personService).getPerson("user", false);
 				will(returnValue(nr));
 				//personService.setPersonProperties
-				allowing(personService).setPersonProperties(with("user"), with(any(HashMap.class)), with(false));
+				allowing(authenticationService).setAuthentication(with("user"), with(any(char[].class)));
 				//authorityService.getAuthoritiesForUser
 				allowing(authorityService).getAuthoritiesForUser("user");
 				will(returnValue(authoritiesForUser));
@@ -275,7 +284,7 @@ public class ResetPasswordServiceImplTest {
 				allowing(nodeService).getProperties(nr);
 				will(returnValue(properties));
 				//sendMailService.sendTextMail
-				allowing(sendMailService).sendTextMail(with(any(String.class)), with(any(String.class)), with(any(String.class)), with(any(String.class)));
+				allowing(sendMailService).sendTextMail(with(any(String.class)), with("from@mail.com"), with(any(String.class)), with(any(String.class)));
 			}
 		});
 		

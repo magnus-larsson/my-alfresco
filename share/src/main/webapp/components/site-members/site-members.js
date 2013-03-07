@@ -559,9 +559,9 @@
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
             var userName = oRecord.getData("userName");
-            //TODO add check for which zone the user is a member of, only external (alfresco internal) users can have their passowords reset
             if (me.isCurrentUserSiteAdmin &&
-            		me.options.currentUser!==userName)
+            		me.options.currentUser!==userName &&
+            		oRecord.getData("zone")==="internal")
             {
                // create HTML for representing buttons
                

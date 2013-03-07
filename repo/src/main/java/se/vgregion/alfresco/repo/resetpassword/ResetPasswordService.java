@@ -1,7 +1,6 @@
 package se.vgregion.alfresco.repo.resetpassword;
 
 public interface ResetPasswordService {
-	public static final String VGR_LDAP_ZONE_NAME = "AUTH.EXT.ldapPersonal";
 	/**
 	 * Checks if user A is site admin on site where user B is a member. User A must not be equal to User B.
 	 * @param userA Username
@@ -16,6 +15,14 @@ public interface ResetPasswordService {
 	 * @return
 	 */
 	public boolean isUserInternalUser(String user);
+	
+	/**
+	 * Checks if user is an admin user
+	 * @param user Username
+	 * @return
+	 */
+	public boolean isAdminUser(String user);
+	
 	/**
 	 * Resets the password for a user, the sendMail flag controls whether the password should be sent as an email.
 	 * This method excepts checks have been made by the user to control whether the user is allowed to change its password before this method is called.

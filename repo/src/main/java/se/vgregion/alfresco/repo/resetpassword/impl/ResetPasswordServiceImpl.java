@@ -101,38 +101,46 @@ public class ResetPasswordServiceImpl implements ResetPasswordService {
 			LOG.error("User " + user + " does not exist");
 			return false;
 		}
-		try {
-			/*
-			 * NodeRef personNodeRef = personService.getPerson(user, false);
-			 * List<ChildAssociationRef> parentAssocs = nodeService
-			 * .getParentAssocs(personNodeRef);
-			 * 
-			 * boolean isInternalUser = true; for (ChildAssociationRef
-			 * parentAssoc : parentAssocs) { if
-			 * (ContentModel.ASSOC_IN_ZONE.equals(parentAssoc .getTypeQName()))
-			 * { NodeRef parentRef = parentAssoc.getParentRef(); String property
-			 * = (String) nodeService.getProperty( parentRef,
-			 * ContentModel.PROP_NAME); if (LOG.isTraceEnabled()) {
-			 * LOG.trace("User: " + user + " belongs to zone: " + property); }
-			 * 
-			 * if (INTERNAL_ZONE_NAME.equalsIgnoreCase(property)) { // Internal
-			 * VGR user (ldap user) = external alfresco user isInternalUser =
-			 * false; } } } return isInternalUser;
-			 */
+		try {			
 			Set<String> authorityZones = authorityService
 					.getAuthorityZones(user);
-			if (authorityZones.contains(VGR_LDAP_ZONE_NAME)) {
-				LOG.error("User is an ldap user");
+			if (authorityZones.contains(AuthorityService.ZONE_AUTH_ALFRESCO)) {
+				if (LOG.isTraceEnabled()) {
+					LOG.trace("User " + user + " is internal alfresco user");
+				}
+				return true;
+			} else {
+				if (LOG.isTraceEnabled()) {
+					LOG.trace("User " + user + " is an ldap user");
+				}
 				return false;
 			}
-			if (LOG.isDebugEnabled()) {
-				LOG.debug("User " + user + " is internal alfresco user");
-			}
-			return true;
-
 		} catch (NoSuchPersonException e) {
 			return false;
 		}
+	}
+	
+	@Override
+	public boolean isAdminUser(String user) {
+		// Check if user exists
+		if (!personService.personExists(user)) {
+			LOG.error("User " + user + " does not exist");
+			throw new NoSuchPersonException(user);
+		}
+		
+		// Check if user is admin, if so, request should be denied
+		if (authorityService.getAuthoritiesForUser(user).contains(
+				PermissionService.ADMINISTRATOR_AUTHORITY)) {
+			if (LOG.isTraceEnabled()) {
+				LOG.trace("User " + user + " is admin");
+			}
+			return true;
+		} else {
+			if (LOG.isTraceEnabled()) {
+				LOG.trace("User " + user + " is not admin");
+			}
+			return false;
+		}		
 	}
 
 	@Override
@@ -145,8 +153,7 @@ public class ResetPasswordServiceImpl implements ResetPasswordService {
 		NodeRef personNodeRef = personService.getPerson(user, false);
 
 		// Check if user is admin, if so, request should be denied
-		if (authorityService.getAuthoritiesForUser(user).contains(
-				PermissionService.ADMINISTRATOR_AUTHORITY)) {
+		if (isAdminUser(user)) {
 			throw new IllegalArgumentException(
 					"Cannot reset password for an admin user: " + user);
 		}
@@ -164,7 +171,6 @@ public class ResetPasswordServiceImpl implements ResetPasswordService {
 		LOG.info("User " + AuthenticationUtil.getFullyAuthenticatedUser()
 				+ " generated a new password for user " + user);
 		// Reset the password
-		// personService.setPersonProperties(user, properties, false);
 		mutableAuthenticationService.setAuthentication(user,
 				password.toCharArray());
 		return password;

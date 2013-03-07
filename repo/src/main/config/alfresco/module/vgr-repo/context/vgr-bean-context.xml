@@ -505,7 +505,7 @@
   </bean>
   
   <!-- ***************************************************************************************************** -->
-  <!-- Reset password service and webscript definitions																											 -->
+  <!-- Reset password service, webscript definitions and javascript proxy object														 -->
   <!-- ***************************************************************************************************** -->
 
 	<bean id="vgr.resetPasswordService" class="se.vgregion.alfresco.repo.resetpassword.impl.ResetPasswordServiceImpl">
@@ -521,6 +521,11 @@
   <bean id="webscript.resetpassword.resetpassword.put" class="se.vgregion.alfresco.repo.scripts.SiteAdminResetUserPassword" parent="webscript">
     <property name="resetPasswordService" ref="vgr.resetPasswordService" />
   </bean>
+  
+  <bean id="vgr.javascriptResetPasswordService" parent="baseJavaScriptExtension" class="se.vgregion.alfresco.repo.resetpassword.JavascriptCompatibleResetPasswordService">
+	  <property name="resetPasswordService" ref="vgr.resetPasswordService" />
+	  <property name="extensionName"   value="resetPasswordService" />
+	</bean>
   
   <!-- ***************************************************************************************************** -->
   <!-- Send mail service																																										 -->
