@@ -46,8 +46,9 @@ webpreviewer/target/
 /pdfa-pilot-converter/target/
 /pdfa-pilot-converter/tomcat-home/
 /pdfa-pilot-converter/pdfa-pilot-converter.iml
+/pdfa-pilot-converter/.classpath
 
-
+/sharepoint/.classpath
 /sharepoint/build/
 /sharepoint/lib/
 /sharepoint/target/
