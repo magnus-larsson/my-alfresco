@@ -1,4 +1,4 @@
-package se.vgregion.alfresco.repo.constraints.impl;
+package se.vgregion.alfresco.repo.resetpassword;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

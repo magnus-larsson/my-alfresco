@@ -19,7 +19,7 @@
   <build>
     <sourceDirectory>source/java</sourceDirectory>
     <outputDirectory>build/classes</outputDirectory>
-    <finalName>alfresco-vti-3.4.10</finalName>
+    <finalName>alfresco-vti-3.4.12</finalName>
 
     <plugins>
       <plugin>

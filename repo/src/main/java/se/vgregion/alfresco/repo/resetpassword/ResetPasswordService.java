@@ -8,20 +8,20 @@ public interface ResetPasswordService {
 	 * @param site Site shortname
 	 * @return
 	 */
-	public boolean isUserASiteAdminForUserB(String userA, String userB, String site);
+	public boolean isUserASiteAdminForUserB(final String userA, final String userB, final String site);
 	/**
 	 * Checks if user is an internal user
 	 * @param user Username
 	 * @return
 	 */
-	public boolean isUserInternalUser(String user);
+	public boolean isUserInternalUser(final String user);
 	
 	/**
 	 * Checks if user is an admin user
 	 * @param user Username
 	 * @return
 	 */
-	public boolean isAdminUser(String user);
+	public boolean isAdminUser(final String user);
 	
 	/**
 	 * Resets the password for a user, the sendMail flag controls whether the password should be sent as an email.
@@ -31,5 +31,5 @@ public interface ResetPasswordService {
 	 * @param sendMail
 	 * @return
 	 */
-	public String resetPassword(String user, boolean sendMail);
+	public String resetPassword(final String user, final boolean sendMail);
 }
