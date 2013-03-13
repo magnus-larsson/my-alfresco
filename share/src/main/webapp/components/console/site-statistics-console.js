@@ -45,6 +45,10 @@ if (typeof RL == "undefined" || !RL) {
 
       /* Define panel handlers */
       var parent = this;
+      
+      var queuedJsonRequests = [];
+      var numOfConcurrentRequests = 6;
+      var runningRequests = 0;
 
       /* File List Panel Handler */
       ListPanelHandler = function ListPanelHandler_constructor() {
@@ -73,11 +77,30 @@ if (typeof RL == "undefined" || !RL) {
                }
             });
 
+            
+            
             // Setup the main datatable
             this._setupDataTable();
          },
+         
+         _fireJsonRequest: function () {
+            var jsonRequest = queuedJsonRequests.shift();
+ 			Alfresco.util.Ajax.jsonGet(jsonRequest);
+ 			runningRequests++;
+         },
+         
+         _handleJsonResponse: function() {
+        	 if (queuedJsonRequests.length>0 && runningRequests <=0) {
+         		for (var i=runningRequests;i<numOfConcurrentRequests;i++) {
+         			this._fireJsonRequest();
+         		}
+         	}
+         },
 
          _setupDataTable: function () {
+        	 
+        	var localThis = this;
+        	 
             var renderCellTitle = function (cell, record, column, data) {
                cell.innerHTML = $html(data);
             };
@@ -88,55 +111,77 @@ if (typeof RL == "undefined" || !RL) {
 
             var renderCellSize = function (cell, record, column, data) {
                var shortName = record.getData('shortName');
-
-               Alfresco.util.Ajax.jsonGet({
-                  url : Alfresco.constants.PROXY_URI + "vgr/reports/siteSize?shortName=" + shortName,
-                  successCallback : {
-                     fn : function(res) {
-                        cell.innerHTML = $html(Math.round(res.json.siteSize / 1024 / 1024));
-                     },
-                     scope : this
-                  }
-               });
+               queuedJsonRequests.push({
+                   url : Alfresco.constants.PROXY_URI + "vgr/reports/siteSize?shortName=" + shortName,
+                   successCallback : {
+                      fn : function(res) {
+                    	  runningRequests--;
+                    	  localThis._handleJsonResponse();
+                    	  cell.innerHTML = $html(Math.round(res.json.siteSize / 1024 / 1024));
+                      },
+                      scope : this
+                   },
+                   failureCallback : {
+                       fn : function(res) {
+                    	   cell.innerHTML = "Failed to get data";
+                    	   runningRequests--;
+                    	   localThis._handleJsonResponse();
+                       },
+                       scope : this
+                    }
+                });
             };
 
             var renderCellMembers = function (cell, record, column, data) {
                var shortName = record.getData('shortName');
-
-               Alfresco.util.Ajax.jsonGet({
-                  url : Alfresco.constants.PROXY_URI + "vgr/reports/numberOfSiteMembers?shortName=" + shortName,
-                  successCallback : {
-                     fn : function(res) {
-                        cell.innerHTML = $html(res.json.numberOfSiteMembers);
-                     },
-                     scope : this
-                  }
-               });
+               queuedJsonRequests.push({
+            	   url : Alfresco.constants.PROXY_URI + "vgr/reports/numberOfSiteMembers?shortName=" + shortName,
+                   successCallback : {
+                      fn : function(res) {
+                    	  runningRequests--;
+                    	  localThis._handleJsonResponse();
+                    	  cell.innerHTML = $html(res.json.numberOfSiteMembers);
+                      },
+                      scope : this
+                   },
+                   failureCallback : {
+                       fn : function(res) {
+                    	   cell.innerHTML = "Failed to get data";
+                    	   runningRequests--;
+                    	   localThis._handleJsonResponse();
+                       },
+                       scope : this
+                    }
+                });
             };
 
             var renderCellLastActivity = function (cell, record, column, data) {
                var shortName = record.getData('shortName');
+               queuedJsonRequests.push({
+            	   url : Alfresco.constants.PROXY_URI + "vgr/reports/lastActivityOnSite?shortName=" + shortName,
+                   successCallback : {
+                      fn : function(res) {
+                    	  runningRequests--;
+                    	  localThis._handleJsonResponse();
+                    	  var lastActivityOnSite = res.json.lastActivityOnSite;
 
-               Alfresco.util.Ajax.jsonGet({
-                  url : Alfresco.constants.PROXY_URI + "vgr/reports/lastActivityOnSite?shortName=" + shortName,
-                  successCallback : {
-                     fn : function(res) {
-                        var lastActivityOnSite = res.json.lastActivityOnSite;
+                          if (lastActivityOnSite == "") {
+                             lastActivityOnSite = Alfresco.util.message("statistics-console.noactivity", "RL.SiteStatisticsConsole");
+                          }
 
-                        if (lastActivityOnSite == "") {
-                           lastActivityOnSite = Alfresco.util.message("statistics-console.noactivity", "RL.SiteStatisticsConsole");
-                        }
-
-                        cell.innerHTML = $html(lastActivityOnSite);
-                     },
-                     scope : this
-                  },
-                  failureCallback : {
-                     fn : function(res) {
-                     },
-                     scope : this
-                  }
-               });
+                          cell.innerHTML = $html(lastActivityOnSite);
+                      },
+                      scope : this
+                   },
+                   failureCallback : {
+                       fn : function(res) {
+                    	   cell.innerHTML = "Failed to get data";
+                    	   runningRequests--;
+                    	   localThis._handleJsonResponse();
+                       },
+                       scope : this
+                    }
+                });
             };
 
             var columnDefinitions = [
@@ -168,12 +213,18 @@ if (typeof RL == "undefined" || !RL) {
                generateRequest: generateRequest,
                initialRequest: generateRequest()
             });
+            
+            parent.widgets.dataTable.subscribe("postRenderEvent", function (o) {
+            	localThis._handleJsonResponse();
+            });
 
             parent.widgets.dataTable.doBeforeLoadData = function (request, response, payload) {
                payload.totalRecords = response.meta.totalRecords;
                //payload.pagination.recordOffset = response.meta.recordOffset;
                return payload;
             }
+            
+            
          }
       });
 
