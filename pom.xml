@@ -10,7 +10,7 @@
 
   <groupId>se.vgregion.alfresco</groupId>
   <artifactId>alfresco-vgr</artifactId>
-  <version>1.3.11</version>
+  <version>1.3.12</version>
   <packaging>pom</packaging>
   <name>VGR Alfresco Base Project</name>
 
