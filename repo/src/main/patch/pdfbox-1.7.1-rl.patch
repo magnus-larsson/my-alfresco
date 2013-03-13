@@ -1,0 +1,56 @@
+diff --git a/deploy.sh b/deploy.sh
+new file mode 100755
+index 0000000000000000000000000000000000000000..852303f4a2362b50758ae796e4c14aa5a1492170
+--- /dev/null
++++ b/deploy.sh
+@@ -0,0 +1,2 @@
++mvn install:install-file -Dfile=pdfbox/target/pdfbox-1.7.1.jar -DgroupId=org.alfresco.enterprise -DartifactId=pdfbox-1.7.1-rl -Dversion=3.4.10 -Dpackaging=jar -DgeneratePom=true -DcreateChecksum=true -DgeneratePom=true
++mvn deploy:deploy-file -Dfile=pdfbox/target/pdfbox-1.7.1.jar -DgroupId=org.alfresco.enterprise -DartifactId=pdfbox-1.7.1-rl -Dversion=3.4.10 -Dpackaging=jar  -DcreateChecksum=true -DrepositoryId=redpill-linpro-releases -Durl=http://javadev.redpill-linpro.com/nexus/content/repositories/releases -DgeneratePom=true
+diff --git a/pdfbox/src/main/java/org/apache/pdfbox/pdfparser/PDFParser.java b/pdfbox/src/main/java/org/apache/pdfbox/pdfparser/PDFParser.java
+index 1b3fba2bd519902c536287b8148315d41de24c69..276d195d2ed160f101b9de439e4c400d7db484fa 100644
+--- a/pdfbox/src/main/java/org/apache/pdfbox/pdfparser/PDFParser.java
++++ b/pdfbox/src/main/java/org/apache/pdfbox/pdfparser/PDFParser.java
+@@ -57,6 +57,9 @@ public class PDFParser extends BaseParser
+
+     private static final String PDF_HEADER = "%PDF-";
+     private static final String FDF_HEADER = "%FDF-";
++
++    private static final String OxFFFFFFFF = Long.toString(0xFFFFFFFFL);
++
+     /**
+      * A list of duplicate objects found when Parsing the PDF
+      * File.
+@@ -728,6 +731,17 @@ public class PDFParser extends BaseParser
+                     LOG.warn("invalid xref line: " + currentLine);
+                     break;
+                 }
++
++                // Handle a not so uncommon xref table encoding error, by overriding the
++                // entryType as free ('f') when the original int offset is -1 (0xFFFFFFFF)
++                // and has been encoded in error as 4294967295. Google search returned
++                // over 7000 hits.
++                if (OxFFFFFFFF.equals(splitString[0]))
++                {
++                    splitString[splitString.length-1] = "f";
++                    splitString[2] = "f";
++                }
++
+                 /* This supports the corrupt table as reported in
+                  * PDFBOX-474 (XXXX XXX XX n) */
+                 if(splitString[splitString.length-1].equals("n"))
+diff --git a/pdfbox/src/main/java/org/apache/pdfbox/pdmodel/PDPage.java b/pdfbox/src/main/java/org/apache/pdfbox/pdmodel/PDPage.java
+index ec74705a1d964a6a6f8cb7b65150340acfca2432..981abb3078e73945d1934e4b2230f08db0fe8393 100644
+--- a/pdfbox/src/main/java/org/apache/pdfbox/pdmodel/PDPage.java
++++ b/pdfbox/src/main/java/org/apache/pdfbox/pdmodel/PDPage.java
+@@ -782,7 +782,10 @@ public class PDPage implements COSObjectable, Printable
+             for (int i=0; i < annots.size(); i++)
+             {
+                 COSBase item = annots.getObject(i);
+-                actuals.add( PDAnnotation.createAnnotation( item ) );
++                if (item != null)
++                {
++                    actuals.add( PDAnnotation.createAnnotation( item ) );
++                }
+             }
+             retval = new COSArrayList(actuals, annots);
+         }

@@ -1,0 +1,4 @@
+org.alfresco.module.vti.web.ws.CheckInFileEndpoint (start on row 84)
+org.alfresco.module.vti.web.ws.CheckOutFileEndpoint (start on row 82)
+org.alfresco.module.vti.web.ws.WebUrlFromPageUrlEndpoint (start on row 83)
+org.alfresco.module.vti.web.fp.GetDocsMetaInfoMethod (start on row 76)

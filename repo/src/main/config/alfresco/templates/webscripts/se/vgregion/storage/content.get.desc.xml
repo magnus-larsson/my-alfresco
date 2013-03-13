@@ -47,6 +47,6 @@
 
   <authentication>guest</authentication>
   <transaction>required</transaction>
-  <family>CMIS</family>
+  <family>VGR</family>
   <lifecycle>public_api</lifecycle>
 </webscript>

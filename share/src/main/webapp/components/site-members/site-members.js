@@ -545,12 +545,60 @@
                elCell.innerHTML = '<div></div>';
             }
          };
+         
+         /**
+          * Reset password button custom datacell formatter
+          *
+          * @method renderCellUninvite
+          * @param elCell {object}
+          * @param oRecord {object}
+          * @param oColumn {object}
+          * @param oData {object|string}
+          */
+         var renderCellResetPassword = function SiteMembers_renderCellResetPassword(elCell, oRecord, oColumn, oData)
+         {
+            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+            var userName = oRecord.getData("userName");
+            if (me.isCurrentUserSiteAdmin &&
+            		me.options.currentUser!==userName &&
+            		oRecord.getData("zone")==="internal")
+            {
+               // create HTML for representing buttons
+               
+               elCell.innerHTML = '<span id="' + me.id + '-button-resetPassword-' + userName + '"></span>';
+               
+               // create the reset password button
+               var button = new YAHOO.widget.Button(
+               {
+                   container: me.id + '-button-resetPassword-' + userName,
+                   label: me._msg("site-members.resetPassword"),
+                   onclick:
+                   {
+                      fn: me.showResetPasswordDialog,
+                      obj: userName,
+                      scope: me
+                     }
+               });
+               
+               // store the buttons
+               me.buttons[userName + "-button-resetPassword"] =
+               {
+                  button: button
+               };
+            }
+            else
+            {
+               // output padding div so layout is not messed up due to missing buttons
+               elCell.innerHTML = '<div></div>';
+            }
+         };
 
          // DataTable column defintions
          var columnDefinitions =
          [
             { key: "userName", label: "User Name", sortable: false, formatter: renderCellAvatar, width: 64 },
             { key: "bio", label: "Bio", sortable: false, formatter: renderCellDescription },
+            { key: "resetPassword", label: "Reset Password", formatter: renderCellResetPassword, width: 140 },
             { key: "role", label: "Select Role", formatter: renderCellRoleSelect, width: 140 },
             { key: "uninvite", label: "Uninvite", formatter: renderCellUninvite, width: 80 }
          ];
@@ -620,6 +668,95 @@
       onShowAll: function SiteMembers_onShowAll()
       {
          this._performSearch('');
+      },
+      
+      showResetPasswordDialog: function SiteMembers_showResetPasswordDialog(event, user)
+      {
+      	  // show a dialog to the user to confirm the request
+    	  var parent = this;
+    	  Alfresco.util.PopupManager.displayPrompt({
+              title: parent._msg("site-members.reset-password.dialog.title", user),
+              text: parent._msg("site-members.reset-password.dialog.text", user),
+              buttons: [
+                 {
+                    text: parent._msg("button.reset-password"),
+                    handler: function SiteMembers_resetPasswordDialog_success_ok() {
+                    	//YAHOO.lang.later(1000, parent, parent.doResetPassword, [event, user]);
+                    	parent.doResetPassword(event, user); 
+                    	this.destroy();
+                    }                    
+                 },
+                 {
+                    text: parent._msg("button.close"),
+                    handler: function SiteMembers_resetPasswordDialog_success_close() {
+                       this.destroy();
+                    },
+                 	isDefault: true
+                 }
+              ]
+           });
+  
+      },
+      
+      /**
+       * Reset password event handler
+       * 
+       * @method doRemove
+       * @param event {object} The event object
+       * @param user {string} The userName to remove
+       */
+      doResetPassword: function SiteMembers_doResetPassword(event, user)
+      {
+    	  
+         // show a wait message
+         this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+         {
+            text: this._msg("message.reset-password"),
+            spanClass: "wait",
+            displayTime: 0,
+            effect: null
+         });
+         
+         // request success handler
+         var success = function SiteMembers_doRemove_success(response, user)
+         {
+            // hide the wait message
+            this.widgets.feedbackMessage.destroy();
+             
+            // show popup message to confirm
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this._msg("site-members.reset-password-success", user)
+            });
+         
+            
+         };
+         
+         // request failure handler
+         var failure = function SiteMembers_doRemove_failure(response)
+         {
+            // remove the message
+            this.widgets.feedbackMessage.destroy();
+         };
+          
+         // make ajax call to site service to remove user
+         Alfresco.util.Ajax.request(
+         {
+            url: Alfresco.constants.PROXY_URI + "vgr/resetpassword/" + this.options.siteId + "/" + encodeURIComponent(user),
+            method: "PUT",
+            successCallback:
+            {
+               fn: success,
+               obj: user,
+               scope: this
+            },
+            failureMessage: this._msg("site-members.reset-password-failure", user),
+            failureCallback:
+            {
+               fn: failure,
+               scope: this
+            }
+         });
       },
       
       /**
@@ -716,7 +853,7 @@
                // show popup message to confirm
                Alfresco.util.PopupManager.displayMessage(
                {
-                  text: this._msg("site-members.change-role-success", userRole.user, userRole.role)
+                  text: this._msg("site-members.change-role-success", userRole.user, this._msg("role." + userRole.role))
                });
 
                // update the data and table

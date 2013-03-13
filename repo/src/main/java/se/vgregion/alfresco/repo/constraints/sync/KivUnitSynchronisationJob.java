@@ -23,7 +23,8 @@ public class KivUnitSynchronisationJob implements Job {
     try {
       final KivUnitSynchronisation kivUnitSynchronisation = (KivUnitSynchronisation) context.getJobDetail()
           .getJobDataMap().get("kivUnitSynchronisation");
-
+      //TODO use JobLockService
+      // 
       kivUnitSynchronisation.synchronise();
 
       if (LOG.isDebugEnabled()) {
@@ -33,5 +34,4 @@ public class KivUnitSynchronisationJob implements Job {
       LOG.error(ex.getMessage(), ex);
     }
   }
-
 }

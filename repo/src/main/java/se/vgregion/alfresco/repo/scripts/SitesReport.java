@@ -44,13 +44,13 @@ public class SitesReport extends DeclarativeWebScript {
 				Map<String, Serializable> siteMap = new HashMap<String, Serializable>();
 				siteMap.put("shortName", site.getShortName());
 				siteMap.put("title", site.getTitle());
-				siteMap.put("size", siteSize);
-				siteMap.put("members", siteMembers);
+				// siteMap.put("size", siteSize);
+				// siteMap.put("members", siteMembers);
 				DateFormat df = new SimpleDateFormat();
 				if (lastActivity != null) {
-					siteMap.put("lastActivity", df.format(lastActivity));
+					// siteMap.put("lastActivity", df.format(lastActivity));
 				} else {
-					siteMap.put("lastActivity", "");
+					// siteMap.put("lastActivity", "");
 				}
 				sitesResult.add(siteMap);
 			}

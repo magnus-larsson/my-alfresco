@@ -8,10 +8,7 @@
     <#list sites as site>
     {
     "title": "${site.title}",
-    "shortName": "${site.shortName}",
-    "size": "${((site.size/1024)/1024)?round}",
-    "members": "${site.members?round}",
-    "lastActivity": "${site.lastActivity}"
+    "shortName": "${site.shortName}"
     }<#if site_has_next>,</#if>
     </#list>
 ]

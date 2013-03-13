@@ -251,13 +251,32 @@
        * @property onlineEditMimetypes
        * @type object
        */
-      onlineEditMimetypes: {
-         "application/vnd.ms-excel": "Excel.Sheet",
-         "application/vnd.ms-powerpoint": "PowerPoint.Slide",
+      onlineEditMimetypes:
+      {
          "application/msword": "Word.Document",
-         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "Excel.Sheet",
+         "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "Word.Document",
+         "application/vnd.ms-word.document.macroenabled.12": "Word.Document",
+         "application/vnd.openxmlformats-officedocument.wordprocessingml.template": "Word.Document",
+         "application/vnd.ms-word.template.macroenabled.12": "Word.Document",
+
+         "application/vnd.ms-powerpoint": "PowerPoint.Slide",
          "application/vnd.openxmlformats-officedocument.presentationml.presentation": "PowerPoint.Slide",
-         "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "Word.Document"
+         "application/vnd.ms-powerpoint.presentation.macroenabled.12": "PowerPoint.Slide",
+         "application/vnd.openxmlformats-officedocument.presentationml.slideshow": "PowerPoint.Slide",
+         "application/vnd.ms-powerpoint.slideshow.macroenabled.12": "PowerPoint.Slide",
+         "application/vnd.openxmlformats-officedocument.presentationml.template": "PowerPoint.Slide",
+         "application/vnd.ms-powerpoint.template.macroenabled.12": "PowerPoint.Slide",
+         "application/vnd.ms-powerpoint.addin.macroenabled.12": "PowerPoint.Slide",
+         "application/vnd.openxmlformats-officedocument.presentationml.slide": "PowerPoint.Slide",
+         "application/vnd.ms-powerpoint.slide.macroEnabled.12": "PowerPoint.Slide",
+
+         "application/vnd.ms-excel": "Excel.Sheet",
+         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "Excel.Sheet",
+         "application/vnd.openxmlformats-officedocument.spreadsheetml.template": "Excel.Sheet",
+         "application/vnd.ms-excel.sheet.macroenabled.12": "Excel.Sheet",
+         "application/vnd.ms-excel.template.macroenabled.12": "Excel.Sheet",
+         "application/vnd.ms-excel.addin.macroenabled.12": "Excel.Sheet",
+         "application/vnd.ms-excel.sheet.binary.macroenabled.12": "Excel.Sheet"
       },
 
       /**
@@ -281,14 +300,37 @@
        * @return {boolean} True if the action was completed successfully, false otherwise.
        */
       _launchOnlineEditor: function dlA__launchOnlineEditor(asset) {
-         var controlProgID = "SharePoint.OpenDocuments", mimetype = asset.mimetype, appProgID = null, activeXControl = null, extensionMap = {
-            xls: "application/vnd.ms-excel",
-            ppt: "application/vnd.ms-powerpoint",
-            doc: "application/msword",
-            xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-            docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-         };
+         var controlProgID = "SharePoint.OpenDocuments",
+            mimetype = asset.mimetype,
+            appProgID = null,
+            activeXControl = null,
+            extensionMap =
+            {
+               doc: "application/msword",
+               docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+               docm: "application/vnd.ms-word.document.macroenabled.12",
+               dotx: "application/vnd.openxmlformats-officedocument.wordprocessingml.template",
+               dotm: "application/vnd.ms-word.template.macroenabled.12",
+
+               ppt: "application/vnd.ms-powerpoint",
+               pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+               pptm: "application/vnd.ms-powerpoint.presentation.macroenabled.12",
+               ppsx: "application/vnd.openxmlformats-officedocument.presentationml.slideshow",
+               ppsm: "application/vnd.ms-powerpoint.slideshow.macroenabled.12",
+               potx: "application/vnd.openxmlformats-officedocument.presentationml.template",
+               potm: "application/vnd.ms-powerpoint.template.macroenabled.12",
+               ppam: "application/vnd.ms-powerpoint.addin.macroenabled.12",
+               sldx: "application/vnd.openxmlformats-officedocument.presentationml.slide",
+               sldm: "application/vnd.ms-powerpoint.slide.macroEnabled.12",
+
+               xls: "application/vnd.ms-excel",
+               xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+               xltx: "application/vnd.openxmlformats-officedocument.spreadsheetml.template",
+               xlsm: "application/vnd.ms-excel.sheet.macroenabled.12",
+               xltm: "application/vnd.ms-excel.template.macroenabled.12",
+               xlam: "application/vnd.ms-excel.addin.macroenabled.12",
+               xlsb: "application/vnd.ms-excel.sheet.binary.macroenabled.12"
+            };
 
          // Try to resolve the asset to an application ProgID; by mimetype first, then file extension.
          if (this.onlineEditMimetypes.hasOwnProperty(mimetype)) {
