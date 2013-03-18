@@ -478,7 +478,7 @@
   <!-- ***************************************************************************************************** -->
 
   <bean id="webscript.reports.sites.sites.get" class="se.vgregion.alfresco.repo.scripts.SitesReport" parent="webscript">
-    <property name="serviceRegistry" ref="ServiceRegistry" />
+    <property name="siteService" ref="SiteService" />
   </bean>
 
   <bean id="vgr.siteReport" class="se.vgregion.alfresco.repo.scripts.ScriptSiteReport" parent="baseJavaScriptExtension" >
