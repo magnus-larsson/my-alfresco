@@ -38,21 +38,23 @@ public class SitesReport extends DeclarativeWebScript {
 		try {
 			for (SiteInfo site : allSites) {
 				NodeRef nodeRef = site.getNodeRef();
-				long siteSize = rsu.getSiteSize(nodeRef);
-				long siteMembers = rsu.getNumberOfSiteMembers(site);
-				Date lastActivity = rsu.getLastActivityOnSite(site);
+				//long siteSize = rsu.getSiteSize(nodeRef);
+				//long siteMembers = rsu.getNumberOfSiteMembers(site);
+				//Date lastActivity = rsu.getLastActivityOnSite(site);
 				Map<String, Serializable> siteMap = new HashMap<String, Serializable>();
 				siteMap.put("shortName", site.getShortName());
 				siteMap.put("title", site.getTitle());
 				// siteMap.put("size", siteSize);
 				// siteMap.put("members", siteMembers);
 				DateFormat df = new SimpleDateFormat();
-				if (lastActivity != null) {
+				//if (lastActivity != null) {
 					// siteMap.put("lastActivity", df.format(lastActivity));
-				} else {
+				//} else {
 					// siteMap.put("lastActivity", "");
+				//}
+				for (int i=0; i < 2000;i++) {
+					sitesResult.add(siteMap);
 				}
-				sitesResult.add(siteMap);
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
