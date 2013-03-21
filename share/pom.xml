@@ -4,7 +4,7 @@
   <parent>
     <groupId>se.vgregion.alfresco</groupId>
     <artifactId>alfresco-vgr</artifactId>
-    <version>1.3.12</version>
+    <version>1.3.12.1</version>
   </parent>
 
   <artifactId>alfresco-vgr-share</artifactId>
@@ -113,14 +113,14 @@
               <url>http://localhost:${tomcat.share.port}/share/page/index</url>
             </configuration>
             <executions>
-							<execution>
-								<id>webscripts</id>
-								<phase>package</phase>
-								<goals>
-									<goal>refresh</goal>
-								</goals>
-							</execution>
-						</executions>
+              <execution>
+                <id>webscripts</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>refresh</goal>
+                </goals>
+              </execution>
+            </executions>
           </plugin>
 
           <plugin>

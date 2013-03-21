@@ -1,14 +1,18 @@
 package se.vgregion.alfresco.repo.rendition.executer;
 
+import java.util.Collection;
+
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.rendition.executer.AbstractTransformationRenderingEngine;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.TransformationOptions;
 import org.apache.commons.lang.StringUtils;
-import se.vgregion.alfresco.repo.content.transform.PdfaPilotTransformationOptions;
 
-import java.util.Collection;
+import se.vgregion.alfresco.repo.content.transform.PdfaPilotTransformationOptions;
 
 public class PdfaPilotRenderingEngine extends AbstractTransformationRenderingEngine {
 
@@ -33,6 +37,12 @@ public class PdfaPilotRenderingEngine extends AbstractTransformationRenderingEng
     String level = context.getCheckedParam(PARAM_LEVEL, String.class);
 
     if (StringUtils.isNotBlank(level)) {
+      ContentData content = (ContentData) nodeService.getProperty(context.getSourceNode(), ContentModel.PROP_CONTENT);
+
+      if (content != null && StringUtils.isNotBlank(content.getMimetype())) {
+        level = content.getMimetype().equalsIgnoreCase(MimetypeMap.MIMETYPE_PDF) ? "2b" : level;
+      }
+
       transformationOptions.setLevel(level);
     }
 
