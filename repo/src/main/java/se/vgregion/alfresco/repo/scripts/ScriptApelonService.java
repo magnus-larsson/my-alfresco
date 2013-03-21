@@ -1,22 +1,17 @@
 package se.vgregion.alfresco.repo.scripts;
 
-import org.alfresco.model.ContentModel;
 import org.alfresco.repo.jscript.BaseScopableProcessorExtension;
 import org.alfresco.repo.jscript.ScriptNode;
-import org.alfresco.repo.processor.BaseProcessorExtension;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.apache.commons.lang.StringUtils;
 import se.vgregion.alfresco.repo.constraints.ApelonService;
 import se.vgregion.alfresco.repo.constraints.sync.ApelonSynchronisation;
+import se.vgregion.alfresco.repo.constraints.sync.SynchroniseCallback;
 import se.vgregion.alfresco.repo.model.ApelonNode;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class ScriptApelonService extends BaseScopableProcessorExtension {
 

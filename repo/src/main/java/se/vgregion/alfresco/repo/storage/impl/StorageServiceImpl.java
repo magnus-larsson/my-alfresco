@@ -17,7 +17,14 @@ import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileFolderServiceType;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.rendition.RenditionService;
-import org.alfresco.service.cmr.repository.*;
+import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentData;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.CopyService;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.ResultSetRow;
@@ -27,7 +34,6 @@ import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.OwnableService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.thumbnail.ThumbnailService;
-import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.QNamePattern;
 import org.apache.commons.lang.StringUtils;
@@ -35,11 +41,16 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 import se.vgregion.alfresco.repo.model.VgrModel;
+import se.vgregion.alfresco.repo.storage.CreationCallback;
 import se.vgregion.alfresco.repo.storage.StorageService;
 import se.vgregion.alfresco.repo.utils.ServiceUtils;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 
 public class StorageServiceImpl implements StorageService, InitializingBean {
 
@@ -666,6 +677,11 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
   @Override
   public int createMissingPdfRenditions() {
+    return createMissingPdfRenditions(null);
+  }
+
+  @Override
+  public int createMissingPdfRenditions(final CreationCallback creationCallback) {
     final int count = AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Integer>() {
 
       @Override
@@ -689,6 +705,10 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
           for (final ResultSetRow document : documents) {
             try {
               count = createMissingPdfRendition(document) ? count + 1 : count;
+
+              if (creationCallback != null) {
+                creationCallback.execute();
+              }
             } catch (final Exception ex) {
               continue;
             }
@@ -765,3 +785,5 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   }
 
 }
+
+
