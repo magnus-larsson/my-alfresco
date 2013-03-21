@@ -1,9 +1,18 @@
 package se.vgregion.alfresco.repo.content.transform;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.transform.ContentTransformerHelper;
 import org.alfresco.repo.content.transform.ContentTransformerWorker;
-import org.alfresco.service.cmr.repository.*;
+import org.alfresco.service.cmr.repository.ContentIOException;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentWriter;
+import org.alfresco.service.cmr.repository.MimetypeService;
+import org.alfresco.service.cmr.repository.TransformationOptions;
 import org.alfresco.util.TempFileProvider;
 import org.alfresco.util.exec.RuntimeExec;
 import org.apache.commons.io.FilenameUtils;
@@ -12,11 +21,6 @@ import org.apache.commons.net.telnet.TelnetClient;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class PdfaPilotContentTransformerWorker extends ContentTransformerHelper implements ContentTransformerWorker, InitializingBean {
 
@@ -50,6 +54,7 @@ public class PdfaPilotContentTransformerWorker extends ContentTransformerHelper 
 
   private boolean _enabled;
 
+  @Override
   public void setMimetypeService(MimetypeService mimetypeService) {
     _mimetypeService = mimetypeService;
   }
@@ -142,9 +147,7 @@ public class PdfaPilotContentTransformerWorker extends ContentTransformerHelper 
   @Override
   public void transform(ContentReader reader, ContentWriter writer, TransformationOptions options) throws Exception {
     if (!isAvailable()) {
-      throw new ContentIOException("Content conversion failed (unavailable): \n" +
-              "   reader: " + reader + "\n" +
-              "   writer: " + writer);
+      throw new ContentIOException("Content conversion failed (unavailable): \n" + "   reader: " + reader + "\n" + "   writer: " + writer);
     }
 
     // get mimetypes
@@ -158,11 +161,9 @@ public class PdfaPilotContentTransformerWorker extends ContentTransformerHelper 
     String targetExtension = _mimetypeService.getExtension(targetMimetype);
 
     if (sourceExtension == null || targetExtension == null) {
-      throw new AlfrescoRuntimeException("Unknown extensions for mimetypes: \n" +
-              "   source mimetype: " + sourceMimetype + "\n" +
-              "   source extension: " + sourceExtension + "\n" +
-              "   target mimetype: " + targetMimetype + "\n" +
-              "   target extension: " + targetExtension);
+      throw new AlfrescoRuntimeException("Unknown extensions for mimetypes: \n" + "   source mimetype: " + sourceMimetype + "\n"
+          + "   source extension: " + sourceExtension + "\n" + "   target mimetype: " + targetMimetype + "\n" + "   target extension: "
+          + targetExtension);
     }
 
     // create required temp files
@@ -171,7 +172,8 @@ public class PdfaPilotContentTransformerWorker extends ContentTransformerHelper 
     File targetFile = TempFileProvider.createTempFile(getClass().getSimpleName() + "_target_", "." + targetExtension);
 
     // pdfaPilot adds _PDFA to the final name, thereof this one here
-    File finalTargetFile = new File(FilenameUtils.getFullPath(targetFile.getAbsolutePath()) + FilenameUtils.getBaseName(targetFile.getName()) + "_PDFA" + "." + targetExtension);
+    File finalTargetFile = new File(FilenameUtils.getFullPath(targetFile.getAbsolutePath()) + FilenameUtils.getBaseName(targetFile.getName())
+        + "_PDFA" + "." + targetExtension);
 
     // pull reader file into source temp file
     reader.getContent(sourceFile);
@@ -255,7 +257,8 @@ public class PdfaPilotContentTransformerWorker extends ContentTransformerHelper 
     Assert.notNull(_documentFormatRegistry, "DocumentFormatRegistry must be set");
 
     try {
-      // On some platforms / versions, the -version command seems to return an error code whilst still
+      // On some platforms / versions, the -version command seems to return an
+      // error code whilst still
       // returning output, so let's not worry about the exit code!
       RuntimeExec.ExecutionResult result = _checkCommand.execute();
 
@@ -265,8 +268,7 @@ public class PdfaPilotContentTransformerWorker extends ContentTransformerHelper 
         throw new RuntimeException("Could not find any pdfaPilot servers on " + _endpointHost + ":" + _endpointPort);
       }
     } catch (Throwable e) {
-      LOG.error(getClass().getSimpleName() + " not available: "
-              + (e.getMessage() != null ? e.getMessage() : ""));
+      LOG.error(getClass().getSimpleName() + " not available: " + (e.getMessage() != null ? e.getMessage() : ""));
 
       // debug so that we can trace the issue if required
       LOG.debug(e);
