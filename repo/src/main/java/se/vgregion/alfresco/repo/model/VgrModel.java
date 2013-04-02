@@ -134,4 +134,6 @@ public interface VgrModel {
   public static final QName PROP_AUTO_DELETABLE_DELETE_NODE = QName.createQName(VGR_URI, "delete_node");
   public static final QName PROP_AUTO_DELETABLE_MIMETYPES = QName.createQName(VGR_URI, "mimetypes");
 
+  public static final QName PROP_SENT_EMAILS = QName.createQName(VGR_URI, "sent-emails");
+
 }

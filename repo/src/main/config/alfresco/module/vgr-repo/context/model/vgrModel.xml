@@ -934,6 +934,19 @@
       </properties>
     </aspect>
 
+    <!-- ######################################################################### -->
+    <!-- Aspect for controlling whether validity reminders has been sent out or not -->
+    <!-- ######################################################################### -->
+
+    <aspect name="vgr:validity-checked">
+      <title>Giltighetstidskontroll</title>
+      <properties>
+        <property name="vgr:sent-emails">
+          <type>d:int</type>
+        </property>
+      </properties>
+    </aspect>
+
   </aspects>
 
 </model>

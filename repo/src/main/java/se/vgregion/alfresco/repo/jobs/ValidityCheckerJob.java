@@ -4,13 +4,13 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-public class AutoDeleteJob implements Job {
+public class ValidityCheckerJob implements Job {
 
   @Override
   public void execute(JobExecutionContext context) throws JobExecutionException {
-    ClusteredExecuter autoDeleter = (ClusteredExecuter) context.getJobDetail().getJobDataMap().get("autoDeleter");
+    ClusteredExecuter validityChecker = (ClusteredExecuter) context.getJobDetail().getJobDataMap().get("validityChecker");
 
-    autoDeleter.execute();
+    validityChecker.execute();
   }
 
 }

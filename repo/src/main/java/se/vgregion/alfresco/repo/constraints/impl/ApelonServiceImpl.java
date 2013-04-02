@@ -32,7 +32,11 @@ import vocabularyservices.wsdl.metaservice_vgr_se.v2.GetVocabularyRequest;
 import vocabularyservices.wsdl.metaservice_vgr_se.v2.VocabularyService;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.UUID;
 
 public class ApelonServiceImpl implements ApelonService {
 

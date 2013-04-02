@@ -15,7 +15,7 @@ import se.vgregion.alfresco.repo.model.VgrModel;
  * Policy for changing all documents created in the document library to
  * vgr:document. Must be done in order to be able to use the Sharepoint feature.
  *
- * @author Niklas Ekman (niklas.ekman@redpill-linpro.com
+ * @author Niklas Ekman (niklas.ekman@redpill-linpro.com)
  */
 public class ChangeTypePolicy extends AbstractPolicy implements OnCreateNodePolicy {
 

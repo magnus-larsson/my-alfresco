@@ -1,5 +1,20 @@
 package se.vgregion.alfresco.repo.content.transform;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.content.filestore.FileContentReader;
 import org.alfresco.repo.content.filestore.FileContentWriter;
@@ -18,11 +33,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.StringUtils;
-
-import java.io.*;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 @ContextConfiguration(locations = {"classpath*:alfresco/subsystems/pdfaPilot/default/pdfapilot-context.xml", "classpath:test-pdfa-pilot-convert-context.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
