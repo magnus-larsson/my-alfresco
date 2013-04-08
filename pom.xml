@@ -17,7 +17,6 @@
   <modules>
     <module>sharepoint</module>
     <module>webpreviewer</module>
-    <module>pdfa-pilot-converter</module>
     <module>repo</module>
     <module>share</module>
     <module>migration</module>

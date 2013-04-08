@@ -400,7 +400,7 @@
   <!-- Thumbnail definition that is actually a PDF preview :) -->
   <!-- ****************************************************** -->
 
-  <bean name="pdfaPilot.pdfOptions" class="se.vgregion.alfresco.repo.content.transform.PdfaPilotTransformationOptions">
+  <bean name="pdfaPilot.pdfOptions" class="org.redpill.alfresco.repo.content.transform.PdfaPilotTransformationOptions">
     <property name="readLimitTimeMs" value="-1" />
     <property name="maxSourceSizeKBytes" value="-1" />
     <property name="readLimitKBytes" value="-1" />
@@ -429,7 +429,7 @@
   <!-- Thumbnail definition that is actually a PDF/A rendition :) -->
   <!-- ********************************************************** -->
 
-  <bean name="pdfaPilot.pdfaOptions" class="se.vgregion.alfresco.repo.content.transform.PdfaPilotTransformationOptions">
+  <bean name="pdfaPilot.pdfaOptions" class="org.redpill.alfresco.repo.content.transform.PdfaPilotTransformationOptions">
     <property name="readLimitTimeMs" value="-1" />
     <property name="maxSourceSizeKBytes" value="-1" />
     <property name="readLimitKBytes" value="-1" />

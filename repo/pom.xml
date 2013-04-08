@@ -147,9 +147,9 @@
     </dependency>
 
     <dependency>
-      <groupId>se.vgregion.alfresco.repo.content.transform</groupId>
+      <groupId>org.redpill-linpro.alfresco.repo.content.transform</groupId>
       <artifactId>pdfa-pilot-converter</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.1</version>
     </dependency>
 
     <dependency>
