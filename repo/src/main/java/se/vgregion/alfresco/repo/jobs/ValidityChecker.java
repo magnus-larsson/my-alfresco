@@ -94,7 +94,7 @@ public class ValidityChecker extends ClusteredExecuter {
 
         String source = (String) _nodeService.getProperty(node, VgrModel.PROP_SOURCE);
 
-        String body = I18NUtil.getMessage((String) mail.get("body"), source);
+        String body = I18NUtil.getMessage((String) mail.get("body"), daysBefore, source);
 
         _sendMailService.sendTextMail(subject, _mailFrom, to, body);
 
@@ -120,7 +120,7 @@ public class ValidityChecker extends ClusteredExecuter {
 
         String source = (String) _nodeService.getProperty(node, VgrModel.PROP_SOURCE);
 
-        String body = I18NUtil.getMessage((String) mail.get("body"), source);
+        String body = I18NUtil.getMessage((String) mail.get("body"), daysBefore, source);
 
         _sendMailService.sendTextMail(subject, _mailFrom, to, body);
 
@@ -139,7 +139,7 @@ public class ValidityChecker extends ClusteredExecuter {
 
     List<String> recipients = new ArrayList<String>();
 
-    if (creatorIds.size() > 0) {
+    if (creatorIds != null && creatorIds.size() > 0) {
       recipients.addAll(creatorIds);
     }
 
@@ -156,7 +156,7 @@ public class ValidityChecker extends ClusteredExecuter {
     @SuppressWarnings("unchecked")
     List<String> creatorDocumentIds = (List<String>) _nodeService.getProperty(node, VgrModel.PROP_CREATOR_DOCUMENT_ID);
 
-    if (creatorDocumentIds.size() > 0) {
+    if (creatorDocumentIds != null && creatorDocumentIds.size() > 0) {
       recipients.addAll(creatorDocumentIds);
     }
 
@@ -176,7 +176,7 @@ public class ValidityChecker extends ClusteredExecuter {
     query.append("ASPECT:\"vgr:published\" AND ");
     query.append("vgr:dc\\.date\\.availablefrom:[MIN TO \"" + sNow + "\"] AND ");
     query.append("(ISNULL:\"vgr:dc.date.availableto\" OR vgr:dc\\.date\\.availableto:[\"" + sNow + "\" TO MAX]) AND ");
-    query.append("ISNOTNULL:\"vgr:dc.date.validto\" AND vgr:dc\\.date\\.validto:[NOW TO \"" + sOld + "\"] AND ");
+    query.append("ISNOTNULL:\"vgr:dc.date.validto\" AND vgr:dc\\.date\\.validto:[MIN TO \"" + sOld + "\"] AND ");
     query.append("ISNOTNULL:\"vgr:pushed-for-publish\" AND ");
 
     if (sentEmails == null) {
