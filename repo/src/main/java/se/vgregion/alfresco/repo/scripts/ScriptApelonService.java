@@ -1,25 +1,22 @@
 package se.vgregion.alfresco.repo.scripts;
 
+import java.util.List;
+
 import org.alfresco.repo.jscript.BaseScopableProcessorExtension;
 import org.alfresco.repo.jscript.ScriptNode;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.apache.commons.lang.StringUtils;
-import se.vgregion.alfresco.repo.constraints.ApelonService;
-import se.vgregion.alfresco.repo.constraints.sync.ApelonSynchronisation;
-import se.vgregion.alfresco.repo.constraints.sync.SynchroniseCallback;
-import se.vgregion.alfresco.repo.model.ApelonNode;
 
-import java.util.List;
+import se.vgregion.alfresco.repo.constraints.ApelonService;
+import se.vgregion.alfresco.repo.jobs.ClusteredExecuter;
+import se.vgregion.alfresco.repo.model.ApelonNode;
 
 public class ScriptApelonService extends BaseScopableProcessorExtension {
 
   private ApelonService _apelonService;
 
-  private List<ApelonSynchronisation> _synchronisations;
-
-  private ContentService _contentService;
+  private List<ClusteredExecuter> _synchronisations;
 
   private ServiceRegistry _serviceRegistry;
 
@@ -27,12 +24,8 @@ public class ScriptApelonService extends BaseScopableProcessorExtension {
     _apelonService = apelonService;
   }
 
-  public void setSynchronisations(final List<ApelonSynchronisation> synchronisations) {
+  public void setSynchronisations(final List<ClusteredExecuter> synchronisations) {
     _synchronisations = synchronisations;
-  }
-
-  public void setContentService(ContentService contentService) {
-    _contentService = contentService;
   }
 
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
@@ -96,8 +89,8 @@ public class ScriptApelonService extends BaseScopableProcessorExtension {
   }
 
   public void synchronise() {
-    for (final ApelonSynchronisation synchronisation : _synchronisations) {
-      synchronisation.synchronise();
+    for (final ClusteredExecuter synchronisation : _synchronisations) {
+      synchronisation.execute();
     }
   }
 

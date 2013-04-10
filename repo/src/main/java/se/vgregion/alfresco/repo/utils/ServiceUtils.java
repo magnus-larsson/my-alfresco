@@ -1,5 +1,24 @@
 package se.vgregion.alfresco.repo.utils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.URL;
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.regex.Pattern;
+
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.search.QueryParameterDefImpl;
@@ -14,12 +33,24 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
-import org.alfresco.service.cmr.repository.*;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentData;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.MimetypeService;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
-import org.alfresco.service.cmr.security.*;
+import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.AuthorityService;
+import org.alfresco.service.cmr.security.AuthorityType;
+import org.alfresco.service.cmr.security.PermissionService;
+import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.cmr.site.SiteInfo;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
@@ -30,22 +61,17 @@ import org.apache.tika.io.IOUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
-import se.vgregion.alfresco.repo.model.VgrModel;
 
-import java.io.*;
-import java.lang.reflect.Method;
-import java.net.InetAddress;
-import java.net.URL;
-import java.security.MessageDigest;
-import java.util.*;
-import java.util.regex.Pattern;
+import se.vgregion.alfresco.repo.model.VgrModel;
 
 public class ServiceUtils implements InitializingBean {
 
   private static final int STREAM_BUFFER_LENGTH = 32 * 1024;
 
-  private static final Pattern docLib = Pattern
-          .compile("/\\{http://www.alfresco.org/model/application/1.0\\}company_home/\\{http://www.alfresco.org/model/site/1.0\\}sites/\\{http://www.alfresco.org/model/content/1.0\\}.*/\\{http://www.alfresco.org/model/content/1.0\\}documentLibrary/.*");
+  private static final Pattern docLibPattern = Pattern
+      .compile("/\\{http://www.alfresco.org/model/application/1.0\\}company_home/\\{http://www.alfresco.org/model/site/1.0\\}sites/\\{http://www.alfresco.org/model/content/1.0\\}.*/\\{http://www.alfresco.org/model/content/1.0\\}documentLibrary/.*");
+
+  private static final Pattern storagePattern = Pattern.compile("/\\{http://www.alfresco.org/model/application/1.0\\}company_home/\\{http://www.alfresco.org/model/content/1.0\\}Lagret/.*");
 
   private TransactionService _transactionService;
 
@@ -162,7 +188,6 @@ public class ServiceUtils implements InitializingBean {
   }
 
   public boolean isDocumentLibrary(final NodeRef nodeRef) {
-    // just add the standard aspect
     final Path path = AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Path>() {
 
       @Override
@@ -179,7 +204,24 @@ public class ServiceUtils implements InitializingBean {
 
     final String pth = path.toString();
 
-    final boolean matches = docLib.matcher(pth).matches();
+    final boolean matches = docLibPattern.matcher(pth).matches();
+
+    return matches;
+  }
+
+  public boolean isStorage(final NodeRef nodeRef) {
+    Path path = AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Path>() {
+
+      @Override
+      public Path doWork() throws Exception {
+        return _nodeService.getPath(nodeRef);
+      }
+
+    }, AuthenticationUtil.getSystemUserName());
+
+    String pth = path.toString();
+
+    boolean matches = storagePattern.matcher(pth).matches();
 
     return matches;
   }
@@ -313,14 +355,13 @@ public class ServiceUtils implements InitializingBean {
 
         params[1] = new QueryParameterDefImpl(ContentModel.PROP_TITLE, _dictionaryService.getDataType(DataTypeDefinition.TEXT), true, escNameFilter);
 
-        params[2] = new QueryParameterDefImpl(ContentModel.PROP_DESCRIPTION, _dictionaryService.getDataType(DataTypeDefinition.TEXT), true,
-                escNameFilter);
+        params[2] = new QueryParameterDefImpl(ContentModel.PROP_DESCRIPTION, _dictionaryService.getDataType(DataTypeDefinition.TEXT), true, escNameFilter);
 
         // get the sites that match the specified names
         query = new StringBuilder(0);
 
-        query.append("+PARENT:\"").append(siteRoot.toString()).append("\" +(@cm\\:name:\"*${cm:name}*\"").append(" @cm\\:title:\"${cm:title}\"")
-                .append(" @cm\\:description:\"${cm:description}\"").append(" @st\\:siteVisibility:\"PUBLIC\")");
+        query.append("+PARENT:\"").append(siteRoot.toString()).append("\" +(@cm\\:name:\"*${cm:name}*\"").append(" @cm\\:title:\"${cm:title}\"").append(" @cm\\:description:\"${cm:description}\"")
+        .append(" @st\\:siteVisibility:\"PUBLIC\")");
       } else {
         params = new QueryParameterDefinition[0];
 
@@ -747,7 +788,7 @@ public class ServiceUtils implements InitializingBean {
 
   /**
    * Creates a link to the original document in Share
-   *
+   * 
    * @param nodeRef
    * @return the original link
    */
@@ -768,20 +809,24 @@ public class ServiceUtils implements InitializingBean {
    * Original desc: List the members of the site. This includes both users and
    * groups if collapseGroups is set to false, otherwise all groups that are
    * members are collapsed into their component users and listed.
-   *
-   * @param shortName      site short name
-   * @param nameFilter     name filter
-   * @param roleFilter     role filter
-   * @param size           max results size crop if >0
-   * @param collapseGroups true if collapse member groups into user list, false otherwise
+   * 
+   * @param shortName
+   *          site short name
+   * @param nameFilter
+   *          name filter
+   * @param roleFilter
+   *          role filter
+   * @param size
+   *          max results size crop if >0
+   * @param collapseGroups
+   *          true if collapse member groups into user list, false otherwise
    * @return Map<String, String> the authority name and their role
    */
-  public Map<String, String> listSiteMembers(final String shortName, final String nameFilter, final String roleFilter, final int size,
-                                             final boolean collapseGroups) {
+  public Map<String, String> listSiteMembers(final String shortName, final String nameFilter, final String roleFilter, final int size, final boolean collapseGroups) {
     final SiteInfo site = _siteService.getSite(shortName);
 
     if (site == null) {
-      throw new SiteServiceException("site_service.site_no_exist", new Object[]{shortName});
+      throw new SiteServiceException("site_service.site_no_exist", new Object[] { shortName });
     }
 
     // Build an array of name filter tokens pre lowercased to test against
@@ -816,45 +861,45 @@ public class ServiceUtils implements InitializingBean {
         final Set<String> authorities = _authorityService.getContainedAuthorities(null, groupName, true);
         for (final String authority : authorities) {
           switch (AuthorityType.getAuthorityType(authority)) {
-            case USER:
-              boolean addUser = true;
-              if (nameFilter != null && nameFilter.length() != 0 && !nameFilter.equals(authority)) {
-                // found a filter - does it match person first/last name?
-                addUser = matchPerson(nameFilters, authority);
-              }
-              if (addUser) {
-                // Add the user and their permission to the returned map
-                members.put(authority, permission);
+          case USER:
+            boolean addUser = true;
+            if (nameFilter != null && nameFilter.length() != 0 && !nameFilter.equals(authority)) {
+              // found a filter - does it match person first/last name?
+              addUser = matchPerson(nameFilters, authority);
+            }
+            if (addUser) {
+              // Add the user and their permission to the returned map
+              members.put(authority, permission);
 
-                // break on max size limit reached
-                if (members.size() == size) {
-                  break;
-                }
+              // break on max size limit reached
+              if (members.size() == size) {
+                break;
               }
-              break;
-            case GROUP:
-              if (collapseGroups) {
-                if (!groupsToExpand.containsKey(authority)) {
-                  groupsToExpand.put(authority, permission);
+            }
+            break;
+          case GROUP:
+            if (collapseGroups) {
+              if (!groupsToExpand.containsKey(authority)) {
+                groupsToExpand.put(authority, permission);
+              }
+            } else {
+              if (nameFilter != null && nameFilter.length() != 0) {
+                // found a filter - does it match Group name part?
+                if (authority.substring(PermissionService.GROUP_PREFIX.length()).toLowerCase().contains(nameFilterLower)) {
+                  members.put(authority, permission);
+                } else {
+                  // Does it match on the Group Display Name part instead?
+                  final String displayName = _authorityService.getAuthorityDisplayName(authority);
+                  if (displayName != null && displayName.toLowerCase().contains(nameFilterLower)) {
+                    members.put(authority, permission);
+                  }
                 }
               } else {
-                if (nameFilter != null && nameFilter.length() != 0) {
-                  // found a filter - does it match Group name part?
-                  if (authority.substring(PermissionService.GROUP_PREFIX.length()).toLowerCase().contains(nameFilterLower)) {
-                    members.put(authority, permission);
-                  } else {
-                    // Does it match on the Group Display Name part instead?
-                    final String displayName = _authorityService.getAuthorityDisplayName(authority);
-                    if (displayName != null && displayName.toLowerCase().contains(nameFilterLower)) {
-                      members.put(authority, permission);
-                    }
-                  }
-                } else {
-                  // No name filter add this group
-                  members.put(authority, permission);
-                }
+                // No name filter add this group
+                members.put(authority, permission);
               }
-              break;
+            }
+            break;
           }
         }
       }
@@ -890,16 +935,15 @@ public class ServiceUtils implements InitializingBean {
 
   /**
    * Helper to match name filters to Person properties
-   *
+   * 
    * @param nameFilters
    * @param username
    * @return
    */
   private boolean matchPerson(final Pattern[] nameFilters, final String username) {
     final Map<QName, Serializable> values = _nodeService.getProperties(_personService.getPerson(username, false));
-    final String[] terms = {((String) values.get(ContentModel.PROP_FIRSTNAME)).toLowerCase(),
-            ((String) values.get(ContentModel.PROP_LASTNAME)).toLowerCase(), ((String) values.get(ContentModel.PROP_EMAIL)).toLowerCase(),
-            ((String) values.get(ContentModel.PROP_USERNAME)).toLowerCase()};
+    final String[] terms = { ((String) values.get(ContentModel.PROP_FIRSTNAME)).toLowerCase(), ((String) values.get(ContentModel.PROP_LASTNAME)).toLowerCase(),
+        ((String) values.get(ContentModel.PROP_EMAIL)).toLowerCase(), ((String) values.get(ContentModel.PROP_USERNAME)).toLowerCase() };
 
     // if user inputed two things, i.e two nameFilters we just suppose this is
     // first and last name and check that both should match
@@ -933,9 +977,8 @@ public class ServiceUtils implements InitializingBean {
     return published;
   }
 
-
   public void disableAllBehaviours() {
-    //find site name
+    // find site name
     AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>() {
 
       @Override

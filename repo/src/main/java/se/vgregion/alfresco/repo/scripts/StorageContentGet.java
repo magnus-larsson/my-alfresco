@@ -18,6 +18,18 @@
  */
 package se.vgregion.alfresco.repo.scripts;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletResponse;
+
 import org.alfresco.cmis.CMISFilterNotValidException;
 import org.alfresco.cmis.CMISRendition;
 import org.alfresco.cmis.CMISRenditionService;
@@ -27,7 +39,6 @@ import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.web.scripts.FileTypeImageUtils;
 import org.alfresco.repo.web.scripts.content.StreamContent;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.rendition.RenditionService;
 import org.alfresco.service.cmr.repository.FileTypeImageSize;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -42,18 +53,18 @@ import org.alfresco.util.VersionNumber;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.extensions.surf.util.I18NUtil;
-import org.springframework.extensions.webscripts.*;
+import org.springframework.extensions.webscripts.Cache;
+import org.springframework.extensions.webscripts.Status;
+import org.springframework.extensions.webscripts.WebScriptException;
+import org.springframework.extensions.webscripts.WebScriptRequest;
+import org.springframework.extensions.webscripts.WebScriptResponse;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.context.support.ServletContextResource;
+
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.storage.StorageService;
 import se.vgregion.alfresco.repo.utils.ServiceUtils;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.*;
 
 /**
  * Content Retrieval Service for the Storage
@@ -73,8 +84,6 @@ public class StorageContentGet extends StreamContent implements ServletContextAw
   private CMISRenditionService _cmisRenditionService;
 
   private SearchService _searchService;
-
-  private RenditionService _renditionService;
 
   private ServiceUtils _serviceUtils;
 
@@ -101,10 +110,6 @@ public class StorageContentGet extends StreamContent implements ServletContextAw
 
   public void setSearchService(final SearchService searchService) {
     _searchService = searchService;
-  }
-
-  public void setRenditionService(final RenditionService renditionService) {
-    _renditionService = renditionService;
   }
 
   public void setServiceUtils(final ServiceUtils serviceUtils) {
@@ -236,7 +241,7 @@ public class StorageContentGet extends StreamContent implements ServletContextAw
    * @throws IOException
    */
   private void streamRendition(final WebScriptRequest req, final WebScriptResponse res, final NodeRef nodeRef, final String streamId,
-                               final boolean attach) throws IOException {
+      final boolean attach) throws IOException {
     try {
       // find rendition
       CMISRendition rendition = null;
@@ -366,7 +371,7 @@ public class StorageContentGet extends StreamContent implements ServletContextAw
 
   private NodeRef getPublishedStorageVersion(final String nodeRef, final String version) {
     final String query = "TYPE:\"vgr:document\" AND ASPECT:\"vgr:published\" AND vgr:dc_x002e_source_x002e_documentid:\"" + nodeRef
-            + "\" AND vgr:dc_x002e_identifier_x002e_version:\"" + version + "\"";
+        + "\" AND vgr:dc_x002e_identifier_x002e_version:\"" + version + "\"";
 
     final SearchParameters searchParameters = new SearchParameters();
     searchParameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);

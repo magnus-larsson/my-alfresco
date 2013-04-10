@@ -1,18 +1,16 @@
 package se.vgregion.alfresco.repo.scripts;
 
+import java.util.Date;
+
 import org.alfresco.repo.jscript.BaseScopableProcessorExtension;
 import org.alfresco.service.cmr.site.SiteInfo;
 import org.alfresco.service.cmr.site.SiteService;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
+
 import se.vgregion.alfresco.repo.report.ReportSiteUsage;
 
-import java.util.Date;
-
 public class ScriptSiteReport extends BaseScopableProcessorExtension implements InitializingBean {
-
-  private static final Logger LOG = Logger.getLogger(ScriptSiteReport.class);
 
   protected SiteService _siteService;
 

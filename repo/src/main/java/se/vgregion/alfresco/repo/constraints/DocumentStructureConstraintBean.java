@@ -1,14 +1,9 @@
 package se.vgregion.alfresco.repo.constraints;
 
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.namespace.QName;
-import org.apache.commons.lang.StringUtils;
-import se.vgregion.alfresco.repo.model.VgrModel;
 
-import java.io.Serializable;
-import java.util.List;
+import se.vgregion.alfresco.repo.model.VgrModel;
 
 public class DocumentStructureConstraintBean extends ApelonNodeTypeConstraintBean {
 

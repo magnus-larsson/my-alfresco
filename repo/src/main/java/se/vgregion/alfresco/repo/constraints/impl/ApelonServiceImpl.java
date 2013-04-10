@@ -1,7 +1,15 @@
 package se.vgregion.alfresco.repo.constraints.impl;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.UUID;
+
 import keywordservices.wsdl.metaservice_vgr_se.v2.GetKeywordsRequest;
 import keywordservices.wsdl.metaservice_vgr_se.v2.KeywordService;
+
 import org.alfresco.repo.cache.EhCacheAdapter;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -13,6 +21,7 @@ import org.alfresco.service.cmr.search.ResultSetRow;
 import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
 import org.apache.commons.lang.StringUtils;
+
 import se.vgr.metaservice.schema.document.v1.TextDocumentType;
 import se.vgr.metaservice.schema.node.v2.NodePropertyType;
 import se.vgr.metaservice.schema.node.v2.NodeType;
@@ -30,13 +39,6 @@ import vocabularyservices.wsdl.metaservice_vgr_se.v2.FindNodesByNameRequest;
 import vocabularyservices.wsdl.metaservice_vgr_se.v2.FindNodesRequest;
 import vocabularyservices.wsdl.metaservice_vgr_se.v2.GetVocabularyRequest;
 import vocabularyservices.wsdl.metaservice_vgr_se.v2.VocabularyService;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
 
 public class ApelonServiceImpl implements ApelonService {
 
@@ -158,7 +160,7 @@ public class ApelonServiceImpl implements ApelonService {
 
   @Override
   public List<ApelonNode> findNodes(String namespace, String propertyName, String propertyValue, boolean sort,
-                                    int returnSize) {
+      int returnSize) {
     IdentificationType identification = new IdentificationType();
     identification.setProfileId(ApelonService.PROFILE_ID);
     identification.setUserId(AuthenticationUtil.getFullyAuthenticatedUser());
@@ -186,7 +188,7 @@ public class ApelonServiceImpl implements ApelonService {
   }
 
   private NodeListResponseObjectType internalFindNodes(String namespace, OptionsType options, IdentificationType identification,
-                                                       String propertyName, String propertyValue) {
+      String propertyName, String propertyValue) {
     if (StringUtils.isNotBlank(propertyName)) {
       FilterByProperties filter = new FilterByProperties();
       Entry filterEntry = new Entry();
@@ -428,7 +430,7 @@ public class ApelonServiceImpl implements ApelonService {
 
   static class ListComparator implements Comparator<ApelonNode>, Serializable {
 
-    private static long serialVersionUID = 6945775292248924071L;
+    private static final long serialVersionUID = -925347541442211110L;
 
     @Override
     public int compare(ApelonNode node1, ApelonNode node2) {
@@ -492,7 +494,7 @@ public class ApelonServiceImpl implements ApelonService {
     }
 
     String query = "TYPE:\"apelon:recordType\" AND @apelon\\:rtDocumentTypeId:\"" + documentTypeApelonNode.getInternalId()
-            + "\" AND @apelon\\:name:\"" + recordType + "\"";
+        + "\" AND @apelon\\:name:\"" + recordType + "\"";
 
     SearchParameters searchParameters = new SearchParameters();
     searchParameters.setLanguage(SearchService.LANGUAGE_LUCENE);

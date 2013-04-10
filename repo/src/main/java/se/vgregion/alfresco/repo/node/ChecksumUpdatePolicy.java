@@ -4,13 +4,13 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.ContentServicePolicies.OnContentPropertyUpdatePolicy;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.policy.JavaBehaviour;
-import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.lock.LockStatus;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
 import org.apache.log4j.Logger;
+
 import se.vgregion.alfresco.repo.model.VgrModel;
 
 public class ChecksumUpdatePolicy extends AbstractPolicy implements OnContentPropertyUpdatePolicy {
@@ -67,7 +67,7 @@ public class ChecksumUpdatePolicy extends AbstractPolicy implements OnContentPro
     super.afterPropertiesSet();
 
     _policyComponent.bindClassBehaviour(OnContentPropertyUpdatePolicy.QNAME, VgrModel.TYPE_VGR_DOCUMENT, new JavaBehaviour(this,
-            "onContentPropertyUpdate", NotificationFrequency.TRANSACTION_COMMIT));
+        "onContentPropertyUpdate", NotificationFrequency.TRANSACTION_COMMIT));
   }
 
 }
