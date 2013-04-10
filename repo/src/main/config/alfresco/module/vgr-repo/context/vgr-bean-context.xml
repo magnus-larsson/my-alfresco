@@ -20,7 +20,6 @@
     <property name="behaviourFilter" ref="policyBehaviourFilter" />
     <property name="globalProperties" ref="global-properties" />
     <property name="storageNodeRef" value="${vgr.storage.noderef}" />
-    <property name="renditionService" ref="RenditionService" />
     <property name="contentService" ref="ContentService" />
     <property name="searchService" ref="SearchService" />
     <property name="dictionaryService" ref="DictionaryService" />
@@ -204,7 +203,6 @@
   <bean id="webscript.webdok.webdok.get" class="se.vgregion.alfresco.repo.scripts.WebDok" parent="webscript.org.alfresco.cmis.content.get">
     <property name="searchService" ref="SearchService" />
     <property name="serviceUtils" ref="vgr.serviceUtils" />
-    <property name="renditionService" ref="RenditionService" />
     <property name="thumbnailService" ref="ThumbnailService" />
     <property name="storageService" ref="vgr.storageService" />
   </bean>

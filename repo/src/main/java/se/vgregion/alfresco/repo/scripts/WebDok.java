@@ -10,15 +10,12 @@ import java.util.Map;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.web.scripts.content.ContentGet;
-import org.alfresco.service.cmr.rendition.RenditionService;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.ResultSetRow;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.thumbnail.ThumbnailService;
-import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -38,8 +35,6 @@ public class WebDok extends ContentGet {
 
   private ServiceUtils _serviceUtils;
 
-  private RenditionService _renditionService;
-
   private ThumbnailService _thumbnailService;
 
   private StorageService _storageService;
@@ -50,10 +45,6 @@ public class WebDok extends ContentGet {
 
   public void setServiceUtils(final ServiceUtils serviceUtils) {
     _serviceUtils = serviceUtils;
-  }
-
-  public void setRenditionService(final RenditionService renditionService) {
-    _renditionService = renditionService;
   }
 
   public void setThumbnailService(ThumbnailService thumbnailService) {
