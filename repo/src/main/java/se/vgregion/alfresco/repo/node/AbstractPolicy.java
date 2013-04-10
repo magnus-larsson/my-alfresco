@@ -1,5 +1,8 @@
 package se.vgregion.alfresco.repo.node;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.policy.PolicyComponent;
@@ -14,11 +17,9 @@ import org.alfresco.service.namespace.QName;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
+
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.utils.ServiceUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class AbstractPolicy implements InitializingBean {
 
@@ -60,6 +61,10 @@ public abstract class AbstractPolicy implements InitializingBean {
 
   public boolean isDocumentLibrary(final NodeRef nodeRef) {
     return _serviceUtils.isDocumentLibrary(nodeRef);
+  }
+
+  public boolean isStorage(NodeRef nodeRef) {
+    return _serviceUtils.isStorage(nodeRef);
   }
 
   @Override

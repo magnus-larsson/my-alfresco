@@ -1,5 +1,12 @@
 package se.vgregion.alfresco.repo.storage.impl;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
+
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
@@ -17,7 +24,6 @@ import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileFolderServiceType;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.rendition.RenditionService;
-import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -34,23 +40,15 @@ import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.OwnableService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.thumbnail.ThumbnailService;
-import org.alfresco.service.namespace.QName;
-import org.alfresco.service.namespace.QNamePattern;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
+
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.storage.CreationCallback;
 import se.vgregion.alfresco.repo.storage.StorageService;
 import se.vgregion.alfresco.repo.utils.ServiceUtils;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
 
 public class StorageServiceImpl implements StorageService, InitializingBean {
 
@@ -185,7 +183,8 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     final String oldName = (String) _nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
     final String newName = getUniqueName(finalFolder, oldName);
 
-    // disable the auditable aspect in order to prevent the last updated user to be "system"
+    // disable the auditable aspect in order to prevent the last updated user to
+    // be "system"
     _behaviourFilter.disableBehaviour(ContentModel.ASPECT_AUDITABLE);
 
     // we don't want to up the version, so we disable the versionalbe aspect
@@ -221,15 +220,14 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
         if (publishedNodeRef != null) {
           // then we need to update the copy's properties as well
           _nodeService.setProperty(publishedNodeRef, VgrModel.PROP_DATE_ISSUED, now);
-          _nodeService.setProperty(publishedNodeRef, VgrModel.PROP_DATE_AVAILABLE_FROM,
-                  _nodeService.getProperty(nodeRef, VgrModel.PROP_DATE_AVAILABLE_FROM));
+          _nodeService.setProperty(publishedNodeRef, VgrModel.PROP_DATE_AVAILABLE_FROM, _nodeService.getProperty(nodeRef, VgrModel.PROP_DATE_AVAILABLE_FROM));
           _nodeService.setProperty(publishedNodeRef, VgrModel.PROP_PUBLISHER, _serviceUtils.getRepresentation(username));
           _nodeService.setProperty(publishedNodeRef, VgrModel.PROP_PUBLISHER_ID, username);
         } else {
           // new publication! let's copy the node to storage
 
-          // unpublish all old associations
-          unpublishAssocs(nodeRef, now);
+          // unpublish all old documents
+          unpublishFromStorage(nodeRef.toString());
 
           // make a copy of the source and rename it...
           final NodeRef newNode = _copyService.copyAndRename(nodeRef, finalFolder, ContentModel.ASSOC_CONTAINS, null, true);
@@ -296,53 +294,32 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     }
   }
 
-  private void unpublishAssocs(final NodeRef nodeRef, final Date now) {
-    final List<AssociationRef> previousPublished = getPublishedAssocs(nodeRef);
-    if (previousPublished.isEmpty()) {
-      return;
-    }
-
-    for (final AssociationRef published : previousPublished) {
-      // check if it's still published
-      final Date availiable = (Date) _nodeService.getProperty(published.getTargetRef(), VgrModel.PROP_DATE_AVAILABLE_TO);
-      if (availiable == null || now.equals(availiable) || now.before(availiable)) {
-        // find storage copy and alter it too
-        _nodeService.setProperty(published.getTargetRef(), VgrModel.PROP_DATE_AVAILABLE_TO, now);
-
-        // must set modified timestamp so that the feed gets the correct
-        // <update> value
-        _nodeService.setProperty(published.getTargetRef(), ContentModel.PROP_MODIFIED, now);
-        _serviceUtils.setDateSaved(published.getTargetRef());
-      }
-    }
-
-  }
-
   private void removePublishedAssocs(final NodeRef nodeRef) {
-    final List<AssociationRef> children = getPublishedAssocs(nodeRef);
+    final List<NodeRef> children = findPublishedDocuments(nodeRef.toString());
 
-    for (final AssociationRef child : children) {
-      _nodeService.removeAssociation(child.getSourceRef(), child.getTargetRef(), VgrModel.ASSOC_PUBLISHED_TO_STORAGE);
+    for (final NodeRef child : children) {
+      _nodeService.removeAssociation(nodeRef, child, VgrModel.ASSOC_PUBLISHED_TO_STORAGE);
     }
   }
 
   /**
    * Returns the published (in Lagret) node for a source node.
-   *
-   * @param nodeRef The source node to look for the published node for.
+   * 
+   * @param nodeRef
+   *          The source node to look for the published node for.
    * @return nodeRef The published node or null if not published.
    */
   @Override
   public NodeRef getPublishedNodeRef(final NodeRef nodeRef) {
     NodeRef result = null;
 
-    final List<AssociationRef> children = getPublishedAssocs(nodeRef);
+    final List<NodeRef> children = findPublishedDocuments(nodeRef.toString());
 
-    for (final AssociationRef child : children) {
+    for (final NodeRef child : children) {
       final String sourceVersion = _serviceUtils.getStringValue(_nodeService.getProperty(nodeRef, VgrModel.PROP_IDENTIFIER_VERSION));
-      final String publishedVersion = _serviceUtils.getStringValue(_nodeService.getProperty(child.getTargetRef(), VgrModel.PROP_IDENTIFIER_VERSION));
+      final String publishedVersion = _serviceUtils.getStringValue(_nodeService.getProperty(child, VgrModel.PROP_IDENTIFIER_VERSION));
 
-      final StoreRef storeRef = child.getTargetRef().getStoreRef();
+      final StoreRef storeRef = child.getStoreRef();
 
       // if the published node is in the archive store, it's not really
       // published...
@@ -353,7 +330,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
       final boolean published = StringUtils.equals(sourceVersion, publishedVersion);
 
       if (published) {
-        result = child.getTargetRef();
+        result = child;
 
         break;
       }
@@ -362,17 +339,30 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     return result;
   }
 
-  private List<AssociationRef> getPublishedAssocs(final NodeRef nodeRef) {
-    final List<AssociationRef> children = _nodeService.getTargetAssocs(nodeRef, new QNamePattern() {
+  /**
+   * Finds all the published documents for a specific source document id.
+   * 
+   * @param sourceDocumentId
+   * @return
+   */
+  private List<NodeRef> findPublishedDocuments(String sourceDocumentId) {
+    StringBuffer query = new StringBuffer();
+    query.append("TYPE:\"vgr:document\" AND ASPECT:\"vgr:published\" AND ");
+    query.append("vgr:dc\\.source\\.documentid:\"" + sourceDocumentId + "\"");
 
-      @Override
-      public boolean isMatch(final QName qname) {
-        return qname.isMatch(VgrModel.ASSOC_PUBLISHED_TO_STORAGE);
-      }
+    SearchParameters searchParameters = new SearchParameters();
 
-    });
+    searchParameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
+    searchParameters.setQuery(query.toString());
+    searchParameters.setLanguage(SearchService.LANGUAGE_FTS_ALFRESCO);
 
-    return children;
+    ResultSet result = _searchService.query(searchParameters);
+
+    try {
+      return result.getNodeRefs();
+    } finally {
+      ServiceUtils.closeQuietly(result);
+    }
   }
 
   private NodeRef createFolderStructure() {
@@ -501,20 +491,47 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   }
 
   @Override
-  public void unpublishFromStorage(final String sourceNodeRef) {
+  public void unpublishFromStorage(final String sourceDocumentId) {
+    unpublishFromStorage(sourceDocumentId, null);
+  }
+
+  private void unpublishFromStorage(final String sourceDocumentId, final String currentVersion) {
+    Assert.hasText(sourceDocumentId, "Source document id can't be empty.");
+
     AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>() {
 
       @Override
       public Void doWork() throws Exception {
         try {
-          final NodeRef nodeRef = new NodeRef(sourceNodeRef);
+          Date now = new Date();
 
-          final FileFolderServiceType nodeType = _fileFolderService.getType(_nodeService.getType(nodeRef));
+          final List<NodeRef> previouslyPublished = findPublishedDocuments(sourceDocumentId);
 
-          if (nodeType == FileFolderServiceType.FILE) {
-            unpublishFileFromStorage(nodeRef);
-          } else {
-            throw new RuntimeException("Only files can be unpublished.");
+          if (previouslyPublished.isEmpty()) {
+            return null;
+          }
+
+          for (NodeRef published : previouslyPublished) {
+            String version = (String) _nodeService.getProperty(published, VgrModel.PROP_IDENTIFIER_VERSION);
+
+            // if currentVersion is passed, that one should NOT be unpublished
+            if (StringUtils.isNotBlank(currentVersion) && version.equals(currentVersion)) {
+              continue;
+            }
+
+            // check if it's still published
+            final Date availiable = (Date) _nodeService.getProperty(published, VgrModel.PROP_DATE_AVAILABLE_TO);
+
+            if (availiable == null || now.equals(availiable) || now.before(availiable)) {
+              // find storage copy and alter it too
+              _nodeService.setProperty(published, VgrModel.PROP_DATE_AVAILABLE_TO, now);
+
+              // must set modified time stamp so that the feed gets the correct
+              // <update> value
+              _nodeService.setProperty(published, ContentModel.PROP_MODIFIED, now);
+
+              _serviceUtils.setDateSaved(published);
+            }
           }
         } catch (final Exception ex) {
           LOG.error(ex.getMessage(), ex);
@@ -527,16 +544,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     }, AuthenticationUtil.getSystemUserName());
   }
 
-  private void unpublishFileFromStorage(final NodeRef nodeRef) {
-    // first, shut of the filter for this..., we don't want a new version
-    _behaviourFilter.disableAllBehaviours();
 
-    final Date now = new Date();
-
-    // unpublish all assocs (change availability date to now)
-    unpublishAssocs(nodeRef, now);
-
-  }
 
   @Override
   public void moveToStorage(final NodeRef nodeRef) {
@@ -547,6 +555,13 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     final NodeRef finalFolder = createFolderStructure();
 
     try {
+      String sourceDocumentId = (String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_DOCUMENTID);
+
+      String currentVersion = (String) _nodeService.getProperty(nodeRef, VgrModel.PROP_IDENTIFIER_VERSION);
+
+      // unpublish all the old versions except this one...
+      unpublishFromStorage(sourceDocumentId, currentVersion);
+
       // set a new name to avoid clashes
       final String oldName = (String) _nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
       final String newName = getUniqueName(finalFolder, oldName);
@@ -590,7 +605,8 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
   @Override
   public boolean createPdfRendition(final NodeRef nodeRef, final boolean async) {
-    // must first check whether the nodeRef can be transformed into a PDF/A or not...
+    // must first check whether the nodeRef can be transformed into a PDF/A or
+    // not...
     if (!pdfaRendable(nodeRef)) {
       return false;
     }
@@ -606,7 +622,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     }
 
     // If there's nothing currently registered to generate thumbnails for the
-    //  specified mimetype, then log a message and bail out
+    // specified mimetype, then log a message and bail out
     String mimeType = _serviceUtils.getMimetype(nodeRef);
 
     Serializable value = _nodeService.getProperty(nodeRef, ContentModel.PROP_CONTENT);
@@ -640,10 +656,12 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   }
 
   private void assertPublishable(final NodeRef nodeRef) {
-    // must get the nodeRef to see if the user has create permission in that folder
+    // must get the nodeRef to see if the user has create permission in that
+    // folder
     NodeRef parentNodeRef = _nodeService.getPrimaryParent(nodeRef).getParentRef();
 
-    // if (!_serviceUtils.isSiteAdmin(nodeRef) && !_serviceUtils.isAdmin() && !_serviceUtils.isSiteCollaborator(nodeRef)) {
+    // if (!_serviceUtils.isSiteAdmin(nodeRef) && !_serviceUtils.isAdmin() &&
+    // !_serviceUtils.isSiteCollaborator(nodeRef)) {
     if (_permissionService.hasPermission(parentNodeRef, PermissionService.CREATE_CHILDREN) != AccessStatus.ALLOWED) {
       throw new AlfrescoRuntimeException("Only site administrators, site collaborators and system wide administrators can publish to storage.");
     }
@@ -656,19 +674,22 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
     try {
       // vgr:dc.title must be set
-      Assert.hasText((String) _nodeService.getProperty(nodeRef, VgrModel.PROP_TITLE));
+      Assert.hasText((String) _nodeService.getProperty(nodeRef, VgrModel.PROP_TITLE), "The published document must have a 'dc.title' property.");
 
       // dc.type.record must be set
-      Assert.hasText((String) _nodeService.getProperty(nodeRef, VgrModel.PROP_TYPE_RECORD));
+      Assert.hasText((String) _nodeService.getProperty(nodeRef, VgrModel.PROP_TYPE_RECORD), "The published document must have a 'dc.type.record' property.");
 
       // dc.publisher.forunit or dc.publisher.project-assignment must be set
+      @SuppressWarnings("unchecked")
       List<String> publisherForunit = (List<String>) _nodeService.getProperty(nodeRef, VgrModel.PROP_PUBLISHER_FORUNIT);
+
+      @SuppressWarnings("unchecked")
       List<String> publisherProjectAssignment = (List<String>) _nodeService.getProperty(nodeRef, VgrModel.PROP_PUBLISHER_PROJECT_ASSIGNMENT);
 
       publisherForunit = publisherForunit != null ? publisherForunit : new ArrayList<String>();
       publisherProjectAssignment = publisherProjectAssignment != null ? publisherProjectAssignment : new ArrayList<String>();
 
-      Assert.isTrue(publisherForunit.size() > 0 || publisherProjectAssignment.size() > 0);
+      Assert.isTrue(publisherForunit.size() > 0 || publisherProjectAssignment.size() > 0, "Either 'dc.publisher.forunit' or 'dc.publisher.project-assignment' must be set.");
     } catch (Exception ex) {
       ex.printStackTrace();
       throw new AlfrescoRuntimeException(ex.getMessage(), ex);
@@ -729,13 +750,6 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   public boolean pdfaRendable(NodeRef nodeRef) {
     final String sourceMimetype = _serviceUtils.getMimetype(nodeRef);
 
-    // this process does not yet support the conversion of PDF -> PDF...
-    /*
-    if (sourceMimetype.equalsIgnoreCase(MimetypeMap.MIMETYPE_PDF)) {
-      return false;
-    }
-    */
-
     // must first check whether the nodeRef can be transformed into a PDF or
     // not...
     if (_contentService.getTransformer(sourceMimetype, MimetypeMap.MIMETYPE_PDF) == null) {
@@ -785,5 +799,3 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   }
 
 }
-
-

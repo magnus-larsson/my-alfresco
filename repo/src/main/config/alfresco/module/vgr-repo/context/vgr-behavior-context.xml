@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
   <bean id="vgr.abstractPolicy" class="se.vgregion.alfresco.repo.node.AbstractPolicy" abstract="true">
     <property name="nodeService" ref="NodeService" />
@@ -37,7 +38,8 @@
     <property name="dictionaryService" ref="DictionaryService" />
   </bean>
 
-  <bean id="vgr.updateSiteFolderMetadataPolicy" class="se.vgregion.alfresco.repo.node.UpdateSiteFolderMetadataPolicy" depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy" p:fileFolderService-ref="FileFolderService" />
+  <bean id="vgr.updateSiteFolderMetadataPolicy" class="se.vgregion.alfresco.repo.node.UpdateSiteFolderMetadataPolicy" depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy"
+    p:fileFolderService-ref="FileFolderService" />
 
   <bean id="vgr.changeTypePolicy" class="se.vgregion.alfresco.repo.node.ChangeTypePolicy" depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy" />
 
@@ -53,7 +55,8 @@
 
   <!-- Configuration done to replace the original version label calculation with a more flexible one that allows for setting parameters. -->
 
-  <bean id="vgr.configurableSerialVersionLabelPolicy" class="se.vgregion.alfresco.repo.node.version.common.versionlabel.ConfigurableSerialVersionLabelPolicy" init-method="init" p:serviceUtils-ref="vgr.serviceUtils" p:lockService-ref="LockService" p:policyComponent-ref="policyComponent" p:nodeService-ref="NodeService">
+  <bean id="vgr.configurableSerialVersionLabelPolicy" class="se.vgregion.alfresco.repo.node.version.common.versionlabel.ConfigurableSerialVersionLabelPolicy" init-method="init"
+    p:serviceUtils-ref="vgr.serviceUtils" p:lockService-ref="LockService" p:policyComponent-ref="policyComponent" p:nodeService-ref="NodeService">
     <constructor-arg>
       <props>
         <prop key="delimiter">.</prop>
@@ -74,10 +77,15 @@
 
   <bean id="vgr.extendPersonPolicy" class="se.vgregion.alfresco.repo.node.ExtendPersonPolicy" parent="vgr.abstractPolicy" depends-on="vgr.dictionaryBootstrap" />
 
-  <bean id="vgr.autoPublishPolicy" class="se.vgregion.alfresco.repo.node.AutoPublishPolicy" parent="vgr.abstractPolicy" depends-on="vgr.dictionaryBootstrap" p:fileFolderService-ref="FileFolderService" p:storageService-ref="vgr.storageService" p:transactionService-ref="TransactionService" />
+  <bean id="vgr.autoPublishPolicy" class="se.vgregion.alfresco.repo.node.AutoPublishPolicy" parent="vgr.abstractPolicy" depends-on="vgr.dictionaryBootstrap" p:fileFolderService-ref="FileFolderService"
+    p:storageService-ref="vgr.storageService" p:transactionService-ref="TransactionService" />
 
   <bean id="vgr.addPdfaPolicy" class="se.vgregion.alfresco.repo.node.AddPdfaPolicy" parent="vgr.abstractPolicy" depends-on="vgr.dictionaryBootstrap">
     <property name="contentService" ref="ContentService" />
+  </bean>
+
+  <bean id="vgr.preventPublishedDuplicatesPolicy" class="se.vgregion.alfresco.repo.node.PreventPublishedDuplicatesPolicy" parent="vgr.abstractPolicy" depends-on="vgr.dictionaryBootstrap">
+    <property name="searchService" ref="SearchService" />
   </bean>
 
 </beans>
