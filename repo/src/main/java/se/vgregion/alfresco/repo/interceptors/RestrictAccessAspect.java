@@ -1,5 +1,13 @@
 package se.vgregion.alfresco.repo.interceptors;
 
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Properties;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -13,15 +21,9 @@ import org.springframework.extensions.webscripts.WrappingWebScriptRequest;
 import org.springframework.extensions.webscripts.WrappingWebScriptResponse;
 import org.springframework.extensions.webscripts.servlet.WebScriptServletRequest;
 import org.springframework.extensions.webscripts.servlet.WebScriptServletResponse;
+
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.utils.ApplicationContextHolder;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Properties;
 
 @Aspect
 public class RestrictAccessAspect {
@@ -103,6 +105,7 @@ public class RestrictAccessAspect {
   private String extractIpAddress(HttpServletRequest request) {
     String ipAddress = request.getRemoteAddr();
 
+    @SuppressWarnings("rawtypes")
     Enumeration headerNames = request.getHeaderNames();
 
     while (headerNames.hasMoreElements()) {

@@ -28,6 +28,7 @@
     <property name="thumbnailService" ref="ThumbnailService" />
     <property name="actionService" ref="ActionService" />
     <property name="ownableService" ref="OwnableService" />
+    <property name="renditionService" ref="RenditionService" />
   </bean>
 
   <bean id="vgr.storageScript" parent="baseJavaScriptExtension" class="se.vgregion.alfresco.repo.scripts.ScriptStorageService">
@@ -261,7 +262,7 @@
     <property name="nodeService" ref="nodeService" />
     <property name="fileFolderService" ref="FileFolderService" />
     <property name="jobLockService" ref="jobLockService" />
-    <property name="transactionService" ref="TransactionService"/>
+    <property name="transactionService" ref="TransactionService" />
   </bean>
 
   <!-- ***************************** -->
@@ -295,7 +296,6 @@
     <property name="mimetypeService" ref="MimetypeService" />
     <property name="CMISRenditionService" ref="CMISRenditionService" />
     <property name="searchService" ref="SearchService" />
-    <property name="renditionService" ref="RenditionService" />
     <property name="serviceUtils" ref="vgr.serviceUtils" />
     <property name="thumbnailService" ref="ThumbnailService" />
     <property name="storageService" ref="vgr.storageService" />
