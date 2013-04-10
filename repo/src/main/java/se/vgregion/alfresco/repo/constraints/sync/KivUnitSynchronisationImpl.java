@@ -61,6 +61,10 @@ public class KivUnitSynchronisationImpl extends ClusteredExecuter implements Ini
 
   @Override
   public void synchronise() {
+    execute();
+  }
+
+  private void synchroniseInternal() {
     final RetryingTransactionHelper retryingTransactionHelper = _transactionService.getRetryingTransactionHelper();
 
     AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>() {
@@ -434,7 +438,7 @@ public class KivUnitSynchronisationImpl extends ClusteredExecuter implements Ini
 
   @Override
   protected void executeInternal() {
-    synchronise();
+    synchroniseInternal();
   }
 
   /*
@@ -445,6 +449,8 @@ public class KivUnitSynchronisationImpl extends ClusteredExecuter implements Ini
    */
   @Override
   public void afterPropertiesSet() throws Exception {
+    super.afterPropertiesSet();
+
     Assert.notNull(_kivService);
     Assert.notNull(_searchService);
     Assert.notNull(_nodeService);

@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
   <!-- activate the load time weaver for weaving aspects into classes and also accessing private mehtods -->
   <context:load-time-weaver />
@@ -52,8 +53,7 @@
   <bean id="webscript.probe.probe.get" class="com.redpill.alfresco.clusterprobe.repo.ProbeScript" parent="webscript.com.redpill.alfresco.clusterprobe.probe.get" />
 
 
-  <!-- Need to override the "registerContentWithVersionService" to replace the version label calculation done for cm:content alternatively create a new 
-    bean for all custom content types. -->
+  <!-- Need to override the "registerContentWithVersionService" to replace the version label calculation done for cm:content alternatively create a new bean for all custom content types. -->
 
   <bean id="registerContentWithVersionService" class="org.alfresco.repo.version.VersionServiceVersionLabelRegistrationBean" init-method="register" depends-on="vgr.dictionaryBootstrap">
     <property name="versionService">
@@ -260,6 +260,8 @@
     <property name="searchService" ref="searchService" />
     <property name="nodeService" ref="nodeService" />
     <property name="fileFolderService" ref="FileFolderService" />
+    <property name="jobLockService" ref="jobLockService" />
+    <property name="transactionService" ref="TransactionService"/>
   </bean>
 
   <!-- ***************************** -->
@@ -299,7 +301,7 @@
     <property name="storageService" ref="vgr.storageService" />
   </bean>
 
-  <!--  Content Retrieval -->
+  <!-- Content Retrieval -->
   <bean id="webscript.org.alfresco.cmis.content.get" class="se.vgregion.alfresco.repo.web.scripts.content.ContentGet" parent="webscript">
     <property name="referenceFactory" ref="CMISReferenceFactory" />
     <property name="namespaceService" ref="NamespaceService" />
@@ -371,9 +373,13 @@
   <!-- Overridden bean for implementing external users specific for VGR -->
   <!-- **************************************************************** -->
 
-  <bean id="vgr.externalUsersInvitationService" class="org.alfresco.repo.invitation.ExternalUsersInvitationServiceImpl" p:authenticationService-ref="AuthenticationService" p:externalUsersService-ref="vgr.externalUsers" p:namespaceService-ref="NamespaceService" p:invitationService-ref="invitationService" p:workflowService-ref="WorkflowService" p:personService-ref="PersonService" p:permissionService-ref="PermissionService" p:siteService-ref="SiteService" p:nodeService-ref="NodeService" p:userSynchronizer-ref="vgr.userSynchronizer" p:userRegistrySynchronizer-ref="userRegistrySynchronizer" p:serviceUtils-ref="vgr.serviceUtils" />
+  <bean id="vgr.externalUsersInvitationService" class="org.alfresco.repo.invitation.ExternalUsersInvitationServiceImpl" p:authenticationService-ref="AuthenticationService"
+    p:externalUsersService-ref="vgr.externalUsers" p:namespaceService-ref="NamespaceService" p:invitationService-ref="invitationService" p:workflowService-ref="WorkflowService" p:personService-ref="PersonService"
+    p:permissionService-ref="PermissionService" p:siteService-ref="SiteService" p:nodeService-ref="NodeService" p:userSynchronizer-ref="vgr.userSynchronizer" p:userRegistrySynchronizer-ref="userRegistrySynchronizer"
+    p:serviceUtils-ref="vgr.serviceUtils" />
 
-  <bean id="vgr.invitationServiceInterceptor" class="se.vgregion.alfresco.repo.invitation.InvitationServiceInterceptor" p:externalActivation="${vgr.external.activation}" p:externalUsersInvitationService-ref="vgr.externalUsersInvitationService" />
+  <bean id="vgr.invitationServiceInterceptor" class="se.vgregion.alfresco.repo.invitation.InvitationServiceInterceptor" p:externalActivation="${vgr.external.activation}"
+    p:externalUsersInvitationService-ref="vgr.externalUsersInvitationService" />
 
   <bean id="InvitationService" class="org.springframework.aop.framework.ProxyFactoryBean" p:targetName="invitationService">
     <property name="proxyInterfaces">
@@ -392,7 +398,8 @@
     </property>
   </bean>
 
-  <bean id="vgr.userSynchronizer" class="se.vgregion.alfresco.repo.security.UserSynchronizer" p:applicationContextManager-ref="Authentication" p:authorityService-ref="authorityService" p:personService-ref="personService" p:ruleService-ref="ruleService" p:transactionService-ref="transactionService" p:zone="${vgr.external.users.zone}" />
+  <bean id="vgr.userSynchronizer" class="se.vgregion.alfresco.repo.security.UserSynchronizer" p:applicationContextManager-ref="Authentication" p:authorityService-ref="authorityService"
+    p:personService-ref="personService" p:ruleService-ref="ruleService" p:transactionService-ref="transactionService" p:zone="${vgr.external.users.zone}" />
 
   <!-- ****************************************************** -->
   <!-- Thumbnail definition that is actually a PDF preview :) -->
@@ -468,16 +475,16 @@
     </property>
     <property name="preferenceService" ref="vgr.customPreferenceService" />
   </bean>
-  
+
   <!-- ***************************************************************************************************** -->
-  <!-- Report site statistics web script and utility classes																	 -->
+  <!-- Report site statistics web script and utility classes -->
   <!-- ***************************************************************************************************** -->
 
   <bean id="webscript.reports.sites.sites.get" class="se.vgregion.alfresco.repo.scripts.SitesReport" parent="webscript">
     <property name="siteService" ref="SiteService" />
   </bean>
 
-  <bean id="vgr.siteReport" class="se.vgregion.alfresco.repo.scripts.ScriptSiteReport" parent="baseJavaScriptExtension" >
+  <bean id="vgr.siteReport" class="se.vgregion.alfresco.repo.scripts.ScriptSiteReport" parent="baseJavaScriptExtension">
     <property name="extensionName" value="siteReport" />
     <property name="siteService" ref="SiteService" />
     <property name="reportSiteUsage" ref="vgr.reportSiteUsage" />
@@ -487,24 +494,24 @@
     <property name="serviceRegistry" ref="ServiceRegistry" />
     <property name="activityService" ref="activityService" />
   </bean>
-  
+
   <!-- ***************************************************************************************************** -->
-  <!-- Report active users statistics web script and utility classes																	 -->
+  <!-- Report active users statistics web script and utility classes -->
   <!-- ***************************************************************************************************** -->
 
   <bean id="webscript.reports.users.activeusers.get" class="se.vgregion.alfresco.repo.scripts.ActiveUsersReport" parent="webscript">
     <property name="serviceRegistry" ref="ServiceRegistry" />
   </bean>
-  
+
   <bean id="reportActiveUsers" class="se.vgregion.alfresco.repo.report.ActiveUsers">
     <property name="serviceRegistry" ref="ServiceRegistry" />
   </bean>
-  
+
   <!-- ***************************************************************************************************** -->
-  <!-- Reset password service, webscript definitions and javascript proxy object														 -->
+  <!-- Reset password service, webscript definitions and javascript proxy object -->
   <!-- ***************************************************************************************************** -->
 
-	<bean id="vgr.resetPasswordService" class="se.vgregion.alfresco.repo.resetpassword.impl.ResetPasswordServiceImpl">
+  <bean id="vgr.resetPasswordService" class="se.vgregion.alfresco.repo.resetpassword.impl.ResetPasswordServiceImpl">
     <property name="siteService" ref="SiteService" />
     <property name="personService" ref="PersonService" />
     <property name="nodeService" ref="NodeService" />
@@ -513,21 +520,21 @@
     <property name="sendMailService" ref="vgr.sendMailService" />
     <property name="globalProperties" ref="global-properties" />
   </bean>
-  
+
   <bean id="webscript.resetpassword.resetpassword.put" class="se.vgregion.alfresco.repo.scripts.SiteAdminResetUserPassword" parent="webscript">
     <property name="resetPasswordService" ref="vgr.resetPasswordService" />
   </bean>
-  
+
   <bean id="vgr.javascriptResetPasswordService" parent="baseJavaScriptExtension" class="se.vgregion.alfresco.repo.resetpassword.JavascriptCompatibleResetPasswordService">
-	  <property name="resetPasswordService" ref="vgr.resetPasswordService" />
-	  <property name="extensionName"   value="resetPasswordService" />
-	</bean>
-  
+    <property name="resetPasswordService" ref="vgr.resetPasswordService" />
+    <property name="extensionName" value="resetPasswordService" />
+  </bean>
+
   <!-- ***************************************************************************************************** -->
-  <!-- Send mail service																																										 -->
+  <!-- Send mail service -->
   <!-- ***************************************************************************************************** -->
 
-	<bean id="vgr.sendMailService" class="se.vgregion.alfresco.repo.mail.impl.SendMailServiceImpl">
+  <bean id="vgr.sendMailService" class="se.vgregion.alfresco.repo.mail.impl.SendMailServiceImpl">
     <property name="actionService" ref="ActionService" />
   </bean>
 
