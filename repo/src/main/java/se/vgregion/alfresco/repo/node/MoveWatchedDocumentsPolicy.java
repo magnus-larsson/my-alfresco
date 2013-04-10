@@ -1,11 +1,15 @@
 package se.vgregion.alfresco.repo.node;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 import org.apache.log4j.Logger;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
@@ -52,6 +56,8 @@ public class MoveWatchedDocumentsPolicy extends AbstractPolicy implements OnCrea
         if (!_nodeService.hasAspect(folderNodeRef, VgrModel.ASPECT_WATCHED)) {
           return;
         }
+
+        Map<QName, Serializable> properties = _nodeService.getProperties(fileNodeRef);
 
         // if we reach this point, all is well and good so let's move the file
         _storageService.moveToStorage(fileNodeRef);

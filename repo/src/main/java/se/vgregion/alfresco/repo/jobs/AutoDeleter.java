@@ -236,6 +236,7 @@ public class AutoDeleter extends ClusteredExecuter {
    * @param site to create configuration for
    * @return A Configuration object
    */
+  @SuppressWarnings("unchecked")
   private void createConfiguration(NodeRef site) {
     Configuration configuration = new Configuration();
 
