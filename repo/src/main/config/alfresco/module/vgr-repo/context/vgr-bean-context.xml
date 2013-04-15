@@ -491,8 +491,10 @@
   </bean>
 
   <bean id="vgr.reportSiteUsage" class="se.vgregion.alfresco.repo.report.ReportSiteUsage">
-    <property name="serviceRegistry" ref="ServiceRegistry" />
     <property name="activityService" ref="activityService" />
+    <property name="fileFolderService" ref="FileFolderService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="siteService" ref="SiteService" />
   </bean>
 
   <!-- ***************************************************************************************************** -->
@@ -500,11 +502,13 @@
   <!-- ***************************************************************************************************** -->
 
   <bean id="webscript.reports.users.activeusers.get" class="se.vgregion.alfresco.repo.scripts.ActiveUsersReport" parent="webscript">
-    <property name="serviceRegistry" ref="ServiceRegistry" />
+    <property name="activeUsers" ref="vgr.reportActiveUsers" />
   </bean>
 
-  <bean id="reportActiveUsers" class="se.vgregion.alfresco.repo.report.ActiveUsers">
-    <property name="serviceRegistry" ref="ServiceRegistry" />
+  <bean id="vgr.reportActiveUsers" class="se.vgregion.alfresco.repo.report.ActiveUsers">
+    <property name="nodeService" ref="NodeService" />
+    <property name="personService" ref="PersonService" />
+    <property name="auditService" ref="AuditService" />
   </bean>
 
   <!-- ***************************************************************************************************** -->
