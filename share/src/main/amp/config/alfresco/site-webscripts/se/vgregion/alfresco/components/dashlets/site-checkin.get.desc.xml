@@ -1,6 +1,0 @@
-<webscript>
-   <shortname>Check in document</shortname>
-   <description>Dashlet for checking in documents</description>
-   <family>site-dashlet</family>
-   <url>/components/dashlets/site-checkin</url>
-</webscript>

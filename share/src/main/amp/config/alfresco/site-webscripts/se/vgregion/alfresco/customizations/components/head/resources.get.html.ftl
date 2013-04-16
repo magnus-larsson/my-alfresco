@@ -49,3 +49,7 @@
       };
    //]]></script>
 </@>
+
+<@markup id="vgr-alfrescoResources" action="after" target="alfrescoResources" scope="global">
+   <@script type="text/javascript" src="${url.context}/res/js/vgr-forms-runtime.js"></@script>
+</@>

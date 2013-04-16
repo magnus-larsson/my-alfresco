@@ -33,8 +33,7 @@ public class VgrFormUIGet extends FormUIGet {
         }
 
         // ALF-7961: don't use a comma as the list separator
-        field.getControl().getParams()
-            .put(CONTROL_PARAM_OPTIONS, StringUtils.collectionToDelimitedString(optionsList, DELIMITER));
+        field.getControl().getParams().put(CONTROL_PARAM_OPTIONS, StringUtils.collectionToDelimitedString(optionsList, DELIMITER));
         field.getControl().getParams().put(CONTROL_PARAM_OPTION_SEPARATOR, DELIMITER);
       }
     } else {

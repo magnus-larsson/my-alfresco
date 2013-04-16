@@ -48,7 +48,7 @@
           <field id="vgr:dc.title.alternative" label-id="vgr.dc.title.alternative" set="dokumentbeskrivning" />
           <field id="vgr:dc.description" label-id="vgr.dc.description" set="dokumentbeskrivning" />
           <field id="vgr:dc.type.document.structure" label-id="vgr.dc.type.document.structure" set="dokumentbeskrivning">
-            <control template="/org/alfresco/components/form/controls/treeselect.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/treeselect.ftl">
               <control-param name="ds">/page/components/treeview/documentstructure</control-param>
               <control-param name="get">/page/components/nodes/documentstructure</control-param>
               <control-param name="optionSeparator">#alf#</control-param>
@@ -56,10 +56,10 @@
             </control>
           </field>
           <field id="vgr:dc.type.document.structure.id" set="dokumentbeskrivning">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
           <field id="vgr:dc.type.document" label-id="vgr.dc.type.document" set="dokumentbeskrivning">
-            <control template="/org/alfresco/components/form/controls/ajaxselectone.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/ajaxselectone.ftl">
               <control-param name="ds">/service/components/documentTypes</control-param>
               <control-param name="emptyTitle">Välj gruppering av handlingstyper</control-param>
             </control>
@@ -68,7 +68,7 @@
             <constraint-handlers>
               <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.mandatory" event="change" />
             </constraint-handlers>
-            <control template="/org/alfresco/components/form/controls/ajaxselectone.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/ajaxselectone.ftl">
               <control-param name="ds">/proxy/alfresco/vgr/apelon/recordTypes?documentTypeId={parent}</control-param>
               <control-param name="parent">vgr_dc.type.document</control-param>
               <control-param name="emptyTitle">Välj handlingstyp</control-param>
@@ -76,19 +76,20 @@
             </control>
           </field>
           <field id="vgr:dc.type.record.id" set="dokumentbeskrivning">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
           <field id="vgr:dc.type.templatename" label-id="vgr.dc.type.templatename" set="dokumentbeskrivning" />
           <field id="vgr:dc.coverage.hsacode" label-id="vgr.dc.coverage.hsacode" set="dokumentbeskrivning">
-            <control template="/org/alfresco/components/form/controls/selecthsacode.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/selecthsacode.ftl">
               <control-param name="optionSeparator">#alf#</control-param>
+              <!--  <control-param name="labelSeparator">#sep#</control-param> -->
             </control>
           </field>
           <field id="vgr:dc.coverage.hsacode.id" set="dokumentbeskrivning">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
           <field id="vgr:dc.subject.keywords" label-id="vgr.dc.subject.keywords" set="dokumentbeskrivning">
-            <control template="/org/alfresco/components/form/controls/treeselect.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/treeselect.ftl">
               <control-param name="ds">/page/components/treeview/kiv</control-param>
               <control-param name="get">/page/components/nodes/kiv</control-param>
               <control-param name="optionSeparator">#alf#</control-param>
@@ -97,45 +98,45 @@
             </control>
           </field>
           <field id="vgr:dc.subject.keywords.id" set="dokumentbeskrivning">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
           <field id="vgr:vgr.status.document" label-id="vgr.vgr.status.document" set="dokumentbeskrivning">
-            <control template="/org/alfresco/components/form/controls/selectstatus.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/selectstatus.ftl" />
           </field>
           <field id="vgr:vgr.status.document.id" set="dokumentbeskrivning">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
 
           <set id="upphovsman" appearance="bordered-panel" label-id="vgr.set.upphovsman" />
           <field id="vgr:dc.creator" label-id="vgr.dc.creator" set="upphovsman">
-            <control template="/org/alfresco/components/form/controls/peoplesearch.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/peoplesearch.ftl">
               <control-param name="optionSeparator">#alf#</control-param>
             </control>
           </field>
           <field id="vgr:dc.creator.id" set="upphovsman">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
           <field id="vgr:dc.creator.freetext" label-id="vgr.dc.creator.freetext" set="upphovsman" />
           <field id="vgr:dc.creator.forunit" label-id="vgr.dc.creator.forunit" set="upphovsman">
-            <control template="/org/alfresco/components/form/controls/treeselect.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/treeselect.ftl">
               <control-param name="ds">/page/components/treeview/kiv</control-param>
               <control-param name="get">/page/components/nodes/kiv</control-param>
               <control-param name="optionSeparator">#alf#</control-param>
             </control>
           </field>
           <field id="vgr:dc.creator.forunit.id" set="upphovsman">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
           <field id="vgr:dc.creator.project-assignment" label-id="vgr.dc.creator.project-assignment" set="upphovsman" />
 
           <set id="ansvariga" appearance="bordered-panel" label-id="vgr.set.ansvariga" />
           <field id="vgr:dc.creator.document" label-id="vgr.dc.creator.document" set="ansvariga">
-            <control template="/org/alfresco/components/form/controls/peoplesearch.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/peoplesearch.ftl">
               <control-param name="optionSeparator">#alf#</control-param>
             </control>
           </field>
           <field id="vgr:dc.creator.document.id" set="ansvariga">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
           <field id="vgr:dc.creator.function" label-id="vgr.dc.creator.function" set="ansvariga" />
 
@@ -165,6 +166,10 @@
       </form>
     </forms>
   </config>
+
+  <!-- ######################################### -->
+  <!-- VGR:Document Edit Node -->
+  <!-- ######################################### -->
 
   <config evaluator="node-type" condition="vgr:document">
     <forms>
@@ -271,7 +276,7 @@
           <field id="vgr:dc.title.alternative" label-id="vgr.dc.title.alternative" set="dokumentbeskrivning" help-id="vgr.help.dc.title.alternative" description-id="vgr.description.dc.title.alternative" />
           <field id="vgr:dc.description" label-id="vgr.dc.description" set="dokumentbeskrivning" help-id="vgr.help.dc.description" description-id="vgr.description.dc.description" />
           <field id="vgr:dc.type.document.structure" label-id="vgr.dc.type.document.structure" set="dokumentbeskrivning" help-id="vgr.help.dc.type.document.structure" description-id="vgr.description.dc.type.document.structure">
-            <control template="/org/alfresco/components/form/controls/treeselect.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/treeselect.ftl">
               <control-param name="ds">/page/components/treeview/documentstructure</control-param>
               <control-param name="get">/page/components/nodes/documentstructure</control-param>
               <control-param name="optionSeparator">#alf#</control-param>
@@ -279,10 +284,10 @@
             </control>
           </field>
           <field id="vgr:dc.type.document.structure.id" set="dokumentbeskrivning">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
           <field id="vgr:dc.type.document" label-id="vgr.dc.type.document" set="dokumentbeskrivning" help-id="vgr.help.dc.type.document" description-id="vgr.description.dc.type.document">
-            <control template="/org/alfresco/components/form/controls/ajaxselectone.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/ajaxselectone.ftl">
               <control-param name="ds">/service/components/documentTypes</control-param>
               <control-param name="emptyTitle">Välj gruppering av handlingstyper</control-param>
             </control>
@@ -291,7 +296,7 @@
             <constraint-handlers>
               <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.mandatory" event="change" />
             </constraint-handlers>
-            <control template="/org/alfresco/components/form/controls/ajaxselectone.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/ajaxselectone.ftl">
               <control-param name="ds">/proxy/alfresco/vgr/apelon/recordTypes?documentTypeId={parent}</control-param>
               <control-param name="parent">vgr_dc.type.document</control-param>
               <control-param name="emptyTitle">Välj handlingstyp</control-param>
@@ -299,65 +304,66 @@
             </control>
           </field>
           <field id="vgr:dc.type.record.id" set="dokumentbeskrivning">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
           <field id="vgr:dc.coverage.hsacode" label-id="vgr.dc.coverage.hsacode" set="dokumentbeskrivning" help-id="vgr.help.dc.coverage.hsacode" description-id="vgr.description.dc.coverage.hsacode">
-            <control template="/org/alfresco/components/form/controls/selecthsacode.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/selecthsacode.ftl">
               <control-param name="optionSeparator">#alf#</control-param>
+              <!-- <control-param name="labelSeparator">#sep#</control-param> -->
             </control>
           </field>
           <field id="vgr:dc.coverage.hsacode.id" set="dokumentbeskrivning" help-id="vgr.help.dc.coverage.hsacode.id" description-id="vgr.description.dc.coverage.hsacode.id">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
           <!-- TODO: DC.audience -->
           <field id="cm:versionLabel" label-id="vgr.dc.identifier.version" set="dokumentbeskrivning" read-only="true" help-id="vgr.help.dc.identifier.version" description-id="vgr.description.dc.identifier.version" />
           <field id="vgr:dc.contributor.savedby" label-id="vgr.dc.contributor.savedby" set="dokumentbeskrivning" read-only="true" help-id="vgr.help.dc.contributor.savedby" description-id="vgr.description.dc.contributor.savedby" />
           <field id="vgr:dc.date.saved" label-id="vgr.dc.date.saved" set="dokumentbeskrivning" read-only="true" help-id="vgr.help.dc.date.saved" description-id="vgr.description.dc.date.saved" />
           <field id="vgr:vgr.status.document" label-id="vgr.vgr.status.document" set="dokumentbeskrivning" help-id="vgr.help.vgr.status.document" description-id="vgr.description.vgr.status.document">
-            <control template="/org/alfresco/components/form/controls/selectstatus.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/selectstatus.ftl" />
           </field>
           <field id="vgr:vgr.status.document.id" set="dokumentbeskrivning">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
           <field id="vgr:dc.source.documentid" label-id="vgr.dc.source.documentid" set="dokumentbeskrivning" read-only="true" help-id="vgr.help.dc.source.documentid" description-id="vgr.description.dc.source.documentid">
-            <control template="/org/alfresco/components/form/controls/string.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/string.ftl" />
           </field>
           <field id="vgr:dc.source" label-id="vgr.dc.source" set="dokumentbeskrivning" read-only="true" help-id="vgr.help.dc.source" description-id="vgr.description.dc.source" />
 
           <set id="upphovsman" appearance="accordion" label-id="vgr.set.upphovsman" />
           <field id="vgr:dc.creator" label-id="vgr.dc.creator" set="upphovsman" help-id="vgr.help.dc.creator" description-id="vgr.description.dc.creator">
-            <control template="/org/alfresco/components/form/controls/peoplesearch.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/peoplesearch.ftl">
               <control-param name="optionSeparator">#alf#</control-param>
             </control>
           </field>
           <field id="vgr:dc.creator.id" set="upphovsman" help-id="vgr.help.dc.creator.id" description-id="vgr.description.dc.creator.id">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
           <field id="vgr:dc.creator.freetext" label-id="vgr.dc.creator.freetext" set="upphovsman" help-id="vgr.help.dc.creator.freetext" description-id="vgr.description.dc.creator.freetext" />
           <field id="vgr:dc.creator.forunit" label-id="vgr.dc.creator.forunit" set="upphovsman" help-id="vgr.help.dc.creator.forunit" description-id="vgr.description.dc.creator.forunit">
-            <control template="/org/alfresco/components/form/controls/treeselect.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/treeselect.ftl">
               <control-param name="ds">/page/components/treeview/kiv</control-param>
               <control-param name="get">/page/components/nodes/kiv</control-param>
               <control-param name="optionSeparator">#alf#</control-param>
             </control>
           </field>
           <field id="vgr:dc.creator.forunit.id" set="upphovsman">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
           <field id="vgr:dc.creator.project-assignment" label-id="vgr.dc.creator.project-assignment" set="upphovsman" help-id="vgr.help.dc.creator.project-assignment" description-id="vgr.description.dc.creator.project-assignment" />
 
           <set id="ansvariga" appearance="accordion" label-id="vgr.set.ansvariga" />
           <field id="vgr:dc.creator.document" label-id="vgr.dc.creator.document" set="ansvariga" help-id="vgr.help.dc.creator.document" description-id="vgr.description.dc.creator.document">
-            <control template="/org/alfresco/components/form/controls/peoplesearch.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/peoplesearch.ftl">
               <control-param name="optionSeparator">#alf#</control-param>
             </control>
           </field>
           <field id="vgr:dc.creator.document.id" set="ansvariga">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
           <field id="vgr:dc.creator.function" label-id="vgr.dc.creator.function" set="ansvariga" help-id="vgr.help.dc.creator.function" description-id="vgr.description.dc.creator.function" />
           <field id="vgr:dc.creator.recordscreator" label-id="vgr.dc.creator.recordscreator" set="ansvariga" help-id="vgr.help.dc.creator.recordscreator" description-id="vgr.description.dc.creator.recordscreator">
-            <control template="/org/alfresco/components/form/controls/treeselect.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/treeselect.ftl">
               <control-param name="ds">/page/components/treeview/kiv</control-param>
               <control-param name="get">/page/components/nodes/kiv</control-param>
               <control-param name="multiple">false</control-param>
@@ -366,7 +372,7 @@
             </control>
           </field>
           <field id="vgr:dc.creator.recordscreator.id" set="ansvariga">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
 
           <set id="dokumentstatus" appearance="accordion" label-id="vgr.set.dokumentstatus" />
@@ -378,35 +384,39 @@
 
           <set id="granskare" appearance="accordion" label-id="vgr.set.granskare" />
           <field id="vgr:dc.contributor.acceptedby" label-id="vgr.dc.contributor.acceptedby" set="granskare" help-id="vgr.help.dc.contributor.acceptedby" description-id="vgr.description.dc.contributor.acceptedby">
-            <control template="/org/alfresco/components/form/controls/peoplesearch.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/peoplesearch.ftl">
               <control-param name="optionSeparator">#alf#</control-param>
             </control>
           </field>
           <field id="vgr:dc.contributor.acceptedby.id" set="granskare">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
-          <field id="vgr:dc.contributor.acceptedby.freetext" label-id="vgr.dc.contributor.acceptedby.freetext" set="granskare" help-id="vgr.help.dc.contributor.acceptedby.freetext" description-id="vgr.description.dc.contributor.acceptedby.freetext" />
+          <field id="vgr:dc.contributor.acceptedby.freetext" label-id="vgr.dc.contributor.acceptedby.freetext" set="granskare" help-id="vgr.help.dc.contributor.acceptedby.freetext"
+            description-id="vgr.description.dc.contributor.acceptedby.freetext" />
           <field id="vgr:dc.date.accepted" label-id="vgr.dc.date.accepted" set="granskare" help-id="vgr.help.dc.date.accepted" description-id="vgr.description.dc.date.accepted" />
           <field id="vgr:dc.contributor.acceptedby.role" label-id="vgr.dc.contributor.acceptedby.role" set="granskare" help-id="vgr.help.dc.contributor.acceptedby.role" description-id="vgr.description.dc.contributor.acceptedby.role" />
-          <field id="vgr:dc.contributor.acceptedby.unit.freetext" label-id="vgr.dc.contributor.acceptedby.unit.freetext" set="granskare" help-id="vgr.help.dc.contributor.acceptedby.unit.freetext" description-id="vgr.description.dc.contributor.acceptedby.unit.freetext" />
+          <field id="vgr:dc.contributor.acceptedby.unit.freetext" label-id="vgr.dc.contributor.acceptedby.unit.freetext" set="granskare" help-id="vgr.help.dc.contributor.acceptedby.unit.freetext"
+            description-id="vgr.description.dc.contributor.acceptedby.unit.freetext" />
           <!-- TODO: DC.contributor.unit.freetext -->
           <field id="vgr:dc.contributor.controlledby" label-id="vgr.dc.contributor.controlledby" set="granskare" help-id="vgr.help.dc.contributor.controlledby" description-id="vgr.description.dc.contributor.controlledby">
-            <control template="/org/alfresco/components/form/controls/peoplesearch.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/peoplesearch.ftl">
               <control-param name="optionSeparator">#alf#</control-param>
             </control>
           </field>
           <field id="vgr:dc.contributor.controlledby.id" set="granskare">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
-          <field id="vgr:dc.contributor.controlledby.freetext" label-id="vgr.dc.contributor.controlledby.freetext" set="granskare" help-id="vgr.help.dc.contributor.controlledby.freetext" description-id="vgr.description.dc.contributor.controlledby.freetext" />
+          <field id="vgr:dc.contributor.controlledby.freetext" label-id="vgr.dc.contributor.controlledby.freetext" set="granskare" help-id="vgr.help.dc.contributor.controlledby.freetext"
+            description-id="vgr.description.dc.contributor.controlledby.freetext" />
           <field id="vgr:dc.date.controlled" label-id="vgr.dc.date.controlled" set="granskare" help-id="vgr.help.dc.date.controlled" description-id="vgr.description.dc.date.controlled" />
           <field id="vgr:dc.contributor.controlledby.role" label-id="vgr.dc.contributor.controlledby.role" set="granskare" help-id="vgr.help.dc.contributor.controlledby.role" description-id="vgr.description.dc.contributor.controlledby.role" />
-          <field id="vgr:dc.contributor.controlledby.unit.freetext" label-id="vgr.dc.contributor.controlledby.unit.freetext" set="granskare" help-id="vgr.help.dc.contributor.controlledby.unit.freetext" description-id="vgr.description.dc.contributor.controlledby.unit.freetext" />
+          <field id="vgr:dc.contributor.controlledby.unit.freetext" label-id="vgr.dc.contributor.controlledby.unit.freetext" set="granskare" help-id="vgr.help.dc.contributor.controlledby.unit.freetext"
+            description-id="vgr.description.dc.contributor.controlledby.unit.freetext" />
 
           <set id="publicerare" appearance="accordion" label-id="vgr.set.publicerare" />
           <!-- TODO: Develop a KIV connector -->
           <field id="vgr:dc.publisher.forunit" label-id="vgr.dc.publisher.forunit" set="publicerare" help-id="vgr.help.dc.publisher.forunit" description-id="vgr.description.dc.publisher.forunit">
-            <control template="/org/alfresco/components/form/controls/treeselect.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/treeselect.ftl">
               <control-param name="ds">/page/components/treeview/kiv</control-param>
               <control-param name="get">/page/components/nodes/kiv</control-param>
               <control-param name="optionSeparator">#alf#</control-param>
@@ -414,7 +424,7 @@
             </control>
           </field>
           <field id="vgr:dc.publisher.forunit.id" set="publicerare">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
           <field id="vgr:dc.publisher.project-assignment" label-id="vgr.dc.publisher.project-assignment" set="publicerare" help-id="vgr.help.dc.publisher.project-assignment" description-id="vgr.description.dc.publisher.project-assignment" />
           <field id="vgr:dc.rights.accessrights" label-id="vgr.dc.rights.accessrights" set="publicerare" help-id="vgr.help.dc.rights.accessrights" description-id="vgr.description.dc.rights.accessrights" />
@@ -432,7 +442,7 @@
 
           <set id="sokstod" appearance="accordion" label-id="vgr.set.sokstod" />
           <field id="vgr:dc.subject.keywords" label-id="vgr.dc.subject.keywords" set="sokstod">
-            <control template="/org/alfresco/components/form/controls/treeselect.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/treeselect.ftl">
               <control-param name="ds">/page/components/treeview/keywords</control-param>
               <control-param name="get">/page/components/nodes/keywords</control-param>
               <control-param name="optionSeparator">#alf#</control-param>
@@ -440,13 +450,12 @@
             </control>
           </field>
           <field id="vgr:dc.subject.keywords.id" set="sokstod">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
           <field id="vgr:dc.subject.authorkeywords" label-id="vgr.dc.subject.authorkeywords" set="sokstod" help-id="vgr.help.dc.subject.authorkeywords" description-id="vgr.description.dc.subject.authorkeywords" />
 
           <!-- TODO: Develop a Share GUI for this -->
-          <!-- <set id="malgrupp" appearance="bordered-panel" label-id="vgr.set.malgrupp" /> <field id="vgr:dc.audience" label-id="vgr.dc.audience" set="malgrupp" 
-            /> -->
+          <!-- <set id="malgrupp" appearance="bordered-panel" label-id="vgr.set.malgrupp" /> <field id="vgr:dc.audience" label-id="vgr.dc.audience" set="malgrupp" /> -->
 
           <set id="information" appearance="accordion" label-id="vgr.set.information" />
           <field id="vgr:dc.language" label-id="vgr.dc.language" set="information" help-id="vgr.help.dc.language" description-id="vgr.description.dc.language">
@@ -466,22 +475,35 @@
           <field id="vgr:dc.identifier.checksum" label-id="vgr.dc.identifier.checksum" set="information" read-only="true" help-id="vgr.help.dc.identifier.checksum" description-id="vgr.description.dc.identifier.checksum" />
           <set id="tags" appearance="accordion" label-id="vgr.set.tags" />
           <field id="cm:taggable" set="tags">
-            <control template="/org/alfresco/components/form/controls/newcategory.ftl">
+            <control>
+              <control-param name="compactMode">true</control-param>
+              <control-param name="params">aspect=cm:taggable</control-param>
+              <control-param name="createNewItemUri">/api/tag/workspace/SpacesStore</control-param>
+              <control-param name="createNewItemIcon">tag</control-param>
+            </control>
+
+            <!-- 
+            <control template="/se/vgregion/alfresco/components/form/controls/newcategory.ftl">
               <control-param name="compactMode">true</control-param>
               <control-param name="params">aspect=cm:taggable</control-param>
               <control-param name="createNewItemUri">/api/tag/workspace/SpacesStore</control-param>
               <control-param name="createNewItemIcon">tag</control-param>
               <control-param name="optionSeparator">#alf#</control-param>
             </control>
+            -->
           </field>
           <set id="kommentar" appearance="simple-panel" />
           <field id="versioncomment" label-id="vgr.dc.format.extent.versioncomment" set="kommentar">
-            <control template="/org/alfresco/components/form/controls/versioncomment.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/versioncomment.ftl" />
           </field>
         </appearance>
       </form>
     </forms>
   </config>
+
+  <!-- ######################################### -->
+  <!-- Edit Folder -->
+  <!-- ######################################### -->
 
   <config evaluator="node-type" condition="cm:folder">
     <forms>
@@ -589,7 +611,7 @@
           <field id="vgr:dc.title.alternative" label-id="vgr.dc.title.alternative" set="dokumentbeskrivning" help-id="vgr.help.dc.title.alternative" description-id="vgr.description.dc.title.alternative" />
           <field id="vgr:dc.description" label-id="vgr.dc.description" set="dokumentbeskrivning" help-id="vgr.help.dc.description" description-id="vgr.description.dc.description" />
           <field id="vgr:dc.type.document.structure" label-id="vgr.dc.type.document.structure" set="dokumentbeskrivning" help-id="vgr.help.dc.type.document.structure" description-id="vgr.description.dc.type.document.structure">
-            <control template="/org/alfresco/components/form/controls/treeselect.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/treeselect.ftl">
               <control-param name="ds">/page/components/treeview/documentstructure</control-param>
               <control-param name="get">/page/components/nodes/documentstructure</control-param>
               <control-param name="optionSeparator">#alf#</control-param>
@@ -597,16 +619,16 @@
             </control>
           </field>
           <field id="vgr:dc.type.document.structure.id" set="dokumentbeskrivning">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
           <field id="vgr:dc.type.document" label-id="vgr.dc.type.document" set="dokumentbeskrivning" help-id="vgr.help.dc.type.document" description-id="vgr.description.dc.type.document">
-            <control template="/org/alfresco/components/form/controls/ajaxselectone.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/ajaxselectone.ftl">
               <control-param name="ds">/service/components/documentTypes</control-param>
               <control-param name="emptyTitle">Välj gruppering av handlingstyper</control-param>
             </control>
           </field>
           <field id="vgr:dc.type.record" label-id="vgr.dc.type.record" set="dokumentbeskrivning" help-id="vgr.help.dc.type.record" description-id="vgr.description.dc.type.record">
-            <control template="/org/alfresco/components/form/controls/ajaxselectone.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/ajaxselectone.ftl">
               <control-param name="ds">/proxy/alfresco/vgr/apelon/recordTypes?documentTypeId={parent}</control-param>
               <control-param name="parent">vgr_dc.type.document</control-param>
               <control-param name="emptyTitle">Välj handlingstyp</control-param>
@@ -614,57 +636,58 @@
             </control>
           </field>
           <field id="vgr:dc.type.record.id" set="dokumentbeskrivning">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
           <field id="vgr:dc.coverage.hsacode" label-id="vgr.dc.coverage.hsacode" set="dokumentbeskrivning" help-id="vgr.help.dc.coverage.hsacode" description-id="vgr.description.dc.coverage.hsacode">
-            <control template="/org/alfresco/components/form/controls/selecthsacode.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/selecthsacode.ftl">
               <control-param name="optionSeparator">#alf#</control-param>
+              <!-- <control-param name="labelSeparator">#sep#</control-param> -->
             </control>
           </field>
           <field id="vgr:dc.coverage.hsacode.id" set="dokumentbeskrivning" help-id="vgr.help.dc.coverage.hsacode.id" description-id="vgr.description.dc.coverage.hsacode.id">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
           <field id="vgr:vgr.status.document" label-id="vgr.vgr.status.document" set="dokumentbeskrivning" help-id="vgr.help.dc.identifier.version" description-id="vgr.description.dc.identifier.version">
-            <control template="/org/alfresco/components/form/controls/selectstatus.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/selectstatus.ftl" />
           </field>
           <field id="vgr:vgr.status.document.id" set="dokumentbeskrivning">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
 
           <set id="upphovsman" appearance="accordion" label-id="vgr.set.upphovsman" parent="standardmetadata" />
           <field id="vgr:dc.creator" label-id="vgr.dc.creator" set="upphovsman" help-id="vgr.help.dc.creator" description-id="vgr.description.dc.creator">
-            <control template="/org/alfresco/components/form/controls/peoplesearch.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/peoplesearch.ftl">
               <control-param name="optionSeparator">#alf#</control-param>
             </control>
           </field>
           <field id="vgr:dc.creator.id" set="upphovsman">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl"></control>
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl"></control>
           </field>
           <field id="vgr:dc.creator.freetext" label-id="vgr.dc.creator.freetext" set="upphovsman" help-id="vgr.help.dc.creator.freetext" description-id="vgr.description.dc.creator.freetext" />
           <field id="vgr:dc.creator.forunit" label-id="vgr.dc.creator.forunit" set="upphovsman" help-id="vgr.help.dc.creator.forunit" description-id="vgr.description.dc.creator.forunit">
-            <control template="/org/alfresco/components/form/controls/treeselect.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/treeselect.ftl">
               <control-param name="ds">/page/components/treeview/kiv</control-param>
               <control-param name="get">/page/components/nodes/kiv</control-param>
               <control-param name="optionSeparator">#alf#</control-param>
             </control>
           </field>
           <field id="vgr:dc.creator.forunit.id" set="upphovsman">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
           <field id="vgr:dc.creator.project-assignment" label-id="vgr.dc.creator.project-assignment" set="upphovsman" help-id="vgr.help.dc.creator.project-assignment" description-id="vgr.description.dc.creator.project-assignment" />
 
           <set id="ansvariga" appearance="accordion" label-id="vgr.set.ansvariga" parent="standardmetadata" />
           <field id="vgr:dc.creator.document" label-id="vgr.dc.creator.document" set="ansvariga" help-id="vgr.help.dc.creator.document" description-id="vgr.description.dc.creator.document">
-            <control template="/org/alfresco/components/form/controls/peoplesearch.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/peoplesearch.ftl">
               <control-param name="optionSeparator">#alf#</control-param>
             </control>
           </field>
           <field id="vgr:dc.creator.document.id" set="ansvariga">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
           <field id="vgr:dc.creator.function" label-id="vgr.dc.creator.function" set="ansvariga" help-id="vgr.help.dc.creator.function" description-id="vgr.description.dc.creator.function" />
           <field id="vgr:dc.creator.recordscreator" label-id="vgr.dc.creator.recordscreator" set="ansvariga" help-id="vgr.help.dc.creator.recordscreator" description-id="vgr.description.dc.creator.recordscreator">
-            <control template="/org/alfresco/components/form/controls/treeselect.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/treeselect.ftl">
               <control-param name="ds">/page/components/treeview/kiv</control-param>
               <control-param name="get">/page/components/nodes/kiv</control-param>
               <control-param name="multiple">false</control-param>
@@ -672,7 +695,7 @@
             </control>
           </field>
           <field id="vgr:dc.creator.recordscreator.id" set="ansvariga">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
 
           <set id="dokumentstatus" appearance="accordion" label-id="vgr.set.dokumentstatus" parent="standardmetadata" />
@@ -684,42 +707,46 @@
 
           <set id="granskare" appearance="accordion" label-id="vgr.set.granskare" parent="standardmetadata" />
           <field id="vgr:dc.contributor.acceptedby" label-id="vgr.dc.contributor.acceptedby" set="granskare" help-id="vgr.help.dc.contributor.acceptedby" description-id="vgr.description.dc.contributor.acceptedby">
-            <control template="/org/alfresco/components/form/controls/peoplesearch.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/peoplesearch.ftl">
               <control-param name="optionSeparator">#alf#</control-param>
             </control>
           </field>
           <field id="vgr:dc.contributor.acceptedby.id" set="granskare">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
-          <field id="vgr:dc.contributor.acceptedby.freetext" label-id="vgr.dc.contributor.acceptedby.freetext" set="granskare" help-id="vgr.help.dc.contributor.acceptedby.freetext" description-id="vgr.description.dc.contributor.acceptedby.freetext" />
+          <field id="vgr:dc.contributor.acceptedby.freetext" label-id="vgr.dc.contributor.acceptedby.freetext" set="granskare" help-id="vgr.help.dc.contributor.acceptedby.freetext"
+            description-id="vgr.description.dc.contributor.acceptedby.freetext" />
           <field id="vgr:dc.date.accepted" label-id="vgr.dc.date.accepted" set="granskare" help-id="vgr.help.dc.date.accepted" description-id="vgr.description.dc.date.accepted" />
           <field id="vgr:dc.contributor.acceptedby.role" label-id="vgr.dc.contributor.acceptedby.role" set="granskare" help-id="vgr.help.dc.contributor.acceptedby.role" description-id="vgr.description.dc.contributor.acceptedby.role" />
-          <field id="vgr:dc.contributor.acceptedby.unit.freetext" label-id="vgr.dc.contributor.acceptedby.unit.freetext" set="granskare" help-id="vgr.help.dc.contributor.acceptedby.unit.freetext" description-id="vgr.description.dc.contributor.acceptedby.unit.freetext" />
+          <field id="vgr:dc.contributor.acceptedby.unit.freetext" label-id="vgr.dc.contributor.acceptedby.unit.freetext" set="granskare" help-id="vgr.help.dc.contributor.acceptedby.unit.freetext"
+            description-id="vgr.description.dc.contributor.acceptedby.unit.freetext" />
           <!-- TODO: DC.contributor.unit.freetext -->
           <field id="vgr:dc.contributor.controlledby" label-id="vgr.dc.contributor.controlledby" set="granskare" help-id="vgr.help.dc.contributor.controlledby" description-id="vgr.description.dc.contributor.controlledby">
-            <control template="/org/alfresco/components/form/controls/peoplesearch.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/peoplesearch.ftl">
               <control-param name="optionSeparator">#alf#</control-param>
             </control>
           </field>
           <field id="vgr:dc.contributor.controlledby.id" set="granskare">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
-          <field id="vgr:dc.contributor.controlledby.freetext" label-id="vgr.dc.contributor.controlledby.freetext" set="granskare" help-id="vgr.help.dc.contributor.controlledby.freetext" description-id="vgr.description.dc.contributor.controlledby.freetext" />
+          <field id="vgr:dc.contributor.controlledby.freetext" label-id="vgr.dc.contributor.controlledby.freetext" set="granskare" help-id="vgr.help.dc.contributor.controlledby.freetext"
+            description-id="vgr.description.dc.contributor.controlledby.freetext" />
           <field id="vgr:dc.date.controlled" label-id="vgr.dc.date.controlled" set="granskare" help-id="vgr.help.dc.date.controlled" description-id="vgr.description.dc.date.controlled" />
           <field id="vgr:dc.contributor.controlledby.role" label-id="vgr.dc.contributor.controlledby.role" set="granskare" help-id="vgr.help.dc.contributor.controlledby.role" description-id="vgr.description.dc.contributor.controlledby.role" />
-          <field id="vgr:dc.contributor.controlledby.unit.freetext" label-id="vgr.dc.contributor.controlledby.unit.freetext" set="granskare" help-id="vgr.help.dc.contributor.controlledby.unit.freetext" description-id="vgr.description.dc.contributor.controlledby.unit.freetext" />
+          <field id="vgr:dc.contributor.controlledby.unit.freetext" label-id="vgr.dc.contributor.controlledby.unit.freetext" set="granskare" help-id="vgr.help.dc.contributor.controlledby.unit.freetext"
+            description-id="vgr.description.dc.contributor.controlledby.unit.freetext" />
 
           <set id="publicerare" appearance="accordion" label-id="vgr.set.publicerare" parent="standardmetadata" />
           <!-- TODO: Develop a KIV connector -->
           <field id="vgr:dc.publisher.forunit" label-id="vgr.dc.publisher.forunit" set="publicerare" help-id="vgr.help.dc.publisher.forunit" description-id="vgr.description.dc.publisher.forunit">
-            <control template="/org/alfresco/components/form/controls/treeselect.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/treeselect.ftl">
               <control-param name="ds">/page/components/treeview/kiv</control-param>
               <control-param name="get">/page/components/nodes/kiv</control-param>
               <control-param name="optionSeparator">#alf#</control-param>
             </control>
           </field>
           <field id="vgr:dc.publisher.forunit.id" set="publicerare">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
           <field id="vgr:dc.publisher.project-assignment" label-id="vgr.dc.publisher.project-assignment" set="publicerare" help-id="vgr.help.dc.publisher.project-assignment" description-id="vgr.description.dc.publisher.project-assignment" />
           <field id="vgr:dc.rights.accessrights" label-id="vgr.dc.rights.accessrights" set="publicerare" help-id="vgr.help.dc.rights.accessrights" description-id="vgr.description.dc.rights.accessrights" />
@@ -734,7 +761,7 @@
 
           <set id="sokstod" appearance="accordion" label-id="vgr.set.sokstod" parent="standardmetadata" />
           <field id="vgr:dc.subject.keywords" label-id="vgr.dc.subject.keywords" set="sokstod">
-            <control template="/org/alfresco/components/form/controls/treeselect.ftl">
+            <control template="/se/vgregion/alfresco/components/form/controls/treeselect.ftl">
               <control-param name="ds">/page/components/treeview/kiv</control-param>
               <control-param name="get">/page/components/nodes/kiv</control-param>
               <control-param name="optionSeparator">#alf#</control-param>
@@ -743,7 +770,7 @@
             </control>
           </field>
           <field id="vgr:dc.subject.keywords.id" set="sokstod">
-            <control template="/org/alfresco/components/form/controls/hidden.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
           <field id="vgr:dc.subject.authorkeywords" label-id="vgr.dc.subject.authorkeywords" set="sokstod" help-id="vgr.help.dc.subject.authorkeywords" description-id="vgr.description.dc.subject.authorkeywords" />
 
@@ -769,13 +796,12 @@
           </field>
           <set id="kommentar" appearance="simple-panel" />
           <field id="versioncomment" label-id="vgr.dc.format.extent.versioncomment" set="kommentar">
-            <control template="/org/alfresco/components/form/controls/versioncomment.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/versioncomment.ftl" />
           </field>
         </appearance>
       </form>
     </forms>
   </config>
-
 
   <!-- Override lists with authority picker to use our site specific search -->
   <!-- dl:todoList type -->

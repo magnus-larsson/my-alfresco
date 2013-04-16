@@ -17,6 +17,7 @@
       <list>
         <value>classpath:alfresco/vgr-share-config.xml</value>
         <value>classpath:alfresco/vgr-form-config.xml</value>
+        <value>classpath:alfresco/vgr-share-documentlibrary-config.xml</value>
         <value>classpath:alfresco/web-extension/share-config-vgr.xml</value>
       </list>
     </property>
@@ -28,6 +29,44 @@
 
   <bean id="webscript.se.vgregion.alfresco.patch.removedashlet.get" class="se.vgregion.web.scripts.patch.RemoveDashlet" parent="webscript">
     <property name="modelObjectService" ref="webframework.service.modelobject" />
+  </bean>
+
+  <bean id="webscript.org.alfresco.components.form.form.get" class="se.vgregion.web.scripts.forms.VgrFormUIGet" parent="webscript">
+    <property name="configService" ref="web.config" />
+  </bean>
+
+  <bean id="evaluator.doclib.action.publishToStorage" parent="evaluator.doclib.action.chainedMatchAll">
+    <property name="evaluators">
+      <list>
+        <ref bean="evaluator.doclib.metadata.isVgrDocument" />
+      </list>
+    </property>
+  </bean>
+
+  <bean id="evaluator.doclib.metadata.isVgrDocument" parent="evaluator.doclib.action.nodeType">
+    <property name="types">
+      <list>
+        <value>vgr:document</value>
+      </list>
+    </property>
+    <property name="allowSubtypes" value="true" />
+  </bean>
+
+  <bean id="evaluator.doclib.metadata.isPublished" parent="evaluator.doclib.action.chainedMatchAll">
+    <property name="evaluators">
+      <list>
+        <ref bean="evaluator.doclib.metadata.isPublishedAspect" />
+        <ref bean="evaluator.doclib.metadata.isVgrDocument" />
+      </list>
+    </property>
+  </bean>
+
+  <bean id="evaluator.doclib.metadata.isPublishedAspect" parent="evaluator.doclib.action.hasAspect">
+    <property name="aspects">
+      <list>
+        <value>vgr:published</value>
+      </list>
+    </property>
   </bean>
 
 </beans>

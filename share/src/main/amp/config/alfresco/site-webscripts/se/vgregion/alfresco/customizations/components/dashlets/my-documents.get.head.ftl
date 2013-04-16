@@ -1,16 +1,19 @@
-<#-- @overridden projects/slingshot/config/alfresco/site-webscripts/org/alfresco/components/dashlets/my-documents.get.head.ftl -->
-
 <#include "/org/alfresco/components/component.head.inc">
 
-<!-- file upload -->
+<!-- Flash-Upload -->
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/res/components/upload/flash-upload.css" />
-<@link rel="stylesheet" type="text/css" href="${page.url.context}/res/components/upload/html-upload.css" />
-
 <@script type="text/javascript" src="${page.url.context}/res/components/upload/flash-upload.js"></@script>
-<@script type="text/javascript" src="${page.url.context}/res/components/upload/html-upload.js"></@script>
+
+<!-- File-Upload -->
 <@script type="text/javascript" src="${page.url.context}/res/components/upload/file-upload.js"></@script>
+
+<!-- HTML Upload -->
+<@link rel="stylesheet" type="text/css" href="${page.url.context}/res/components/upload/html-upload.css" />
+<@script type="text/javascript" src="${page.url.context}/res/components/upload/html-upload.js"></@script>
+
+<!-- check in -->
 <@script type="text/javascript" src="${page.url.context}/res/components/checkin/checkin.js"></@script>
 
-<!-- My Documents -->
-<@link rel="stylesheet" type="text/css" href="${page.url.context}/res/components/dashlets/my-documents.css" />
-<@script type="text/javascript" src="${page.url.context}/res/components/dashlets/my-documents.js"></@script>
+<!-- Code for automatically redirecting to default-redirect instead of the dashboard page when clicking on a site -->
+<@script type="text/javascript" src="${page.url.context}/res/components/dashlets/vgr-my-documents.js"></@script>
+

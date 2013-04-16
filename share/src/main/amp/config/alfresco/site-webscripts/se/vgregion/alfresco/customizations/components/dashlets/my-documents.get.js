@@ -13,4 +13,3 @@ function getContentTypes()
 }
 
 model.contentTypes = getContentTypes();
-model.user = user.name;

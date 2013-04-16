@@ -15,15 +15,15 @@ public class HsaCodeConstraintBean extends ApelonNodeTypeConstraintBean {
 
   @Override
   protected String getValue(final NodeRef nodeRef) {
-    final String value = super.getValue(nodeRef);
+    String value = super.getValue(nodeRef);
 
-    final String verksamhetskod = getVerksamhetskod(nodeRef);
+    String verksamhetskod = getVerksamhetskod(nodeRef);
 
     if (StringUtils.isBlank(value) || StringUtils.isBlank(verksamhetskod)) {
       return "";
     }
 
-    return verksamhetskod + "|" + value;
+    return verksamhetskod + "#sep#" + value;
   }
 
   private String getVerksamhetskodUnauthorized(final NodeRef nodeRef) {

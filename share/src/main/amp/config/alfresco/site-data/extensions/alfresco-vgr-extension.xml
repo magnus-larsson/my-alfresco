@@ -34,6 +34,56 @@
         </config>
       </configurations>
 
+      <components>
+        <!-- Hide Publishing area in document details -->
+        <component>
+          <scope>template</scope>
+          <region-id>document-publishing</region-id>
+          <source-id>document-details</source-id>
+          <sub-components>
+            <sub-component id="default">
+              <evaluations>
+                <evaluation id="vgr-hide">
+                  <render>false</render>
+                </evaluation>
+              </evaluations>
+            </sub-component>
+          </sub-components>
+        </component>
+        
+        <!-- Hide sync area in document details -->
+        <component>
+          <scope>template</scope>
+          <region-id>document-sync</region-id>
+          <source-id>document-details</source-id>
+          <sub-components>
+            <sub-component id="default">
+              <evaluations>
+                <evaluation id="vgr-hide">
+                  <render>false</render>
+                </evaluation>
+              </evaluations>
+            </sub-component>
+          </sub-components>
+        </component>
+        
+        <!-- Hide workflows area in document details -->
+        <component>
+          <scope>template</scope>
+          <region-id>document-workflows</region-id>
+          <source-id>document-details</source-id>
+          <sub-components>
+            <sub-component id="default">
+              <evaluations>
+                <evaluation id="vgr-hide">
+                  <render>false</render>
+                </evaluation>
+              </evaluations>
+            </sub-component>
+          </sub-components>
+        </component>
+      </components>
+
     </module>
 
   </modules>
