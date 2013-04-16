@@ -1,0 +1,9 @@
+<webscript>
+  <shortname>Reject a invitation</shortname>
+  <description>Can only be done by the invitee</description>
+  <url>/vgr/invite/reject</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+  <family>VGR</family>
+</webscript>

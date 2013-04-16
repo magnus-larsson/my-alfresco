@@ -1,0 +1,12 @@
+<webscript>
+  <shortname>Move a list item between lists</shortname>
+  <description>
+      Moves an item between lists of same type
+  </description>
+  <url>/vgr/data-lists/move</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+  <family>VGR</family>
+</webscript>
+

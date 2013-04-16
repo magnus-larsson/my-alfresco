@@ -1,0 +1,1 @@
+<@region id="additional-content" target="footer" action="after" scope="global" />

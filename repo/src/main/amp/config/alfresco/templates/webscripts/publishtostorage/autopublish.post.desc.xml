@@ -1,0 +1,12 @@
+<webscript>
+  <shortname>Auto Publish</shortname>
+  <description>
+    Saves the Auto Publish Settings to the repo
+   </description>
+  <url>/vgr/autopublish</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+  <family>VGR</family>
+</webscript>
+

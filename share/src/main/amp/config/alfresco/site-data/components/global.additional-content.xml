@@ -1,0 +1,6 @@
+<component>
+  <region-id>additional-content</region-id>
+  <source-id>global</source-id>
+  <scope>global</scope>
+  <uri>/se/vgregion/alfresco/components/global/additional-content</uri>
+</component>

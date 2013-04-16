@@ -1,7 +1,0 @@
-<webscript>
-  <shortname>Sites</shortname>
-  <url>/vgr/reports/sitesize</url>
-  <format default="html">argument</format>
-  <authentication>admin</authentication>
-  <transaction allow="readonly">required</transaction>
-</webscript>

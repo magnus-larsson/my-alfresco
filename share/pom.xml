@@ -13,24 +13,29 @@
 
   <properties>
     <module.id>vgr-share</module.id>
-    <webapp.name>share</webapp.name>
+    <alfresco.client.war>share</alfresco.client.war>
     <tomcat.home>${tomcat.share.home}</tomcat.home>
-    <tomcat.share.port>8080</tomcat.share.port>
+    <tomcat.port>${tomcat.share.port}</tomcat.port>
   </properties>
 
   <dependencies>
     <dependency>
-      <groupId>org.alfresco</groupId>
+      <groupId>org.alfresco.enterprise</groupId>
       <artifactId>alfresco-web-framework-commons</artifactId>
-      <version>3.4.4</version>
-      <classifier>enterprise</classifier>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.alfresco.enterprise</groupId>
+      <artifactId>alfresco-share</artifactId>
+      <version>4.1.4</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>com.redpill-linpro.alfresco</groupId>
       <artifactId>alfresco-cluster-probe</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.1</version>
     </dependency>
 
     <dependency>
@@ -39,97 +44,5 @@
       <version>2.1</version>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>net.alchim31.maven</groupId>
-        <artifactId>yuicompressor-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>minimize-javascript</id>
-          </execution>
-        </executions>
-        <configuration>
-          <force>true</force>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
-  <profiles>
-    <profile>
-      <id>dev</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-clean-plugin</artifactId>
-          </plugin>
-
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jar-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>default</id>
-              </execution>
-            </executions>
-          </plugin>
-
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>copy-dependencies</id>
-              </execution>
-            </executions>
-          </plugin>
-
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-resources-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>copy-web-resources</id>
-                <phase>package</phase>
-              </execution>
-              <execution>
-                <id>copy-config-resources-share</id>
-                <phase>package</phase>
-              </execution>
-              <execution>
-                <id>copy-jrebel-config</id>
-                <phase>package</phase>
-              </execution>
-            </executions>
-          </plugin>
-
-          <plugin>
-            <groupId>com.redpill-linpro.alfresco</groupId>
-            <artifactId>maven-refresh-webscripts-plugin</artifactId>
-            <configuration>
-              <url>http://localhost:${tomcat.share.port}/share/page/index</url>
-            </configuration>
-            <executions>
-              <execution>
-                <id>webscripts</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>refresh</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
-          <plugin>
-            <groupId>org.zeroturnaround</groupId>
-            <artifactId>jrebel-maven-plugin</artifactId>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 
 </project>

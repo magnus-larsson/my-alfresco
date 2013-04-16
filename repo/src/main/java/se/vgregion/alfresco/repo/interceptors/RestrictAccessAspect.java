@@ -32,7 +32,8 @@ public class RestrictAccessAspect {
 
   public static final String HTTP_HEADER_X_FORWARDED_FOR = "x-forwarded-for";
 
-  // public static final String[] FORBIDDEN_IP_ADDRESSES = {"192.71.67.138", "192.71.67.139"};
+  // public static final String[] FORBIDDEN_IP_ADDRESSES = {"192.71.67.138",
+  // "192.71.67.139"};
 
   @Pointcut("execution(* org.alfresco.repo.web.scripts.content.StreamContent+.streamContent(..))")
   private void hook() {
@@ -96,10 +97,12 @@ public class RestrictAccessAspect {
   }
 
   /**
-   * Extracts the IP adress of the caller. If there's an "x-forwarded-for" header set,
-   * that one is used cause that is set by proxies, load balancers and the like.
-   *
-   * @param request the http servlet request
+   * Extracts the IP adress of the caller. If there's an "x-forwarded-for"
+   * header set, that one is used cause that is set by proxies, load balancers
+   * and the like.
+   * 
+   * @param request
+   *          the http servlet request
    * @return The IP address of the caller
    */
   private String extractIpAddress(HttpServletRequest request) {
@@ -125,7 +128,8 @@ public class RestrictAccessAspect {
     NodeService nodeService = (NodeService) ApplicationContextHolder.getApplicationContext().getBean("nodeService");
     Properties globalProperties = (Properties) ApplicationContextHolder.getApplicationContext().getBean("global-properties");
 
-    // first of all, if the node is not in the Storage, continue using the regular security
+    // first of all, if the node is not in the Storage, continue using the
+    // regular security
     if (!nodeService.hasAspect(nodeRef, VgrModel.ASPECT_PUBLISHED)) {
       return false;
     }
@@ -144,14 +148,17 @@ public class RestrictAccessAspect {
       return false;
     }
 
-    // if access rights contains "Intranät" (and probably only this value at this stage) then it's fine as long as the users IP is not among the forbidden ones
+    // if access rights contains "Intranät" (and probably only this value at
+    // this stage) then it's fine as long as the users IP is not among the
+    // forbidden ones
     if (accessRights.contains(VgrModel.ACCESS_RIGHT_INTRANET)) {
       List<String> forbiddenIpAddresses = Arrays.asList(StringUtils.split(globalProperties.getProperty("vgr.tmg_forbidden_ip_addresses", ""), ","));
 
       return forbiddenIpAddresses.contains(ipAddress);
     }
 
-    // if we reach this stage then it ought to be good, continue with the regular security
+    // if we reach this stage then it ought to be good, continue with the
+    // regular security
     return false;
   }
 

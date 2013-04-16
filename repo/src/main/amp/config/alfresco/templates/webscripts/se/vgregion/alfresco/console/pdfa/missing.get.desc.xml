@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>Count the number of documents that may lack a PDF/A.</shortname>
+  <url>/se/vgregion/alfresco/console/pdfa/missing</url>
+  <format default="json">extension</format>
+  <authentication>admin</authentication>
+  <transaction allow="readonly" />
+  <family>VGR</family>
+</webscript>

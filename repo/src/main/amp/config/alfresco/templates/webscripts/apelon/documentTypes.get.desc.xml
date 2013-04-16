@@ -1,0 +1,9 @@
+<webscript>
+  <shortname>Get a list of document types from Apelon</shortname>
+  <description>Get a list of document types from Apelon</description>
+  <url>/vgr/apelon/documentTypes</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction allow="readonly">required</transaction>
+  <family>VGR</family>
+</webscript>

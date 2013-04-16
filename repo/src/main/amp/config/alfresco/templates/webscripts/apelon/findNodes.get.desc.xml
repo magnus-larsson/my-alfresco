@@ -1,0 +1,11 @@
+<webscript>
+  <shortname>Get Apelon values</shortname>
+  <description>
+    Get a list of apelon values based on a namespace and a name filter
+   </description>
+  <url>/vgr/apelon/findNodes?namespace={namespace}&amp;propertyName={propertyName}&amp;propertyValue={propertyValue}</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction allow="readonly">required</transaction>
+  <family>VGR</family>
+</webscript>

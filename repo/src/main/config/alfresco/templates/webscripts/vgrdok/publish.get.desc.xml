@@ -1,7 +1,0 @@
-<webscript>
-  <shortname>Publishes VGR Dok documents which originally was published in VGR Dok</shortname>
-  <description>Publishes VGR Dok documents which originally was published in VGR Dok</description>
-  <url>/vgr/vgrdok/publish</url>
-  <transaction>required</transaction>
-  <authentication>admin</authentication>
-</webscript>

@@ -1,0 +1,11 @@
+<webscript>
+  <shortname>Synchronise KIV values</shortname>
+  <description>
+    Synchronise KIV Values 
+   </description>
+  <url>/vgr/kiv/synchronise</url>
+  <format default="json">argument</format>
+  <authentication>admin</authentication>
+  <transaction>required</transaction>
+  <family>VGR</family>
+</webscript>

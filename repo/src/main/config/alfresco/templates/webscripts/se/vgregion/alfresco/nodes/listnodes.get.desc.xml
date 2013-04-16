@@ -1,7 +1,0 @@
-<webscript>
-  <shortname>List nodes for a number of days</shortname>
-  <description>List nodes for a number of days</description>
-  <url>/se/vgregion/alfresco/nodes/listnodes?days={days?}</url>
-  <format default="json">argument</format>
-  <authentication>admin</authentication>
-</webscript>

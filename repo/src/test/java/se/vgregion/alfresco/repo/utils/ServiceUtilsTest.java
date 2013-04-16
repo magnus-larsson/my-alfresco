@@ -68,7 +68,7 @@ public class ServiceUtilsTest {
 
     context.checking(new Expectations() {
       {
-        oneOf(nodeService).getProperty(publishedNodeRef, ContentModel.PROP_COPY_REFERENCE);
+        oneOf(nodeService).getProperty(publishedNodeRef, ContentModel.PROP_REFERENCE);
         will(returnValue(sourceNodeRef));
       }
     });
@@ -94,7 +94,7 @@ public class ServiceUtilsTest {
 
     context.checking(new Expectations() {
       {
-        oneOf(nodeService).getProperty(publishedNodeRef, ContentModel.PROP_COPY_REFERENCE);
+        oneOf(nodeService).getProperty(publishedNodeRef, ContentModel.PROP_REFERENCE);
         will(returnValue(null));
       }
     });

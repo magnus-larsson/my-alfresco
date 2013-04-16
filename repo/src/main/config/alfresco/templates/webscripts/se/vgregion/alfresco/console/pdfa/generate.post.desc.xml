@@ -1,7 +1,0 @@
-<webscript>
-  <shortname>Generate PDF/A documents</shortname>
-  <url>/se/vgregion/alfresco/console/pdfa/generate</url>
-  <format default="json">extension</format>
-  <authentication>admin</authentication>
-  <transaction>required</transaction>
-</webscript>

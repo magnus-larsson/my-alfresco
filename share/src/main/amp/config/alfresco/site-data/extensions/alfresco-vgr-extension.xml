@@ -1,0 +1,40 @@
+<extension>
+  <modules>
+
+    <module>
+      <id>VGR Global</id>
+      <auto-deploy>true</auto-deploy>
+
+      <!-- Base evaluator that decides if any of the component bindings should be used at all -->
+      <evaluator type="site.module.evaluator">
+        <params>
+          <sites>.*</sites>
+          <sitePresets>site-dashboard</sitePresets>
+          <applyForNonSites>true</applyForNonSites>
+        </params>
+      </evaluator>
+
+      <!-- Apply the following customizations when the base evaluator above passes -->
+      <customizations>
+        <customization>
+          <targetPackageRoot>org.alfresco</targetPackageRoot>
+          <sourcePackageRoot>se.vgregion.alfresco.customizations</sourcePackageRoot>
+        </customization>
+      </customizations>
+
+      <configurations>
+        <config evaluator="string-compare" condition="DocumentLibrary" replace="true">
+          <create-content>
+            <content id="document" label="type.vgr_document" type="pagelink" index="10" icon="text">
+              <param name="page">create-content?destination={nodeRef}&amp;itemId=vgr:document</param>
+            </content>
+          </create-content>
+
+          <create-content-by-template>false</create-content-by-template>
+        </config>
+      </configurations>
+
+    </module>
+
+  </modules>
+</extension>

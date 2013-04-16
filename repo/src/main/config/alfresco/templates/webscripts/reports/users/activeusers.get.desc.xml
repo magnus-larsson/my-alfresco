@@ -1,7 +1,0 @@
-<webscript>
-  <shortname>Active Users Report</shortname>
-  <url>/vgr/reports/activeUsers</url>
-  <format default="json">argument</format>
-  <authentication>admin</authentication>
-  <transaction allow="readonly">required</transaction>
-</webscript>

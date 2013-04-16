@@ -56,7 +56,7 @@ public class FixDcSourceDocumentIdPatchTest {
         will(returnValue(searchResult));
         oneOf(searchResult).iterator();
         will(returnIterator(nodes));
-        oneOf(row).getValue(ContentModel.PROP_COPY_REFERENCE);
+        oneOf(row).getValue(ContentModel.PROP_REFERENCE);
         will(returnValue(null));
         oneOf(row).getValue(VgrModel.PROP_IDENTIFIER);
         will(returnValue(link));

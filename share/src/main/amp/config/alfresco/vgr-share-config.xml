@@ -1,0 +1,273 @@
+<alfresco-config>
+
+  <config>
+    <forms>
+      <constraint-handlers>
+        <constraint type="APELON" validation-handler="Alfresco.forms.validation.inList" event="blur" />
+        <constraint type="APELON_FIND_NODES" validation-handler="Alfresco.forms.validation.inList" event="blur" />
+        <constraint type="APELON_NODE_TYPE" validation-handler="Alfresco.forms.validation.inList" event="blur" />
+      </constraint-handlers>
+    </forms>
+  </config>
+
+  <!-- Global config section -->
+  <config replace="true">
+    <probe-host>localhost</probe-host>
+
+    <flags>
+      <!-- Developer debugging setting to turn on DEBUG mode for client scripts in the browser -->
+      <client-debug>false</client-debug>
+
+      <!-- LOGGING can always be toggled at runtime when in DEBUG mode (Ctrl, Ctrl, Shift, Shift). This flag automatically activates logging on page load. -->
+      <client-debug-autologging>false</client-debug-autologging>
+    </flags>
+
+    <!-- override menu so that repository can be hidden when not admin -->
+    <header>
+      <app-items>
+        <!-- defaults: icon="{id}.png" label="header.{id}.label" description="header.{id}.description" -->
+        <item type="link" id="my-dashboard">{userdashboardpage}</item>
+        <item type="js" id="sites">Alfresco.module.Sites</item>
+        <item type="link" id="people">/people-finder</item>
+        <item type="link" id="repository" condition="conditionRepositoryRootNode" permission="admin">/repository</item>
+        <item type="container" id="more">
+          <container-group id="my">
+            <!-- <item type="link" id="my-tasks">/my-tasks</item> -->
+            <!-- <item type="link" id="my-workflows">/my-workflows</item> -->
+            <item type="link" id="my-content">/user/user-content</item>
+            <item type="link" id="my-sites">/user/user-sites</item>
+            <item type="link" id="my-profile">{userprofilepage}</item>
+            <!-- <item type="js" id="saved-searches" condition="false">Alfresco.module.SavedSearches</item> -->
+          </container-group>
+          <container-group id="tools" permission="admin">
+            <item type="link" id="application">/console/admin-console/application</item>
+            <item type="link" id="groups">/console/admin-console/groups</item>
+            <item type="link" id="replication-jobs" condition="!conditionEditionTeam">/console/admin-console/replication-jobs</item>
+            <item type="link" id="repository">/console/admin-console/repository</item>
+            <item type="link" id="users">/console/admin-console/users</item>
+            <item type="link" id="trashcan">/console/admin-console/trashcan</item>
+            <item type="link" id="more">/console/admin-console/</item>
+          </container-group>
+        </item>
+        <item type="link" id="my-sites">/user/user-sites</item>
+      </app-items>
+      <user-items>
+        <item type="container" id="user" icon="" description="">
+          <container-group id="usermenu" label="">
+            <item type="user" id="status">{userprofilepage}</item>
+            <item type="link" id="my-profile">{userprofilepage}</item>
+            <item type="link" id="change-password" condition="user.capabilities.isMutable">/user/change-password</item>
+            <item type="external-link" id="help-external" icon="">{share-help-external}</item>
+            <item type="external-link" id="help-internal" icon="">{share-help-internal}</item>
+            <item type="link" id="logout" condition="!context.externalAuthentication">/dologout</item>
+          </container-group>
+        </item>
+        <item type="js" id="tycktill" label="Tyck till" icon="">Alfresco.thirdparty.module.TyckTill</item>
+        <item type="container" id="help" icon="">
+          <container-group id="helpmenu" label="">
+            <item type="external-link" id="help-external" icon="">{share-help-external}</item>
+            <item type="external-link" id="help-internal" icon="">{share-help-internal}</item>
+          </container-group>
+        </item>
+      </user-items>
+      <dependencies>
+        <css src="/modules/create-site.css" />
+        <css src="/modules/header/sites.css" />
+        <js src="/modules/create-site.js" />
+        <js src="/modules/header/sites.js" />
+        <js src="/modules/header/tycktill.js" />
+      </dependencies>
+    </header>
+
+    <!-- misc configuration -->
+    <kivurl>http://sokikiv.vgregion.se/sokikiv/visaperson?vgrid={id}</kivurl>
+  </config>
+
+  <config evaluator="string-compare" condition="WebFramework">
+    <web-framework>
+      <!-- SpringSurf Autowire Runtime Settings -->
+      <!-- Developers can set mode to 'development' to disable; SpringSurf caches, FreeMarker template caching and Rhino JavaScript compilation. -->
+      <autowire>
+        <!-- Pick the mode: "production" or "development" -->
+        <mode>production</mode>
+      </autowire>
+
+      <!-- This is the user factory we use to provide the user object in share with the specific properties for VGR -->
+      <defaults>
+        <user-factory>webframework.factory.user.vgr</user-factory>
+      </defaults>
+    </web-framework>
+  </config>
+
+  <config evaluator="string-compare" condition="AdvancedSearch">
+    <advanced-search>
+      <forms>
+        <form labelId="search.form.label.vgr_document" descriptionId="search.form.desc.vgr_document">vgr:document</form>
+      </forms>
+    </advanced-search>
+  </config>
+
+  <!-- Document Library config section -->
+  <config evaluator="string-compare" condition="DocumentLibrary" replace="true">
+
+    <!-- <tree> -->
+    <!-- Whether the folder Tree component should enumerate child folders or not. This is a relatively expensive operation, so should be set to "false" for Repositories with broad folder structures. -->
+    <!-- <evaluate-child-folders>false</evaluate-child-folders> -->
+
+    <!-- Optionally limit the number of folders shown in treeview throughout Share. -->
+    <!-- <maximum-folder-count>-1</maximum-folder-count> -->
+    <!-- </tree> -->
+
+    <!-- Used by the "Manage Aspects" action For custom aspects, remember to also add the relevant i18n string(s) cm_myaspect=My Aspect -->
+    <aspects>
+      <!-- Aspects that a user can see -->
+      <visible>
+
+      </visible>
+
+      <!-- Aspects that a user can add. Same as "visible" if left empty -->
+      <addable></addable>
+
+      <!-- Aspects that a user can remove. Same as "visible" if left empty -->
+      <removeable></removeable>
+    </aspects>
+
+    <!-- Used by the "Change Type" action Define valid subtypes using the following example: <type name="cm:content"> <subtype name="cm:mysubtype" /> </type> Remember to also add the relevant i18n string(s): 
+      cm_mysubtype=My SubType -->
+    <types>
+      <type name="cm:content">
+        <subtype name="vgr:document" />
+      </type>
+
+      <!-- <type name="cm:folder"> </type> -->
+    </types>
+
+    <!-- If set, will present a WebDAV link for the current item on the Document and Folder details pages. Also used to generate the "View in Alfresco Explorer" action for folders. -->
+    <!-- <repository-url>http://localhost:8080/alfresco</repository-url> -->
+
+    <!-- Google Docs™ integration -->
+    <google-docs>
+      <!-- Enable/disable the Google Docs UI integration (Extra types on Create Content menu, Google Docs actions). -->
+      <enabled>false</enabled>
+
+      <!-- The mimetypes of documents Google Docs allows you to create via the Share interface. The I18N label is created from the "type" attribute, e.g. google-docs.doc=Google Docs&trade; Document -->
+      <creatable-types>
+        <creatable type="doc">application/msword</creatable>
+        <creatable type="xls">application/vnd.ms-excel</creatable>
+        <creatable type="ppt">application/vnd.ms-powerpoint</creatable>
+      </creatable-types>
+    </google-docs>
+
+    <!-- File upload configuration -->
+    <file-upload>
+      <!-- Adobe Flash™ In certain environments, an HTTP request originating from Flash cannot be authenticated using an existing session. See: http://bugs.adobe.com/jira/browse/FP-4830 For these cases, 
+        it is useful to disable the Flash-based uploader for Share Document Libraries. -->
+      <adobe-flash-enabled>true</adobe-flash-enabled>
+    </file-upload>
+  </config>
+
+  <!-- Repository Library config section -->
+  <config evaluator="string-compare" condition="RepositoryLibrary" replace="true">
+    <!-- Root nodeRef or xpath expression for top-level folder. e.g. alfresco://user/home, /app:company_home/st:sites/cm:site1 If using an xpath expression, ensure it is properly ISO9075 encoded here. -->
+    <root-node>alfresco://company/home</root-node>
+
+    <tree>
+      <!-- Whether the folder Tree component should enumerate child folders or not. This is a relatively expensive operation, so should be set to "false" for Repositories with broad folder structures. -->
+      <evaluate-child-folders>false</evaluate-child-folders>
+
+      <!-- Optionally limit the number of folders shown in treeview throughout Share. -->
+      <!-- <maximum-folder-count>500</maximum-folder-count> -->
+    </tree>
+  </config>
+
+  <!-- share help urls -->
+  <config evaluator="string-compare" condition="HelpPages">
+    <help-pages>
+      <share-help-external>http://www.vgregion.se/alfresco</share-help-external>
+      <share-help-internal>http://intra.vgregion.se/alfresco</share-help-internal>
+      <share-tutorial>http://www.vgregion.se/alfresco</share-tutorial>
+    </help-pages>
+  </config>
+
+  <!-- Custom DocLibActions config section -->
+  <config evaluator="string-compare" condition="DocLibActions" replace="true">
+    <actionGroups>
+      <actionGroup id="document-browse">
+        <action index="100" id="document-download" label="actions.document.download-reading-copy" />
+        <!-- <action index="110" id="document-view-content" /> -->
+        <action index="120" id="document-locate" />
+        <action index="130" id="document-edit-properties" />
+        <!-- 
+        <action index="140" id="document-upload-new-version" />
+        -->
+        <action index="150" id="document-view-original" />
+        <action index="160" id="document-view-working-copy" />
+        <action index="170" id="document-approve" />
+        <action index="180" id="document-reject" />
+        <!-- 
+        <action index="190" id="document-inline-edit" />
+        -->
+        <action index="200" id="document-edit-online" />
+        <action index="210" id="document-edit-offline" />
+        <action index="220" id="document-view-googledoc" />
+        <action index="230" id="document-checkout-to-googledocs" />
+        <action index="240" id="document-checkin-from-googledocs" />
+
+        <action index="250" id="document-copy-to" />
+        <action index="260" id="document-move-to" />
+        <action index="270" id="document-delete" />
+        <action index="280" id="document-assign-workflow" />
+        <action index="290" id="document-cancel-editing" />
+        <action index="295" id="document-cancel-editing-unlock" icon="document-cancel-editing" />
+        <!-- <action index="300" id="document-publish" /> -->
+        <action index="310" id="document-view-googlemaps" />
+        <action index="320" id="document-view-in-source-repository" />
+        <action index="330" id="document-cloud-sync" />
+        <action index="340" id="document-cloud-unsync" />
+        <action index="350" id="document-view-in-cloud" />
+        <action index="360" id="document-request-sync" />
+      </actionGroup>
+
+      <actionGroup id="document-details">
+        <action index="100" id="document-download" label="actions.document.download-reading-copy" />
+        <!-- 
+        <action index="110" id="document-view-content" />
+        -->
+        <action index="120" id="document-edit-metadata" />
+        <!-- 
+        <action index="130" id="document-upload-new-version" />
+        -->
+        <action index="140" id="document-view-original" />
+        <action index="150" id="document-view-working-copy" />
+        <action index="160" id="document-approve" />
+        <action index="170" id="document-reject" />
+        <!-- 
+        <action index="180" id="document-inline-edit" />
+        -->
+        <action index="190" id="document-edit-online" />
+        <action index="200" id="document-edit-offline" />
+        <action index="210" id="document-view-googledoc" />
+        <action index="220" id="document-checkout-to-googledocs" />
+        <action index="230" id="document-checkin-from-googledocs" />
+        <action index="240" id="document-copy-to" />
+        <action index="250" id="document-move-to" />
+        <action index="260" id="document-delete" />
+        <action index="270" id="document-assign-workflow" />
+        <action index="280" id="document-cancel-editing" />
+        <action index="285" id="document-cancel-editing-unlock" icon="document-cancel-editing" />
+        <action index="290" id="document-manage-site-permissions" />
+        <action index="300" id="document-manage-repo-permissions" />
+        <!-- <action index="310" id="document-manage-aspects" /> -->
+        <!-- <action index="320" id="document-change-type" /> -->
+        <action index="330" id="document-view-in-source-repository" />
+        <!-- <action index="340" id="document-publish" /> -->
+        <action index="350" id="document-view-googlemaps" />
+        <action index="360" id="document-cloud-sync" />
+        <action index="370" id="document-cloud-unsync" />
+        <action index="380" id="document-view-in-cloud" />
+        <action index="390" id="document-request-sync" />
+      </actionGroup>
+    </actionGroups>
+  </config>
+
+</alfresco-config>

@@ -1,0 +1,11 @@
+<webscript>
+  <shortname>Synchronise Apelon values</shortname>
+  <description>
+    Synchronise Apelon Values 
+   </description>
+  <url>/vgr/apelon/synchronise</url>
+  <format default="json">argument</format>
+  <authentication>admin</authentication>
+  <transaction>required</transaction>
+  <family>VGR</family>
+</webscript>

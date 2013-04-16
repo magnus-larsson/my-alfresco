@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>Count the number of documents to be pushed.</shortname>
+  <url>/se/vgregion/alfresco/console/push/count?fromDate={fromDate}&amp;fromTime={fromTime}&amp;toDate={toDate}&amp;toTime={toTime}</url>
+  <format default="json">extension</format>
+  <authentication>admin</authentication>
+  <transaction allow="readonly" />
+  <family>VGR</family>
+</webscript>

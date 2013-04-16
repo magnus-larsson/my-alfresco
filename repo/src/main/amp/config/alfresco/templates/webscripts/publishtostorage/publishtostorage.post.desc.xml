@@ -1,0 +1,12 @@
+<webscript>
+  <shortname>Publish To Storage</shortname>
+  <description>
+    Validate publishing to storage or publish to storage.
+   </description>
+  <url>/vgr/publishtostorage</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+  <family>VGR</family>
+</webscript>
+

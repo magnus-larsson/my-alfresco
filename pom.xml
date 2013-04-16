@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.redpill-linpro.alfresco</groupId>
     <artifactId>alfresco-base</artifactId>
-    <version>3.4.12-enterprise</version>
+    <version>1.0.1.4</version>
   </parent>
 
   <groupId>se.vgregion.alfresco</groupId>
@@ -24,67 +24,8 @@
   </modules>
 
   <build>
-    <extensions>
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-ssh</artifactId>
-        <version>1.0-beta-6</version>
-      </extension>
-    </extensions>
-
-    <plugins>
-      <plugin>
-        <groupId>com.redpill-linpro.alfresco</groupId>
-        <artifactId>maven-refresh-webscripts-plugin</artifactId>
-        <version>1.0.0</version>
-      </plugin>
-
-      <plugin>
-        <groupId>com.sourcesense.maven</groupId>
-        <artifactId>maven-nosnapshot-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>default</id>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>buildnumber-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>default</id>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.alfresco.maven.plugin</groupId>
-        <artifactId>maven-amp-plugin</artifactId>
-      </plugin>
-    </plugins>
-
     <pluginManagement>
       <plugins>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>wagon-maven-plugin</artifactId>
-          <configuration>
-            <serverId>alfrescolab01</serverId>
-            <fromFile>${project.build.directory}/${project.build.finalName}.amp</fromFile>
-          </configuration>
-          <executions>
-            <execution>
-              <id>upload-amp-to-server</id>
-              <phase>deploy</phase>
-              <goals>
-                <goal>upload-single</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
           <artifactId>lifecycle-mapping</artifactId>
@@ -139,38 +80,5 @@
       </plugins>
     </pluginManagement>
   </build>
-
-  <profiles>
-    <profile>
-      <id>upload</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.redpill-linpro.alfresco</groupId>
-            <artifactId>artifact-upload-plugin</artifactId>
-            <version>1.0.0</version>
-            <executions>
-              <execution>
-                <id>artifact-upload</id>
-                <phase>install</phase>
-                <goals>
-                  <goal>upload</goal>
-                </goals>
-                <inherited>true</inherited>
-              </execution>
-            </executions>
-            <configuration>
-              <username>${artifact-upload.username}</username>
-              <password>${artifact-upload.password}</password>
-              <site>${artifact-upload.site}</site>
-              <url>${artifact-upload.cmis.url}</url>
-              <path>${artifact-upload.client.upload.path}</path>
-              <overwrite>true</overwrite>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 
 </project>
