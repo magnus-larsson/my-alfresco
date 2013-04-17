@@ -7,8 +7,8 @@
 "documents": [
     <#list sites as site>
     {
-    "title": "${site.title}",
-    "shortName": "${site.shortName}"
+    "title": "${site.title?js_string}",
+    "shortName": "${site.shortName?js_string}"
     }<#if site_has_next>,</#if>
     </#list>
 ]

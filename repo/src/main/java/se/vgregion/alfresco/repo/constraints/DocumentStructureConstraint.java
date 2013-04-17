@@ -1,13 +1,16 @@
 package se.vgregion.alfresco.repo.constraints;
 
-import org.alfresco.repo.dictionary.constraint.ListOfValuesConstraint;
-import se.vgregion.alfresco.repo.utils.ApplicationContextHolder;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.repo.dictionary.constraint.ListOfValuesConstraint;
+
+import se.vgregion.alfresco.repo.utils.ApplicationContextHolder;
+
 public class DocumentStructureConstraint extends ListOfValuesConstraint implements Serializable {
+
+  private static final long serialVersionUID = -5638082363103003898L;
 
   private static final String NODE_TYPE = "apelon:documentStructure";
 

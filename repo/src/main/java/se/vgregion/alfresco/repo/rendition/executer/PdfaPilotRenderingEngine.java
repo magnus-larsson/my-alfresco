@@ -11,8 +11,7 @@ import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.TransformationOptions;
 import org.apache.commons.lang.StringUtils;
-
-import se.vgregion.alfresco.repo.content.transform.PdfaPilotTransformationOptions;
+import org.redpill.alfresco.repo.content.transform.PdfaPilotTransformationOptions;
 
 public class PdfaPilotRenderingEngine extends AbstractTransformationRenderingEngine {
 

@@ -1,14 +1,15 @@
 package se.vgregion.alfresco.repo.thumbnail;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import org.alfresco.repo.thumbnail.ThumbnailRenditionConvertor;
 import org.alfresco.service.cmr.repository.TransformationOptions;
 import org.alfresco.service.cmr.thumbnail.ThumbnailParentAssociationDetails;
-import se.vgregion.alfresco.repo.content.transform.OpenOfficeTransformationOptions;
-import se.vgregion.alfresco.repo.content.transform.PdfaPilotTransformationOptions;
-import se.vgregion.alfresco.repo.rendition.executer.PdfaPilotRenderingEngine;
+import org.redpill.alfresco.repo.content.transform.PdfaPilotTransformationOptions;
 
-import java.io.Serializable;
-import java.util.Map;
+import se.vgregion.alfresco.repo.content.transform.OpenOfficeTransformationOptions;
+import se.vgregion.alfresco.repo.rendition.executer.PdfaPilotRenderingEngine;
 
 public class CustomThumbnailRenditionConvertor extends ThumbnailRenditionConvertor {
 

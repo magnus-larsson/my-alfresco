@@ -20,6 +20,8 @@ public interface StorageService {
 
   int createMissingPdfRenditions();
 
+  int createMissingPdfRenditions(CreationCallback creationCallback);
+
   boolean pdfaRendable(NodeRef nodeRef);
 
 }

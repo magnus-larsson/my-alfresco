@@ -4,7 +4,6 @@ import static org.junit.Assert.fail;
 
 import java.util.Calendar;
 
-import org.alfresco.service.cmr.repository.NodeRef;
 import org.apache.commons.lang.StringUtils;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
@@ -133,7 +132,6 @@ public class StorageServiceTest {
     final StorageService storageService = context.mock(StorageService.class);
 
     final String sourceNodeRef = "workspace://SpacesStore/12345-12345-12345-12345";
-    final NodeRef nodeRef = new NodeRef(sourceNodeRef);
 
     context.checking(new Expectations() {
       {

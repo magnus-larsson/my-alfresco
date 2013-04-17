@@ -1,5 +1,15 @@
 package se.vgregion.alfresco.repo.constraints.sync;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
@@ -11,21 +21,18 @@ import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
+
 import se.vgregion.alfresco.repo.constraints.ApelonService;
+import se.vgregion.alfresco.repo.jobs.ClusteredExecuter;
 import se.vgregion.alfresco.repo.model.ApelonNode;
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.utils.ServiceUtils;
 
-import java.io.Serializable;
-import java.util.*;
-import java.util.Map.Entry;
-
-public class ApelonSynchronisationImpl implements InitializingBean, ApelonSynchronisation {
+public class ApelonSynchronisationImpl extends ClusteredExecuter implements InitializingBean, ApelonSynchronisation {
 
   protected ApelonService _apelonService;
 
@@ -44,8 +51,6 @@ public class ApelonSynchronisationImpl implements InitializingBean, ApelonSynchr
   protected String _apelonNodeType;
 
   protected String _apelonNodeTitle;
-
-  protected TransactionService _transactionService;
 
   /**
    * This parameter controls whether the category should be synced as a
@@ -92,17 +97,23 @@ public class ApelonSynchronisationImpl implements InitializingBean, ApelonSynchr
     _apelonNodeTitle = apelonNodeTitle;
   }
 
-  public void setTransactionService(TransactionService transactionService) {
-    _transactionService = transactionService;
+  @Override
+  protected String getJobName() {
+    return "Apelon Synchronisation";
+  }
+
+  @Override
+  protected void executeInternal() {
+    synchronise();
   }
 
   /*
-  * (non-Javadoc)
-  *
-  * @see
-  * se.vgregion.alfresco.repo.constraints.sync.ApelonSynchronisation#synchronise
-  * ()
-  */
+   * (non-Javadoc)
+   *
+   * @see
+   * se.vgregion.alfresco.repo.constraints.sync.ApelonSynchronisation#synchronise
+   * ()
+   */
   @Override
   public void synchronise() {
     AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>() {
@@ -179,7 +190,7 @@ public class ApelonSynchronisationImpl implements InitializingBean, ApelonSynchr
         result = null;
       } else if (nodeRefs.length() > 1) {
         throw new RuntimeException("Found more than 1 node in Alfresco for apelon:name '" + name
-                + "' and apelon:internalid '" + internalId + "'");
+            + "' and apelon:internalid '" + internalId + "'");
       } else {
         result = nodeRefs.getNodeRef(0);
       }
@@ -208,6 +219,8 @@ public class ApelonSynchronisationImpl implements InitializingBean, ApelonSynchr
   }
 
   protected void doSynchroniseNode(final ApelonNode node, final Parent parent) {
+    refreshLock();
+
     NodeRef nodeRef = findNodeRef(node);
 
     if (nodeRef == null) {
@@ -278,7 +291,7 @@ public class ApelonSynchronisationImpl implements InitializingBean, ApelonSynchr
   }
 
   private void setPropertyValues(NodeRef apelonNodeRef, NodeRef propertyNode, String key,
-                                 List<String> values) {
+      List<String> values) {
     if (propertyNode == null) {
       addProperty(apelonNodeRef, key, values);
       return;
@@ -379,7 +392,7 @@ public class ApelonSynchronisationImpl implements InitializingBean, ApelonSynchr
     properties.put(ContentModel.PROP_NAME, name);
 
     NodeRef apelonNodeRef = _nodeService.createNode(parentNodeRef, ContentModel.ASSOC_CONTAINS,
-            QName.createQName(uri, validLocalName), assocQName).getChildRef();
+        QName.createQName(uri, validLocalName), assocQName).getChildRef();
     _nodeService.setProperties(apelonNodeRef, properties);
 
     addProperties(apelonNode, apelonNodeRef);
@@ -416,7 +429,7 @@ public class ApelonSynchronisationImpl implements InitializingBean, ApelonSynchr
     String validLocalName = QName.createValidLocalName(apelonNodeRef.getId() + "-" + key);
 
     _nodeService.createNode(apelonNodeRef, ContentModel.ASSOC_CONTAINS, QName.createQName(uri, validLocalName),
-            VgrModel.TYPE_APELON_PROPERTY, properties).getChildRef();
+        VgrModel.TYPE_APELON_PROPERTY, properties).getChildRef();
 
     QName type = _nodeService.getType(apelonNodeRef);
 
@@ -448,7 +461,7 @@ public class ApelonSynchronisationImpl implements InitializingBean, ApelonSynchr
     String validLocalName = QName.createValidLocalName(_apelonNodeType);
 
     NodeRef apelonTypeNode = _nodeService.createNode(apelonStorageNode, ContentModel.ASSOC_CONTAINS,
-            QName.createQName(uri, validLocalName), ContentModel.TYPE_FOLDER).getChildRef();
+        QName.createQName(uri, validLocalName), ContentModel.TYPE_FOLDER).getChildRef();
 
     _nodeService.setProperty(apelonTypeNode, ContentModel.PROP_NAME, _apelonNodeTitle);
 
@@ -479,7 +492,7 @@ public class ApelonSynchronisationImpl implements InitializingBean, ApelonSynchr
     String validLocalName = QName.createValidLocalName("apelon");
 
     NodeRef apelonStorageNode = _nodeService.createNode(dataDictionaryNode, ContentModel.ASSOC_CONTAINS,
-            QName.createQName(uri, validLocalName), ContentModel.TYPE_FOLDER).getChildRef();
+        QName.createQName(uri, validLocalName), ContentModel.TYPE_FOLDER).getChildRef();
 
     _nodeService.setProperty(apelonStorageNode, ContentModel.PROP_NAME, "Apelon");
 
