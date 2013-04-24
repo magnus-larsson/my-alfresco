@@ -1,7 +1,6 @@
 package se.vgregion.alfresco.repo.mail.impl;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.alfresco.repo.action.executer.MailActionExecuter;
@@ -15,21 +14,30 @@ public class SendMailServiceImpl implements SendMailService {
 
   private static final Logger LOG = Logger.getLogger(SendMailServiceImpl.class);
 
-  private ActionService actionService;
+  private ActionService _actionService;
 
   @Override
   public void sendTextMail(String subject, String from, String to, String body) {
-    List<String> toList = new ArrayList<String>();
+    Action mailAction = _actionService.createAction(MailActionExecuter.NAME);
 
-    toList.add(to);
+    mailAction.setParameterValue(MailActionExecuter.PARAM_SUBJECT, subject);
 
-    sendTextMail(subject, from, toList, body);
+    mailAction.setParameterValue(MailActionExecuter.PARAM_TO, to);
+
+    mailAction.setParameterValue(MailActionExecuter.PARAM_FROM, from);
+
+    mailAction.setParameterValue(MailActionExecuter.PARAM_TEXT, body);
+
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Sending mail to " + to + " from " + from + " with subject " + subject);
+    }
+
+    _actionService.executeAction(mailAction, null);
   }
 
   @Override
   public void sendTextMail(String subject, String from, List<String> to, String body) {
-
-    Action mailAction = actionService.createAction(MailActionExecuter.NAME);
+    Action mailAction = _actionService.createAction(MailActionExecuter.NAME);
 
     mailAction.setParameterValue(MailActionExecuter.PARAM_SUBJECT, subject);
 
@@ -43,12 +51,11 @@ public class SendMailServiceImpl implements SendMailService {
       LOG.debug("Sending mail to " + to + " from " + from + " with subject " + subject);
     }
 
-    actionService.executeAction(mailAction, null);
-
+    _actionService.executeAction(mailAction, null);
   }
 
   public void setActionService(ActionService actionService) {
-    this.actionService = actionService;
+    _actionService = actionService;
   }
 
 }
