@@ -147,6 +147,12 @@ public class ValidityChecker extends ClusteredExecuter {
       recipients.add(savedById);
     }
 
+    if (LOG.isDebugEnabled()) {
+      for (String recipient : recipients) {
+        LOG.debug("First email recipients: " + recipient);
+      }
+    }
+
     return recipients;
   }
 
@@ -158,6 +164,12 @@ public class ValidityChecker extends ClusteredExecuter {
 
     if (creatorDocumentIds != null && creatorDocumentIds.size() > 0) {
       recipients.addAll(creatorDocumentIds);
+    }
+
+    if (LOG.isDebugEnabled()) {
+      for (String recipient : recipients) {
+        LOG.debug("Second email recipients: " + recipient);
+      }
     }
 
     return recipients;
