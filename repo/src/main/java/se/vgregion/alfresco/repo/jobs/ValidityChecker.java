@@ -93,8 +93,12 @@ public class ValidityChecker extends ClusteredExecuter {
         List<String> to = new ArrayList<String>(new LinkedHashSet<String>(getFirstEmailRecipients(node)));
 
         String source = (String) _nodeService.getProperty(node, VgrModel.PROP_SOURCE);
+        
+        String identifier = (String) _nodeService.getProperty(node, VgrModel.PROP_IDENTIFIER);
+        
+        String title = (String) _nodeService.getProperty(node, VgrModel.PROP_TITLE);
 
-        String body = I18NUtil.getMessage((String) mail.get("body"), daysBefore, source);
+        String body = I18NUtil.getMessage((String) mail.get("body"), daysBefore, source, identifier, title);
 
         _sendMailService.sendTextMail(subject, _mailFrom, to, body);
 
@@ -120,7 +124,11 @@ public class ValidityChecker extends ClusteredExecuter {
 
         String source = (String) _nodeService.getProperty(node, VgrModel.PROP_SOURCE);
 
-        String body = I18NUtil.getMessage((String) mail.get("body"), daysBefore, source);
+        String identifier = (String) _nodeService.getProperty(node, VgrModel.PROP_IDENTIFIER);
+        
+        String title = (String) _nodeService.getProperty(node, VgrModel.PROP_TITLE);
+
+        String body = I18NUtil.getMessage((String) mail.get("body"), daysBefore, source, identifier, title);
 
         _sendMailService.sendTextMail(subject, _mailFrom, to, body);
 
