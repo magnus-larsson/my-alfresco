@@ -74,7 +74,7 @@
   <!-- **** -->
   <!-- I18N -->
   <!-- ***** -->
-  
+
   <bean id="vgr.resourceBundles" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
     <property name="resourceBundles">
       <list>

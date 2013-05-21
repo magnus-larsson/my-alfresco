@@ -108,7 +108,7 @@
   </config>
 
   <!-- Document Library config section -->
-  <config evaluator="string-compare" condition="DocumentLibrary" replace="true">
+  <config evaluator="string-compare" condition="DocumentLibrary">
 
     <!-- <tree> -->
     <!-- Whether the folder Tree component should enumerate child folders or not. This is a relatively expensive operation, so should be set to "false" for Repositories with broad folder structures. -->
@@ -164,6 +164,15 @@
         it is useful to disable the Flash-based uploader for Share Document Libraries. -->
       <adobe-flash-enabled>true</adobe-flash-enabled>
     </file-upload>
+
+    <indicators>
+      <indicator id="auto-publish-all-versions" index="39">
+        <evaluator>evaluator.doclib.indicator.auto-publish-all-versions</evaluator>
+      </indicator>
+      <indicator id="auto-publish-major-version" index="39">
+        <evaluator>evaluator.doclib.indicator.auto-publish-major-version</evaluator>
+      </indicator>
+    </indicators>
   </config>
 
   <!-- Repository Library config section -->
@@ -195,9 +204,22 @@
     <!-- Action definitions -->
     <actions>
 
-      <action id="action-header-edit" type="header" />
-      <action id="action-header-publish" type="header" />
+      <action id="action-header-edit" type="header">
+        <permissions>
+          <permission allow="true">Write</permission>
+        </permissions>
+        <evaluator negate="true">evaluator.doclib.action.isLocked</evaluator>
+      </action>
+
+      <action id="action-header-publish" type="header">
+        <permissions>
+          <permission allow="true">Write</permission>
+        </permissions>
+        <evaluator>evaluator.doclib.metadata.showPublishHeader</evaluator>
+      </action>
+
       <action id="action-header-manage" type="header" />
+
       <action id="action-header-origin" type="header">
         <evaluator>evaluator.doclib.action.isWorkingCopy</evaluator>
       </action>
@@ -207,9 +229,31 @@
         <permissions>
           <permission allow="true">Write</permission>
         </permissions>
-        <evaluator>evaluator.doclib.action.publishToStorage</evaluator>
+        <evaluator>evaluator.doclib.metadata.canPublish</evaluator>
       </action>
 
+      <action id="document-unpublish-from-storage" type="javascript" label="actions.document.unpublish-from-storage">
+        <param name="function">onActionUnpublishFromStorage</param>
+        <permissions>
+          <permission allow="true">Write</permission>
+        </permissions>
+        <evaluator>evaluator.doclib.metadata.canUnpublish</evaluator>
+      </action>
+
+      <action id="document-unpublish-old-from-storage" type="javascript" label="actions.document.unpublish-old-from-storage" icon="document-unpublish-from-storage">
+        <param name="function">onActionUnpublishFromStorage</param>
+        <permissions>
+          <permission allow="true">Write</permission>
+        </permissions>
+        <evaluator>evaluator.doclib.metadata.canUnpublishOld</evaluator>
+      </action>
+
+      <action id="folder-auto-publish" type="javascript" label="actions.folder.auto-publish" icon="auto-publish-all-versions-indicator">
+        <param name="function">onActionAutoPublish</param>
+        <permissions>
+          <permission allow="true">Write</permission>
+        </permissions>
+      </action>
     </actions>
 
     <actionGroups>
@@ -229,6 +273,11 @@
         <action index="190" id="document-inline-edit">
           <evaluator>evaluator.doclib.action.disableAction</evaluator>
         </action>
+
+        <action index="202" id="document-publish-to-storage" />
+        <action index="203" id="document-unpublish-from-storage" />
+        <action index="203" id="document-unpublish-old-from-storage" />
+
         <action index="280" id="document-assign-workflow">
           <evaluator>evaluator.doclib.action.disableAction</evaluator>
         </action>
@@ -260,6 +309,8 @@
         <action index="139" id="action-header-origin" label="actions.document.label.origin" />
 
         <action index="202" id="document-publish-to-storage" />
+        <action index="203" id="document-unpublish-from-storage" />
+        <action index="203" id="document-unpublish-old-from-storage" />
 
         <action index="110" id="document-view-content">
           <evaluator>evaluator.doclib.action.disableAction</evaluator>
@@ -301,6 +352,65 @@
         <action index="130" id="document-upload-new-version">
           <evaluator>evaluator.doclib.action.isWorkingCopy</evaluator>
         </action>
+      </actionGroup>
+
+
+      <actionGroup id="folder-browse">
+        <action index="120" id="document-approve" icon="folder-approve">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="130" id="document-reject" icon="folder-reject">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="210" id="document-manage-aspects" label="actions.folder.manage-aspects">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="220" id="document-view-in-source-repository" label="actions.folder.view-source-repository" />
+        <action index="360" id="document-cloud-sync">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="370" id="document-cloud-unsync">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="380" id="document-view-in-cloud">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="390" id="document-request-sync">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="400" id="folder-auto-publish" />
+      </actionGroup>
+
+      <actionGroup id="folder-details">
+        <action index="110" id="document-approve" icon="folder-approve">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="120" id="document-reject" icon="folder-reject">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="190" id="document-manage-aspects" label="actions.folder.manage-aspects">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="200" id="document-change-type" label="actions.folder.change-type">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="210" id="view-in-explorer">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="220" id="document-view-in-source-repository" label="actions.folder.view-source-repository" />
+        <action index="360" id="document-cloud-sync">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="370" id="document-cloud-unsync">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="380" id="document-view-in-cloud">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="390" id="document-request-sync">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="400" id="folder-auto-publish" />
       </actionGroup>
     </actionGroups>
   </config>

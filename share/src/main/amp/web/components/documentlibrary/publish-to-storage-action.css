@@ -1,9 +1,9 @@
 .doclist .onActionPublishToStorage a, .doclist .onActionPublishFolderToStorage a, .toolbar  .onActionPublishToStorage {
-    background-image: url(images/publish-to-storage-16.png);
+    background-image: url(actions/document-publish-to-storage-16.png);
 }
 
 .doclist .onActionUnpublishFromStorage a, .doclist .onActionUnpublishFolderFromStorage a, .toolbar .onActionUnpublishFromStorage {
-    background-image: url(images/unpublish-from-storage-16.png);
+    background-image: url(actions/document-unpublish-from-storage-16.png);
 }
 
 .doclist .onActionAutoPublish a {

@@ -6,7 +6,7 @@ import org.json.simple.JSONObject;
 import se.vgregion.web.scripts.PublishedDocumentService;
 import se.vgregion.web.scripts.PublishedStatus;
 
-public class SameAsPublishedVersionEvaluator extends BaseEvaluator {
+public class PublishedVersionEvaluator extends BaseEvaluator {
 
   private PublishedDocumentService _publishedDocumentService;
 

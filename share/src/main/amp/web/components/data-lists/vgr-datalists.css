@@ -1,0 +1,31 @@
+.datalists li.highlight {
+   background-color: #6CA5CE !important; color: white;
+}
+
+.move-dialog .list-wrapper {
+   height: 16em; overflow: auto;
+}
+
+.move-dialog-datalists {
+   margin: 8px; list-style-type: none;
+}
+
+.move-dialog-datalists li {
+   background: url("../images/list-16.png") no-repeat scroll 4px 3px transparent; cursor: pointer; padding-top: 3px; padding-bottom: 3px; padding-left: 22px;
+}
+
+.move-dialog-datalists li:hover {
+   background-color: #d2e5f2;
+}
+
+.move-dialog-datalists .selected {
+   background-color: #6CA5CE !important;
+}
+
+.move-dialog p {
+   padding-top: 8px; margin-left: 8px;
+}
+
+.datagrid .onActionMove a,.toolbar .onActionMove {
+   background-image: url("actions/move-row-16.png");
+}

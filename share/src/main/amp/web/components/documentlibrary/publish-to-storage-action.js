@@ -139,7 +139,21 @@
 
     return autoPublish;
   };
+  
+  if (Alfresco.doclib.Actions) {
+     Alfresco.doclib.Actions.prototype.onActionPublishToStorage = onActionPublishToStorage;
+     Alfresco.doclib.Actions.prototype.onActionUnpublishFromStorage = onActionUnpublishFromStorage;
+     Alfresco.doclib.Actions.prototype.onActionAutoPublish = function (folder) {
+       onActionAutoPublish.call(this, folder);
+     };
 
+     // monkey patch remove so that we can check for published documents
+     var oldDelete = Alfresco.doclib.Actions.prototype.onActionDelete;
+     Alfresco.doclib.Actions.prototype.onActionDelete = function (assets) {
+       onActionDeleteChecked.call(this, assets, oldDelete);
+     };
+  }
+  
   // documentlibrary
   if (Alfresco.DocumentList) {
     Alfresco.DocumentList.prototype.onActionPublishToStorage = onActionPublishToStorage;
@@ -154,7 +168,7 @@
       onActionDeleteChecked.call(this, assets, oldDelete);
     };
   }
-
+  
   // toolbar
   if (Alfresco.DocListToolbar) {
     Alfresco.DocListToolbar.prototype.onActionPublishToStorage = onActionPublishToStorage;
@@ -164,7 +178,7 @@
       onActionDeleteChecked.call(this, assets, oldToolbarDelete);
     };
   }
-
+  
   // Document details
   if (Alfresco.DocumentActions) {
     Alfresco.DocumentActions.prototype.onActionPublishToStorage = function (files) {
@@ -180,7 +194,7 @@
       onActionDeleteChecked.call(this, assets, oldDetailDelete);
     };
   }
-
+  
   // folder details
   if (Alfresco.FolderActions) {
     Alfresco.FolderActions.prototype.onActionAutoPublish = function (folder) {

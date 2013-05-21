@@ -125,7 +125,6 @@ var Publish = {
             var validators = []; //no validators
                        
             return Publish.recurse(node,validators,Publish._std_extractor);
-        
 	    },
 	    
 	      

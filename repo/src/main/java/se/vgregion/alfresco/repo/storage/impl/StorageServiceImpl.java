@@ -502,6 +502,8 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
       @Override
       public Void doWork() throws Exception {
+        _behaviourFilter.disableBehaviour(ContentModel.ASPECT_VERSIONABLE);
+
         try {
           Date now = new Date();
 
@@ -536,6 +538,8 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
         } catch (final Exception ex) {
           LOG.error(ex.getMessage(), ex);
           throw new RuntimeException(ex);
+        } finally {
+          _behaviourFilter.enableBehaviour(ContentModel.ASPECT_VERSIONABLE);
         }
 
         return null;

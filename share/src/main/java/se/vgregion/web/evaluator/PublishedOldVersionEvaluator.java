@@ -6,7 +6,7 @@ import org.json.simple.JSONObject;
 import se.vgregion.web.scripts.PublishedDocumentService;
 import se.vgregion.web.scripts.PublishedStatus;
 
-public class SameAsPublishedVersionEvaluator extends BaseEvaluator {
+public class PublishedOldVersionEvaluator extends BaseEvaluator {
 
   private PublishedDocumentService _publishedDocumentService;
 
@@ -20,7 +20,7 @@ public class SameAsPublishedVersionEvaluator extends BaseEvaluator {
 
     PublishedStatus status = _publishedDocumentService.getPublishedStatus(nodeRef);
 
-    return status.published;
+    return status.publishedold;
   }
 
 }

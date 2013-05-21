@@ -82,6 +82,22 @@
             </sub-component>
           </sub-components>
         </component>
+
+        <!-- Hide sync area in folder details -->
+        <component>
+          <scope>template</scope>
+          <region-id>folder-sync</region-id>
+          <source-id>folder-details</source-id>
+          <sub-components>
+            <sub-component id="default">
+              <evaluations>
+                <evaluation id="vgr-hide">
+                  <render>false</render>
+                </evaluation>
+              </evaluations>
+            </sub-component>
+          </sub-components>
+        </component>
       </components>
 
     </module>

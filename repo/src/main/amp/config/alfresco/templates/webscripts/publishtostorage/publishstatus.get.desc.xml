@@ -1,0 +1,12 @@
+<webscript>
+  <shortname>Get Publish Status</shortname>
+  <description>
+    Gets the Publish Status of a node from the repo
+   </description>
+  <url>/vgr/publishstatus?nodeRef={nodeRef}</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+  <family>VGR</family>
+</webscript>
+
