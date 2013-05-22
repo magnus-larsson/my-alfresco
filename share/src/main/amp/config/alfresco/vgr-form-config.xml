@@ -45,7 +45,9 @@
         <appearance>
           <set id="dokumentbeskrivning" appearance="bordered-panel" label-id="vgr.set.dokumentbeskrivning" />
           <field id="vgr:dc.title" label-id="vgr.dc.title" set="dokumentbeskrivning" mandatory="true" />
-          <field id="vgr:dc.title.alternative" label-id="vgr.dc.title.alternative" set="dokumentbeskrivning" />
+          <field id="vgr:dc.title.alternative" label-id="vgr.dc.title.alternative" set="dokumentbeskrivning">
+            <control template="/se/vgregion/alfresco/components/form/controls/textfield.ftl" />
+          </field>
           <field id="vgr:dc.description" label-id="vgr.dc.description" set="dokumentbeskrivning" />
           <field id="vgr:dc.type.document.structure" label-id="vgr.dc.type.document.structure" set="dokumentbeskrivning">
             <control template="/se/vgregion/alfresco/components/form/controls/treeselect.ftl">
@@ -82,7 +84,7 @@
           <field id="vgr:dc.coverage.hsacode" label-id="vgr.dc.coverage.hsacode" set="dokumentbeskrivning">
             <control template="/se/vgregion/alfresco/components/form/controls/selecthsacode.ftl">
               <control-param name="optionSeparator">#alf#</control-param>
-              <!--  <control-param name="labelSeparator">#sep#</control-param> -->
+              <!-- <control-param name="labelSeparator">#sep#</control-param> -->
             </control>
           </field>
           <field id="vgr:dc.coverage.hsacode.id" set="dokumentbeskrivning">
@@ -273,7 +275,9 @@
           <set id="dokumentbeskrivning" appearance="bordered-panel" label-id="vgr.set.dokumentbeskrivning" />
           <field id="vgr:dc.title" label-id="vgr.dc.title" set="dokumentbeskrivning" mandatory="true" help-id="vgr.help.dc.title" description-id="vgr.description.dc.title" />
           <field id="vgr:dc.title.filename" label-id="vgr.dc.title.filename" set="dokumentbeskrivning" read-only="true" help-id="vgr.help.dc.title.filename" description-id="vgr.description.dc.title.filename" />
-          <field id="vgr:dc.title.alternative" label-id="vgr.dc.title.alternative" set="dokumentbeskrivning" help-id="vgr.help.dc.title.alternative" description-id="vgr.description.dc.title.alternative" />
+          <field id="vgr:dc.title.alternative" label-id="vgr.dc.title.alternative" set="dokumentbeskrivning" help-id="vgr.help.dc.title.alternative" description-id="vgr.description.dc.title.alternative">
+            <control template="/se/vgregion/alfresco/components/form/controls/textfield.ftl" />
+          </field>
           <field id="vgr:dc.description" label-id="vgr.dc.description" set="dokumentbeskrivning" help-id="vgr.help.dc.description" description-id="vgr.description.dc.description" />
           <field id="vgr:dc.type.document.structure" label-id="vgr.dc.type.document.structure" set="dokumentbeskrivning" help-id="vgr.help.dc.type.document.structure" description-id="vgr.description.dc.type.document.structure">
             <control template="/se/vgregion/alfresco/components/form/controls/treeselect.ftl">
@@ -426,16 +430,36 @@
           <field id="vgr:dc.publisher.forunit.id" set="publicerare">
             <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
-          <field id="vgr:dc.publisher.project-assignment" label-id="vgr.dc.publisher.project-assignment" set="publicerare" help-id="vgr.help.dc.publisher.project-assignment" description-id="vgr.description.dc.publisher.project-assignment" />
-          <field id="vgr:dc.rights.accessrights" label-id="vgr.dc.rights.accessrights" set="publicerare" help-id="vgr.help.dc.rights.accessrights" description-id="vgr.description.dc.rights.accessrights" />
+          <field id="vgr:dc.publisher.project-assignment" label-id="vgr.dc.publisher.project-assignment" set="publicerare" help-id="vgr.help.dc.publisher.project-assignment" description-id="vgr.description.dc.publisher.project-assignment">
+            <control template="/se/vgregion/alfresco/components/form/controls/textfield.ftl">
+              <control-param name="optionSeparator">#alf#</control-param>
+            </control>
+          </field>
+          <field id="vgr:dc.rights.accessrights" label-id="vgr.dc.rights.accessrights" set="publicerare" help-id="vgr.help.dc.rights.accessrights" description-id="vgr.description.dc.rights.accessrights">
+            <control template="/se/vgregion/alfresco/components/form/controls/selectmany.ftl">
+              <control-param name="optionSeparator">#alf#</control-param>
+            </control>
+          </field>
           <field id="vgr:dc.publisher" label-id="vgr.dc.publisher" set="publicerare" read-only="true" help-id="vgr.help.dc.publisher" description-id="vgr.description.dc.publisher" />
           <field id="vgr:dc.date.issued" label-id="vgr.dc.date.issued" set="publicerare" read-only="true" help-id="vgr.help.dc.date.issued" description-id="vgr.description.dc.date.issued" />
           <field id="vgr:dc.identifier" label-id="vgr.dc.identifier" set="publicerare" help-id="vgr.help.dc.identifier" description-id="vgr.description.dc.identifier" />
 
           <set id="kontext" appearance="accordion" label-id="vgr.set.kontext" />
-          <field id="vgr:dc.type.process.name" label-id="vgr.dc.type.process.name" set="kontext" help-id="vgr.help.dc.type.process.name" description-id="vgr.description.dc.type.process.name" />
-          <field id="vgr:dc.type.file.process" label-id="vgr.dc.type.file.process" set="kontext" help-id="vgr.help.dc.type.file.process" description-id="vgr.description.dc.type.file.process" />
-          <field id="vgr:dc.type.file" label-id="vgr.dc.type.file" set="kontext" help-id="vgr.help.dc.type.file" description-id="vgr.description.dc.type.file" />
+          <field id="vgr:dc.type.process.name" label-id="vgr.dc.type.process.name" set="kontext" help-id="vgr.help.dc.type.process.name" description-id="vgr.description.dc.type.process.name">
+            <control template="/se/vgregion/alfresco/components/form/controls/textfield.ftl">
+              <control-param name="optionSeparator">#alf#</control-param>
+            </control>
+          </field>
+          <field id="vgr:dc.type.file.process" label-id="vgr.dc.type.file.process" set="kontext" help-id="vgr.help.dc.type.file.process" description-id="vgr.description.dc.type.file.process">
+            <control template="/se/vgregion/alfresco/components/form/controls/textfield.ftl">
+              <control-param name="optionSeparator">#alf#</control-param>
+            </control>
+          </field>
+          <field id="vgr:dc.type.file" label-id="vgr.dc.type.file" set="kontext" help-id="vgr.help.dc.type.file" description-id="vgr.description.dc.type.file">
+            <control template="/se/vgregion/alfresco/components/form/controls/textfield.ftl">
+              <control-param name="optionSeparator">#alf#</control-param>
+            </control>
+          </field>
           <field id="vgr:dc.identifier.diarie.id" label-id="vgr.dc.identifier.diarie.id" set="kontext" help-id="vgr.help.dc.identifier.diarie.id" description-id="vgr.description.dc.identifier.diarie.id" />
           <field id="vgr:dc.type.document.serie" label-id="vgr.dc.type.document.serie" set="kontext" help-id="vgr.help.dc.type.document.serie" description-id="vgr.description.dc.type.document.serie" />
           <field id="vgr:dc.type.document.id" label-id="vgr.dc.type.document.id" set="kontext" help-id="vgr.help.dc.type.document.id" description-id="vgr.description.dc.type.document.id" />
@@ -452,7 +476,11 @@
           <field id="vgr:dc.subject.keywords.id" set="sokstod">
             <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
-          <field id="vgr:dc.subject.authorkeywords" label-id="vgr.dc.subject.authorkeywords" set="sokstod" help-id="vgr.help.dc.subject.authorkeywords" description-id="vgr.description.dc.subject.authorkeywords" />
+          <field id="vgr:dc.subject.authorkeywords" label-id="vgr.dc.subject.authorkeywords" set="sokstod" help-id="vgr.help.dc.subject.authorkeywords" description-id="vgr.description.dc.subject.authorkeywords">
+            <control template="/se/vgregion/alfresco/components/form/controls/textfield.ftl">
+              <control-param name="optionSeparator">#alf#</control-param>
+            </control>
+          </field>
 
           <!-- TODO: Develop a Share GUI for this -->
           <!-- <set id="malgrupp" appearance="bordered-panel" label-id="vgr.set.malgrupp" /> <field id="vgr:dc.audience" label-id="vgr.dc.audience" set="malgrupp" /> -->
@@ -464,9 +492,21 @@
             </control>
           </field>
           <field id="vgr:dc.relation.isversionof" label-id="vgr.dc.relation.isversionof" set="information" help-id="vgr.help.dc.relation.isversionof" description-id="vgr.description.dc.relation.isversionof" />
-          <field id="vgr:dc.relation.replaces" label-id="vgr.dc.relation.replaces" set="information" help-id="vgr.help.dc.relation.replaces" description-id="vgr.description.dc.relation.replaces" />
-          <field id="vgr:dc.format.extent" label-id="vgr.dc.format.extent" set="information" help-id="vgr.help.dc.format.extent" description-id="vgr.description.dc.format.extent" />
-          <field id="vgr:dc.identifier.location" label-id="vgr.dc.identifier.location" set="information" help-id="vgr.help.dc.identifier.location" description-id="vgr.description.dc.identifier.location" />
+          <field id="vgr:dc.relation.replaces" label-id="vgr.dc.relation.replaces" set="information" help-id="vgr.help.dc.relation.replaces" description-id="vgr.description.dc.relation.replaces">
+            <control template="/se/vgregion/alfresco/components/form/controls/textfield.ftl">
+              <control-param name="optionSeparator">#alf#</control-param>
+            </control>
+          </field>
+          <field id="vgr:dc.format.extent" label-id="vgr.dc.format.extent" set="information" help-id="vgr.help.dc.format.extent" description-id="vgr.description.dc.format.extent">
+            <control template="/se/vgregion/alfresco/components/form/controls/textfield.ftl">
+              <control-param name="optionSeparator">#alf#</control-param>
+            </control>
+          </field>
+          <field id="vgr:dc.identifier.location" label-id="vgr.dc.identifier.location" set="information" help-id="vgr.help.dc.identifier.location" description-id="vgr.description.dc.identifier.location">
+            <control template="/se/vgregion/alfresco/components/form/controls/textfield.ftl">
+              <control-param name="optionSeparator">#alf#</control-param>
+            </control>
+          </field>
           <field id="vgr:dc.type.templatename" label-id="vgr.dc.type.templatename" set="information" help-id="vgr.help.dc.type.templatename" description-id="vgr.description.dc.type.templatename" />
           <field id="mimetype" label-id="vgr.dc.format.extent.mimetype" set="information" help-id="vgr.help.dc.format.extent.mimetype" description-id="vgr.description.dc.format.extent.mimetype">
             <control template="/org/alfresco/components/form/controls/mimetype.ftl" />
@@ -482,15 +522,9 @@
               <control-param name="createNewItemIcon">tag</control-param>
             </control>
 
-            <!-- 
-            <control template="/se/vgregion/alfresco/components/form/controls/newcategory.ftl">
-              <control-param name="compactMode">true</control-param>
-              <control-param name="params">aspect=cm:taggable</control-param>
-              <control-param name="createNewItemUri">/api/tag/workspace/SpacesStore</control-param>
-              <control-param name="createNewItemIcon">tag</control-param>
-              <control-param name="optionSeparator">#alf#</control-param>
-            </control>
-            -->
+            <!-- <control template="/se/vgregion/alfresco/components/form/controls/newcategory.ftl"> <control-param name="compactMode">true</control-param> <control-param name="params">aspect=cm:taggable</control-param> 
+              <control-param name="createNewItemUri">/api/tag/workspace/SpacesStore</control-param> <control-param name="createNewItemIcon">tag</control-param> <control-param name="optionSeparator">#alf#</control-param> 
+              </control> -->
           </field>
           <set id="kommentar" appearance="simple-panel" />
           <field id="versioncomment" label-id="vgr.dc.format.extent.versioncomment" set="kommentar">
@@ -608,7 +642,9 @@
           <set id="standardmetadata" appearance="bordered-panel" label-id="vgr.set.standardmetadata" />
 
           <set id="dokumentbeskrivning" appearance="bordered-panel" label-id="vgr.set.dokumentbeskrivning" parent="standardmetadata" />
-          <field id="vgr:dc.title.alternative" label-id="vgr.dc.title.alternative" set="dokumentbeskrivning" help-id="vgr.help.dc.title.alternative" description-id="vgr.description.dc.title.alternative" />
+          <field id="vgr:dc.title.alternative" label-id="vgr.dc.title.alternative" set="dokumentbeskrivning" help-id="vgr.help.dc.title.alternative" description-id="vgr.description.dc.title.alternative">
+            <control template="/se/vgregion/alfresco/components/form/controls/textfield.ftl" />
+          </field>
           <field id="vgr:dc.description" label-id="vgr.dc.description" set="dokumentbeskrivning" help-id="vgr.help.dc.description" description-id="vgr.description.dc.description" />
           <field id="vgr:dc.type.document.structure" label-id="vgr.dc.type.document.structure" set="dokumentbeskrivning" help-id="vgr.help.dc.type.document.structure" description-id="vgr.description.dc.type.document.structure">
             <control template="/se/vgregion/alfresco/components/form/controls/treeselect.ftl">
@@ -748,13 +784,33 @@
           <field id="vgr:dc.publisher.forunit.id" set="publicerare">
             <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
-          <field id="vgr:dc.publisher.project-assignment" label-id="vgr.dc.publisher.project-assignment" set="publicerare" help-id="vgr.help.dc.publisher.project-assignment" description-id="vgr.description.dc.publisher.project-assignment" />
-          <field id="vgr:dc.rights.accessrights" label-id="vgr.dc.rights.accessrights" set="publicerare" help-id="vgr.help.dc.rights.accessrights" description-id="vgr.description.dc.rights.accessrights" />
+          <field id="vgr:dc.publisher.project-assignment" label-id="vgr.dc.publisher.project-assignment" set="publicerare" help-id="vgr.help.dc.publisher.project-assignment" description-id="vgr.description.dc.publisher.project-assignment">
+            <control template="/se/vgregion/alfresco/components/form/controls/textfield.ftl">
+              <control-param name="optionSeparator">#alf#</control-param>
+            </control>
+          </field>
+          <field id="vgr:dc.rights.accessrights" label-id="vgr.dc.rights.accessrights" set="publicerare" help-id="vgr.help.dc.rights.accessrights" description-id="vgr.description.dc.rights.accessrights">
+            <control template="/se/vgregion/alfresco/components/form/controls/selectmany.ftl">
+              <control-param name="optionSeparator">#alf#</control-param>
+            </control>
+          </field>
 
           <set id="kontext" appearance="accordion" label-id="vgr.set.kontext" parent="standardmetadata" />
-          <field id="vgr:dc.type.process.name" label-id="vgr.dc.type.process.name" set="kontext" help-id="vgr.help.dc.type.process.name" description-id="vgr.description.dc.type.process.name" />
-          <field id="vgr:dc.type.file.process" label-id="vgr.dc.type.file.process" set="kontext" help-id="vgr.help.dc.type.file.process" description-id="vgr.description.dc.type.file.process" />
-          <field id="vgr:dc.type.file" label-id="vgr.dc.type.file" set="kontext" help-id="vgr.help.dc.type.file" description-id="vgr.description.dc.type.file" />
+          <field id="vgr:dc.type.process.name" label-id="vgr.dc.type.process.name" set="kontext" help-id="vgr.help.dc.type.process.name" description-id="vgr.description.dc.type.process.name">
+            <control template="/se/vgregion/alfresco/components/form/controls/textfield.ftl">
+              <control-param name="optionSeparator">#alf#</control-param>
+            </control>
+          </field>
+          <field id="vgr:dc.type.file.process" label-id="vgr.dc.type.file.process" set="kontext" help-id="vgr.help.dc.type.file.process" description-id="vgr.description.dc.type.file.process">
+            <control template="/se/vgregion/alfresco/components/form/controls/textfield.ftl">
+              <control-param name="optionSeparator">#alf#</control-param>
+            </control>
+          </field>
+          <field id="vgr:dc.type.file" label-id="vgr.dc.type.file" set="kontext" help-id="vgr.help.dc.type.file" description-id="vgr.description.dc.type.file">
+            <control template="/se/vgregion/alfresco/components/form/controls/textfield.ftl">
+              <control-param name="optionSeparator">#alf#</control-param>
+            </control>
+          </field>
           <field id="vgr:dc.identifier.diarie.id" label-id="vgr.dc.identifier.diarie.id" set="kontext" help-id="vgr.help.dc.identifier.diarie.id" description-id="vgr.description.dc.identifier.diarie.id" />
           <field id="vgr:dc.type.document.serie" label-id="vgr.dc.type.document.serie" set="kontext" help-id="vgr.help.dc.type.document.serie" description-id="vgr.description.dc.type.document.serie" />
           <field id="vgr:dc.type.document.id" label-id="vgr.dc.type.document.id" set="kontext" help-id="vgr.help.dc.type.document.id" description-id="vgr.description.dc.type.document.id" />
@@ -772,14 +828,30 @@
           <field id="vgr:dc.subject.keywords.id" set="sokstod">
             <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
-          <field id="vgr:dc.subject.authorkeywords" label-id="vgr.dc.subject.authorkeywords" set="sokstod" help-id="vgr.help.dc.subject.authorkeywords" description-id="vgr.description.dc.subject.authorkeywords" />
+          <field id="vgr:dc.subject.authorkeywords" label-id="vgr.dc.subject.authorkeywords" set="sokstod" help-id="vgr.help.dc.subject.authorkeywords" description-id="vgr.description.dc.subject.authorkeywords">
+            <control template="/se/vgregion/alfresco/components/form/controls/textfield.ftl">
+              <control-param name="optionSeparator">#alf#</control-param>
+            </control>
+          </field>
 
           <set id="information" appearance="accordion" label-id="vgr.set.information" parent="standardmetadata" />
           <field id="vgr:dc.language" label-id="vgr.dc.language" set="information" help-id="vgr.help.dc.language" description-id="vgr.description.dc.language" />
           <field id="vgr:dc.relation.isversionof" label-id="vgr.dc.relation.isversionof" set="information" help-id="vgr.help.dc.relation.isversionof" description-id="vgr.description.dc.relation.isversionof" />
-          <field id="vgr:dc.relation.replaces" label-id="vgr.dc.relation.replaces" set="information" help-id="vgr.help.dc.relation.replaces" description-id="vgr.description.dc.relation.replaces" />
-          <field id="vgr:dc.format.extent" label-id="vgr.dc.format.extent" set="information" help-id="vgr.help.dc.format.extent" description-id="vgr.description.dc.format.extent" />
-          <field id="vgr:dc.identifier.location" label-id="vgr.dc.identifier.location" set="information" help-id="vgr.help.dc.identifier.location" description-id="vgr.description.dc.identifier.location" />
+          <field id="vgr:dc.relation.replaces" label-id="vgr.dc.relation.replaces" set="information" help-id="vgr.help.dc.relation.replaces" description-id="vgr.description.dc.relation.replaces">
+            <control template="/se/vgregion/alfresco/components/form/controls/textfield.ftl">
+              <control-param name="optionSeparator">#alf#</control-param>
+            </control>
+          </field>
+          <field id="vgr:dc.format.extent" label-id="vgr.dc.format.extent" set="information" help-id="vgr.help.dc.format.extent" description-id="vgr.description.dc.format.extent">
+            <control template="/se/vgregion/alfresco/components/form/controls/textfield.ftl">
+              <control-param name="optionSeparator">#alf#</control-param>
+            </control>
+          </field>
+          <field id="vgr:dc.identifier.location" label-id="vgr.dc.identifier.location" set="information" help-id="vgr.help.dc.identifier.location" description-id="vgr.description.dc.identifier.location">
+            <control template="/se/vgregion/alfresco/components/form/controls/textfield.ftl">
+              <control-param name="optionSeparator">#alf#</control-param>
+            </control>
+          </field>
           <field id="vgr:dc.type.templatename" label-id="vgr.dc.type.templatename" set="information" help-id="vgr.help.dc.type.templatename" description-id="vgr.description.dc.type.templatename" />
           <field id="mimetype" label-id="vgr.dc.format.extent.mimetype" set="information" help-id="vgr.help.dc.format.extent.mimetype" description-id="vgr.description.dc.format.extent.mimetype">
             <control template="/org/alfresco/components/form/controls/mimetype.ftl" />
@@ -824,7 +896,7 @@
             <control template="/org/alfresco/components/form/controls/textarea.ftl" />
           </field>
           <field id="dl:assignee">
-            <control template="/org/alfresco/components/form/controls/authoritysearch.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/authoritysearch.ftl" />
           </field>
 
           <field id="dl:attachments">
@@ -871,7 +943,7 @@
             <control template="/org/alfresco/components/form/controls/textarea.ftl" />
           </field>
           <field id="dl:assignee">
-            <control template="/org/alfresco/components/form/controls/authoritysearch.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/authoritysearch.ftl" />
           </field>
           <field id="dl:attachments">
             <control>
@@ -916,7 +988,7 @@
             <control template="/org/alfresco/components/form/controls/textarea.ftl" />
           </field>
           <field id="dl:taskAssignee">
-            <control template="/org/alfresco/components/form/controls/authoritysearch.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/authoritysearch.ftl" />
           </field>
 
           <field id="cm:attachments">
@@ -958,7 +1030,7 @@
             <control template="/org/alfresco/components/form/controls/textfield.ftl" />
           </field>
           <field id="dl:taskAssignee">
-            <control template="/org/alfresco/components/form/controls/authoritysearch.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/authoritysearch.ftl" />
           </field>
 
           <field id="dl:taskComments">
@@ -1003,7 +1075,7 @@
             <control template="/org/alfresco/components/form/controls/textfield.ftl" />
           </field>
           <field id="dl:issueAssignedTo">
-            <control template="/org/alfresco/components/form/controls/authoritysearch.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/authoritysearch.ftl" />
           </field>
           <field id="dl:issueComments">
             <control template="/org/alfresco/components/form/controls/textarea.ftl" />
@@ -1046,7 +1118,7 @@
             <control template="/org/alfresco/components/form/controls/textfield.ftl" />
           </field>
           <field id="dl:issueAssignedTo">
-            <control template="/org/alfresco/components/form/controls/authoritysearch.ftl" />
+            <control template="/se/vgregion/alfresco/components/form/controls/authoritysearch.ftl" />
           </field>
           <field id="dl:issueComments">
             <control template="/org/alfresco/components/form/controls/textarea.ftl" />

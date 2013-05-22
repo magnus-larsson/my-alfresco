@@ -2,6 +2,4 @@
 
 <!-- document-actions.get.head.ftl -->
 
-<@link rel="stylesheet" type="text/css" href="${page.url.context}/res/modules/documentlibrary/copy-move-to.css" />
-
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/res/components/document-details/vgr-document-actions.css" />

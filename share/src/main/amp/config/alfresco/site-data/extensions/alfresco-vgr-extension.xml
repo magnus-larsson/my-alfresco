@@ -25,7 +25,7 @@
       <configurations>
         <config evaluator="string-compare" condition="DocumentLibrary" replace="true">
           <create-content>
-            <content id="document" label="type.vgr_document" type="pagelink" index="10" icon="text">
+            <content id="document" label="menu.create-content.vgr-document" type="pagelink" index="10" icon="text">
               <param name="page">create-content?destination={nodeRef}&amp;itemId=vgr:document</param>
             </content>
           </create-content>

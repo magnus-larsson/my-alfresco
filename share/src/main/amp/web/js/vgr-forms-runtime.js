@@ -10,9 +10,9 @@
 
       // if the form is valid, hide the warning text, otherwise show it
       if (valid) {
-         Dom.setStyle(warningText, "visibility", "hidden");
+         Dom.setStyle(warningText, "display", "none");
       } else {
-         Dom.setStyle(warningText, "visibility", "visible");
+         Dom.setStyle(warningText, "display", "block");
       }
       
       return valid;

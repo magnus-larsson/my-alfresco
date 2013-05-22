@@ -1,7 +1,0 @@
-<!-- <![CDATA[ @overridden projects/slingshot/config/alfresco/site-webscripts/org/alfresco/components/documentlibrary/toolbar.get.desc.xml ]]> -->
-
-<webscript>
-  <shortname>DocLib Toolbar</shortname>
-  <description>Document Library: Toolbar Component</description>
-  <url>/components/documentlibrary/toolbar</url>
-</webscript>

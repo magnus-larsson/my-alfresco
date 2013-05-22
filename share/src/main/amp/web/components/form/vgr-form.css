@@ -1,5 +1,5 @@
 .form-container .form-warningtext {
-   padding: 1em !important; margin-top: 1em; font-style: italic; color: #ef6700; border: 1px solid #c2c2c2 !important; background-color: #f5fff2; width: 800px; visibility: hidden;
+   padding: 1em !important; margin-top: 1em; font-style: italic; color: #ef6700; border: 1px solid #c2c2c2 !important; background-color: #f5fff2; width: 800px; display: none;
 }
 
 .metadata .form-container input {
