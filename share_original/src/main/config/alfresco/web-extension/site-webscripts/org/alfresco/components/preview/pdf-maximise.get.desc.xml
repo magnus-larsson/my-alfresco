@@ -1,6 +1,0 @@
-<webscript>
-  <shortname>pdf-maximise</shortname>
-  <description>Get form for pdf maximise</description>
-  <url>/components/preview/pdf-maximise</url>
-  <format default="html" />
-</webscript>

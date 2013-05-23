@@ -18,10 +18,10 @@
  */
 
 /**
- * Dashboard MySites component.
+ * Dashboard PublicSites component.
  *
  * @namespace Alfresco.dashlet
- * @class Alfresco.dashlet.MySites
+ * @class Alfresco.dashlet.PublicSites
  */
 (function()
 {
@@ -53,15 +53,15 @@
       PREFERENCES_SITES_DASHLET_FILTER = PREFERENCES_SITES + ".dashlet.filter";
 
    /**
-    * Dashboard MySites constructor.
+    * Dashboard PublicSites constructor.
     *
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.dashlet.MySites} The new component instance
+    * @return {Alfresco.dashlet.PublicSites} The new component instance
     * @constructor
     */
-   Alfresco.dashlet.MySites = function MySites_constructor(htmlId)
+   Alfresco.dashlet.PublicSites = function PublicSites_constructor(htmlId)
    {
-      Alfresco.dashlet.MySites.superclass.constructor.call(this, "Alfresco.dashlet.MySites", htmlId, ["datasource", "datatable", "animation"]);
+      Alfresco.dashlet.PublicSites.superclass.constructor.call(this, "Alfresco.dashlet.PublicSites", htmlId, ["datasource", "datatable", "animation"]);
 
       // Initialise prototype properties
       this.sites = [];
@@ -77,7 +77,7 @@
       return this;
    };
 
-   YAHOO.extend(Alfresco.dashlet.MySites, Alfresco.component.Base,
+   YAHOO.extend(Alfresco.dashlet.PublicSites, Alfresco.component.Base,
    {
       /**
        * Site data
@@ -138,7 +138,7 @@
        * Fired by YUI when parent element is available for scripting
        * @method onReady
        */
-      onReady: function MySites_onReady()
+      onReady: function PublicSites_onReady()
       {
          var me = this;
 
@@ -174,7 +174,7 @@
          });
 
          // Override abstract function within DataTable to set custom empty message
-         this.widgets.dataTable.doBeforeLoadData = function MySites_doBeforeLoadData(sRequest, oResponse, oPayload)
+         this.widgets.dataTable.doBeforeLoadData = function PublicSites_doBeforeLoadData(sRequest, oResponse, oPayload)
          {
             if ((oResponse.results.length === 0) || (oResponse.results.length === 1 && oResponse.results[0].shortName === "swsdp"))
             {
@@ -189,7 +189,7 @@
          };
 
          // Add animation to row delete
-         this.widgets.dataTable._deleteTrEl = function MySites__deleteTrEl(row)
+         this.widgets.dataTable._deleteTrEl = function PublicSites__deleteTrEl(row)
          {
             var scope = this,
                trEl = this.getTrEl(row);
@@ -211,9 +211,9 @@
          /**
           * Hook favourite site events
           */
-         var registerEventHandler = function MySites_onReady_registerEventHandler(cssClass, fnHandler)
+         var registerEventHandler = function PublicSites_onReady_registerEventHandler(cssClass, fnHandler)
          {
-            var fnEventHandler = function MySites_onReady_fnEventHandler(layer, args)
+            var fnEventHandler = function PublicSites_onReady_fnEventHandler(layer, args)
             {
                var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
                if (owner !== null)
@@ -246,7 +246,7 @@
        * @param p_sType {string} The event
        * @param p_aArgs {array}
        */
-      onTypeFilterChanged: function MySites_onTypeFilterChanged(p_sType, p_aArgs)
+      onTypeFilterChanged: function PublicSites_onTypeFilterChanged(p_sType, p_aArgs)
       {
          var menuItem = p_aArgs[1];
          if (menuItem)
@@ -271,7 +271,7 @@
        *
        * @method loadSites
        */
-      loadSites: function MySites_loadSites()
+      loadSites: function PublicSites_loadSites()
       {
          // Load sites
          Alfresco.util.Ajax.request(
@@ -291,7 +291,7 @@
        * @method onSitesLoaded
        * @param p_response {object} Response from "api/people/{userId}/sites" query
        */
-      onSitesLoaded: function MySites_onSitesLoaded(p_response)
+      onSitesLoaded: function PublicSites_onSitesLoaded(p_response)
       {
          // Load preferences (after which the appropriate sites will be displayed)
          this.services.preferences.request(PREFERENCES_SITES,
@@ -312,7 +312,7 @@
        * @param p_response {object} Response from "api/people/{userId}/preferences" query
        * @param p_items {object} Response from "api/people/{userId}/sites" query
        */
-      onPreferencesLoaded: function MySites_onPreferencesLoaded(p_response, p_items)
+      onPreferencesLoaded: function PublicSites_onPreferencesLoaded(p_response, p_items)
       {
          var favSites = {},
             imapfavSites = {},
@@ -368,7 +368,7 @@
             return (name1 > name2) ? 1 : (name1 < name2) ? -1 : 0;
          });
 
-         var successHandler = function MySites_onSitesUpdate_success(sRequest, oResponse, oPayload)
+         var successHandler = function PublicSites_onSitesUpdate_success(sRequest, oResponse, oPayload)
          {
             oResponse.results=this.sites;
             this.widgets.dataTable.set("MSG_EMPTY", "");
@@ -389,7 +389,7 @@
        * @param site {object} Site object literal
        * @return {boolean}
        */
-      filterAccept: function MySites_filterAccept(filter, site)
+      filterAccept: function PublicSites_filterAccept(filter, site)
       {
          switch (filter)
          {
@@ -409,7 +409,7 @@
        * @param record {object} DataTable record
        * @return {string} HTML mark-up for Favourite UI
        */
-      generateFavourite: function MySites_generateFavourite(record)
+      generateFavourite: function PublicSites_generateFavourite(record)
       {
          var html = "";
 
@@ -432,7 +432,7 @@
        * @param record {object} DataTable record
        * @return {string} HTML mark-up for Favourite UI
        */
-      generateIMAPFavourite: function MySites_generateIMAPFavourite(record)
+      generateIMAPFavourite: function PublicSites_generateIMAPFavourite(record)
       {
          var html = "";
 
@@ -455,7 +455,7 @@
        * @param record {object} DataTable record
        * @return {string} HTML mark-up for Likes UI
        */
-      generateLikes: function MySites_generateLikes(record)
+      generateLikes: function PublicSites_generateLikes(record)
       {
          var likes = record.getData("likes"),
             html = "";
@@ -490,7 +490,7 @@
        * @param oColumn {object}
        * @param oData {object|string}
        */
-      renderCellIcon: function MySites_renderCellIcon(elCell, oRecord, oColumn, oData)
+      renderCellIcon: function PublicSites_renderCellIcon(elCell, oRecord, oColumn, oData)
       {
          Dom.setStyle(elCell, "width", oColumn.width + "px");
          Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
@@ -510,7 +510,7 @@
        * @param oColumn {object}
        * @param oData {object|string}
        */
-      renderCellDetail: function MySites_renderCellDetail(elCell, oRecord, oColumn, oData)
+      renderCellDetail: function PublicSites_renderCellDetail(elCell, oRecord, oColumn, oData)
       {
          var site = oRecord.getData(),
             description = '<span class="faded">' + this.msg("details.description.none") + '</span>',
@@ -529,7 +529,7 @@
                description = $links($html(site.description));
             }
 
-            desc += '<h3 class="site-title"><a href="' + Alfresco.constants.URL_PAGECONTEXT + 'site/' + site.shortName + '/dashboard" class="theme-color-1">' + $html(site.title) + '</a></h3>';
+            desc += '<h3 class="site-title"><a href="' + Alfresco.constants.URL_PAGECONTEXT + 'site/' + site.shortName + '/default-redirect" class="theme-color-1">' + $html(site.title) + '</a></h3>';
             desc += '<div class="detail"><span>' + description + '</span></div>';
 
             /* Favourite / IMAP / (Likes) */
@@ -559,7 +559,7 @@
        * @param oColumn {object}
        * @param oData {object|string}
        */
-      renderCellActions: function MySites_renderCellActions(elCell, oRecord, oColumn, oData)
+      renderCellActions: function PublicSites_renderCellActions(elCell, oRecord, oColumn, oData)
       {
          Dom.setStyle(elCell, "width", oColumn.width + "px");
          Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
@@ -579,7 +579,7 @@
        * @method onDeleteSite
        * @param row {object} DataTable row representing site to be actioned
        */
-      onDeleteSite: function MySites_onDeleteSite(row)
+      onDeleteSite: function PublicSites_onDeleteSite(row)
       {
          var record = this.widgets.dataTable.getRecord(row);
 
@@ -597,7 +597,7 @@
        * @param layer {object} Event fired (unused)
        * @param args {array} Event parameters (unused)
        */
-      onSiteDeleted: function MySites_onSiteDeleted(layer, args)
+      onSiteDeleted: function PublicSites_onSiteDeleted(layer, args)
       {
          var site = args[1].site,
             siteId = site.shortName;
@@ -616,7 +616,7 @@
        * @method onFavouriteSite
        * @param row {object} DataTable row representing site to be actioned
        */
-      onFavouriteSite: function MySites_onFavouriteSite(row)
+      onFavouriteSite: function PublicSites_onFavouriteSite(row)
       {
          var record = this.widgets.dataTable.getRecord(row),
             site = record.getData(),
@@ -631,7 +631,7 @@
          {
             failureCallback:
             {
-               fn: function MySites_onFavouriteSite_failure(event, obj)
+               fn: function PublicSites_onFavouriteSite_failure(event, obj)
                {
                   // Reset the flag to it's previous state
                   var record = obj.record,
@@ -652,7 +652,7 @@
             },
             successCallback:
             {
-               fn: function MySites_onFavouriteSite_success(event, obj)
+               fn: function PublicSites_onFavouriteSite_success(event, obj)
                {
                   var record = obj.record,
                      site = record.getData();
@@ -676,7 +676,7 @@
        * @method onImapFavouriteSite
        * @param row {object} DataTable row representing site to be actioned
        */
-      onImapFavouriteSite: function MySites_onImapFavouriteSite(row)
+      onImapFavouriteSite: function PublicSites_onImapFavouriteSite(row)
       {
          var record = this.widgets.dataTable.getRecord(row),
             site = record.getData(),
@@ -691,7 +691,7 @@
          {
             failureCallback:
             {
-               fn: function MySites_onImapFavouriteSite_failure(event, obj)
+               fn: function PublicSites_onImapFavouriteSite_failure(event, obj)
                {
                   // Reset the flag to it's previous state
                   var record = obj.record,
@@ -721,7 +721,7 @@
        * @method onLikes
        * @param row {HTMLElement} DOM reference to a TR element (or child thereof)
        */
-      onLikes: function MySites_onLikes(row)
+      onLikes: function PublicSites_onLikes(row)
       {
          var record = this.widgets.dataTable.getRecord(row),
             site = record.getData(),
@@ -735,7 +735,7 @@
          {
             successCallback:
             {
-               fn: function MySites_onLikes_success(event, p_nodeRef)
+               fn: function PublicSites_onLikes_success(event, p_nodeRef)
                {
                   var data = event.json.data;
                   if (data)
@@ -754,7 +754,7 @@
             },
             failureCallback:
             {
-               fn: function MySites_onLikes_failure(event, p_nodeRef)
+               fn: function PublicSites_onLikes_failure(event, p_nodeRef)
                {
                   // Reset the flag to it's previous state
                   var record = this._findRecordByParameter(p_nodeRef, "nodeRef"),
@@ -790,7 +790,7 @@
        * @method onCreateSite
        * @param event {domEvent} DOM event
        */
-      onCreateSite: function MySites_onCreateSite(event)
+      onCreateSite: function PublicSites_onCreateSite(event)
       {
          Alfresco.module.getCreateSiteInstance().show();
          Event.preventDefault(event);
@@ -803,7 +803,7 @@
        * @param p_value {string} Value to find
        * @param p_parameter {string} Parameter to look for the value in
        */
-      _findRecordByParameter: function MySites__findRecordByParameter(p_value, p_parameter)
+      _findRecordByParameter: function PublicSites__findRecordByParameter(p_value, p_parameter)
       {
         var recordSet = this.widgets.dataTable.getRecordSet();
         for (var i = 0, j = recordSet.getLength(); i < j; i++)

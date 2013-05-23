@@ -4,7 +4,7 @@
 <script type="text/javascript">//<![CDATA[
 (function()
 {
-   new Alfresco.dashlet.MySites("${jsid}").setOptions(
+   new Alfresco.dashlet.PublicSites("${jsid}").setOptions(
    {
       imapEnabled: ${imapServerEnabled?string},
       listSize: ${dashboardconfig.getChildValue('summary-list-size')!100}
