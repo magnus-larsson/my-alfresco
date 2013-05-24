@@ -1,5 +1,3 @@
-<#-- @overridden projects/slingshot/config/alfresco/site-webscripts/org/alfresco/components/wiki/page.get.html.ftl -->
-
 <#-- Tags -->
 <#if (result.tags?? && result.tags?size > 0)>
    <#assign tags = result.tags />
@@ -38,7 +36,7 @@
       versions: [<#if result.versionhistory??>
          <#list result.versionhistory as version>
          {
-            title: "${version.name?js_string}",
+            title: "${version.title?js_string}",
             label: "${version.version?js_string}",
             versionId: "${version.versionId}",
             createdDate: "${version.date}"
@@ -54,7 +52,7 @@
       }
    }).setMessages(
       ${messages}
-   );    
+   );
 //]]></script>
 <#-- Note, since result.pagetext has already been stripped by the page.get.js script -->
 <div class="yui-g wikipage-bar">
@@ -65,7 +63,7 @@
 <#assign action = page.url.args.action!"view">
 <#assign tabs =
 [
-   { 
+   {
       "label": msg("tab.view"),
       "action": "view",
       "permitted": !errorState
@@ -95,12 +93,12 @@
 </#list>
       </div>
    </div>
-</div>  
-<div id="${args.htmlid}-wikipage" class="wiki-page">       
-   <div class="yui-content" style="background: #FFFFFF;"> 
-<#if action == "view">       
-      <div id="${args.htmlid}-page" class="rich-content"><#if result.pagetext??>${result.pagetext}<#elseif result.message??><span class="error-alt">${result.message}</span></#if></div> 
-<#elseif action == "edit">           
+</div>
+<div id="${args.htmlid}-wikipage" class="wiki-page">
+   <div class="yui-content" style="background: #FFFFFF;">
+<#if action == "view">
+      <div id="${args.htmlid}-page" class="rich-content"><#if result.pagetext??>${result.pagetext}<#elseif result.message??><span class="error-alt">${result.message}</span></#if></div>
+<#elseif action == "edit">
       <div class="page-form-body">
          <form id="${args.htmlid}-form" action="${page.url.context}/proxy/alfresco/slingshot/wiki/page/${page.url.templateArgs.site}/${page.url.args["title"]?url}" method="post">
             <fieldset>
@@ -137,7 +135,7 @@
             </fieldset>
          </form>
       </div>
-<#elseif action == "details">             
+<#elseif action == "details">
       <div>
          <div class="details-wrapper">
          <div class="yui-g">
@@ -175,14 +173,14 @@
                <#assign canRevert = permissions["edit"]!false>
                <#list result.versionhistory as version>
                   <#if version_index == 0>
-                     <div class="info-sub-section">
-                        <span class="meta-heading">${msg("section.thisVersion")}</span>
-                     </div>
+                  <div class="info-sub-section">
+                     <span class="meta-heading">${msg("section.thisVersion")}</span>
+                  </div>
                   </#if>
                   <#if version_index == 1>
-                     <div class="info-sub-section">
-                        <span class="meta-heading">${msg("section.olderVersion")}</span>
-                     </div>
+                  <div class="info-sub-section">
+                     <span class="meta-heading">${msg("section.olderVersion")}</span>
+                  </div>
                   </#if>
                   <div id="${args.htmlid}-expand-div-${version_index}" class="info more <#if version_index != 0>collapsed<#else>expanded</#if>">
                      <span class="meta-section-label theme-color-1">${msg("label.version")} ${version.version}</span>
@@ -191,7 +189,7 @@
                   <div id="${args.htmlid}-moreVersionInfo-div-${version_index}" class="moreInfo" <#if version_index != 0>style="display: none;"</#if>>
                      <div class="info">
                         <span class="meta-label">${msg("label.title")}</span>
-                        <span class="meta-value">${version.name?html}</span>
+                        <span class="meta-value">${version.title?html}</span>
                      </div>
                      <div class="info">
                         <span class="meta-label">${msg("label.creator")}</span>
@@ -215,7 +213,7 @@
                <div class="tags">
                <#if result.tags?? && result.tags?size &gt; 0>
                   <#list result.tags as tag>
-                     <div class="tag"><img src="${page.url.context}/res/components/images/tag-16.png" /> ${tag}</img></div>                    
+                  <div class="tag"><img src="${page.url.context}/res/components/images/tag-16.png" /> ${tag}</img></div>
                   </#list>
                <#else>
                   ${msg("label.none")}
@@ -224,16 +222,28 @@
             </div>
             <div class="yui-u">
                <div class="columnHeader">${msg("label.linkedPages")}</div>
-               <div class="links">               
+               <div class="links">
                <#if result.links??>
                   <#list result.links as link>
-                     <div><span><a href="${page.url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${link?replace(" ", "_")}">${link}</a></span></div>
+                  <div><span>[[${link?replace("</?[^>]+>", " ", "ir")}]]</span></div>
                   </#list>
                </#if>
                </div>
+               <script type="text/javascript">//<![CDATA[
+var links = YUIDom.getElementsByClassName("links", "div");
+this.parser = new Alfresco.WikiParser();
+this.parser.URL = "${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=";
+for (i=0; i<links.length; i++)
+{
+   if (links[i].className === "links")
+   {
+      links[i].innerHTML = this.parser.parse(links[i].innerHTML);
+   }
+}
+               //]]></script>
             </div>
-         </div><#-- end of yui-gb -->
+         </div>
       </div>
 </#if>
-   </div>        
+   </div>
 </div>

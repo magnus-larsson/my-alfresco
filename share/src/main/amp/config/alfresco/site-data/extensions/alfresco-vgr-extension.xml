@@ -50,7 +50,7 @@
             </sub-component>
           </sub-components>
         </component>
-        
+
         <!-- Hide sync area in document details -->
         <component>
           <scope>template</scope>
@@ -66,7 +66,7 @@
             </sub-component>
           </sub-components>
         </component>
-        
+
         <!-- Hide workflows area in document details -->
         <component>
           <scope>template</scope>
@@ -93,6 +93,26 @@
               <evaluations>
                 <evaluation id="vgr-hide">
                   <render>false</render>
+                </evaluation>
+              </evaluations>
+            </sub-component>
+          </sub-components>
+        </component>
+
+        <component>
+          <scope>template</scope>
+          <region-id>people-finder</region-id>
+          <source-id>invite</source-id>
+          <sub-components>
+            <sub-component id="default">
+              <evaluations>
+                <evaluation id="vgr-default">
+                  <url>/components/people-finder/people-finder</url>
+                  <properties>
+                    <setFocus>true</setFocus>
+                    <addButtonSuffix>&gt;&gt;</addButtonSuffix>
+                    <dataWebScript>vgr/sites/[siteId]/potentialmembers?authorityType=USER</dataWebScript>
+                  </properties>
                 </evaluation>
               </evaluations>
             </sub-component>
