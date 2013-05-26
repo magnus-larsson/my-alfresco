@@ -1,0 +1,7 @@
+div.login-panel {
+   height: 360px; background: transparent url("./images/vgr-loginbg.png") no-repeat;
+}
+
+div.login-logo {
+   background: transparent url("./images/vgr-logo.png") no-repeat;
+}

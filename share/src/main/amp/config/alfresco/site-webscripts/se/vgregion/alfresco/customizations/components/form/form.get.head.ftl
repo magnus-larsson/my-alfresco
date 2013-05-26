@@ -18,3 +18,5 @@
 
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/res/css/accordion/accordion.css" />
 <@script type="text/javascript" src="${page.url.context}/res/js/accordion/accordion.js"></@script>
+
+<@script type="text/javascript" src="${page.url.context}/res/components/object-finder/vgr-object-finder.js"></@script>

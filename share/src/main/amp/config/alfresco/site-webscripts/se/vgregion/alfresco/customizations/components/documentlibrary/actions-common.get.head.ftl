@@ -14,3 +14,5 @@
 
 <@script type="text/javascript" src="${page.url.context}/res/modules/documentlibrary/vgr-copy-move-to.js"></@script>
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/res/modules/documentlibrary/vgr-copy-move-to.css" />
+
+<@link rel="stylesheet" type="text/css" href="${page.url.context}/res/modules/documentlibrary/vgr-permissions.css" />

@@ -515,16 +515,13 @@
           <field id="vgr:dc.identifier.checksum" label-id="vgr.dc.identifier.checksum" set="information" read-only="true" help-id="vgr.help.dc.identifier.checksum" description-id="vgr.description.dc.identifier.checksum" />
           <set id="tags" appearance="accordion" label-id="vgr.set.tags" />
           <field id="cm:taggable" set="tags">
-            <control>
+            <control template="/se/vgregion/alfresco/components/form/controls/category.ftl">
               <control-param name="compactMode">true</control-param>
               <control-param name="params">aspect=cm:taggable</control-param>
               <control-param name="createNewItemUri">/api/tag/workspace/SpacesStore</control-param>
               <control-param name="createNewItemIcon">tag</control-param>
+              <control-param name="optionSeparator">#alf#</control-param>
             </control>
-
-            <!-- <control template="/se/vgregion/alfresco/components/form/controls/newcategory.ftl"> <control-param name="compactMode">true</control-param> <control-param name="params">aspect=cm:taggable</control-param> 
-              <control-param name="createNewItemUri">/api/tag/workspace/SpacesStore</control-param> <control-param name="createNewItemIcon">tag</control-param> <control-param name="optionSeparator">#alf#</control-param> 
-              </control> -->
           </field>
           <set id="kommentar" appearance="simple-panel" />
           <field id="versioncomment" label-id="vgr.dc.format.extent.versioncomment" set="kommentar">
@@ -859,11 +856,12 @@
           <field id="vgr:dc.format.extension" label-id="vgr.dc.format.extension" set="information" read-only="true" help-id="vgr.help.dc.format.extension" description-id="vgr.description.dc.format.extension" />
           <field id="vgr:dc.identifier.checksum" label-id="vgr.dc.identifier.checksum" set="information" read-only="true" help-id="vgr.help.dc.identifier.checksum" description-id="vgr.description.dc.identifier.checksum" />
           <field id="cm:taggable" set="foldermetadata">
-            <control>
+            <control template="/se/vgregion/alfresco/components/form/controls/category.ftl">
               <control-param name="compactMode">true</control-param>
               <control-param name="params">aspect=cm:taggable</control-param>
               <control-param name="createNewItemUri">/api/tag/workspace/SpacesStore</control-param>
               <control-param name="createNewItemIcon">tag</control-param>
+              <control-param name="optionSeparator">#alf#</control-param>
             </control>
           </field>
           <set id="kommentar" appearance="simple-panel" />
