@@ -1,0 +1,7 @@
+.postview {
+   width: 48em;
+}
+
+.node .authorPicture,.reply .authorPicture,.comment .authorPicture {
+   margin-left: 5em;
+}

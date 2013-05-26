@@ -29,8 +29,6 @@
 
       var userName = oRecord.getData("userName");
 
-      console.log(self);
-
       if (self.isCurrentUserSiteAdmin && self.options.currentUser !== userName && oRecord.getData("zone") === "internal") {
          // create HTML for representing buttons
 

@@ -19,6 +19,21 @@ function main() {
 
       page.defaultPage = page.defaultPage ? true : false;
    }
+   
+   var themes = [];
+   
+   // remove the test and stage themes
+   for (var x = 0; x < model.themes.length; x++) {
+      var theme = model.themes[x];
+      
+      if (theme.id == 'testTheme' || theme.id == 'stageTheme') {
+         continue;
+      }
+      
+      themes.push(theme);
+   }
+   
+   model.themes = themes;
 }
 
 main();

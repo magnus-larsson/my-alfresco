@@ -72,8 +72,10 @@
       </user-items>
       <dependencies>
         <css src="/modules/create-site.css" />
+        <css src="/modules/vgr-create-site.css" />
         <css src="/modules/header/sites.css" />
         <js src="/modules/create-site.js" />
+        <js src="/modules/vgr-create-site.js" />
         <js src="/modules/header/sites.js" />
         <js src="/modules/header/vgr-sites.js" />
         <js src="/modules/header/tycktill.js" />
@@ -217,6 +219,7 @@
           <permission allow="true">Write</permission>
         </permissions>
         <evaluator>evaluator.doclib.metadata.showPublishHeader</evaluator>
+        <evaluator negate="true">evaluator.doclib.action.isWorkingCopy</evaluator>
       </action>
 
       <action id="action-header-manage" type="header" />
@@ -231,6 +234,7 @@
           <permission allow="true">Write</permission>
         </permissions>
         <evaluator>evaluator.doclib.metadata.canPublish</evaluator>
+        <evaluator negate="true">evaluator.doclib.action.isWorkingCopy</evaluator>
       </action>
 
       <action id="document-unpublish-from-storage" type="javascript" label="actions.document.unpublish-from-storage">
@@ -239,6 +243,7 @@
           <permission allow="true">Write</permission>
         </permissions>
         <evaluator>evaluator.doclib.metadata.canUnpublish</evaluator>
+        <evaluator negate="true">evaluator.doclib.action.isWorkingCopy</evaluator>
       </action>
 
       <action id="document-unpublish-old-from-storage" type="javascript" label="actions.document.unpublish-old-from-storage" icon="document-unpublish-from-storage">
@@ -247,6 +252,7 @@
           <permission allow="true">Write</permission>
         </permissions>
         <evaluator>evaluator.doclib.metadata.canUnpublishOld</evaluator>
+        <evaluator negate="true">evaluator.doclib.action.isWorkingCopy</evaluator>
       </action>
 
       <action id="folder-auto-publish" type="javascript" label="actions.folder.auto-publish" icon="auto-publish-all-versions-indicator">

@@ -3,6 +3,8 @@
 <@script type="text/javascript" src="${page.url.context}/res/components/form/controls/selecthsacode.js"></@script>
 
 <@script type="text/javascript" src="${page.url.context}/res/components/form/controls/treeselect.js"></@script>
+<@script type="text/javascript" src="${page.url.context}/res/components/form/controls/treeselectnode.js"></@script>
+<@script type="text/javascript" src="${page.url.context}/res/components/form/controls/treeselecttooltip.js"></@script>
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/res/components/form/controls/treeselect.css" />
 
 <@script type="text/javascript" src="${page.url.context}/res/components/form/controls/ajaxselectone.js"></@script>
@@ -18,3 +20,5 @@
 
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/res/css/accordion/accordion.css" />
 <@script type="text/javascript" src="${page.url.context}/res/js/accordion/accordion.js"></@script>
+
+<@script type="text/javascript" src="${page.url.context}/res/components/object-finder/vgr-object-finder.js"></@script>

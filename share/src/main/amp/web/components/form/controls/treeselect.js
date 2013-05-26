@@ -4,7 +4,7 @@
 
    /**
     * Alfresco.thirdparty.TreeSelect constructor.
-    *
+    * 
     * @param {string}
     *           htmlId
     * @param {list}
@@ -54,7 +54,7 @@
 
       /**
        * Object container for initialization options
-       *
+       * 
        * @property options
        * @type object
        */
@@ -74,9 +74,8 @@
          multipleSelectMode : true,
 
          /**
-          * The number of levels that are selectable.
-          * 0 means all levels
-          *
+          * The number of levels that are selectable. 0 means all levels
+          * 
           * @property selectableLevels
           * @type integer
           * @default 0
@@ -113,7 +112,7 @@
 
          /**
           * The default value to set if no saved value is found.
-          *
+          * 
           * @property dflt
           * @type string
           * @default ""
@@ -264,7 +263,7 @@
 
       /**
        * Fired by YUILoaderHelper when required component script files have been loaded into the browser.
-       *
+       * 
        * @method onComponentsLoaded
        */
       _initComponentsLoaded : function() {
@@ -379,7 +378,7 @@
 
       /**
        * Fired when the user clicks the remove button Removes the selected items from the selected list
-       *
+       * 
        * @method onRemoveButtonClick
        * @param event
        *           {object} an "click" event
@@ -436,7 +435,7 @@
             url : this.options.fetchKeywordsUrl,
             method : Alfresco.util.Ajax.GET,
             dataObj : {
-               nodeRef: this.options.nodeRef
+               nodeRef : this.options.nodeRef
             },
             responseContentType : Alfresco.util.Ajax.JSON,
             successCallback : {
@@ -454,7 +453,7 @@
                      });
                   }
 
-                  for (var x = 0; x < values.length; x++) {
+                  for ( var x = 0; x < values.length; x++) {
                      var value = values[x];
 
                      if (!this.selected[value.id]) { // check so we haven't added it before
@@ -514,7 +513,7 @@
 
       /**
        * Fired when the user clicks the add button Adds the selected items from thre tree to the selected list
-       *
+       * 
        * @method onAddButtonClick
        * @param event
        *           {object} an "click" event
@@ -601,7 +600,7 @@
 
       /**
        * Fired when the user clicks the clear all button Clears the selected items list
-       *
+       * 
        * @method onClearButtonClick
        * @param event
        *           {object} an "click" event
@@ -624,7 +623,7 @@
 
       /**
        * Fired when the user clicks on a li in the selected items list
-       *
+       * 
        * @method onClearButtonClick
        * @param event
        *           {object} an "click" event
@@ -710,7 +709,7 @@
       /**
        * Override this method in order to make nodes without a valid ID unselectable
        */
-      onEventToggleHighlight: function (args) {
+      onEventToggleHighlight : function(args) {
          var node;
 
          if ('node' in args && args.node instanceof YAHOO.widget.Node) {
@@ -736,267 +735,19 @@
 
    });
 
-   // Custom TreeView Node since we had problems with click event not being stopped
-   // properly on icon
-   Alfresco.thirdparty.TreeSelectNode = function(oData, oParent, expanded) {
-      Alfresco.thirdparty.TreeSelectNode.superclass.constructor.call(this, oData, oParent, expanded);
-
-      return this;
-   };
-
-   YAHOO.extend(Alfresco.thirdparty.TreeSelectNode, YAHOO.widget.TextNode, {
-
-      // override constructions of html
-      getNodeHtml : function() {
-         var sb = [], i;
-
-         sb[sb.length] = '<table id="ygtvtableel' + this.index + '" border="0" cellpadding="0" cellspacing="0" class="ygtvtable ygtvdepth' + this.depth;
-
-         if (this.enableHighlight) {
-            sb[sb.length] = ' ygtv-highlight' + this.highlightState;
-         }
-
-         if (this.className) {
-            sb[sb.length] = ' ' + this.className;
-         }
-
-         sb[sb.length] = '"><tr class="ygtvrow">';
-
-         for (i = 0; i < this.depth; ++i) {
-            sb[sb.length] = '<td class="ygtvcell ' + this.getDepthStyle(i) + '"><div class="ygtvspacer"></div></td>';
-         }
-
-         if (this.hasIcon) {
-            sb[sb.length] = '<td id="' + this.getToggleElId();
-            sb[sb.length] = '" class="ygtvcell ';
-            sb[sb.length] = this.getStyle();
-            sb[sb.length] = '"><a href="#" onclick="return false;" class="ygtvspacer">&#160;</a></td>';
-         }
-
-         sb[sb.length] = '<td id="' + this.contentElId;
-         sb[sb.length] = '" class="ygtvcell ';
-         sb[sb.length] = this.contentStyle + ' ygtvcontent" ';
-         sb[sb.length] = (this.nowrap) ? ' nowrap="nowrap" ' : '';
-         sb[sb.length] = ' >';
-         sb[sb.length] = this.getContentHtml();
-         sb[sb.length] = '</td></tr></table>';
-
-         return sb.join("");
-      }
-
-   });
-
-   Alfresco.thirdparty.TreeSelectTooltip = function(htmlId, fieldHtmlId) {
-      this.name = "Alfresco.thirdparty.TreeSelectTooltip";
-      this.htmlId = htmlId;
-      this.id = htmlId;
-      this.fieldHtmlId = fieldHtmlId;
-
-      Alfresco.thirdparty.TreeSelectTooltip.superclass.constructor.call(this, "Alfresco.thirdparty.TreeSelectTooltip", htmlId, [ "container" ]);
-
-      return this;
-   };
-
-   YAHOO.extend(Alfresco.thirdparty.TreeSelectTooltip, Alfresco.component.Base, {
-
-      /**
-       * Object container for initialization options
-       *
-       * @property options
-       * @type object
-       */
-      options : {
-
-         /**
-          * @property optionSeparator
-          * @type string
-          * @default "#alf#"
-          */
-         optionSeparator : "#alf#",
-
-         /**
-          * @property tooltipDataLoaderUrl
-          * @type string
-          * @default ""
-          */
-         tooltipDataLoaderUrl : ""
-
-      },
-
-      onComponentsLoaded : function() {
-         var self = this;
-
-         Event.onDOMReady(function() {
-            self.onDOMReady();
-         });
-      },
-
-      onDOMReady : function() {
-         this.initTooltipsFromList();
-      },
-
-      // parses the name of a unit to a tree structure of parents to use in tooltips
-      _parseTitle : function(name) {
-         var pairs = name.split(","), i, j, n, parents = [], result;
-
-         for (i = 0; i < pairs.length; i++) {
-            n = pairs[i].split('=')[1];
-
-            if (n != 'VGR' && n != 'OrgExtended') { // filter these common root nodes out
-               parents.push(n);
-            }
-         }
-
-         parents.reverse();
-
-         result = [ '<div style="text-align: left; white-space: nowrap;">' ];
-
-         for (i = 0; i < parents.length; i++) {
-            if (i > 0 && i < parents.length) {
-               for (j = 0; j < i; j++) {
-                  result.push("&nbsp;&nbsp;");
-               }
-            }
-
-            result.push(parents[i]);
-
-            result.push('<br />');
-         }
-
-         result.push('</div>');
-
-         return result.join('');
-      },
-
-      // parses the name of a apelon node to a tree structure of parents to use in tooltips
-      _parseApelonTitle : function(name) {
-         var pairs = name.split("#alf#"), i, j, n, parents = [], result;
-
-         result = [ '<div style="text-align: left; white-space: nowrap;">' ];
-
-         for (i = 0; i < pairs.length; i++) {
-            if (i > 0 && i < pairs.length) {
-               for (j = 0; j < i; j++) {
-                  result.push("&nbsp;&nbsp;");
-               }
-            }
-
-            result.push(pairs[i]);
-
-            result.push('<br />');
-         }
-
-         result.push('</div>');
-
-         return result.join('');
-      },
-
-      // hooks up tooltips on li elements
-      setupTooltips : function(lis) {
-         var selected_tooltips = {}, i, self = this;
-
-         for (i = 0; i < lis.length; i++) {
-            var li = lis[i];
-
-            if (selected_tooltips[li.id]) {
-               continue;
-            }
-
-            var tt = new YAHOO.widget.Tooltip(li.id + '-tooltip', {
-               context : li
-            });
-
-            tt.contextTriggerEvent.subscribe(function(type, args) {
-               var li = args[0];
-
-               if (li.name) {
-                  if (self.id.indexOf('dc.subject.keywords') < 0 && self.id.indexOf('dc.type.document.structure') < 0) {
-                     var text = self._parseTitle(li.name);
-                  } else {
-                     var text = self._parseApelonTitle(li.name);
-                  }
-                  this.cfg.setProperty("text", text);
-               }
-            });
-
-            selected_tooltips[li.id] = tt;
-         }
-      },
-
-      // ajax loads info about a unit/units
-      // more specifically we get the name to use in a tooltip
-      _loadUnits : function(ids, callback) {
-         Alfresco.util.Ajax.request({
-            url : this.options.tooltipDataLoaderUrl,
-            method : Alfresco.util.Ajax.GET,
-            dataObj : {
-               nodes : (typeof ids == "string" ? ids : ids.join(this.options.optionSeparator))
-            },
-            responseContentType : Alfresco.util.Ajax.JSON,
-            successCallback : {
-               fn : function(res) {
-                  callback(res.json.values);
-               },
-               scope : this
-            },
-            failureCallback : { // TODO: proper error messages
-               fn : function(res) {
-                  var json = Alfresco.util.parseJSON(res.serverResponse.responseText);
-                  Alfresco.util.PopupManager.displayPrompt({
-                     title : "Fel",
-                     text : "Feldetalj:" + json
-                  });
-               },
-               scope : this
-            }
-         });
-      },
-
-      initTooltipsFromList : function() {
-         var ids = [], i;
-
-         var lis = YAHOO.util.Dom.getChildren(this.htmlId);
-
-         var liMap = {};
-
-         var self = this;
-
-         for (i = 0; i < lis.length; i++) {
-            var id = lis[i].id;
-
-            if (id.indexOf('//') != -1 && id.indexOf('//') + 2 < id.length) {
-               id = id.split('//')[1];
-            }
-
-            liMap[id] = lis[i];
-
-            ids.push(id);
-         }
-
-         this._loadUnits(ids, function(units) {
-            for (i = 0; i < units.length; i++) {
-               var li = liMap[units[i].id];
-               li.name = units[i].dn;
-               self.setupTooltips([ li ]);
-            }
-         });
-      }
-
-   });
-   
    /**
-    * Helper function to add the current state of the given list to
-    * the given hidden field.
-    *
+    * Helper function to add the current state of the given list to the given hidden field.
+    * 
     * @method updateListValue
-    * @param list {string} The id of the ul|ol element
-    * @param hiddenField {string} The id of the hidden field to populate the value with
-    * @param signalChange {boolean} If true a bubbling event is sent to inform any
-    *        interested listeners that the hidden field value changed
+    * @param list
+    *           {string} The id of the ul|ol element
+    * @param hiddenField
+    *           {string} The id of the hidden field to populate the value with
+    * @param signalChange
+    *           {boolean} If true a bubbling event is sent to inform any interested listeners that the hidden field value changed
     * @static
     */
-   Alfresco.util.updateListValue = function(list, hiddenField, signalChange)
-   {
+   Alfresco.util.updateListValue = function(list, hiddenField, signalChange) {
       var listElement = YUIDom.get(list);
 
       if (listElement !== null) {
@@ -1007,20 +758,20 @@
 
          var hiddenIdInput = YUIDom.get(hiddenField + ".id");
 
-         for (var j = 0, jj = children.length; j < jj; j++) {
-             var id = children[j].id;
-             var value = children[j].innerHTML;
+         for ( var j = 0, jj = children.length; j < jj; j++) {
+            var id = children[j].id;
+            var value = children[j].innerHTML;
 
-             if (id.indexOf('//') != -1 && id.indexOf('//')+2 < id.length) {
-                id = id.split('//')[1]; //id of li is ${fieldHtmlId}//ID to make it unique to that control
-             }
+            if (id.indexOf('//') != -1 && id.indexOf('//') + 2 < id.length) {
+               id = id.split('//')[1]; // id of li is ${fieldHtmlId}//ID to make it unique to that control
+            }
 
-             if (hiddenIdInput) {
-                values.push(value);
-                ids.push(id);
-             } else {
-                values.push(id + '|' + value);
-             }
+            if (hiddenIdInput) {
+               values.push(value);
+               ids.push(id);
+            } else {
+               values.push(id + '|' + value);
+            }
          }
 
          YUIDom.get(hiddenField).value = values.join("#alf#");

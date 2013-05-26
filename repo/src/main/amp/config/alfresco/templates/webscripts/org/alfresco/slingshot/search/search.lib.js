@@ -20,12 +20,11 @@
  * Outputs:
  *  items - Array of objects containing the search results
  */
+
 const DEFAULT_MAX_RESULTS = 250;
 const SITES_SPACE_QNAME_PATH = "/app:company_home/st:sites/";
 const DISCUSSION_QNAMEPATH = "/fm:discussion";
 const COMMENT_QNAMEPATH = DISCUSSION_QNAMEPATH + "/cm:Comments";
-const QUERY_TEMPLATES = [
-   {field: "keywords", template: "%(cm:name cm:title cm:description ia:whatEvent ia:descriptionEvent lnk:title lnk:description TEXT TAG)"}];
 
 /**
  * Returns site information data structure.
@@ -77,7 +76,7 @@ function getPersonDisplayName(userId)
  * Cache to not display twice the same element (e.g. if two comments of the
  * same blog post match the search criteria
  */
-var processedCache = {};
+var processedCache;
 function checkProcessedCache(key)
 {
    var found = processedCache.hasOwnProperty(key);
@@ -368,7 +367,7 @@ function getWikiItem(siteId, containerId, pathParts, node)
    };
    item.modifiedBy = getPersonDisplayName(item.modifiedByUser);
    item.createdBy = getPersonDisplayName(item.createdByUser);
-      
+   
    return item;
 }
 
@@ -516,7 +515,7 @@ function getItem(siteId, containerId, pathParts, node)
       item.dc_source_origin = node.properties['vgr:dc.source.origin'];
       item.unknown_source_and_published = Published.unknownSourceAndPublished(node);
    }
-   
+
    return item;
 }
 
@@ -528,11 +527,20 @@ function getItem(siteId, containerId, pathParts, node)
  * [1] = container or null if the node does not match
  * [2] = remaining part of the cm:name based path to the object - as an array
  */
-function splitQNamePath(node)
+function splitQNamePath(node, rootNodeDisplayPath, rootNodeQNamePath)
 {
    var path = node.qnamePath,
        displayPath = node.displayPath.split("/"),
        parts = null;
+   
+   // restructure the display path of the node if we have an overriden root node
+   if (rootNodeDisplayPath != null && path.indexOf(rootNodeQNamePath) === 0)
+   {
+      var nodeDisplayPath = node.displayPath.split("/");
+      nodeDisplayPath = nodeDisplayPath.splice(rootNodeDisplayPath.length);
+      nodeDisplayPath.unshift("");
+      displayPath = nodeDisplayPath;
+   }
    
    if (path.match("^"+SITES_SPACE_QNAME_PATH) == SITES_SPACE_QNAME_PATH)
    {
@@ -563,25 +571,28 @@ function splitQNamePath(node)
  * 
  * @return the final search results object
  */
-function processResults(nodes, maxResults)
-{    
+function processResults(nodes, maxResults, rootNode)
+{
+   // empty cache state
+   processedCache = {};
    var results = [],
       added = 0,
       parts,
       item,
       failed = 0,
-      i, j;
+      rootNodeDisplayPath = rootNode ? rootNode.displayPath.split("/") : null,
+      rootNodeQNamePath = rootNode ? rootNode.qnamePath : null;
    
    if (logger.isLoggingEnabled())
       logger.log("Processing resultset of length: " + nodes.length);
    
-   for (i = 0, j = nodes.length; i < j && added < maxResults; i++)
+   for (var i = 0, j = nodes.length; i < j && added < maxResults; i++)
    {
       /**
        * For each node we extract the site/container qname path and then
        * let the per-container helper function decide what to do.
        */
-      parts = splitQNamePath(nodes[i]);
+      parts = splitQNamePath(nodes[i], rootNodeDisplayPath, rootNodeQNamePath);
       item = getItem(parts[0], parts[1], parts[2], nodes[i]);
       if (item !== null)
       {
@@ -691,6 +702,61 @@ function processMultiValue(propName, propValue, operand, pseudo)
 }
 
 /**
+ * Resolve a root node reference to use as the Repository root for a search.
+ * 
+ * NOTE: see ParseArgs.resolveNode()
+ * 
+ * @method resolveRootNode
+ * @param reference {string} "virtual" nodeRef, nodeRef or xpath expressions
+ * @return {ScriptNode|null} Node corresponding to supplied expression. Returns null if node cannot be resolved.
+ */
+function resolveRootNode(reference)
+{
+   var node = null;
+   try
+   {
+      if (reference == "alfresco://company/home")
+      {
+         node = null;
+      }
+      else if (reference == "alfresco://user/home")
+      {
+         node = userhome;
+      }
+      else if (reference == "alfresco://sites/home")
+      {
+         node = companyhome.childrenByXPath("st:sites")[0];
+      }
+      else if (reference.indexOf("://") > 0)
+      {
+         if (reference.indexOf(":") < reference.indexOf("://"))
+         {
+            var newRef = "/" + reference.replace("://", "/");
+            var newRefNodes = search.xpathSearch(newRef);
+            node = search.findNode(String(newRefNodes[0].nodeRef));
+         }
+         else
+         {
+            node = search.findNode(reference);
+         }
+      }
+      else if (reference.substring(0, 1) == "/")
+      {
+         node = search.xpathSearch(reference)[0];
+      }
+      if (node === null)
+      {
+         logger.log("Unable to resolve specified root node reference: " + reference);
+      }
+   }
+   catch (e)
+   {
+      node = null;
+   }
+   return node;
+}
+
+/**
  * Return Search results with the given search terms.
  * 
  * "or" is the default operator, AND and NOT are also supported - as is any other valid fts-alfresco
@@ -704,7 +770,8 @@ function getSearchResults(params)
       ftsQuery = "",
       term = params.term,
       tag = params.tag,
-      formData = params.query;
+      formData = params.query,
+      rootNode = resolveRootNode(params.rootNode);
    
    // Simple keyword search and tag specific search
    if (term !== null && term.length !== 0)
@@ -735,6 +802,7 @@ function getSearchResults(params)
       
       // extract form data and generate search query
       var first = true;
+      var useSubCats = false;
       for (var p in formJson)
       {
          // retrieve value and check there is someting to search for
@@ -746,7 +814,7 @@ function getSearchResults(params)
             {
                // found a property - is it namespace_propertyname or pseudo property format?
                var propName = p.substr(5);
-
+               
                // replace #dot# with .
                propName = propName.replace(/#dot#/g, ".");
                
@@ -893,12 +961,16 @@ function getSearchResults(params)
          }
       }
       
-      if (path !== null)
+      // root node - generally used for overridden Repository root in Share
+      if (params.repo && rootNode !== null)
       {
-         ftsQuery = 'PATH:"' + path + '/*" AND (' + ftsQuery + ') ';
+         ftsQuery = 'PATH:"' + rootNode.qnamePath + '//*" AND (' + ftsQuery + ')';
       }
-      ftsQuery = '(' + ftsQuery + ') AND -TYPE:"cm:thumbnail"';
-
+      else if (path !== null)
+      {
+         ftsQuery = 'PATH:"' + path + '/*" AND (' + ftsQuery + ')';
+      }
+      ftsQuery = '(' + ftsQuery + ') AND -TYPE:"cm:thumbnail" AND -TYPE:"cm:failedThumbnail" AND -TYPE:"cm:rating"';
       ftsQuery = '(' + ftsQuery + ') AND NOT ASPECT:"sys:hidden"';
 
       // sort field - expecting field to in one of the following formats:
@@ -947,7 +1019,7 @@ function getSearchResults(params)
          query: ftsQuery,
          language: "fts-alfresco",
          page: {maxItems: params.maxResults * 2},    // allow for space for filtering out results
-         templates: QUERY_TEMPLATES,
+         templates: getQueryTemplate(),
          defaultField: "keywords",
          onerror: "no-results",
          sort: sortColumns 
@@ -960,5 +1032,25 @@ function getSearchResults(params)
       nodes = [];
    }
    
-   return processResults(nodes, params.maxResults);
+   return processResults(nodes, params.maxResults, rootNode);
+}
+
+/**
+ * Return the fts-alfresco query template to use.
+ * The default searches name, title, descripton, calendar, link, full text and tag fields.
+ * It is configurable via the .config.xml attached to this webscript.
+ */
+function getQueryTemplate()
+{
+   var t =
+      [{
+         field: "keywords",
+         template: "%(cm:name cm:title cm:description ia:whatEvent ia:descriptionEvent lnk:title lnk:description TEXT TAG)"
+      }],
+      qt = new XML(config.script)["default-query-template"];
+   if (qt != null && qt.length() != 0)
+   {
+      t[0].template = qt.toString();
+   }
+   return t;
 }
