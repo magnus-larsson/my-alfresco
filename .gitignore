@@ -52,3 +52,5 @@ webpreviewer/target/
 /sharepoint/build/
 /sharepoint/lib/
 /sharepoint/target/
+
+repo/activemq-data
