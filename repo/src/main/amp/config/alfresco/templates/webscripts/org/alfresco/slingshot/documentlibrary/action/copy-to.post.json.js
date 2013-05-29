@@ -52,7 +52,7 @@ function runAction(p_params)
          else
          {
             result.id = fileNode.name;
-            result.type = fileNode.isContainer ? "folder" : "document"
+            result.type = fileNode.isContainer ? "folder" : "document";
             
             // Retain the name of the site the node is currently in. Null if it's not in a site.
             fromSite = String(fileNode.siteShortName);
@@ -95,7 +95,7 @@ function runAction(p_params)
                }
                copiedNode.save();
                
-               //remove any pubished aspect from the copy
+               //remove any published aspect from the copy
                if (copiedNode.hasAspect('vgr:published')) {
                   copiedNode.removeAspect('vgr:published');
                }
@@ -107,7 +107,7 @@ function runAction(p_params)
                   // check assocs
                   for each (assoc in assocs) {
                      // if the associated node is not in the regular workspace, skip it
-                     var assocStoreRef = assoc.nodeRef.storeRef.toString()"";
+                     var assocStoreRef = assoc.nodeRef.storeRef.toString() + "";
                      if (assocStoreRef !== "workspace://SpacesStore") {
                         continue;
                      }
