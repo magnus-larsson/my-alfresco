@@ -97,7 +97,7 @@
       
       var page = Alfresco.constants.PAGEID;
       
-      if (!page || page.length === 0) {
+      if (!page || page.length === 0) {
          var span = YAHOO.util.Selector.query('span.title-explanation')[0];
          
          YAHOO.util.Dom.setStyle(span, "display", "none");
