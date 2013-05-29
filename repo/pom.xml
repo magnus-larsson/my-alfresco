@@ -19,6 +19,37 @@
 
   <dependencies>
     <dependency>
+      <groupId>se.vgregion.icc.sd.docpublishing</groupId>
+      <artifactId>docpublishing-schemas</artifactId>
+      <version>1.0.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.jms</groupId>
+      <artifactId>jms-api</artifactId>
+      <version>1.1-rev-1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activemq-core</artifactId>
+      <version>5.7.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
       <groupId>se.vgregion</groupId>
       <artifactId>metadata-client</artifactId>
       <version>1.0.5</version>
@@ -206,5 +237,16 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
-
+  <repositories>
+    <repository>
+      <id>vgr-releases</id>
+      <url>http://nexus.vgregion.se:8081/nexus/content/repositories/releases</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
 </project>
