@@ -110,6 +110,7 @@
     <property name="behaviourFilter" ref="policyBehaviourFilter" />
     <property name="pushService" ref="vgr.pushService" />
     <property name="test" value="${vgr.pushserver.test}" />
+    <property name="pushJmsService" ref="vgr.pushJmsService" />
   </bean>
 
   <bean id="vgr.pushServerJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">

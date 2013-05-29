@@ -162,12 +162,23 @@
     <property name="pushServerUrl" value="${vgr.pushserver.url}" />
     <property name="dumpFeed" value="false" />
     <property name="serviceUtils" ref="vgr.serviceUtils" />
+    <property name="searchService" ref="SearchService" />
   </bean>
 
   <bean id="vgr.pushServiceScript" parent="baseJavaScriptExtension" class="se.vgregion.alfresco.repo.scripts.ScriptPushService">
     <property name="extensionName" value="pushService" />
     <property name="nodeService" ref="NodeService" />
     <property name="behaviourFilter" ref="policyBehaviourFilter" />
+  </bean>
+
+  <bean id="vgr.pushJmsService" class="se.vgregion.alfresco.repo.push.impl.PushJmsServiceImpl">
+    <property name="nodeService" ref="NodeService" />
+    <property name="queueName" value="${vgr.pushJms.queueName}" />
+    <property name="consumerRemoteUrl" value="${vgr.pushJms.consumerRemoteUrl}" />
+    <property name="producerLocalUrl" value="${vgr.pushJms.producerLocalUrl}" />
+    <property name="vgrHdrSenderId" value="${vgr.pushJms.vgrHdrSenderId}" />
+    <property name="vgrHdrReceiverId" value="${vgr.pushJms.vgrHdrReceiverId}" />
+    <property name="vgrHdrMessageTypeVersion" value="${vgr.pushJms.VgrHdrMessageTypeVersion}" />
   </bean>
 
   <!-- *********************************** -->
@@ -297,7 +308,6 @@
     <property name="dictionaryService" ref="DictionaryService" />
     <property name="mimetypeService" ref="MimetypeService" />
     <property name="CMISRenditionService" ref="CMISRenditionService" />
-    <property name="searchService" ref="SearchService" />
     <property name="serviceUtils" ref="vgr.serviceUtils" />
     <property name="thumbnailService" ref="ThumbnailService" />
     <property name="storageService" ref="vgr.storageService" />
@@ -516,6 +526,27 @@
 
   <bean id="vgr.sendMailService" class="se.vgregion.alfresco.repo.mail.impl.SendMailServiceImpl">
     <property name="actionService" ref="ActionService" />
+  </bean>
+
+  <!-- ***************************************************************************************************** -->
+  <!-- Publish status web scripts -->
+  <!-- ***************************************************************************************************** -->
+
+  <bean id="webscript.publishtostorage.publishstatus.post" class="se.vgregion.alfresco.repo.scripts.SetPublishStatus" parent="webscript">
+    <property name="globalProperties" ref="global-properties" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="behaviourFilter" ref="policyBehaviourFilter" />
+  </bean>
+
+  <bean id="webscript.publishtostorage.publishstatus.get" class="se.vgregion.alfresco.repo.scripts.GetPublishStatus" parent="webscript">
+    <property name="storageService" ref="vgr.storageService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="serviceUtils" ref="vgr.serviceUtils" />
+  </bean>
+
+  <bean id="webscript.publishtostorage.publishreport.get" class="se.vgregion.alfresco.repo.scripts.ScriptGetDocumentsPublishReport" parent="webscript">
+    <property name="pushService" ref="vgr.pushService" />
+    <property name="nodeService" ref="NodeService" />
   </bean>
 
 </beans>

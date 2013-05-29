@@ -1,12 +1,43 @@
 <webscript>
-  <shortname>Get Publish Status</shortname>
+  <shortname>Get publish status for a document</shortname>
   <description>
-    Gets the Publish Status of a node from the repo
-   </description>
-  <url>/vgr/publishstatus?nodeRef={nodeRef}</url>
+  <![CDATA[
+    REST API for getting the publish status for a document.<br />
+    
+    Request should look like this:<br />
+    <pre>GET /alfresco/service/vgr/publishstatus/workspace/SpacesStore/143e127f-fe5a-4121-86a3-0cb0d4763837&1364303674884</pre><br />
+    
+    Result will look like this:<br />
+    <pre>
+{ 
+	"result": SENT_FOR_UNPUBLISH, 
+	"status": "new", 
+	"pushed_for_publish": "2013-04-08T06:40:05.877Z",
+	"pushed_for_unpublish": "2013-04-08T07:48:04.116Z",
+	"nodeRef": "workspace://SpacesStore/b720370d-cc18-4043-9692-6b6cb9192b66"
+}
+    </pre>
+    
+    The result variable in the result map will contain one of the following values:<br />
+    <ul>
+    	<li>ERROR</li>
+    	<li>PUBLISH_ERROR</li>
+    	<li>UNPUBLISH_ERROR</li>
+    	<li>PUBLISHED</li>
+    	<li>UNPUBLISHED</li>
+    	<li>UNKNOWN_STATUS_ERROR</li>
+    	<li>SENT_FOR_PUBLISH</li>
+    	<li>SENT_FOR_UNPUBLISH</li>
+    	<li>PREVIOUSLY_PUBLISHED</li>
+    	<li>NOT_PUBLISHED</li>
+    </ul>
+    ]]>
+  </description>
+  <url>/vgr/publishstatus/{store_type}/{store_id}/{node_id}</url>
+  <url>/vgr/publishstatus/{document_id}</url>
+  <family>VGR</family>
   <format default="json">argument</format>
   <authentication>user</authentication>
-  <transaction>required</transaction>
-  <family>VGR</family>
+  <transaction allow="readonly">required</transaction>
 </webscript>
 

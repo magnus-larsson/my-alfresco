@@ -4,7 +4,7 @@
 
   <!-- ********************************** -->
   <!-- Job for fixing the status property -->
-  <!-- ********************************** -->
+  <!-- ********************************** 
   
   <bean id="vgr.patch.fixVgrStatusJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
     <property name="jobClass" value="se.vgregion.alfresco.repo.admin.patch.impl.FixVgrStatusJob" />
@@ -27,10 +27,10 @@
     <property name="scheduler" ref="schedulerFactory" />
     <property name="cronExpression" value="0 0 1 * * ?" />
   </bean>
-  
+  -->
   <!-- ************************************* -->
   <!-- Job for fixing the ID fields property -->
-  <!-- ************************************* -->
+  <!-- ************************************* 
   
   <bean id="vgr.patch.fixMissingIdValuesJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
     <property name="jobClass" value="se.vgregion.alfresco.repo.admin.patch.impl.FixMissingIdValuesJob" />
@@ -53,10 +53,10 @@
     <property name="scheduler" ref="schedulerFactory" />
     <property name="cronExpression" value="0 0 1 * * ?" />
   </bean>
-  
+  -->
   <!-- ***************************************************************** -->
   <!-- Job for fixing the vgr:dc.source and vgr:dc.identifier properties -->
-  <!-- ***************************************************************** -->
+  <!-- *****************************************************************
   
   <bean id="vgr.patch.fixDcSourceAndIdentifierJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
     <property name="jobClass" value="se.vgregion.alfresco.repo.admin.patch.impl.FixDcSourceAndIdentifierJob" />
@@ -80,5 +80,5 @@
     <property name="scheduler" ref="schedulerFactory" />
     <property name="cronExpression" value="0 0 1 * * ?" />
   </bean>
-  
+   -->
 </beans>

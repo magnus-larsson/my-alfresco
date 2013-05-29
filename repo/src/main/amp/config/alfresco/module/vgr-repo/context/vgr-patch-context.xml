@@ -2,7 +2,7 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
-
+<!-- 
   <bean id="vgr.patch.fixDocumentTypes" class="se.vgregion.alfresco.repo.admin.patch.impl.FixDocumentTypesPatch" parent="basePatch">
     <property name="id" value="vgr.patch.fixDocumentTypes" />
     <property name="description" value="vgr.patch.fixDocumentTypes.description" />
@@ -97,10 +97,10 @@
     <property name="force" value="true" />
     <property name="behaviourFilter" ref="policyBehaviourFilter" />
   </bean>
-
+ -->
   <!-- This patch must be run LAST after all other things has been run -->
   <!-- To run this patch, the vgrModel.xml MUST be changed so that dc.source and dc.identifier no longer has multiple=true -->
-
+<!-- 
   <bean id="vgr.patch.copyTempPropertiesToSourceIdentifier" class="se.vgregion.alfresco.repo.admin.patch.impl.CopyTempPropertiesToSourceIdentifierPatch"
     parent="basePatch">
     <property name="id" value="vgr.patch.copyTempPropertiesToSourceIdentifier" />
@@ -224,5 +224,5 @@
         p:fixesFromSchema="0"
         p:id="vgr.patch.fixVgrDocumentComments"
         p:description="vgr.patch.fixVgrDocumentComments.description" />
-
+ -->
 </beans>

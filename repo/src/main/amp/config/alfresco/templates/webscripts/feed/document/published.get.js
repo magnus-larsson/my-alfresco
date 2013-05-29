@@ -99,6 +99,15 @@ function getDocumentItem(node) {
 	  
 	  var published = now <= safeAvailableTo && now >= safeAvailableFrom;
 	  
+	  var requestId;
+    if (node.properties["vgr:pushed-for-unpublish"] == null && node.properties["vgr:pushed-for-publish"] == null) {
+      requestId = "";
+    } else if (node.properties["vgr:pushed-for-unpublish"] == null) {
+      requestId = "publish" "_" "workspace://SpacesStore/"  node.id  "_"  node.properties["vgr:pushed-for-publish"].getTime();
+    } else {
+      requestId = "unpublish" "_" "workspace://SpacesStore/"  node.id  "_"  node.properties["vgr:pushed-for-unpublish"].getTime();
+    }
+	  
 	  // change the language to ISO standard
 	  for each (var language in node.properties["vgr:dc.language"]) {
 	    code = serviceUtils.findLanguageCode(language);
@@ -196,6 +205,7 @@ function getDocumentItem(node) {
        ,objectType                      : "document"
        ,id : "tag:" + host + ",2011-06-30:" + node.id
        ,published: published ? "true" : "false"
+       ,request_id : requestId
     };
    }
    

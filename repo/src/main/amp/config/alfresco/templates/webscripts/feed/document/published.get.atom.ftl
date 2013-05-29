@@ -12,6 +12,7 @@
 <#list data.items as row>
   <entry>
     <published>${row.published}</published>
+    <requestId>${row.request_id}</requestId>
     <@outputSingle value=row.title tag="title" />
     <link href="${(absurl(row.downloadUrl)!"")?html?replace(':80/', '/')?replace(':443/', '/')}"/>
     <@outputSingle value=row.id tag="id" />

@@ -1,6 +1,9 @@
 package se.vgregion.alfresco.repo.storage;
 
+import java.util.List;
+
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.search.ResultSetRow;
 
 public interface StorageService {
 
@@ -23,5 +26,42 @@ public interface StorageService {
   int createMissingPdfRenditions(CreationCallback creationCallback);
 
   boolean pdfaRendable(NodeRef nodeRef);
+
+  /**
+   * Gets the latest published storage version of a document
+   * 
+   * @param nodeRef
+   *          Original document id
+   * @return
+   */
+  public NodeRef getLatestPublishedStorageVersion(final String nodeRef);
+
+  /**
+   * Gets an expecit version of a document in the storage
+   * 
+   * @param nodeRef
+   *          Original document id
+   * @param version
+   * @return
+   */
+  public NodeRef getPublishedStorageVersion(final String nodeRef, final String version);
+
+  /**
+   * Gets the latest storage version of a document
+   * 
+   * @param nodeRef
+   *          Original document id
+   * @return
+   */
+  public NodeRef getLatestStorageVersion(final String nodeRef);
+
+  /**
+   * Gets all storage versions of a document
+   * 
+   * @param nodeRef
+   *          Original document id
+   * @return
+   */
+  public List<ResultSetRow> getStorageVersions(final String nodeRef);
 
 }

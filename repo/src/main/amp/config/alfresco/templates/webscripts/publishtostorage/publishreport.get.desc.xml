@@ -1,0 +1,12 @@
+<webscript>
+  <shortname>Get publish status report for documents</shortname>
+  <description>
+  
+  </description>
+  <url>/vgr/publishreport?status={status}&amp;from={dateFrom}&amp;to={dateTo}</url>
+  <family>VGR</family>
+  <format default="json">argument</format>
+  <authentication>admin</authentication>
+  <transaction allow="readonly">required</transaction>
+</webscript>
+

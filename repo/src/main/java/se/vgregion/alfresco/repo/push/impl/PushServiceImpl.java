@@ -5,10 +5,17 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.SearchParameters;
+import org.alfresco.service.cmr.search.SearchService;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -32,6 +39,8 @@ public class PushServiceImpl implements PushService, InitializingBean {
 
   private ServiceUtils _serviceUtils;
 
+  private SearchService _searchService;
+
   public void setDumpFeed(final boolean dumpFeed) {
     _dumpFeed = dumpFeed;
   }
@@ -48,6 +57,10 @@ public class PushServiceImpl implements PushService, InitializingBean {
     _serviceUtils = serviceUtils;
   }
 
+  public void setSearchService(SearchService _searchService) {
+    this._searchService = _searchService;
+  }
+
   @Override
   public boolean pushFile(final NodeRef nodeRef) {
     final List<NodeRef> nodeRefs = new ArrayList<NodeRef>();
@@ -61,6 +74,10 @@ public class PushServiceImpl implements PushService, InitializingBean {
   public boolean pushFiles(final List<NodeRef> nodeRefs) {
     if (_dumpFeed) {
       dumpFeed();
+    }
+    
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Pinging PuSH server");
     }
 
     if (!_serviceUtils.pingServer(_pushServerUrl)) {
@@ -78,6 +95,9 @@ public class PushServiceImpl implements PushService, InitializingBean {
     post.addParameter("hub.url", _feedUrl);
 
     try {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Posting files to PuSH server");
+      }
       final int response = client.executeMethod(post);
 
       final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -88,8 +108,7 @@ public class PushServiceImpl implements PushService, InitializingBean {
         LOG.debug(post.getResponseBodyAsString());
 
         for (final NodeRef nodeRef : nodeRefs) {
-          LOG.debug("File '" + nodeRef + "' published to '" + _pushServerUrl + "' with feed URL '" + _feedUrl
-              + "', response code " + response);
+          LOG.debug("File '" + nodeRef + "' published to '" + _pushServerUrl + "' with feed URL '" + _feedUrl + "', response code " + response);
         }
       }
 
@@ -142,10 +161,109 @@ public class PushServiceImpl implements PushService, InitializingBean {
   }
 
   @Override
+  public List<NodeRef> findPushedFiles(String publishStatus, String unpublishStatus, Date startTime, Date endTime) {
+
+    String query = findPublishedDocumentsByStatusQuery(formatDate(startTime), formatDate(endTime), publishStatus, unpublishStatus);
+    ResultSet result = findDocuments(query);
+    try {
+      return result.getNodeRefs();
+    } finally {
+      ServiceUtils.closeQuietly(result);
+    }
+  }
+
+  private String formatDate(Date date) {
+    if (date == null) {
+      return "";
+    }
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+    return sdf.format(date);
+  }
+
+  private Date parseStringDate(String stringDate) {
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+    try {
+      return sdf.parse(stringDate);
+    } catch (ParseException ex) {
+      throw new RuntimeException(ex);
+    }
+  }
+
+  private String findPublishedDocumentsByStatusQuery(String startDate, String endDate, String publishStatus, String unpublishStatus) {
+    StringBuffer query = new StringBuffer();
+
+    query.append("TYPE:\"vgr:document\" AND ");
+    query.append("ASPECT:\"vgr:published\" AND ");
+    // query.append("vgr:dc\\.date\\.availablefrom:[MIN TO \"" + startDate +
+    // "\"] AND ");
+    // query.append("(ISNULL:\"vgr:dc.date.availableto\" OR vgr:dc\\.date\\.availableto:[\""
+    // + startDate + "\" TO MAX]) AND ");
+    String queryStartDate = "MIN";
+    if (startDate != "") {
+      queryStartDate = "\"" + startDate + "\"";
+    }
+
+    String queryEndDate = "MAX";
+    if (endDate != "") {
+      queryEndDate = "\"" + endDate + "\"";
+    }
+
+    if (startDate == "" && endDate == "") {
+      // Include records not pushed yet in the result
+      query.append("(ISNULL:\"pushed-for-publish\" OR ");
+      query.append("ISNULL:\"pushed-for-unpublish\") ");
+    } else {
+      // When we have a start or end date, show only documents scheduled for publish/unpublish
+      query.append("(vgr\\:pushed\\-for\\-publish:[" + queryStartDate + " TO " + queryEndDate + "] OR ");    
+      query.append("vgr\\:pushed\\-for\\-unpublish:[" + queryStartDate + " TO " + queryEndDate + "]) ");
+    }
+    // query.append("vgr\\:pushed\\-for\\-unpublish:[" + queryStartDate +
+    // " TO "+ queryEndDate +"] AND ");
+    if (publishStatus.length() == 0) {
+      query.append("AND ISNULL:\"vgr:publish-status\"");
+    } else if (publishStatus.length() > 0 && !"any".equalsIgnoreCase(publishStatus)){
+      query.append("AND vgr\\:publish\\-status: \"" + publishStatus + "\" ");
+    }
+    
+    if (unpublishStatus.length() == 0) {
+      query.append("AND ISNULL:\"vgr:unpublish-status\"");
+    } else if (unpublishStatus.length() > 0 && !"any".equalsIgnoreCase(unpublishStatus)){
+      query.append("AND vgr\\:unpublish\\-status: \"" + unpublishStatus + "\" ");
+    }
+    
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Query for finding documents scheduled for publishing/unpublishing: " + query.toString());
+    }
+
+    return query.toString();
+  }
+
+  private ResultSet findDocuments(String query) {
+    SearchParameters searchParameters = new SearchParameters();
+
+    searchParameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
+    searchParameters.setLanguage(SearchService.LANGUAGE_FTS_ALFRESCO);
+    searchParameters.setQuery(query.toString());
+
+    ResultSet result = _searchService.query(searchParameters);
+
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Documents found for query: " + query.toString());
+      LOG.debug("Count: " + result.length());
+      LOG.debug("");
+    }
+
+    return result;
+  }
+
+  @Override
   public void afterPropertiesSet() throws Exception {
     Assert.notNull(_serviceUtils);
     Assert.hasText(_feedUrl);
     Assert.hasText(_pushServerUrl);
+    Assert.notNull(_searchService);
   }
 
 }

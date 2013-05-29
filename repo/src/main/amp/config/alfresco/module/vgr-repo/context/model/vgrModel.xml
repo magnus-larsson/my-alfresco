@@ -297,29 +297,34 @@
     </aspect>
 
     <!-- ################################################################### -->
-    <!-- Aspect for automatic deletion. If this aspect is set on a site the  -->
-    <!-- documents in that site and it's content and/or the document itself  -->
-    <!-- gets deleted after max_age days.                                    -->
-    <!-- The default behaviour is to delete node and content after 90 days.  -->
+    <!-- Aspect for automatic deletion. If this aspect is set on a site the -->
+    <!-- documents in that site and it's content and/or the document itself -->
+    <!-- gets deleted after max_age days. -->
+    <!-- The default behaviour is to delete node and content after 90 days. -->
     <!-- ################################################################### -->
 
     <aspect name="vgr:auto_deletable">
       <title>Automatic deletion</title>
       <properties>
         <property name="vgr:max_age">
-          <description>The maximum age (in days) that a node or it's content can have before it's deleted</description>
+          <description>The maximum age (in days) that a node or it's content
+            can have before it's deleted
+          </description>
           <type>d:long</type>
           <mandatory enforced="true">true</mandatory>
           <default>90</default>
         </property>
         <property name="vgr:delete_node">
-          <description>Whether the node should also be deleted and not only the content</description>
+          <description>Whether the node should also be deleted and not only
+            the content
+          </description>
           <type>d:boolean</type>
           <mandatory enforced="true">true</mandatory>
           <default>true</default>
         </property>
         <property name="vgr:mimetypes">
-          <description>The mimetypes to delete the content/node for</description>
+          <description>The mimetypes to delete the content/node for
+          </description>
           <type>d:text</type>
           <multiple>true</multiple>
         </property>
@@ -580,7 +585,7 @@
         <property name="vgr:dc.type.document.structure">
           <type>d:text</type>
           <constraints>
-            <constraint name="vgr:structures" type="se.vgregion.alfresco.repo.constraints.DocumentStructureConstraint"/>
+            <constraint name="vgr:structures" type="se.vgregion.alfresco.repo.constraints.DocumentStructureConstraint" />
           </constraints>
         </property>
         <property name="vgr:dc.type.document.structure.id">
@@ -829,6 +834,15 @@
         <property name="vgr:pushed-for-unpublish">
           <type>d:datetime</type>
         </property>
+
+        <!-- This property is used to indicate the current status of the publishing and is set through a REST API -->
+        <property name="vgr:publish-status">
+          <type>d:text</type>
+        </property>
+        <!-- This property is used to indicate the current status of the publishing and is set through a REST API -->
+        <property name="vgr:unpublish-status">
+          <type>d:text</type>
+        </property>
       </properties>
     </aspect>
 
@@ -877,12 +891,16 @@
           <type>d:text</type>
         </property>
         <property name="vgr:vgr_dok_moved_to_path">
-          <description>True if the document is moved to it's final folder, reads the vgr:vgrDokFilePath property.</description>
+          <description>True if the document is moved to it's final folder,
+            reads the vgr:vgrDokFilePath property.
+          </description>
           <type>d:boolean</type>
           <default>false</default>
         </property>
         <property name="vgr:vgr_dok_moved_to_version">
-          <description>True if the document is moved the correct version hierarchy.</description>
+          <description>True if the document is moved the correct version
+            hierarchy.
+          </description>
           <type>d:boolean</type>
           <default>false</default>
         </property>

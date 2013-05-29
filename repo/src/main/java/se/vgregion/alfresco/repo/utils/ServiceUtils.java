@@ -973,8 +973,10 @@ public class ServiceUtils implements InitializingBean {
     final long safeAvailableTo = availableTo != null ? availableTo.getTime() : now;
 
     final boolean published = now <= safeAvailableTo && now >= safeAvailableFrom;
+    
+    final boolean publishStatus = "ok".equalsIgnoreCase((String)_nodeService.getProperty(nodeRef, VgrModel.PROP_PUBLISH_STATUS));
 
-    return published;
+    return published && publishStatus;
   }
 
   public void disableAllBehaviours() {
