@@ -10,3 +10,7 @@ ${tomcat.share.home}
 activemq-data
 WebPreviewer.swf
 sharepoint/
+*.iml
+.idea
+*.launch
+.springBeans
