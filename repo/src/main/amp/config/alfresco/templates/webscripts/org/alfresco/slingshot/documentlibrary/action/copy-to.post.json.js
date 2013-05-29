@@ -23,7 +23,7 @@ function runAction(p_params)
       fromSite, copiedNode;
 
    // Must have array of files
-   if (!files || files.length === 0)
+   if (!files || files.length == 0)
    {
       status.setCode(status.STATUS_BAD_REQUEST, "No files.");
       return;
@@ -40,10 +40,10 @@ function runAction(p_params)
          success: false
       };
       
-      //try
-      //{
+      try
+      {
          fileNode = search.findNode(nodeRef);
-         if (fileNode === null)
+         if (fileNode == null)
          {
             result.id = file;
             result.nodeRef = nodeRef;
@@ -55,8 +55,7 @@ function runAction(p_params)
             result.type = fileNode.isContainer ? "folder" : "document"
             
             // Retain the name of the site the node is currently in. Null if it's not in a site.
-            fromSite = fileNode.siteShortName;
-            
+            fromSite = String(fileNode.siteShortName);
             
             // copy the node (deep copy for containers)
             if (fileNode.isContainer)
@@ -69,62 +68,62 @@ function runAction(p_params)
                copiedNode = fileNode.copy(destNode);
                result.nodeRef = copiedNode.nodeRef.toString();
             }
-            
-            result.success = (result.nodeRef !== null);
+
+            result.nodeRef = copiedNode.nodeRef.toString();
+            result.success = (result.nodeRef != null);
             
             if (result.success)
             {
-                //add a "donottouch" aspect to hinder CreateSiteDocumentPolicy copying properties (we do that ourselves later)
-                copiedNode.addAspect('{http://www.vgregion.se/model/1.0}donottouch');
-              
-                // If this was an inter-site copy, we'll need to clean up the permissions on the node
-                if (fromSite !== copiedNode.nodeRef.siteShortName)
-                {
-                    siteService.cleanSitePermissions(copiedNode.nodeRef);
-                }
-                
-                //reset some properties on the copy since they are not to be copied
-                //blacklisted properties are ignored
-                var blacklist = properties.get('vgr.metadata.copy.blacklist','').split(',');
-                for each (black in blacklist) {
-                   if (black.indexOf('{http://www.vgregion.se/model/1.0}') === 0) {
-                      copiedNode.properties[black] = null; //since we can't delete
-                   } else {
-                      copiedNode.properties['{http://www.vgregion.se/model/1.0}'+black] = null; //since we can't delete
-                   }
-                }
-                copiedNode.save();
-
-                //remove any pubished aspect from the copy
-                if (copiedNode.hasAspect('vgr:published')) {
+               //add a "donottouch" aspect to hinder CreateSiteDocumentPolicy copying properties (we do that ourselves later)
+               copiedNode.addAspect('{http://www.vgregion.se/model/1.0}donottouch');
+               
+               // If this was an inter-site copy, we'll need to clean up the permissions on the node
+               if (fromSite !== copiedNode.nodeRef.siteShortName)
+               {
+                  siteService.cleanSitePermissions(copiedNode.nodeRef);
+               }
+                 
+               //reset some properties on the copy since they are not to be copied
+               //blacklisted properties are ignored
+               var blacklist = properties.get('vgr.metadata.copy.blacklist','').split(',');
+               for each (black in blacklist) {
+                  if (black.indexOf('{http://www.vgregion.se/model/1.0}') === 0) {
+                     copiedNode.properties[black] = null; //since we can't delete
+                  } else {
+                     copiedNode.properties['{http://www.vgregion.se/model/1.0}'+black] = null; //since we can't delete
+                  }
+               }
+               copiedNode.save();
+               
+               //remove any pubished aspect from the copy
+               if (copiedNode.hasAspect('vgr:published')) {
                   copiedNode.removeAspect('vgr:published');
-                }
-
-                //remove any association to published documents
-                var assocs = copiedNode.assocs["vgr:published-to-storage"];
-         
-                if (assocs) {
-                   // check assocs
-                   for each (assoc in assocs) {
-                      // if the associated node is not in the regular workspace, skip it
-                      var assocStoreRef = assoc.nodeRef.storeRef.toString() + "";
-                      if (assocStoreRef !== "workspace://SpacesStore") {
-                         continue;
-                      }
-
+               }
+               
+               //remove any association to published documents
+               var assocs = copiedNode.assocs["vgr:published-to-storage"];
+                
+               if (assocs) {
+                  // check assocs
+                  for each (assoc in assocs) {
+                     // if the associated node is not in the regular workspace, skip it
+                     var assocStoreRef = assoc.nodeRef.storeRef.toString()"";
+                     if (assocStoreRef !== "workspace://SpacesStore") {
+                        continue;
+                     }
+               
                      copiedNode.removeAssociation(assoc,"vgr:published-to-storage");
                   }
-                }
+               }
             }
          }
-      /*}
+      }
       catch (e)
       {
          result.id = file;
          result.nodeRef = nodeRef;
          result.success = false;
-         result.error = ''+e.message;
-      }*/
+      }
       
       results.push(result);
    }
