@@ -71,6 +71,7 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
   @Override
   protected void executeInternal() {
     final String now = formatNow();
+
     // Get the actual nodes we want to push
     final RetryingTransactionCallback<List<NodeRef>> executionSelectPublished = new RetryingTransactionCallback<List<NodeRef>>() {
       @Override
@@ -78,18 +79,21 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
         return findPublishedDocuments(now);
       }
     };
+
     final RetryingTransactionCallback<List<NodeRef>> executionSelectUnpublished = new RetryingTransactionCallback<List<NodeRef>>() {
       @Override
       public List<NodeRef> execute() throws Throwable {
         return findUnpublishedDocuments(now);
       }
     };
+
     final List<NodeRef> publishedDocuments = AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<List<NodeRef>>() {
       @Override
       public List<NodeRef> doWork() throws Exception {
         return _transactionService.getRetryingTransactionHelper().doInTransaction(executionSelectPublished, true, false);
       }
     }, AuthenticationUtil.getSystemUserName());
+
     final List<NodeRef> unpublishedDocuments = AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<List<NodeRef>>() {
       @Override
       public List<NodeRef> doWork() throws Exception {
@@ -133,7 +137,7 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
   private void executeUpdate(List<NodeRef> publishedDocuments, List<NodeRef> unpublishedDocuments) {
     // disable all behaviours, we can't have the modified date updated for
     // this...
-    _behaviourFilter.disableAllBehaviours();
+    _behaviourFilter.disableBehaviour();
 
     if (LOG.isDebugEnabled()) {
       LOG.debug("Setting cm:modified property for all published documents");
@@ -155,7 +159,7 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
     }
     setPublishStatusProperties(unpublishedDocuments, VgrModel.PROP_PUSHED_FOR_UNPUBLISH);
 
-    _behaviourFilter.enableAllBehaviours();
+    _behaviourFilter.enableBehaviour();
   }
 
   protected void setPublishStatusProperties(List<NodeRef> nodeRefs, QName property) {
@@ -173,7 +177,7 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
   private Boolean executePush(List<NodeRef> publishedDocuments, List<NodeRef> unpublishedDocuments) {
     // disable all behaviours, we can't have the modified date updated for
     // this...
-    _behaviourFilter.disableAllBehaviours();
+    _behaviourFilter.disableBehaviour();
 
     if (LOG.isDebugEnabled()) {
       LOG.debug("Sending published and unpublished documents to PuSH server");
@@ -204,7 +208,7 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
       }
     }
 
-    _behaviourFilter.enableAllBehaviours();
+    _behaviourFilter.enableBehaviour();
     return pushed;
   }
 
