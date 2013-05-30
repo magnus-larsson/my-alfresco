@@ -1,5 +1,6 @@
 package se.vgregion.alfresco.repo.jobs;
 
+import org.alfresco.repo.admin.RepositoryState;
 import org.alfresco.repo.lock.JobLockService;
 import org.alfresco.repo.lock.LockAcquisitionException;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
@@ -27,6 +28,8 @@ public abstract class ClusteredExecuter implements InitializingBean {
 
   protected TransactionService _transactionService;
 
+  protected RepositoryState _repositoryState;
+
   public void setJobLockService(JobLockService jobLockService) {
     _jobLockService = jobLockService;
   }
@@ -39,10 +42,21 @@ public abstract class ClusteredExecuter implements InitializingBean {
     _transactionService = transactionService;
   }
 
+  public void setRepositoryState(RepositoryState repositoryState) {
+    _repositoryState = repositoryState;
+  }
+
   public void execute() {
     // Bypass if the system is in read-only mode
     if (_transactionService.isReadOnly()) {
       LOG.debug(getJobName() + " bypassed; the system is read-only.");
+
+      return;
+    }
+
+    // Bypass if the system is bootstrapping
+    if (_repositoryState.isBootstrapping()) {
+      LOG.debug(getJobName() + " bypassed; the system is bootstrapping.");
 
       return;
     }
