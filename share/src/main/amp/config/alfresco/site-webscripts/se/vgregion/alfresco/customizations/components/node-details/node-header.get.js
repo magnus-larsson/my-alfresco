@@ -32,8 +32,6 @@ function main() {
          model.item.status = status.join(',');
       }
    }
-   
-   logger.warn(model.item.status);
 }
 
 main();
