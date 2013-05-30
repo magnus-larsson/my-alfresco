@@ -204,6 +204,7 @@ public class PushJmsServiceTest {
         pushJmsService.setQueueName(QUEUE_NAME);
         pushJmsService.setVgrHdrSenderId(SENDER_ID);
         pushJmsService.setVgrHdrReceiverId(RECEIVER_ID);
+        pushJmsService.setProducerLocalUrl("vm://producerTest");
         pushJmsService.setConsumerRemoteUrl("failover:(" + CONSUMER_REMOTE_URL + ")");
         pushJmsService.setNodeService(nodeService);
         pushJmsService.setVgrHdrMessageTypeVersion(MESSAGE_TYPE_VERSION);

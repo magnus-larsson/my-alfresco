@@ -94,6 +94,7 @@ public class FixDcSourceDocumentIdPatch extends AbstractPatch {
       }
     } finally {
       ServiceUtils.closeQuietly(documents);
+      _behaviourFilter.enableBehaviour();
     }
 
     return I18NUtil.getMessage(MSG_SUCCESS);
