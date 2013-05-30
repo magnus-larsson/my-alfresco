@@ -32,7 +32,7 @@
          </form>
       </#if>
       
-      <div id="${formId}-warningtext" class="form-warningtext">
+      <div id="${formId}-warningtext" class="form-warningtext" style="display:none;">
          Man kan bara spara om någon ändring är gjord, samt att alla obligatoriska fält är ifyllda.
       <div>
    </div>
