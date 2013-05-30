@@ -113,4 +113,6 @@
 
   <bean id="evaluator.doclib.indicator.auto-publish-major-version" class="se.vgregion.web.evaluator.doclib.indicator.AutoPublishMajorVersionEvaluator" />
 
+  <bean id="evaluator.doclib.indicator.vgr-publish-status" class="se.vgregion.web.evaluator.doclib.indicator.PublishStatusEvaluator" />
+
 </beans>

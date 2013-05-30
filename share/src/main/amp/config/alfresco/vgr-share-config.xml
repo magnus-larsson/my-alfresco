@@ -169,6 +169,9 @@
     </file-upload>
 
     <indicators>
+      <indicator id="vgr-publish-status-placeholder" index="39" icon="loading.gif">
+        <evaluator>evaluator.doclib.indicator.vgr-publish-status</evaluator>
+      </indicator>
       <indicator id="auto-publish-all-versions" index="39">
         <evaluator>evaluator.doclib.indicator.auto-publish-all-versions</evaluator>
       </indicator>
@@ -176,6 +179,13 @@
         <evaluator>evaluator.doclib.indicator.auto-publish-major-version</evaluator>
       </indicator>
     </indicators>
+  </config>
+
+   <!-- DocLibCustom section -->
+  <config evaluator="string-compare" condition="DocLibCustom">
+    <dependencies>
+      <js src="/components/documentlibrary/vgr-publish-status.js" />
+    </dependencies>
   </config>
 
   <!-- Repository Library config section -->

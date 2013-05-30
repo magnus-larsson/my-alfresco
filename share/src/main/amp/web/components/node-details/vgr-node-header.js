@@ -2,21 +2,30 @@
 
    Alfresco.component.NodeHeader.prototype.onReady = function() {
       onReady.call(this);
+      var status = this.options.status;
 
+      var icon = YAHOO.util.Selector.query('img.node-thumbnail')[0];
+      
+      var indicators = _constructStatusIcons(this.options.status, this);
       if (this.options.isContainer === true) {
-         var status = this.options.status;
-
-         var icon = YAHOO.util.Selector.query('img.node-thumbnail')[0];
-         
-         var indicators = _constructStatusIcons(this.options.status, this);
-
          for ( var x = 0; x < indicators.length; x++) {
             var indicator = indicators[x];
 
             var result = YAHOO.util.Dom.insertAfter(indicator, icon);
          }
+      } else {
+        var indicator = _constructPublishStatusPlaceholder();
+        var result = YAHOO.util.Dom.insertAfter(indicator, icon);
       }
    };
+   
+   function _constructPublishStatusPlaceholder() {
+     var indicator = new YAHOO.util.Element(document.createElement('div'));
+     indicator.addClass('status-icon');
+     //indicator.addClass('hidden');
+     indicator.set('id', "vgr-publish-status");
+     return indicator;
+   }
 
    function _constructStatusIcons(dataStatus, scope) {
       if (!dataStatus || dataStatus.length == 0) {
