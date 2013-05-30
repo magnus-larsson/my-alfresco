@@ -16,14 +16,21 @@
       } else {
         var indicator = _constructPublishStatusPlaceholder();
         var result = YAHOO.util.Dom.insertAfter(indicator, icon);
+        var placeholder = YAHOO.util.Selector.query('img#vgr-publish-status-placeholder')[0];
+        YAHOO.Bubbling.fire("vgrUpdatePublishStatus",
+            {
+              nodeRef: this.options.nodeRef.replace("://","/"),
+              imagePlaceholder: placeholder
+            });
       }
    };
    
    function _constructPublishStatusPlaceholder() {
-     var indicator = new YAHOO.util.Element(document.createElement('div'));
+     var indicator = new YAHOO.util.Element(document.createElement('img'));
      indicator.addClass('status-icon');
      //indicator.addClass('hidden');
-     indicator.set('id', "vgr-publish-status");
+     indicator.set('id', "vgr-publish-status-placeholder");
+     //indicator.set('src', Alfresco.constants.URL_RESCONTEXT + "components/documentlibrary/indicators/loading.gif");
      return indicator;
    }
 
