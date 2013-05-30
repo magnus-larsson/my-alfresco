@@ -103,9 +103,9 @@ function getDocumentItem(node) {
     if (node.properties["vgr:pushed-for-unpublish"] == null && node.properties["vgr:pushed-for-publish"] == null) {
       requestId = "";
     } else if (node.properties["vgr:pushed-for-unpublish"] == null) {
-      requestId = "publish" "_" "workspace://SpacesStore/"  node.id  "_"  node.properties["vgr:pushed-for-publish"].getTime();
+      requestId = "publish" + "_" + "workspace://SpacesStore/" + node.id + "_" + node.properties["vgr:pushed-for-publish"].getTime();
     } else {
-      requestId = "unpublish" "_" "workspace://SpacesStore/"  node.id  "_"  node.properties["vgr:pushed-for-unpublish"].getTime();
+      requestId = "unpublish" + "_" + "workspace://SpacesStore/" + node.id + "_" + node.properties["vgr:pushed-for-unpublish"].getTime();
     }
 	  
 	  // change the language to ISO standard

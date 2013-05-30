@@ -55,6 +55,8 @@ public class ScriptVgrDokTest {
         will(returnValue(searchResult));
         oneOf(searchResult).iterator();
         will(returnIterator(nodes));
+        oneOf(searchResult).close();
+        will(returnValue(null));
         oneOf(row1).getNodeRef();
         will(returnValue(nodeRef1));
         oneOf(storageService).getPublishedNodeRef(nodeRef1);

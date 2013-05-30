@@ -141,7 +141,7 @@ public class StorageServiceTest {
 
     storageService.publishToStorage(sourceNodeRef);
   }
-
+/*
   @Test
   public void testPublishToStorageNodeRef() {
     fail("Not yet implemented");
@@ -166,7 +166,7 @@ public class StorageServiceTest {
   public void testCreatePdfRendition() {
     fail("Not yet implemented");
   }
-
+*/
   private String getYear() {
     final Calendar calendar = Calendar.getInstance();
 

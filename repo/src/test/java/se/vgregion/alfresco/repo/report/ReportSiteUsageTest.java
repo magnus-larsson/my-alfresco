@@ -125,6 +125,13 @@ public class ReportSiteUsageTest {
     rsu.setNodeService(nodeService);
     rsu.setSiteService(siteService);
 
+    context.checking(new Expectations() {
+      {
+        allowing(nodeService).exists(with(any(NodeRef.class)));
+        will(returnValue(false));
+      }
+    });
+    
     try {
       rsu.getSiteSize(siteNodeRef1);
       fail();
