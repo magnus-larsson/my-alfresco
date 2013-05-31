@@ -103,11 +103,13 @@
     <dependency>
       <groupId>org.jmock</groupId>
       <artifactId>jmock-legacy</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jmock</groupId>
       <artifactId>jmock-junit4</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -159,10 +161,10 @@
 
 
     <dependency>
-      <groupId>org.alfresco.enterprise</groupId>
-      <artifactId>alfresco-enterprise-repo</artifactId>
-      <version>4.1.2</version>
+      <groupId>${alfresco.groupId}</groupId>
+      <artifactId>alfresco-enterprise-repository</artifactId>
       <scope>provided</scope>
+      <version>${alfresco.version}</version>
     </dependency>
 
     <dependency>
@@ -242,13 +244,13 @@
     </dependency>
 
     <dependency>
-      <groupId>org.alfresco.enterprise</groupId>
+      <groupId>${alfresco.groupId}</groupId>
       <artifactId>alfresco-remote-api</artifactId>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
-      <groupId>org.alfresco.enterprise</groupId>
+      <groupId>${alfresco.groupId}</groupId>
       <artifactId>alfresco-web-client</artifactId>
       <scope>provided</scope>
       <exclusions>
