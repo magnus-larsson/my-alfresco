@@ -128,6 +128,13 @@
       <div class="node-action">
 
       <#if showDownload == "true" && node.contentURL??>
+         <!-- Reload Button -->
+         <span class="yui-button yui-link-button onReloadDocumentClick">
+            <span class="first-child">
+               <a href="javascript:document.location=document.location;" tabindex="0">${msg("button.reload")}</a>
+            </span>
+         </span>
+         
          <!-- Download Button -->
          <span class="yui-button yui-link-button onDownloadDocumentClick">
             <span class="first-child">
