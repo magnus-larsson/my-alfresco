@@ -20,15 +20,16 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.alfresco.enterprise</groupId>
+      <groupId>${alfresco.groupId}</groupId>
       <artifactId>alfresco-web-framework-commons</artifactId>
+      <version>${alfresco.version}</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
-      <groupId>org.alfresco.enterprise</groupId>
+      <groupId>${alfresco.groupId}</groupId>
       <artifactId>alfresco-share</artifactId>
-      <version>4.1.4</version>
+      <version>${alfresco.version}</version>
       <scope>provided</scope>
     </dependency>
 
