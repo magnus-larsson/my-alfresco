@@ -4,7 +4,7 @@
 
    Alfresco.WebPreview.prototype.Plugins.Embed.prototype.display = function() {
       var self = this;
-      
+
       var url = this.attributes.src ? this.wp.getThumbnailUrl(this.attributes.src) : this.wp.getContentUrl(), displaysource, previewHeight;
 
       // add the toolbar (will be shown if Adobe Acrobat)
@@ -52,3 +52,47 @@
    };
 
 }(Alfresco.WebPreview.prototype.Plugins.Embed.prototype.display));
+
+(function(onComponentsLoaded) {
+
+   var Dom = YAHOO.util.Dom, Selector = YAHOO.util.Selector, Event = YAHOO.util.Event;
+
+   Alfresco.WebPreview.prototype.Plugins.Embed.prototype.onComponentsLoaded = function() {
+      onComponentsLoaded.call(this);
+      
+      Alfresco.thirdparty.addTitleText(this);
+   };
+
+}(Alfresco.WebPreview.prototype.Plugins.Embed.prototype.onComponentsLoaded));
+
+(function(onComponentsLoaded) {
+
+   var Dom = YAHOO.util.Dom, Selector = YAHOO.util.Selector, Event = YAHOO.util.Event;
+
+   Alfresco.WebPreview.prototype.Plugins.PdfJs.prototype.onComponentsLoaded = function() {
+      onComponentsLoaded.call(this);
+      
+      Alfresco.thirdparty.addTitleText(this);
+   };
+
+}(Alfresco.WebPreview.prototype.Plugins.PdfJs.prototype.onComponentsLoaded));
+
+(function() {
+   
+   Alfresco.thirdparty = Alfresco.thirdparty || {};
+
+   Alfresco.thirdparty.addTitleText = function (scope) {
+      var result = Selector.query('div.node-info span.document-version');
+      
+      if (result.length > 0) {
+         var titleNote = document.createElement('span');
+         
+         Dom.addClass(titleNote, 'title-note');
+         
+         titleNote.innerHTML = '(' + scope.wp.msg('preview.title-text') + ')';
+         
+         result[0].parentNode.appendChild(titleNote);
+      }
+   };
+   
+})();

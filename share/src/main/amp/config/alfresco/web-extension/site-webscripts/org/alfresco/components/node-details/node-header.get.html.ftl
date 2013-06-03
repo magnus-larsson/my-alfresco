@@ -131,7 +131,7 @@
          <!-- Reload Button -->
          <span class="yui-button yui-link-button onReloadDocumentClick">
             <span class="first-child">
-               <a href="javascript:document.location=document.location;" tabindex="0">${msg("button.reload")}</a>
+               <a href="javascript:void(0);" tabindex="0">${msg("button.reload")}</a>
             </span>
          </span>
          
