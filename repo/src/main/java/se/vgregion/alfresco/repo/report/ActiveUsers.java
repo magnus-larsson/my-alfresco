@@ -15,6 +15,7 @@ import org.alfresco.service.cmr.audit.AuditService.AuditQueryCallback;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.security.NoSuchPersonException;
 import org.alfresco.service.cmr.security.PersonService;
 import org.apache.log4j.Logger;
 
@@ -58,7 +59,14 @@ public class ActiveUsers {
     List<UserLoginDetails> activeUsers = getActiveUsers();
 
     for (UserLoginDetails user : activeUsers) {
-      NodeRef person = _personService.getPerson(user.getUserName(), false);
+      NodeRef person = null;
+      try {
+        person = _personService.getPerson(user.getUserName(), false);
+      } catch (NoSuchPersonException ex) {
+        LOG.warn("Could not find person "+ user.getUserName(), ex);
+        continue;
+      }
+      
 
       List<ChildAssociationRef> parentAssocs = _nodeService.getParentAssocs(person);
 
