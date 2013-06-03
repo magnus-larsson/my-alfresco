@@ -9,8 +9,8 @@
 	"users": [
 	    <#list internal.users as user>
 	    {
-	    "userName": "${user.userName}",
-	    "fullName": "${user.fullName}",
+	    "userName": "${user.userName?js_string}",
+	    "fullName": "${user.fullName?js_string}",
 	    "logins": "${user.logins?round}",
 	    "lastActivity": "${user.lastActivity?datetime}"
 	    }<#if user_has_next>,</#if>
@@ -26,8 +26,8 @@
 	"users": [
 	    <#list external.users as user>
 	    {
-	    "userName": "${user.userName}",
-	    "fullName": "${user.fullName}",
+	    "userName": "${user.userName?js_string}",
+	    "fullName": "${user.fullName?js_string}",
 	    "logins": "${user.logins?round}",
 	    "lastActivity": "${user.lastActivity?datetime}"
 	    }<#if user_has_next>,</#if>
