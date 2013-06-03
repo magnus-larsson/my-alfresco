@@ -7,6 +7,8 @@ import org.alfresco.service.cmr.repository.NodeRef;
 
 public interface PushService {
 
+  public boolean pingPush();
+  
   public boolean pushFile(NodeRef nodeRef);
 
   public boolean pushFiles(List<NodeRef> nodeRefs);

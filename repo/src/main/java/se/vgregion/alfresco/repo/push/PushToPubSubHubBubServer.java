@@ -101,12 +101,32 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
       }
     }, AuthenticationUtil.getSystemUserName());
 
+    final RetryingTransactionCallback<Void> executionUpdate = new RetryingTransactionCallback<Void>() {
+      @Override
+      public Void execute() throws Throwable {
+        executeUpdate(publishedDocuments, unpublishedDocuments);
+        return null;
+      }
+    };
+
     // Push the nodes
     final RetryingTransactionCallback<Boolean> executionPush = new RetryingTransactionCallback<Boolean>() {
       @Override
       public Boolean execute() throws Throwable {
-        executeUpdate(publishedDocuments, unpublishedDocuments);
-        return executePush(publishedDocuments, unpublishedDocuments);
+        if (_test || _pushService.pingPush()) {
+          // We need to commit the updates before we can push the documents so
+          // that we can guarantee that the Push server reads the correct
+          // results from the feed
+          AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>() {
+            @Override
+            public Void doWork() throws Exception {
+              return _transactionService.getRetryingTransactionHelper().doInTransaction(executionUpdate, false, true);
+            }
+          }, AuthenticationUtil.getSystemUserName());
+          return executePush(publishedDocuments, unpublishedDocuments);
+        } else {
+          return false;
+        }
       }
     };
 
