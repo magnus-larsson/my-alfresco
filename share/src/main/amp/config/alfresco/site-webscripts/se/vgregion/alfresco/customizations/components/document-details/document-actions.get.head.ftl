@@ -3,3 +3,4 @@
 <!-- document-actions.get.head.ftl -->
 
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/res/components/document-details/vgr-document-actions.css" />
+<@script type="text/javascript" src="${page.url.context}/res/components/document-details/vgr-document-actions.js"></@script>

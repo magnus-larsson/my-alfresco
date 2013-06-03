@@ -31,3 +31,34 @@
    };
 
 }(Alfresco.DocumentListViewRenderer.prototype.renderCellDescription));
+
+(function(onActionEditOffline) {
+
+   Alfresco.DocumentList.prototype.onActionEditOffline = function(record) {
+      var self = this;
+      
+      if (record.node.size == 0) {
+         Alfresco.util.PopupManager.displayMessage({
+            text : this.msg("message.edit-offline.nocontent", record.displayName)
+         });
+
+         return;
+      }
+
+      Alfresco.util.PopupManager.displayPrompt({
+         title: this.msg("message.edit-offline.observe"),
+         text: this.msg("message.edit-offline.observe.information"),
+         modal: true,
+         buttons: [{
+            text: self.msg("button.ok"),
+            handler: function () {
+               this.destroy();
+               
+               onActionEditOffline.call(self, record);
+            },
+            isDefault: true
+         }]
+      });
+   };
+
+}(Alfresco.DocumentList.prototype.onActionEditOffline));

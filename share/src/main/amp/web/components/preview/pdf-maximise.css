@@ -1,0 +1,37 @@
+html {
+    overflow-y: hidden;
+    overflow-x: hidden;
+}
+
+body {
+    overflow-y: hidden;
+    overflow-x: hidden;
+}
+
+div#pdf-maximise {
+    overflow-y: hidden;
+    overflow-x: hidden;
+}
+
+div#pdf-maximise div#pdf {
+    overflow-y: hidden;
+    overflow-x: hidden;
+}
+
+div#pdf-maximise div#toolbar {
+    height: 30px;
+    border-bottom: 1px solid black;
+    background-color: #ddd;
+}
+
+div#pdf-maximise div#toolbar a {
+    float: right;
+    margin: 7px 14px 7px 7px;
+    width: 16px;
+    height: 16px;
+    border: none;
+}
+
+div#pdf-maximise div#toolbar a img {
+    border: none;
+}

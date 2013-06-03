@@ -2,11 +2,13 @@
 
    Alfresco.component.NodeHeader.prototype.onReady = function() {
       onReady.call(this);
+      
       var status = this.options.status;
 
       var icon = YAHOO.util.Selector.query('img.node-thumbnail')[0];
       
       var indicators = _constructStatusIcons(this.options.status, this);
+      
       if (this.options.isContainer === true) {
          for ( var x = 0; x < indicators.length; x++) {
             var indicator = indicators[x];
@@ -23,6 +25,13 @@
               imagePlaceholder: placeholder
             });
       }
+      
+      // add on click on reload document button
+      var anchor = YAHOO.util.Selector.query('span.onReloadDocumentClick span.first-child a')[0];
+      
+      YAHOO.util.Event.addListener(anchor, 'click', function(e) {
+         location.reload();
+      });
    };
    
    function _constructPublishStatusPlaceholder() {

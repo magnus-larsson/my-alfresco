@@ -122,5 +122,16 @@
 
     </module>
 
+    <module>
+      <id>VGR Embed Viewer</id>
+      <customizations>
+        <customization>
+          <targetPackageRoot>org.alfresco.components.preview</targetPackageRoot>
+          <sourcePackageRoot>se.vgregion.alfresco.customizations.media-previews.embed</sourcePackageRoot>
+        </customization>
+      </customizations>
+      <auto-deploy>true</auto-deploy>
+    </module>
+
   </modules>
 </extension>

@@ -1,5 +1,5 @@
 (function(renderAction) {
-   
+
    var $html = Alfresco.util.encodeHTML;
    var $isValueSet = Alfresco.util.isValueSet;
    var $siteURL = Alfresco.util.siteURL;
@@ -53,10 +53,91 @@
             Alfresco.logger.warn("Action configuration error: Missing 'function' parameter for actionId: ", p_action.id);
          }
       } else if (p_action.type === "header") {
-               
+
       }
-      
+
       return YAHOO.lang.substitute(actionTypeMarkup[p_action.type], markupParams);
    };
 
 }(Alfresco.doclib.Actions.prototype.renderAction));
+
+(function() {
+
+   Alfresco.doclib.Actions.prototype._launchOnlineEditorDisplayPrompt = function(callback) {
+      Alfresco.util.PopupManager.displayPrompt({
+         title : this.msg("actions.document.edit-online"),
+         text : "<span style='color: red'>" + this.msg("actions.document.edit-online.information") + "</span>",
+         modal : true,
+         noEscape : true,
+         buttons : [ {
+            text : this.msg("button.ok"),
+            handler : function() {
+               this.destroy();
+               
+               callback();
+            },
+            isDefault : true
+         } ]
+      });
+   };
+
+}());
+
+(function(_launchOnlineEditorIE) {
+
+   Alfresco.doclib.Actions.prototype._launchOnlineEditorIE = function(controlProgID, record, appProgID) {
+      this._launchOnlineEditorDisplayPrompt(function() {
+         var result = _launchOnlineEditorIE.call(this, controlProgID, record, appProgID);
+
+         if (result) {
+            YAHOO.Bubbling.fire("metadataRefresh");
+         } else {
+            Alfresco.util.PopupManager.displayMessage({
+               text : this.msg("message.edit-online.office.failure")
+            });
+         }
+      });
+
+      return;
+   };
+
+}(Alfresco.doclib.Actions.prototype._launchOnlineEditorIE));
+
+(function(_launchOnlineEditorPlugin) {
+
+   Alfresco.doclib.Actions.prototype._launchOnlineEditorPlugin = function(record, appProgID) {
+      this._launchOnlineEditorDisplayPrompt(function() {
+         var result = _launchOnlineEditorPlugin.call(this, record, appProgID);
+
+         if (result) {
+            YAHOO.Bubbling.fire("metadataRefresh");
+         } else {
+            Alfresco.util.PopupManager.displayMessage({
+               text : this.msg("message.edit-online.office.failure")
+            });
+         }
+
+      });
+
+      return;
+   };
+
+}(Alfresco.doclib.Actions.prototype._launchOnlineEditorPlugin));
+
+(function(onActionEditOnline) {
+
+   Alfresco.doclib.Actions.prototype.onActionEditOnline = function(record, appProgID) {
+      var result = this._launchOnlineEditor(record);
+
+      if (result == null) {
+         return;
+      } else if (!result) {
+         Alfresco.util.PopupManager.displayMessage({
+            text : this.msg("message.edit-online.office.failure")
+         });
+      }
+
+      return;
+   };
+
+}(Alfresco.doclib.Actions.prototype.onActionEditOnline));
