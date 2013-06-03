@@ -774,7 +774,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
       @Override
       public Boolean execute() throws Throwable {
-        _behaviourFilter.disableAllBehaviours();
+        _behaviourFilter.disableBehaviour();
 
         final NodeRef nodeRef = node.getNodeRef();
 
@@ -796,7 +796,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
           return false;
         }
 
-        _behaviourFilter.enableAllBehaviours();
+        _behaviourFilter.enableBehaviour();
 
         LOG.info("Create PDF/A for: " + nodeRef);
 
