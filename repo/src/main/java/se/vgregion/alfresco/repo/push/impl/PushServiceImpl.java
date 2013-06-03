@@ -75,17 +75,9 @@ public class PushServiceImpl implements PushService, InitializingBean {
     if (_dumpFeed) {
       dumpFeed();
     }
-    
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Pinging PuSH server");
-    }
-
-    if (!_serviceUtils.pingServer(_pushServerUrl)) {
-      LOG.warn("Can't contact PuSH server for feed '" + _feedUrl + "', exiting...");
-
+    if (!pingPush()) {
       return false;
     }
-
     final HttpClient client = new HttpClient();
 
     final PostMethod post = new UTF8PostMethod(_pushServerUrl);
@@ -264,6 +256,21 @@ public class PushServiceImpl implements PushService, InitializingBean {
     Assert.hasText(_feedUrl);
     Assert.hasText(_pushServerUrl);
     Assert.notNull(_searchService);
+  }
+
+  @Override
+  public boolean pingPush() {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Pinging PuSH server");
+    }
+
+    if (!_serviceUtils.pingServer(_pushServerUrl)) {
+      LOG.warn("Can't contact PuSH server for feed '" + _feedUrl + "', exiting...");
+
+      return false;
+    } else {
+      return true;
+    }
   }
 
 }
