@@ -7,6 +7,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy;
 import org.alfresco.repo.policy.Behaviour;
 import org.alfresco.repo.policy.JavaBehaviour;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.lock.LockStatus;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -26,13 +27,22 @@ public class PropertyReplicationPolicy extends AbstractPolicy implements OnUpdat
 
   @Override
   public void onUpdateProperties(final NodeRef nodeRef, final Map<QName, Serializable> before, final Map<QName, Serializable> after) {
-    _behaviourFilter.disableAllBehaviours();
+    // Run as system user to prevent certain access restriction errors which may
+    // appear when property updates are made by alfresco when new renditions are
+    // created
+    AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>() {
+      @Override
+      public Void doWork() throws Exception {
+        _behaviourFilter.disableBehaviour();
+        try {
+          updateProperties(nodeRef);
+        } finally {
+          _behaviourFilter.enableBehaviour();
+        }
+        return null;
+      }
 
-    try {
-      updateProperties(nodeRef);
-    } finally {
-      _behaviourFilter.enableAllBehaviours();
-    }
+    }, AuthenticationUtil.getSystemUserName());
   }
 
   private void updateProperties(final NodeRef nodeRef) {
@@ -117,7 +127,7 @@ public class PropertyReplicationPolicy extends AbstractPolicy implements OnUpdat
 
   /**
    * Replicate the title only if it's not set.
-   *
+   * 
    * @param nodeRef
    */
   private void setTitle(final NodeRef nodeRef) {

@@ -356,7 +356,9 @@
 
   <bean id="pdfa" class="se.vgregion.alfresco.repo.rendition.executer.PdfaRenderingEngine" parent="baseRenderingAction" />
 
-  <bean id="pdfapilot" class="se.vgregion.alfresco.repo.rendition.executer.PdfaPilotRenderingEngine" parent="baseRenderingAction" />
+  <bean id="pdfapilot" class="se.vgregion.alfresco.repo.rendition.executer.PdfaPilotRenderingEngine" parent="baseRenderingAction">
+    <property name="policyBehaviourFilter" ref="policyBehaviourFilter" />
+  </bean>
 
   <!-- *************************************************** -->
   <!-- Rendering engine for rendering PDF/A compliant PDFs -->

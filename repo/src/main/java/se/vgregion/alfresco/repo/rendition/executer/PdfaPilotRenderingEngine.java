@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.rendition.executer.AbstractTransformationRenderingEngine;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
@@ -21,6 +22,8 @@ public class PdfaPilotRenderingEngine extends AbstractTransformationRenderingEng
 
   public static final String PARAM_OPTIMIZE = "optimize";
 
+  private BehaviourFilter _behaviourFilter;
+  
   @Override
   protected TransformationOptions getTransformOptions(RenderingContext context) {
     return getTransformOptionsImpl(new PdfaPilotTransformationOptions(), context);
@@ -28,9 +31,13 @@ public class PdfaPilotRenderingEngine extends AbstractTransformationRenderingEng
 
   @Override
   protected TransformationOptions getTransformOptionsImpl(TransformationOptions options, RenderingContext context) {
-    options.setSourceNodeRef(context.getSourceNode());
-    options.setTargetNodeRef(context.getDestinationNode());
-
+    try {    
+      _behaviourFilter.disableBehaviour(ContentModel.ASPECT_VERSIONABLE);
+      options.setSourceNodeRef(context.getSourceNode());
+      options.setTargetNodeRef(context.getDestinationNode());
+    } finally {
+      _behaviourFilter.enableBehaviour(ContentModel.ASPECT_VERSIONABLE);
+    }
     PdfaPilotTransformationOptions transformationOptions = (PdfaPilotTransformationOptions) options;
 
     String level = context.getCheckedParam(PARAM_LEVEL, String.class);
@@ -63,5 +70,9 @@ public class PdfaPilotRenderingEngine extends AbstractTransformationRenderingEng
     paramList.add(new ParameterDefinitionImpl(PARAM_OPTIMIZE, DataTypeDefinition.BOOLEAN, false, getParamDisplayLabel(PARAM_OPTIMIZE)));
 
     return paramList;
+  }
+
+  public void setPolicyBehaviourFilter(BehaviourFilter _behaviourFilter) {
+    this._behaviourFilter = _behaviourFilter;
   }
 }
