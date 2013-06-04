@@ -55,7 +55,7 @@ public abstract class ClusteredExecuter implements InitializingBean {
     }
 
     // Bypass if the system is bootstrapping
-    if (_repositoryState.isBootstrapping()) {
+    if (_repositoryState != null && _repositoryState.isBootstrapping()) {
       LOG.debug(getJobName() + " bypassed; the system is bootstrapping.");
 
       return;
