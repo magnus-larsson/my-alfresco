@@ -3,7 +3,7 @@
 
     <module>
       <id>VGR Global</id>
-      <auto-deploy>true</auto-deploy>
+      <auto-deploy>false</auto-deploy>
 
       <!-- Base evaluator that decides if any of the component bindings should be used at all -->
       <evaluator type="site.module.evaluator">
