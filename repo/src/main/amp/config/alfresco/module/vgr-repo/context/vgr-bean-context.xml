@@ -93,6 +93,17 @@
     </property>
   </bean>
 
+  <bean id="activitiesResourceBundles" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+    <property name="resourceBundles">
+      <list>
+        <value>alfresco.messages.activities-service</value>
+        <value>alfresco.messages.activity-list</value>
+        <value>alfresco.module.vgr-repo.context.messages.activity-list</value>
+        <value>alfresco.messages.slingshot</value>
+      </list>
+    </property>
+  </bean>
+
   <!-- *********************************** -->
   <!-- LDAP search in the Portal Directory -->
   <!-- *********************************** -->
