@@ -2,9 +2,15 @@
 
    var Dom = YAHOO.util.Dom, Selector = YAHOO.util.Selector, Event = YAHOO.util.Event;
 
+   /**
+    * Does multiple stuff:
+    * 
+    * - adds toolbar=1 to the PDF url to instruct Adobe Reader to view the toolbar
+    * - adds a maximise button to the page
+    */
    Alfresco.WebPreview.prototype.Plugins.Embed.prototype.display = function() {
       var self = this;
-      
+
       var url = this.attributes.src ? this.wp.getThumbnailUrl(this.attributes.src) : this.wp.getContentUrl(), displaysource, previewHeight;
 
       // add the toolbar (will be shown if Adobe Acrobat)
@@ -52,3 +58,56 @@
    };
 
 }(Alfresco.WebPreview.prototype.Plugins.Embed.prototype.display));
+
+/**
+ * Overloaded function to add the 'preview as PDF' text to document details
+ */
+(function(onComponentsLoaded) {
+
+   var Dom = YAHOO.util.Dom, Selector = YAHOO.util.Selector, Event = YAHOO.util.Event;
+
+   Alfresco.WebPreview.prototype.Plugins.Embed.prototype.onComponentsLoaded = function() {
+      onComponentsLoaded.call(this);
+      
+      Alfresco.thirdparty.addTitleText(this);
+   };
+
+}(Alfresco.WebPreview.prototype.Plugins.Embed.prototype.onComponentsLoaded));
+
+/**
+ * Overloaded function to add the 'preview as PDF' text to document details
+ */
+(function(onComponentsLoaded) {
+
+   var Dom = YAHOO.util.Dom, Selector = YAHOO.util.Selector, Event = YAHOO.util.Event;
+
+   Alfresco.WebPreview.prototype.Plugins.PdfJs.prototype.onComponentsLoaded = function() {
+      onComponentsLoaded.call(this);
+      
+      Alfresco.thirdparty.addTitleText(this);
+   };
+
+}(Alfresco.WebPreview.prototype.Plugins.PdfJs.prototype.onComponentsLoaded));
+
+/**
+ * Function for adding a 'preview as PDF' text to the document details page.
+ */
+(function() {
+   
+   Alfresco.thirdparty = Alfresco.thirdparty || {};
+
+   Alfresco.thirdparty.addTitleText = function (scope) {
+      var result = Selector.query('div.node-info span.document-version');
+      
+      if (result.length > 0) {
+         var titleNote = document.createElement('span');
+         
+         Dom.addClass(titleNote, 'title-note');
+         
+         titleNote.innerHTML = '(' + scope.wp.msg('preview.title-text') + ')';
+         
+         result[0].parentNode.appendChild(titleNote);
+      }
+   };
+   
+})();

@@ -13,3 +13,7 @@
 .node-header .node-action {
    width: 23%;
 }
+
+.node-header .node-info span.title-note {
+   color: #606060; font-weight: normal; padding-left: 5px; font-size: 13px;
+}
