@@ -28,6 +28,10 @@
 
       Alfresco.util.YUILoaderHelper.require([ "tabview" ], this.onComponentsLoaded, this);
       Alfresco.util.YUILoaderHelper.loadComponents();
+      
+      YAHOO.util.Event.onContentReady(this.wp.id + '-embed', function() {
+         YAHOO.lang.later(100, self, self._hideShowIframe);
+      });
 
       var nodeAction = Selector.query('div.node-action')[0];
       nodeAction.style.width = '30%';
@@ -70,6 +74,13 @@
       onComponentsLoaded.call(this);
       
       Alfresco.thirdparty.addTitleText(this);
+      
+      // Attach to links to capture action events (the yui buttons swallows the above)
+      var buttons = Selector.query('span.yui-button button');
+      
+      for (button in buttons) {
+         Event.addListener(buttons[button], "click", this.onClick, this, true);
+      }
    };
 
 }(Alfresco.WebPreview.prototype.Plugins.Embed.prototype.onComponentsLoaded));
