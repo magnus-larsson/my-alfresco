@@ -1,4 +1,4 @@
-<#-- projects/slingshot/config/alfresco/site-webscripts/org/alfresco/components/people-finder/people-finder.get.html.ftl -->
+<#-- @overridden projects/slingshot/config/alfresco/site-webscripts/org/alfresco/components/people-finder/people-finder.get.html.ftl -->
 
 <#assign el=args.htmlid?html>
 <script type="text/javascript">//<![CDATA[

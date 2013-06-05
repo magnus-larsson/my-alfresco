@@ -1,3 +1,5 @@
+<#-- @overridden projects/slingshot/config/alfresco/site-webscripts/org/alfresco/components/profile/userprofile.get.html.ftl -->
+
 <#assign el=args.htmlid>
 <script type="text/javascript">//<![CDATA[
    var userProfile = new Alfresco.UserProfile("${el}").setOptions(
