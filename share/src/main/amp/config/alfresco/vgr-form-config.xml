@@ -92,8 +92,8 @@
           </field>
           <field id="vgr:dc.subject.keywords" label-id="vgr.dc.subject.keywords" set="dokumentbeskrivning">
             <control template="/se/vgregion/alfresco/components/form/controls/treeselect.ftl">
-              <control-param name="ds">/page/components/treeview/kiv</control-param>
-              <control-param name="get">/page/components/nodes/kiv</control-param>
+              <control-param name="ds">/page/components/treeview/keywords</control-param>
+              <control-param name="get">/page/components/nodes/keywords</control-param>
               <control-param name="optionSeparator">#alf#</control-param>
               <!-- Here the fetchKeywords must be set to false as the document is not yet saved -->
               <control-param name="fetchKeywords">false</control-param>
@@ -815,8 +815,8 @@
           <set id="sokstod" appearance="accordion" label-id="vgr.set.sokstod" parent="standardmetadata" />
           <field id="vgr:dc.subject.keywords" label-id="vgr.dc.subject.keywords" set="sokstod">
             <control template="/se/vgregion/alfresco/components/form/controls/treeselect.ftl">
-              <control-param name="ds">/page/components/treeview/kiv</control-param>
-              <control-param name="get">/page/components/nodes/kiv</control-param>
+              <control-param name="ds">/page/components/treeview/keywords</control-param>
+              <control-param name="get">/page/components/nodes/keywords</control-param>
               <control-param name="optionSeparator">#alf#</control-param>
               <!-- Here the fetchKeywords must be set to false as it's not a document that's being handled but a folder -->
               <control-param name="fetchKeywords">false</control-param>
