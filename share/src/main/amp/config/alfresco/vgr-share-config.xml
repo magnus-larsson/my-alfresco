@@ -16,7 +16,7 @@
 
     <flags>
       <!-- Developer debugging setting to turn on DEBUG mode for client scripts in the browser -->
-      <client-debug>false</client-debug>
+      <client-debug>true</client-debug>
 
       <!-- LOGGING can always be toggled at runtime when in DEBUG mode (Ctrl, Ctrl, Shift, Shift). This flag automatically activates logging on page load. -->
       <client-debug-autologging>false</client-debug-autologging>
@@ -57,16 +57,16 @@
             <item type="user" id="status">{userprofilepage}</item>
             <item type="link" id="my-profile">{userprofilepage}</item>
             <item type="link" id="change-password" condition="user.capabilities.isMutable">/user/change-password</item>
-            <item type="external-link" id="help-external" icon="">{share-help-external}</item>
-            <item type="external-link" id="help-internal" icon="">{share-help-internal}</item>
+            <item type="external-link" id="help-external" icon="help.png">{share-help-external}</item>
+            <item type="external-link" id="help-internal" icon="help.png">{share-help-internal}</item>
             <item type="link" id="logout" condition="!context.externalAuthentication">/dologout</item>
           </container-group>
         </item>
         <item type="js" id="tycktill" label="Tyck till" icon="">Alfresco.thirdparty.module.TyckTill</item>
         <item type="container" id="help" icon="">
           <container-group id="helpmenu" label="">
-            <item type="external-link" id="help-external" icon="">{share-help-external}</item>
-            <item type="external-link" id="help-internal" icon="">{share-help-internal}</item>
+            <item type="external-link" id="help-external" icon="help.png">{share-help-external}</item>
+            <item type="external-link" id="help-internal" icon="help.png">{share-help-internal}</item>
           </container-group>
         </item>
       </user-items>
@@ -92,8 +92,14 @@
       <!-- Developers can set mode to 'development' to disable; SpringSurf caches, FreeMarker template caching and Rhino JavaScript compilation. -->
       <autowire>
         <!-- Pick the mode: "production" or "development" -->
-        <mode>production</mode>
+        <mode>development</mode>
       </autowire>
+
+      <module-deployment>
+        <!-- Allow extension modules with <auto-deploy> set to true to be automatically deployed -->
+        <mode>manual</mode>
+        <enable-auto-deploy-modules>true</enable-auto-deploy-modules>
+      </module-deployment>
 
       <!-- This is the user factory we use to provide the user object in share with the specific properties for VGR -->
       <defaults>
@@ -181,7 +187,7 @@
     </indicators>
   </config>
 
-   <!-- DocLibCustom section -->
+  <!-- DocLibCustom section -->
   <config evaluator="string-compare" condition="DocLibCustom">
     <dependencies>
       <js src="/components/documentlibrary/vgr-publish-status.js" />
