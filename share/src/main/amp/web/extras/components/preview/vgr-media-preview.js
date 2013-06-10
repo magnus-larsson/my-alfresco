@@ -1,38 +1,78 @@
-(function(display) {
+(function(onReady) {
 
    var Dom = YAHOO.util.Dom, Selector = YAHOO.util.Selector, Event = YAHOO.util.Event;
 
-   /**
-    * Does multiple stuff:
-    * 
-    * - adds toolbar=1 to the PDF url to instruct Adobe Reader to view the toolbar
-    * - adds a maximise button to the page
-    */
-   Alfresco.WebPreview.prototype.Plugins.Embed.prototype.display = function() {
+   Alfresco.WebPreview.prototype.onReady = function() {
       var self = this;
-
-      var url = this.attributes.src ? this.wp.getThumbnailUrl(this.attributes.src) : this.wp.getContentUrl(), displaysource, previewHeight;
-
-      // add the toolbar (will be shown if Adobe Acrobat)
-      url = url + '#toolbar=1';
-
-      previewHeight = this.wp.setupPreviewSize();
-
-      displaysource = '<div class="iframe-view-controls"><div class="iframe-viewer-button">';
-      displaysource += '<a title="View In Browser" class="simple-link" href="' + url;
-      displaysource += '" target="_blank" style="background-image:url(' + Alfresco.constants.URL_RESCONTEXT + 'components/documentlibrary/actions/document-view-content-16.png)">';
-      displaysource += '<span>' + Alfresco.util.message("actions.document.view") + ' </span></a></div></div>'
-      // Set the iframe
-      displaysource += '<iframe id="' + this.wp.id + '-embed" name="Embed" src="' + url + '" scrolling="yes" marginwidth="0" marginheight="0" frameborder="0" vspace="0" hspace="0"  style="height:'
-               + (previewHeight - 10).toString() + 'px; width:100%"></iframe>';
-
-      Alfresco.util.YUILoaderHelper.require([ "tabview" ], this.onComponentsLoaded, this);
-      Alfresco.util.YUILoaderHelper.loadComponents();
       
-      YAHOO.util.Event.onContentReady(this.wp.id + '-embed', function() {
-         YAHOO.lang.later(100, self, self._hideShowIframe);
-      });
+      onReady.call(this);
 
+      if (this.plugin instanceof Alfresco.WebPreview.prototype.Plugins.Embed) {
+         // first add the toolbar to the src for Adobe Acrobat plugin
+         var iframe = Dom.get(this.id + '-embed');
+         
+         if (iframe) {
+            iframe.src = iframe.src + '#toolbar=1';
+         }
+
+         // fix so that the iframe is positioned above the Adobe Reader plugin
+         Event.onContentReady(this.id + '-embed', function() {
+            // Delay the check slightly, so that the panel has time to display and be detected
+            YAHOO.lang.later(100, self.plugin, self.plugin._hideShowIframe);
+            // Again, because it may be to fast. We want fast, but depends on browser and hardware.
+            // To slow and its is "blinking". So do it twice.
+            YAHOO.lang.later(300, self.plugin, self.plugin._hideShowIframe);
+         });
+
+         // Attach to links to capture action events (the yui buttons swallows the above)
+         var buttons = Selector.query('span.yui-button button');
+         
+         for (button in buttons) {
+            Event.addListener(buttons[button], "click", function() {
+               // Delay the check slightly, so that the panel has time to display and be detected
+               YAHOO.lang.later(100, self.plugin, self.plugin._hideShowIframe);
+               // Again, because it may be to fast. We want fast, but depends on browser and hardware.
+               // To slow and its is "blinking". So do it twice.
+               YAHOO.lang.later(300, self.plugin, self.plugin._hideShowIframe);
+            }, this, true);
+         }
+
+         Alfresco.thirdparty.addTitleText(this);
+         
+         Alfresco.thirdparty.addMaximiseButton(this);
+      }
+      
+      if (this.plugin instanceof Alfresco.WebPreview.prototype.Plugins.PdfJs) {
+         Alfresco.thirdparty.addTitleText(this);
+      }
+   };
+
+}(Alfresco.WebPreview.prototype.onReady));
+
+/**
+ * Function for adding a 'preview as PDF' text to the document details page.
+ */
+(function() {
+
+   var Dom = YAHOO.util.Dom, Selector = YAHOO.util.Selector, Event = YAHOO.util.Event;
+   
+   Alfresco.thirdparty = Alfresco.thirdparty || {};
+
+   Alfresco.thirdparty.addTitleText = function (scope) {
+      var result = Selector.query('div.node-info span.document-version');
+      
+      if (result.length > 0) {
+         var titleNote = document.createElement('span');
+         
+         Dom.addClass(titleNote, 'title-note');
+         
+         titleNote.innerHTML = '(' + scope.msg('preview.title-text') + ')';
+         
+         result[0].parentNode.appendChild(titleNote);
+      }
+   };
+   
+   Alfresco.thirdparty.addMaximiseButton = function(scope) {
       var nodeAction = Selector.query('div.node-action')[0];
       nodeAction.style.width = '30%';
       var nodeInfo = Selector.query('div.node-header div.node-info')[0];
@@ -51,74 +91,12 @@
       anchor.innerHTML = 'Fullskärm';
 
       Event.addListener(anchor, 'click', function(e) {
-         window.open(Alfresco.constants.URL_PAGECONTEXT + "pdf-maximise?nodeRef=" + self.wp.options.nodeRef, "_blank");
+         window.open(Alfresco.constants.URL_PAGECONTEXT + "pdf-maximise?nodeRef=" + scope.options.nodeRef, "_blank");
       });
 
       button.appendChild(firstChild);
       firstChild.appendChild(anchor);
       nodeAction.insertBefore(button, nodeAction.firstChild);
-
-      return displaysource;
-   };
-
-}(Alfresco.WebPreview.prototype.Plugins.Embed.prototype.display));
-
-/**
- * Overloaded function to add the 'preview as PDF' text to document details
- */
-(function(onComponentsLoaded) {
-
-   var Dom = YAHOO.util.Dom, Selector = YAHOO.util.Selector, Event = YAHOO.util.Event;
-
-   Alfresco.WebPreview.prototype.Plugins.Embed.prototype.onComponentsLoaded = function() {
-      onComponentsLoaded.call(this);
-      
-      Alfresco.thirdparty.addTitleText(this);
-      
-      // Attach to links to capture action events (the yui buttons swallows the above)
-      var buttons = Selector.query('span.yui-button button');
-      
-      for (button in buttons) {
-         Event.addListener(buttons[button], "click", this.onClick, this, true);
-      }
-   };
-
-}(Alfresco.WebPreview.prototype.Plugins.Embed.prototype.onComponentsLoaded));
-
-/**
- * Overloaded function to add the 'preview as PDF' text to document details
- */
-(function(onComponentsLoaded) {
-
-   var Dom = YAHOO.util.Dom, Selector = YAHOO.util.Selector, Event = YAHOO.util.Event;
-
-   Alfresco.WebPreview.prototype.Plugins.PdfJs.prototype.onComponentsLoaded = function() {
-      onComponentsLoaded.call(this);
-      
-      Alfresco.thirdparty.addTitleText(this);
-   };
-
-}(Alfresco.WebPreview.prototype.Plugins.PdfJs.prototype.onComponentsLoaded));
-
-/**
- * Function for adding a 'preview as PDF' text to the document details page.
- */
-(function() {
-   
-   Alfresco.thirdparty = Alfresco.thirdparty || {};
-
-   Alfresco.thirdparty.addTitleText = function (scope) {
-      var result = Selector.query('div.node-info span.document-version');
-      
-      if (result.length > 0) {
-         var titleNote = document.createElement('span');
-         
-         Dom.addClass(titleNote, 'title-note');
-         
-         titleNote.innerHTML = '(' + scope.wp.msg('preview.title-text') + ')';
-         
-         result[0].parentNode.appendChild(titleNote);
-      }
    };
    
 })();
