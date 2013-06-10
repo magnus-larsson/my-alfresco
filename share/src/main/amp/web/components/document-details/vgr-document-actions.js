@@ -35,13 +35,11 @@
       if (Alfresco.thirdparty && Alfresco.thirdparty.onActionCheckInNewVersion) {
          Alfresco.thirdparty.onActionCheckInNewVersion(asset, this.name, function(nodeRef, filename, data) {
             var ref = nodeRef;
-            
+
             if (asset.workingCopy && asset.workingCopy.sourceNodeRef) {
                ref = asset.workingCopy.sourceNodeRef
             }
-            
-            console.log(ref);
-            
+
             this.onNewVersionUploadCompleteCustom({
                successful : [ {
                   nodeRef : ref,

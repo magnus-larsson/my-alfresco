@@ -66,8 +66,6 @@
       onReady : function() {
          var url = this.getThumbnailUrl('pdf');
 
-         console.log(url);
-
          // Register the ESC key to close the dialog
          if (!this.widgets.escapeListener) {
             this.widgets.escapeListener = new KeyListener(document, {
