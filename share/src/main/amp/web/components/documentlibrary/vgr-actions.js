@@ -73,12 +73,28 @@
             text : this.msg("button.ok"),
             handler : function() {
                this.destroy();
-               
+
                callback();
             },
             isDefault : true
          } ]
       });
+   };
+
+   /**
+    * Same as onActionUploadNewVersion, but performs an document id check. User can still choose to overwrite.
+    */
+   Alfresco.doclib.Actions.prototype.onActionCheckInNewVersion = function(asset) {
+      if (Alfresco.thirdparty && Alfresco.thirdparty.onActionCheckInNewVersion) {
+         Alfresco.thirdparty.onActionCheckInNewVersion(asset, this.name, function(nodeRef, filename) {
+            this.onNewVersionUploadComplete({
+               successful : [ {
+                  nodeRef : nodeRef,
+                  fileName : asset.displayName
+               } ]
+            });
+         }, this, {});
+      }
    };
 
 }());

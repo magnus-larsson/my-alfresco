@@ -277,6 +277,17 @@
           <permission allow="true">Write</permission>
         </permissions>
       </action>
+
+      <!-- Upload new version -->
+      <action id="document-upload-new-version" type="javascript" label="actions.document.upload-new-version">
+        <param name="function">onActionCheckInNewVersion</param>
+        <permissions>
+          <permission allow="true">Write</permission>
+        </permissions>
+        <evaluator>evaluator.doclib.action.upload</evaluator>
+        <evaluator>evaluator.doclib.action.editableByCurrentUser</evaluator>
+        <evaluator negate="true">evaluator.doclib.metadata.isLocked</evaluator>
+      </action>
     </actions>
 
     <actionGroups>
