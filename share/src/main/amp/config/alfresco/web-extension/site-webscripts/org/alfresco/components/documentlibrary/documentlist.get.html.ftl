@@ -22,7 +22,7 @@
       repositoryBrowsing: ${(rootNode??)?string},
       useTitle: ${(useTitle!true)?string},
       userIsSiteManager: ${(userIsSiteManager!false)?string},
-      containerType: "${containerType}"
+      containerType: "${containerType!""}"
    }).setMessages(
       ${messages}
    );
