@@ -13,7 +13,7 @@
          documentDetails: ${documentDetailsJSON},
          repositoryBrowsing: ${(rootNode??)?string},
          syncMode: "${syncMode}",
-         containerType: "${containerType}"
+         containerType: "${containerType!""}"
       }).setMessages(
          ${messages}
       );
