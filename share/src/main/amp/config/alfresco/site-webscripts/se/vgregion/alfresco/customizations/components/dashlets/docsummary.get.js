@@ -1,12 +1,18 @@
-function getContentTypes()
-{
-   var contentTypes = [
-   {
-      id: "vgr:document",
-      value: "vgr_document"
-   }];
-
-   return contentTypes;
+/**
+ * Custom content types
+ */
+function getContentTypes() {
+   return contentTypes = [ {
+      id : "vgr:document",
+      value : "vgr_document"
+   } ];
 }
 
-model.contentTypes = getContentTypes();
+function getRepositoryContentTypes() {
+   return contentTypes = [ {
+      id : "cm:content",
+      value : "cm_content"
+   } ];
+}
+
+model.contentTypes = page.id == 'repository' ? getRepositoryContentTypes() : getContentTypes();
