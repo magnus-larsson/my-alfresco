@@ -1,3 +1,5 @@
+<#-- @overridden projects/slingshot/config/alfresco/site-webscripts/org/alfresco/components/dashlets/docsummary.get.html.ftl -->
+
 <#assign id = args.htmlid>
 <#assign jsid = args.htmlid?js_string>
 <#assign prefFilter = preferences.filter!"recentlyModifiedByMe">

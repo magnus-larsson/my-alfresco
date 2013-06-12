@@ -1,3 +1,5 @@
+<#-- @overridden projects/slingshot/config/alfresco/site-webscripts/org/alfresco/components/wiki/page.get.html.ftl -->
+
 <#-- Tags -->
 <#if (result.tags?? && result.tags?size > 0)>
    <#assign tags = result.tags />

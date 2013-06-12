@@ -1,3 +1,5 @@
+<#-- @overridden projects/slingshot/config/alfresco/site-webscripts/org/alfresco/components/site-members/site-members.get.html.ftl -->
+
 <script type="text/javascript">//<![CDATA[
    new Alfresco.SiteMembers("${args.htmlid}").setOptions(
    {

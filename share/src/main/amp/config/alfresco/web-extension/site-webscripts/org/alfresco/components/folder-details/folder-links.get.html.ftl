@@ -1,3 +1,5 @@
+<#-- @overridden projects/slingshot/config/alfresco/site-webscripts/org/alfresco/components/folder-details/folder-links.get.html.ftl -->
+
 <#if folder??>
    <#assign el=args.htmlid?html>
    <script type="text/javascript">//<![CDATA[
