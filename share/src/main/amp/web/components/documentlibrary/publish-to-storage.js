@@ -165,7 +165,7 @@
       this.widgets.dialog = Alfresco.util.createYUIPanel(dialogDiv, {
         width: this.options.width
       });
-
+      
       // OK button
       this.widgets.okButton = Alfresco.util.createYUIButton(this, "ok", this.onOK);
 
@@ -319,6 +319,16 @@
       // Show the dialog
       this.widgets.escapeListener.enable();
       this.widgets.dialog.show();
+      
+      // this fix is here because the regular hideshow fix for the Embed plugin is to slow, this dialog takes too long time to show
+      var iframes = Selector.query("iframe");
+      for (index in iframes) {
+         var iframe = iframes[index];
+         
+         if (iframe.name === 'Embed') {
+            Dom.setStyle(iframe, 'visibility', 'hidden');
+         }
+      }
     },
 
     /**
