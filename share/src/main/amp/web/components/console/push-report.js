@@ -105,6 +105,10 @@ if (typeof RL == "undefined" || !RL) {
                   cell.innerHTML = $html(data);
                 };
 
+                var renderCellVersion = function(cell, record, column, data) {
+                  cell.innerHTML = $html(data);
+                };
+                
                 var renderCellSourceId = function(cell, record, column, data) {
                   cell.innerHTML = $html(data);
 
@@ -140,6 +144,11 @@ if (typeof RL == "undefined" || !RL) {
                   sortable : false,
                   formatter : renderCellTitle,
                   width : 110
+                }, {
+                  key : "version",
+                  label : parent.msg("label.version"),
+                  sortable : false,
+                  formatter : renderCellVersion
                 }, {
                   key : "id",
                   label : parent.msg("label.id"),
@@ -210,15 +219,10 @@ if (typeof RL == "undefined" || !RL) {
                       initialRequest : generateRequest()
                     });
 
-                /*
-                 * parent.widgets.dataTable.subscribe("postRenderEvent",
-                 * function (o) { localThis._handleJsonResponse(); });
-                 */
                 parent.widgets.dataTable.doBeforeLoadData = function(request,
                     response, payload) {
                   payload.totalRecords = response.meta.totalRecords;
-                  // payload.pagination.recordOffset =
-                  // response.meta.recordOffset;
+
                   return payload;
                 }
 

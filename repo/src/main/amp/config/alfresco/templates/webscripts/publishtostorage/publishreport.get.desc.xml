@@ -3,7 +3,7 @@
   <description>
   
   </description>
-  <url>/vgr/publishreport?status={status}&amp;from={dateFrom}&amp;to={dateTo}</url>
+  <url>/vgr/publishreport?publishstatus={publishstatus}&amp;unpublishstatus={unpublishstatus}&amp;from={dateFrom}&amp;to={dateTo}</url>
   <family>VGR</family>
   <format default="json">argument</format>
   <authentication>admin</authentication>

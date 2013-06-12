@@ -57,7 +57,7 @@ public class ScriptGetDocumentsPublishReport extends DeclarativeWebScript implem
       publishStatusParam = "";
     }
     if (unpublishStatusParam == null) {
-      publishStatusParam = "";
+      unpublishStatusParam = "";
     }
     List<NodeRef> pushedFiles = _pushService.findPushedFiles(publishStatusParam, unpublishStatusParam, dateFrom, dateTo);
     for (NodeRef pushedFileNodeRef : pushedFiles) {
@@ -65,6 +65,7 @@ public class ScriptGetDocumentsPublishReport extends DeclarativeWebScript implem
       HashMap<String, Serializable> document = new HashMap<String, Serializable>();
       document.put("title", properties.get(VgrModel.PROP_TITLE));
       document.put("id", pushedFileNodeRef.toString());
+      document.put("version", properties.get(VgrModel.PROP_IDENTIFIER_VERSION));
       document.put("sourceId", properties.get(VgrModel.PROP_SOURCE_DOCUMENTID));
       document.put("pushedForPublish", properties.get(VgrModel.PROP_PUSHED_FOR_PUBLISH));
       document.put("pushedForUnpublish", properties.get(VgrModel.PROP_PUSHED_FOR_UNPUBLISH));
