@@ -97,6 +97,47 @@
       }
    };
 
+   Alfresco.doclib.Actions.prototype.onActionCreateFinalVersion = function(asset) {
+      var self = this;
+
+      Alfresco.util.PopupManager.displayMessage({
+         text : self.msg('message.create-final-version.waiting')
+      });
+
+      Alfresco.util.PopupManager.getUserInput({
+         title : this.msg('actions.document.create-final-version'),
+         text : this.msg('label.comments'),
+         callback : {
+            fn : function(comment) {
+               Alfresco.util.Ajax.jsonPost({
+                  url : Alfresco.constants.PROXY_URI_RELATIVE + "se/vgregion/alfresco/nodes/createfinalversion",
+                  dataObj : {
+                     nodeRef : asset.nodeRef,
+                     comment : comment
+                  },
+                  successCallback : {
+                     fn : function() {
+                        Alfresco.util.PopupManager.displayMessage({
+                           text : self.msg('message.create-final-version.success')
+                        });
+
+                        YAHOO.Bubbling.fire("metadataRefresh", {});
+                     },
+                     scope : self
+                  },
+                  failureMessage : self.msg("message.create-final-version.failure"),
+                  failureCallback : {
+                     fn : function() {
+                     },
+                     scope : self
+                  }
+               });
+            },
+            scope : self
+         }
+      });
+   };
+
 }());
 
 (function(_launchOnlineEditorIE) {

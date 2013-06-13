@@ -236,6 +236,7 @@
         </permissions>
         <evaluator>evaluator.doclib.metadata.showPublishHeader</evaluator>
         <evaluator negate="true">evaluator.doclib.action.isWorkingCopy</evaluator>
+        <evaluator negate="true">evaluator.doclib.metadata.isLocked</evaluator>
       </action>
 
       <action id="action-header-manage" type="header" />
@@ -251,6 +252,7 @@
         </permissions>
         <evaluator>evaluator.doclib.metadata.canPublish</evaluator>
         <evaluator negate="true">evaluator.doclib.action.isWorkingCopy</evaluator>
+        <evaluator negate="true">evaluator.doclib.metadata.isLocked</evaluator>
       </action>
 
       <action id="document-unpublish-from-storage" type="javascript" label="actions.document.unpublish-from-storage">
@@ -260,6 +262,7 @@
         </permissions>
         <evaluator>evaluator.doclib.metadata.canUnpublish</evaluator>
         <evaluator negate="true">evaluator.doclib.action.isWorkingCopy</evaluator>
+        <evaluator negate="true">evaluator.doclib.metadata.isLocked</evaluator>
       </action>
 
       <action id="document-unpublish-old-from-storage" type="javascript" label="actions.document.unpublish-old-from-storage" icon="document-unpublish-from-storage">
@@ -269,6 +272,7 @@
         </permissions>
         <evaluator>evaluator.doclib.metadata.canUnpublishOld</evaluator>
         <evaluator negate="true">evaluator.doclib.action.isWorkingCopy</evaluator>
+        <evaluator negate="true">evaluator.doclib.metadata.isLocked</evaluator>
       </action>
 
       <action id="folder-auto-publish" type="javascript" label="actions.folder.auto-publish" icon="auto-publish-all-versions-indicator">
@@ -286,6 +290,17 @@
         </permissions>
         <evaluator>evaluator.doclib.action.upload</evaluator>
         <evaluator>evaluator.doclib.action.editableByCurrentUser</evaluator>
+        <evaluator negate="true">evaluator.doclib.metadata.isLocked</evaluator>
+      </action>
+
+      <!-- Upload new version -->
+      <action id="document-create-final-version" type="javascript" label="actions.document.create-final-version">
+        <param name="function">onActionCreateFinalVersion</param>
+        <permissions>
+          <permission allow="true">Write</permission>
+        </permissions>
+        <evaluator>evaluator.doclib.action.editableByCurrentUser</evaluator>
+        <evaluator negate="true">evaluator.doclib.action.isWorkingCopy</evaluator>
         <evaluator negate="true">evaluator.doclib.metadata.isLocked</evaluator>
       </action>
     </actions>
@@ -312,6 +327,8 @@
         <action index="203" id="document-unpublish-from-storage" />
         <action index="203" id="document-unpublish-old-from-storage" />
 
+        <action index="211" id="document-create-final-version" />
+
         <action index="280" id="document-assign-workflow">
           <evaluator>evaluator.doclib.action.disableAction</evaluator>
         </action>
@@ -337,18 +354,11 @@
       </actionGroup>
 
       <actionGroup id="document-details">
-        <action index="119" id="action-header-edit" label="actions.document.label.edit" />
-        <action index="201" id="action-header-publish" label="actions.document.label.publish" />
-        <action index="239" id="action-header-manage" label="actions.document.label.copy" />
-        <action index="139" id="action-header-origin" label="actions.document.label.origin" />
-
-        <action index="202" id="document-publish-to-storage" />
-        <action index="203" id="document-unpublish-from-storage" />
-        <action index="203" id="document-unpublish-old-from-storage" />
-
         <action index="110" id="document-view-content">
           <evaluator>evaluator.doclib.action.disableAction</evaluator>
         </action>
+        <action index="119" id="action-header-edit" label="actions.document.label.edit" />
+        <action index="139" id="action-header-origin" label="actions.document.label.origin" />
         <action index="160" id="document-approve">
           <evaluator>evaluator.doclib.action.disableAction</evaluator>
         </action>
@@ -358,6 +368,12 @@
         <action index="180" id="document-inline-edit">
           <evaluator>evaluator.doclib.action.disableAction</evaluator>
         </action>
+        <action index="201" id="document-create-final-version" />
+        <action index="202" id="action-header-publish" label="actions.document.label.publish" />
+        <action index="203" id="document-publish-to-storage" />
+        <action index="204" id="document-unpublish-from-storage" />
+        <action index="205" id="document-unpublish-old-from-storage" />
+        <action index="239" id="action-header-manage" label="actions.document.label.copy" />
         <action index="270" id="document-assign-workflow">
           <evaluator>evaluator.doclib.action.disableAction</evaluator>
         </action>
@@ -387,7 +403,6 @@
           <evaluator>evaluator.doclib.action.isWorkingCopy</evaluator>
         </action>
       </actionGroup>
-
 
       <actionGroup id="folder-browse">
         <action index="120" id="document-approve" icon="folder-approve">
