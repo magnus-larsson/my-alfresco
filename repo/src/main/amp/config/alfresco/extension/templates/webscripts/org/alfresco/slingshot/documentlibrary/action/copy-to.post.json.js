@@ -68,7 +68,7 @@ function runAction(p_params)
                copiedNode = fileNode.copy(destNode);
                result.nodeRef = copiedNode.nodeRef.toString();
             }
-
+            
             result.nodeRef = copiedNode.nodeRef.toString();
             result.success = (result.nodeRef != null);
             
@@ -83,24 +83,33 @@ function runAction(p_params)
                   siteService.cleanSitePermissions(copiedNode.nodeRef);
                }
                  
-               //reset some properties on the copy since they are not to be copied
-               //blacklisted properties are ignored
-               var blacklist = properties.get('vgr.metadata.copy.blacklist','').split(',');
+               // reset some properties on the copy since they are not to be copied
+               // blacklisted properties are ignored
+               var blacklist = properties.get('vgr.metadata.copy.blacklist', '').split(',');
                for each (black in blacklist) {
+                  if (!black || black.length() == 0) {
+                     continue;
+                  }
+                  
                   if (black.indexOf('{http://www.vgregion.se/model/1.0}') === 0) {
                      copiedNode.properties[black] = null; //since we can't delete
                   } else {
                      copiedNode.properties['{http://www.vgregion.se/model/1.0}'+black] = null; //since we can't delete
                   }
                }
+               
+               // use the cm:name from the copied node to set the vgr:dc.title to support the property replication
+               // this ensures that property replication works :)
+               copiedNode.properties['vgr:dc.title'] = serviceUtils.removeExtension(copiedNode.properties['cm:name']);
+               
                copiedNode.save();
                
-               //remove any published aspect from the copy
+               // remove any published aspect from the copy
                if (copiedNode.hasAspect('vgr:published')) {
                   copiedNode.removeAspect('vgr:published');
                }
                
-               //remove any association to published documents
+               // remove any association to published documents
                var assocs = copiedNode.assocs["vgr:published-to-storage"];
                 
                if (assocs) {
