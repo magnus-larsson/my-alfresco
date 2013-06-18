@@ -303,6 +303,16 @@
         <evaluator negate="true">evaluator.doclib.action.isWorkingCopy</evaluator>
         <evaluator negate="true">evaluator.doclib.metadata.isLocked</evaluator>
       </action>
+
+      <!-- Cancel editing (unlock) -->
+      <action id="document-unlock-vti" type="javascript" label="actions.document.unlock" icon="document-unlock">
+        <param name="function">onActionCancelEditing</param>
+        <permissions>
+          <permission allow="true">CancelCheckOut</permission>
+        </permissions>
+        <evaluator negate="true">evaluator.doclib.action.isWorkingCopy</evaluator>
+        <evaluator>evaluator.doclib.metadata.isVtiLocked</evaluator>
+      </action>
     </actions>
 
     <actionGroups>
@@ -332,6 +342,7 @@
         <action index="280" id="document-assign-workflow">
           <evaluator>evaluator.doclib.action.disableAction</evaluator>
         </action>
+        <action index="295" id="document-unlock-vti" />
         <action index="300" id="document-publish">
           <evaluator>evaluator.doclib.action.disableAction</evaluator>
         </action>
@@ -377,6 +388,7 @@
         <action index="270" id="document-assign-workflow">
           <evaluator>evaluator.doclib.action.disableAction</evaluator>
         </action>
+        <action index="285" id="document-unlock-vti" />
         <action index="310" id="document-manage-aspects">
           <evaluator>evaluator.doclib.action.disableAction</evaluator>
         </action>

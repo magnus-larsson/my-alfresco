@@ -105,6 +105,8 @@
     </property>
   </bean>
 
+  <bean id="evaluator.doclib.metadata.isVtiLocked" class="se.vgregion.web.evaluator.VtiLockEvaluator" />
+
   <bean id="vgr.publishedDocumentService" class="se.vgregion.web.scripts.PublishedDocumentService" parent="baseScriptExtension">
     <property name="extensionName" value="publishedDocumentService" />
   </bean>
