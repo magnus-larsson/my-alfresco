@@ -61,6 +61,13 @@ public abstract class ClusteredExecuter implements InitializingBean {
       return;
     }
 
+    // bypass if there already exists a lock
+    if (hasLock()) {
+      LOG.debug(getJobName() + " bypassed; a lock already exists.");
+
+      return;
+    }
+
     createLock();
 
     try {
@@ -115,6 +122,45 @@ public abstract class ClusteredExecuter implements InitializingBean {
     _jobLockService.releaseLock(lockToken, getLockQName());
 
     _lockThreadLocal.remove();
+  }
+
+  /**
+   * Method for checking whether a lock exists or not. There are currently no
+   * good ways of doing this, so a try...catch procedure is used.
+   * 
+   * @return
+   */
+  protected boolean hasLock() {
+    boolean hasLock = false;
+
+    String lockToken = _lockThreadLocal.get();
+
+    if (StringUtils.isBlank(lockToken)) {
+      return false;
+    }
+
+    RetryingTransactionCallback<String> txnWork = new RetryingTransactionCallback<String>() {
+
+      @Override
+      public String execute() throws Exception {
+        return _jobLockService.getLock(getLockQName(), _lockTTL);
+      }
+
+    };
+
+    try {
+      lockToken = _transactionService.getRetryingTransactionHelper().doInTransaction(txnWork, false, true);
+    } catch (Exception ex) {
+      hasLock = true;
+    } finally {
+      // silently release the lock, ignoring all errors
+      try {
+        _jobLockService.releaseLock(lockToken, getLockQName());
+      } catch (Exception ex) {
+      }
+    }
+
+    return hasLock;
   }
 
   protected String createLock() {
