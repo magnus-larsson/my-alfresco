@@ -68,9 +68,10 @@ public abstract class ClusteredExecuter implements InitializingBean {
       return;
     }
 
-    createLock();
 
     try {
+      createLock();
+
       LOG.debug(getJobName() + " started.");
 
       refreshLock();
