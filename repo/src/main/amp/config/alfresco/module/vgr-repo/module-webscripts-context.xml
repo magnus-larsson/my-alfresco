@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <!-- Lists the membership of a site -->
+  <bean id="webscript.org.alfresco.repository.site.membership.memberships.get" class="se.vgregion.alfresco.repo.web.scripts.site.VgrSiteMembershipsGet" parent="abstractSiteWebScript">
+    <property name="personService" ref="PersonService" />
+    <property name="scriptAuthorityService" ref="authorityServiceScript" />
+    <property name="resetPasswordService" ref="vgr.resetPasswordService" />
+  </bean>
+
+  <!-- Content Retrieval -->
+  <bean id="webscript.org.alfresco.cmis.content.get" class="se.vgregion.alfresco.repo.web.scripts.content.VgrContentGet" parent="webscript">
+    <property name="referenceFactory" ref="CMISReferenceFactory" />
+    <property name="namespaceService" ref="NamespaceService" />
+    <property name="permissionService" ref="PermissionService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="contentService" ref="ContentService" />
+    <property name="dictionaryService" ref="DictionaryService" />
+    <property name="mimetypeService" ref="MimetypeService" />
+    <property name="CMISRenditionService" ref="CMISRenditionService" />
+    <property name="serviceUtils" ref="vgr.serviceUtils" />
+  </bean>
+
+</beans>

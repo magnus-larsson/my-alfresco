@@ -1,0 +1,11 @@
+<webscript>
+  <shortname>Get Apelon values</shortname>
+  <description>
+    Get a list of apelon values based on a path 
+   </description>
+  <url>/vgr/apelon/getVocabulary?path={path}</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction allow="readonly">required</transaction>
+  <family>VGR</family>
+</webscript>

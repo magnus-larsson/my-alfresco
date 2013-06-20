@@ -19,12 +19,8 @@
 package se.vgregion.alfresco.repo.scripts;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -41,23 +37,18 @@ import org.alfresco.repo.web.scripts.content.StreamContent;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.FileTypeImageSize;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.search.ResultSet;
-import org.alfresco.service.cmr.search.ResultSetRow;
-import org.alfresco.service.cmr.search.SearchParameters;
-import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.thumbnail.ThumbnailService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.VersionNumber;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.extensions.surf.util.I18NUtil;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.extensions.webscripts.Cache;
 import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.WebScriptException;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
+import org.springframework.util.Assert;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.context.support.ServletContextResource;
@@ -70,7 +61,7 @@ import se.vgregion.alfresco.repo.utils.ServiceUtils;
  * Content Retrieval Service for the Storage
  * <p/>
  * Stream content from the Repository.
- *
+ * 
  * @author Niklas Ekman
  */
 public class StorageContentGet extends StreamContent implements ServletContextAware {
@@ -82,8 +73,6 @@ public class StorageContentGet extends StreamContent implements ServletContextAw
   private NamespaceService _namespaceService;
 
   private CMISRenditionService _cmisRenditionService;
-
-  private SearchService _searchService;
 
   private ServiceUtils _serviceUtils;
 
@@ -106,10 +95,6 @@ public class StorageContentGet extends StreamContent implements ServletContextAw
 
   public void setCMISRenditionService(final CMISRenditionService cmisRenditionService) {
     _cmisRenditionService = cmisRenditionService;
-  }
-
-  public void setSearchService(final SearchService searchService) {
-    _searchService = searchService;
   }
 
   public void setServiceUtils(final ServiceUtils serviceUtils) {
@@ -147,9 +132,9 @@ public class StorageContentGet extends StreamContent implements ServletContextAw
     NodeRef nodeRef;
 
     if (StringUtils.isNotBlank(version)) {
-      nodeRef = getPublishedStorageVersion(id, version);
+      nodeRef = _storageService.getPublishedStorageVersion(id, version);
     } else {
-      nodeRef = getLatestPublishedStorageVersion(id);
+      nodeRef = _storageService.getLatestPublishedStorageVersion(id);
     }
 
     if (nodeRef == null) {
@@ -157,7 +142,8 @@ public class StorageContentGet extends StreamContent implements ServletContextAw
       return;
     }
 
-    // must have a nodeRef for the filename later on, base it on the original node, not an eventual PDF/A node
+    // must have a nodeRef for the filename later on, base it on the
+    // original node, not an eventual PDF/A node
     NodeRef filenameNodeRef = nodeRef;
 
     // stream content on node, or rendition of node
@@ -232,7 +218,7 @@ public class StorageContentGet extends StreamContent implements ServletContextAw
 
   /**
    * Stream content rendition
-   *
+   * 
    * @param req
    * @param res
    * @param nodeRef
@@ -240,8 +226,7 @@ public class StorageContentGet extends StreamContent implements ServletContextAw
    * @param attach
    * @throws IOException
    */
-  private void streamRendition(final WebScriptRequest req, final WebScriptResponse res, final NodeRef nodeRef, final String streamId,
-      final boolean attach) throws IOException {
+  private void streamRendition(final WebScriptRequest req, final WebScriptResponse res, final NodeRef nodeRef, final String streamId, final boolean attach) throws IOException {
     try {
       // find rendition
       CMISRendition rendition = null;
@@ -272,7 +257,7 @@ public class StorageContentGet extends StreamContent implements ServletContextAw
 
   /**
    * Stream Icon
-   *
+   * 
    * @param res
    * @param nodeRef
    * @param streamId
@@ -324,78 +309,9 @@ public class StorageContentGet extends StreamContent implements ServletContextAw
     FileCopyUtils.copy(resource.getInputStream(), res.getOutputStream());
   }
 
-  private NodeRef getLatestPublishedStorageVersion(final String nodeRef) {
-    final String query = "TYPE:\"vgr:document\" AND ASPECT:\"vgr:published\" AND vgr:dc_x002e_source_x002e_documentid:\"" + nodeRef + "\"";
-
-    final Locale locale = new Locale("sv");
-    I18NUtil.setLocale(locale);
-
-    final SearchParameters searchParameters = new SearchParameters();
-    searchParameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
-    searchParameters.setLanguage(SearchService.LANGUAGE_FTS_ALFRESCO);
-    searchParameters.setQuery(query);
-    searchParameters.addSort("vgr:dc.identifier.version", true);
-
-    final ResultSet nodes = _searchService.query(searchParameters);
-
-    final List<ResultSetRow> rows = new ArrayList<ResultSetRow>();
-
-    try {
-      for (final ResultSetRow row : nodes) {
-        // only add published nodes to this list
-        if (!_serviceUtils.isPublished(row.getNodeRef())) {
-          continue;
-        }
-
-        rows.add(row);
-      }
-    } finally {
-      ServiceUtils.closeQuietly(nodes);
-    }
-
-    Collections.sort(rows, new Comparator<ResultSetRow>() {
-
-      @Override
-      public int compare(final ResultSetRow row1, final ResultSetRow row2) {
-        final String label1 = (String) row1.getValue(VgrModel.PROP_IDENTIFIER_VERSION);
-        final String label2 = (String) row2.getValue(VgrModel.PROP_IDENTIFIER_VERSION);
-
-        // sort the list descending (ie. most recent first)
-        return new VersionNumber(label2).compareTo(new VersionNumber(label1));
-      }
-
-    });
-
-    return rows.size() > 0 ? rows.get(0).getNodeRef() : null;
-  }
-
-  private NodeRef getPublishedStorageVersion(final String nodeRef, final String version) {
-    final String query = "TYPE:\"vgr:document\" AND ASPECT:\"vgr:published\" AND vgr:dc_x002e_source_x002e_documentid:\"" + nodeRef
-        + "\" AND vgr:dc_x002e_identifier_x002e_version:\"" + version + "\"";
-
-    final SearchParameters searchParameters = new SearchParameters();
-    searchParameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
-    searchParameters.setLanguage(SearchService.LANGUAGE_FTS_ALFRESCO);
-    searchParameters.setQuery(query);
-
-    final ResultSet nodes = _searchService.query(searchParameters);
-
-    try {
-      final NodeRef document = nodes.length() > 0 ? nodes.getNodeRef(0) : null;
-
-      if (document == null) {
-        return null;
-      }
-
-      return _serviceUtils.isPublished(document) ? document : null;
-    } finally {
-      ServiceUtils.closeQuietly(nodes);
-    }
-  }
-
   /**
    * Sends a 404 error to the browser.
-   *
+   * 
    * @param req
    * @param res
    * @throws IOException

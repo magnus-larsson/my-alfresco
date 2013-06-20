@@ -14,6 +14,8 @@ public class HsaCodeConstraint extends ListOfValuesConstraint implements Seriali
 
   private static final String NODE_TYPE = "apelon:hsacode";
 
+  public static final String NODE_TYPE_PARAM = "nodeType";
+
   public ApelonNodeTypeConstraintBean getApelonNodeTypeConstraintBean() {
     return (ApelonNodeTypeConstraintBean) ApplicationContextHolder.getApplicationContext().getBean("vgr.hsaCodeConstraint");
   }
@@ -32,8 +34,8 @@ public class HsaCodeConstraint extends ListOfValuesConstraint implements Seriali
   public Map<String, Object> getParameters() {
     final Map<String, Object> parameters = super.getParameters();
 
-    parameters.put("nodeType", NODE_TYPE);
-    parameters.put("allowedValues", getRawAllowedValues());
+    parameters.put(NODE_TYPE_PARAM, NODE_TYPE);
+    parameters.put(ALLOWED_VALUES_PARAM, getRawAllowedValues());
 
     return parameters;
   }

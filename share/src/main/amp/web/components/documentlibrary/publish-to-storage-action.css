@@ -1,0 +1,175 @@
+.doclist .onActionPublishToStorage a, .doclist .onActionPublishFolderToStorage a, .toolbar  .onActionPublishToStorage {
+    background-image: url(actions/document-publish-to-storage-16.png);
+}
+
+.doclist .onActionUnpublishFromStorage a, .doclist .onActionUnpublishFolderFromStorage a, .toolbar .onActionUnpublishFromStorage {
+    background-image: url(actions/document-unpublish-from-storage-16.png);
+}
+
+.doclist .onActionAutoPublish a {
+    background-image: url(images/auto-publish-all-versions-indicator-16.png);
+}
+
+/* CSS for the publish to storage dialog */
+.publish-to-storage-body {
+    padding: 24px !important;
+}
+
+.publish-to-storage .tree-width-wrapper {
+    padding: 10px;
+
+}
+
+.publish-to-storage-tree {
+    padding: 6px;
+    overflow: auto;
+    height: 20em;
+    background-color: white;
+    border: 1px solid #d9d9d9;
+    border-top: none;
+}
+
+.publish-to-storage-tree .published {
+    color: #aaa;
+}
+
+/* unpublishing is vice verse */
+.unpublish-from-storage .publish-to-storage-tree .published, .unpublish-from-storage .publish-to-storage-tree .publishedold {
+    color: #000;
+    text-decoration: none;
+}
+
+.unpublish-from-storage  .publish-to-storage-tree .notpublished {
+    color: #aaa;
+}
+
+.publish-to-storage-tree .error {
+    color: #db4949;
+    padding: 0px;
+}
+
+.publish-to-storage-tree .ygtvln, .publish-to-storage-tree .ygtvtn {
+    background: url("images/generic-16.png") no-repeat transparent;
+}
+
+.publish-to-storage-tree .ygtvlabel {
+    height: 1.4em;
+    background-color: transparent;
+    width: 100%;
+    overflow: hidden;
+}
+
+/* double height to ensure we have place for error message*/
+.publish-to-storage-tree .error {
+    height: 2.4em;
+}
+
+.publish-to-storage .error_desc {
+    font-size: 90%;
+    color: #515D6B;
+    font-style: italic;
+}
+
+.publish-to-storage-tree .pub_date {
+    float: right;
+    text-align: rght;
+    font-style: italic;
+}
+
+.publish-to-storage-tree .ygtvitem table {
+    width: 100%;
+}
+
+.publish-to-storage-body .headers {
+    width: 100%;
+    background-color: #EEE;
+    border: 1px solid #d9d9d9;
+    border-bottom: none;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+.publish-to-storage-body .headers td {
+    padding: 7px;
+}
+
+.publish-to-storage-body .headers .pub_header {
+    text-align: right;
+}
+
+/* CSS for the auto publish dialog */
+.auto-publish-body {
+    padding: 24px !important;
+}
+
+.auto-publish .form-width-wrapper {
+    padding: 10px;
+}
+
+.auto-publish-form {
+    padding: 6px;
+    overflow: auto;
+    background-color: white;
+    border: 1px solid #d9d9d9;
+    border-top: none;
+}
+
+.auto-publish-form .published {
+    color: #aaa;
+}
+
+.auto-publish-form .error {
+    color: #db4949;
+    padding: 0px;
+}
+
+.auto-publish-form .ygtvln, .auto-publish-form .ygtvtn {
+    background: url("images/generic-16.png") no-repeat transparent;
+}
+
+.auto-publish-form .ygtvlabel {
+    height: 1.4em;
+    background-color: transparent;
+    width: 100%;
+    overflow: hidden;
+}
+
+/* double height to ensure we have place for error message*/
+.auto-publish-form .error {
+    height: 2.4em;
+}
+
+.auto-publish .error_desc {
+    font-size: 90%;
+    color: #515D6B;
+    font-style: italic;
+}
+
+.auto-publish-form .pub_date {
+    float: right;
+    text-align: right;
+    font-style: italic;
+}
+
+.autp-publish-form .ygtvitem table {
+    width: 100%;
+}
+
+.auto-publish-body .headers {
+    width: 100%;
+    background-color: #EEE;
+    border: 1px solid #d9d9d9;
+    border-bottom: none;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+.autp-publish-body .headers td {
+    padding: 7px;
+}
+
+.auto-publish-form .yui-radio-button {
+    display: block;
+    margin: 5px;
+    width: 200px;
+}

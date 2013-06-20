@@ -1,0 +1,970 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<model name="vgr:vastragotalandsregionen" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+
+  <description>VGR Model</description>
+  <author>Repill Linpro AB</author>
+  <version>1.0.6</version>
+
+  <imports>
+    <!-- Import Alfresco System Definitions -->
+    <import uri="http://www.alfresco.org/model/system/1.0" prefix="sys" />
+    <!-- Import Alfresco Dictionary Definitions -->
+    <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d" />
+    <!-- Import Alfresco Content Domain Model Definitions -->
+    <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm" />
+    <!-- Import Alfresco Rendition Domain Model Definitions -->
+    <import uri="http://www.alfresco.org/model/rendition/1.0" prefix="rn" />
+    <import uri="http://www.alfresco.org/model/datalist/1.0" prefix="dl" />
+  </imports>
+
+  <namespaces>
+    <namespace uri="http://www.vgregion.se/model/1.0" prefix="vgr" />
+    <namespace uri="http://www.vgregion.se/apelon/1.0" prefix="apelon" />
+    <namespace uri="http://www.vgregion.se/kiv/1.0" prefix="kiv" />
+    <namespace uri="http://www.vgregion.se/datalist/1.0" prefix="vdl" />
+  </namespaces>
+
+  <constraints>
+    <constraint name="vgr:accessRights" type="LIST">
+      <parameter name="allowedValues">
+        <list>
+          <value>Internet</value>
+          <value>Intranät</value>
+        </list>
+      </parameter>
+    </constraint>
+  </constraints>
+
+  <types>
+    <type name="vgr:document">
+      <title>VGR Dokument</title>
+      <parent>cm:content</parent>
+
+      <associations>
+        <association name="vgr:published-to-storage">
+          <source>
+            <mandatory>false</mandatory>
+            <many>true</many>
+          </source>
+          <target>
+            <class>vgr:document</class>
+            <mandatory>false</mandatory>
+            <many>true</many>
+          </target>
+        </association>
+      </associations>
+
+      <mandatory-aspects>
+        <aspect>vgr:standard</aspect>
+        <aspect>cm:versionable</aspect>
+      </mandatory-aspects>
+    </type>
+
+    <type name="apelon:property">
+      <parent>cm:content</parent>
+      <properties>
+        <property name="apelon:key">
+          <type>d:text</type>
+          <index enabled="true">
+            <atomic>true</atomic>
+            <stored>false</stored>
+            <tokenised>false</tokenised>
+          </index>
+        </property>
+        <property name="apelon:value">
+          <type>d:text</type>
+          <multiple>true</multiple>
+          <index enabled="true">
+            <atomic>true</atomic>
+            <stored>false</stored>
+            <tokenised>false</tokenised>
+          </index>
+        </property>
+      </properties>
+    </type>
+
+    <type name="apelon:apelonNode">
+      <parent>cm:folder</parent>
+      <properties>
+        <property name="apelon:name">
+          <type>d:text</type>
+          <index enabled="true">
+            <atomic>true</atomic>
+            <stored>false</stored>
+            <tokenised>false</tokenised>
+          </index>
+        </property>
+        <property name="apelon:internalid">
+          <type>d:text</type>
+          <index enabled="true">
+            <atomic>true</atomic>
+            <stored>false</stored>
+            <tokenised>false</tokenised>
+          </index>
+        </property>
+        <property name="apelon:namespaceid">
+          <type>d:text</type>
+          <index enabled="true">
+            <atomic>true</atomic>
+            <stored>false</stored>
+            <tokenised>false</tokenised>
+          </index>
+        </property>
+        <property name="apelon:sourceid">
+          <type>d:text</type>
+          <index enabled="true">
+            <atomic>true</atomic>
+            <stored>false</stored>
+            <tokenised>false</tokenised>
+          </index>
+        </property>
+      </properties>
+    </type>
+
+    <!-- Category Type for the property vgr:dc.type.document -->
+    <type name="apelon:documentType">
+      <parent>apelon:apelonNode</parent>
+    </type>
+
+    <!-- Category Type for the property vgr:dc.type.document.structure -->
+    <type name="apelon:documentStructure">
+      <parent>apelon:apelonNode</parent>
+    </type>
+
+    <!-- Category Type for the property vgr:dc.type.record -->
+    <type name="apelon:recordType">
+      <parent>apelon:apelonNode</parent>
+      <properties>
+        <property name="apelon:rtType">
+          <type>d:text</type>
+          <index enabled="true">
+            <atomic>true</atomic>
+            <stored>false</stored>
+            <tokenised>false</tokenised>
+          </index>
+        </property>
+        <property name="apelon:rtDocumentTypeId">
+          <type>d:text</type>
+          <multiple>true</multiple>
+          <index enabled="true">
+            <atomic>true</atomic>
+            <stored>false</stored>
+            <tokenised>false</tokenised>
+          </index>
+        </property>
+      </properties>
+    </type>
+
+    <!-- Category Type for the property vgr:vgr.status.document -->
+    <type name="apelon:documentStatus">
+      <parent>apelon:apelonNode</parent>
+    </type>
+
+    <!-- Category Type for the property vgr:dc.language -->
+    <type name="apelon:language">
+      <parent>apelon:apelonNode</parent>
+    </type>
+
+    <!-- Category Type for the property vgr:dc.coverage.hsacode -->
+    <type name="apelon:hsacode">
+      <parent>apelon:apelonNode</parent>
+    </type>
+
+    <type name="apelon:swemesh">
+      <parent>apelon:apelonNode</parent>
+    </type>
+
+    <type name="kiv:unit">
+      <parent>cm:folder</parent>
+      <properties>
+        <property name="kiv:ou">
+          <type>d:text</type>
+          <index enabled="true">
+            <atomic>true</atomic>
+            <stored>false</stored>
+            <tokenised>false</tokenised>
+          </index>
+        </property>
+        <property name="kiv:dn">
+          <type>d:text</type>
+          <index enabled="true">
+            <atomic>true</atomic>
+            <stored>false</stored>
+            <tokenised>false</tokenised>
+          </index>
+        </property>
+        <property name="kiv:hsaidentity">
+          <type>d:text</type>
+          <index enabled="true">
+            <atomic>true</atomic>
+            <stored>false</stored>
+            <tokenised>false</tokenised>
+          </index>
+        </property>
+        <property name="kiv:modified">
+          <type>d:long</type>
+          <!-- <type>d:datetime</type> -->
+          <mandatory enforced="true">true</mandatory>
+          <index enabled="true">
+            <atomic>true</atomic>
+            <stored>false</stored>
+            <tokenised>both</tokenised>
+          </index>
+        </property>
+        <property name="kiv:accessed">
+          <type>d:long</type>
+          <!-- <type>d:datetime</type> -->
+          <index enabled="true">
+            <atomic>true</atomic>
+            <stored>false</stored>
+            <tokenised>both</tokenised>
+          </index>
+        </property>
+      </properties>
+    </type>
+
+    <!-- Data List - System maintenance messages -->
+    <type name="vdl:systemMessage">
+      <title>System messages</title>
+      <parent>dl:dataListItem</parent>
+      <properties>
+        <property name="vdl:systemMessageTitle">
+          <title>Title</title>
+          <type>d:text</type>
+          <mandatory>true</mandatory>
+        </property>
+        <property name="vdl:systemMessageDescription">
+          <title>Description</title>
+          <type>d:mltext</type>
+          <mandatory>true</mandatory>
+        </property>
+        <property name="vdl:systemMessageStartTime">
+          <title>Start Time</title>
+          <type>d:datetime</type>
+        </property>
+        <property name="vdl:systemMessageEndTime">
+          <title>End Time</title>
+          <type>d:datetime</type>
+        </property>
+        <property name="vdl:systemMessagePriority">
+          <title>Priority</title>
+          <type>d:text</type>
+          <default>Normal</default>
+          <constraints>
+            <constraint ref="dl:priority_value" />
+          </constraints>
+        </property>
+      </properties>
+    </type>
+
+    <type name="vgr:pdf">
+      <title>PDF Rendition</title>
+      <parent>cm:content</parent>
+      <archive>false</archive>
+      <includedInSuperTypeQuery>false</includedInSuperTypeQuery>
+    </type>
+
+    <!-- ##################################################### -->
+    <!-- Type for the Prevent Download Document Library Folder -->
+    <!-- ##################################################### -->
+
+    <type name="vgr:prevent-download">
+      <title>Förhindra nedladdning</title>
+      <parent>cm:folder</parent>
+    </type>
+  </types>
+
+  <aspects>
+    <aspect name="vgr:cleanable">
+      <title>Städbar webbplats</title>
+      <properties>
+        <property name="vgr:startDate">
+          <type>d:datetime</type>
+          <mandatory>true</mandatory>
+        </property>
+        <property name="vgr:firstMessageSent">
+          <type>d:boolean</type>
+          <mandatory>true</mandatory>
+          <default>false</default>
+        </property>
+        <property name="vgr:secondMessageSent">
+          <type>d:boolean</type>
+          <mandatory>true</mandatory>
+          <default>false</default>
+        </property>
+      </properties>
+    </aspect>
+
+    <!-- ################################################################### -->
+    <!-- Aspect for automatic deletion. If this aspect is set on a site the -->
+    <!-- documents in that site and it's content and/or the document itself -->
+    <!-- gets deleted after max_age days. -->
+    <!-- The default behaviour is to delete node and content after 90 days. -->
+    <!-- ################################################################### -->
+
+    <aspect name="vgr:auto_deletable">
+      <title>Automatic deletion</title>
+      <properties>
+        <property name="vgr:max_age">
+          <description>The maximum age (in days) that a node or it's content
+            can have before it's deleted
+          </description>
+          <type>d:long</type>
+          <mandatory enforced="true">true</mandatory>
+          <default>90</default>
+        </property>
+        <property name="vgr:delete_node">
+          <description>Whether the node should also be deleted and not only
+            the content
+          </description>
+          <type>d:boolean</type>
+          <mandatory enforced="true">true</mandatory>
+          <default>true</default>
+        </property>
+        <property name="vgr:mimetypes">
+          <description>The mimetypes to delete the content/node for
+          </description>
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+      </properties>
+    </aspect>
+
+    <aspect name="vgr:noarchive">
+      <title>Aspect for setting no archive</title>
+      <archive>false</archive>
+    </aspect>
+
+    <aspect name="vgr:donottouch"></aspect>
+
+    <aspect name="vgr:mandatory"></aspect>
+
+    <aspect name="vgr:titled"></aspect>
+
+    <aspect name="vgr:statusable"></aspect>
+
+    <aspect name="vgr:metadata">
+      <properties>
+
+        <!-- ######################################### -->
+        <!-- DC.Title -->
+        <!-- ######################################### -->
+
+        <property name="vgr:dc.title">
+          <type>d:text</type>
+        </property>
+        <property name="vgr:dc.title.alternative">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+        <!-- Replicated field -->
+        <property name="vgr:dc.title.filename">
+          <type>d:text</type>
+        </property>
+        <property name="vgr:dc.title.filename.native">
+          <type>d:text</type>
+        </property>
+
+        <!-- ######################################### -->
+        <!-- DC.Creator -->
+        <!-- ######################################### -->
+
+        <!-- Source is synchronized from the portal directory, an LDAP catalog -->
+        <property name="vgr:dc.creator">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+        <property name="vgr:dc.creator.id">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+        <property name="vgr:dc.creator.freetext">
+          <type>d:text</type>
+          <!-- TODO: Develop a GUI in Share for multiple values with a constraint -->
+          <!-- <multiple>true</multiple> -->
+        </property>
+        <!-- Source is synchronized from the portal directory, an LDAP catalog -->
+        <property name="vgr:dc.creator.document">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+        <property name="vgr:dc.creator.document.id">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+        <property name="vgr:dc.creator.function">
+          <type>d:text</type>
+        </property>
+        <!-- KIV -->
+        <property name="vgr:dc.creator.forunit">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+        <property name="vgr:dc.creator.forunit.id">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+        <!-- KIV -->
+        <property name="vgr:dc.creator.recordscreator">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+        <property name="vgr:dc.creator.recordscreator.id">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+        <property name="vgr:dc.creator.project-assignment">
+          <type>d:text</type>
+        </property>
+
+        <!-- ######################################### -->
+        <!-- DC.Subject -->
+        <!-- ######################################### -->
+
+        <!-- APELON: SweMeSH -->
+        <property name="vgr:dc.subject.keywords">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+
+        <property name="vgr:dc.subject.keywords.id">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+
+        <property name="vgr:dc.subject.authorkeywords">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+
+        <!-- ######################################### -->
+        <!-- DC.Description -->
+        <!-- ######################################### -->
+
+        <property name="vgr:dc.description">
+          <type>d:mltext</type>
+        </property>
+
+        <!-- ######################################### -->
+        <!-- DC.Publisher -->
+        <!-- ######################################### -->
+
+        <!-- Source is synchronized from the portal directory, an LDAP catalog -->
+        <property name="vgr:dc.publisher">
+          <type>d:text</type>
+          <!-- TODO: solve this with a property override at verion 1.0 later -->
+          <!-- <mandatory>true</mandatory> -->
+        </property>
+        <property name="vgr:dc.publisher.id">
+          <type>d:text</type>
+          <!-- TODO: solve this with a property override at verion 1.0 later -->
+          <!-- <mandatory>true</mandatory> -->
+        </property>
+        <!-- KIV -->
+        <property name="vgr:dc.publisher.forunit">
+          <type>d:text</type>
+          <multiple>true</multiple>
+          <!-- TODO: solve this with a property override at verion 1.0 later -->
+          <!-- <mandatory>true</mandatory> -->
+        </property>
+        <property name="vgr:dc.publisher.forunit.id">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+        <property name="vgr:dc.publisher.project-assignment">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+        <property name="vgr:dc.date.issued">
+          <type>d:datetime</type>
+        </property>
+
+        <!-- ######################################### -->
+        <!-- DC.Contributor -->
+        <!-- ######################################### -->
+
+        <!-- Replicated field -->
+        <property name="vgr:dc.contributor.savedby">
+          <type>d:text</type>
+        </property>
+        <property name="vgr:dc.contributor.savedby.id">
+          <type>d:text</type>
+        </property>
+
+        <!-- Source is synchronized from the portal directory, an LDAP catalog -->
+        <!-- Must implement GUI support for multiple for this... -->
+        <!-- Start of group -->
+        <property name="vgr:dc.contributor.acceptedby">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+        <property name="vgr:dc.contributor.acceptedby.id">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+        <property name="vgr:dc.contributor.acceptedby.freetext">
+          <type>d:text</type>
+          <!-- <multiple>true</multiple> -->
+        </property>
+        <property name="vgr:dc.date.accepted">
+          <type>d:datetime</type>
+          <!-- <multiple>true</multiple> -->
+        </property>
+        <property name="vgr:dc.contributor.acceptedby.role">
+          <type>d:text</type>
+          <!-- <multiple>true</multiple> -->
+        </property>
+        <property name="vgr:dc.contributor.acceptedby.unit.freetext">
+          <type>d:text</type>
+          <!-- <multiple>true</multiple> -->
+        </property>
+        <!-- End of group -->
+
+        <!-- Source is synchronized from the portal directory, an LDAP catalog -->
+        <!-- Must implement GUI support for multiple for this... -->
+        <!-- Start of group -->
+        <property name="vgr:dc.contributor.controlledby">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+        <property name="vgr:dc.contributor.controlledby.id">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+        <property name="vgr:dc.contributor.controlledby.freetext">
+          <type>d:text</type>
+          <!-- <multiple>true</multiple> -->
+        </property>
+        <property name="vgr:dc.date.controlled">
+          <type>d:datetime</type>
+          <!-- <multiple>true</multiple> -->
+        </property>
+        <property name="vgr:dc.contributor.controlledby.role">
+          <type>d:text</type>
+          <!-- <multiple>true</multiple> -->
+        </property>
+        <property name="vgr:dc.contributor.controlledby.unit.freetext">
+          <type>d:text</type>
+          <!-- <multiple>true</multiple> -->
+        </property>
+        <!-- End of group -->
+
+        <!-- ######################################### -->
+        <!-- DC.Date -->
+        <!-- ######################################### -->
+
+        <property name="vgr:dc.date.validfrom">
+          <type>d:date</type>
+        </property>
+        <property name="vgr:dc.date.validto">
+          <type>d:date</type>
+        </property>
+        <property name="vgr:dc.date.availablefrom">
+          <type>d:datetime</type>
+        </property>
+        <property name="vgr:dc.date.availableto">
+          <type>d:datetime</type>
+        </property>
+        <property name="vgr:dc.date.copyrighted">
+          <type>d:datetime</type>
+        </property>
+        <!-- Replicated field -->
+        <property name="vgr:dc.date.saved">
+          <type>d:datetime</type>
+        </property>
+
+        <!-- ######################################### -->
+        <!-- DC.Type -->
+        <!-- ######################################### -->
+
+        <!-- APELON -->
+        <property name="vgr:dc.type.document">
+          <type>d:text</type>
+        </property>
+        <property name="vgr:dc.type.document.structure">
+          <type>d:text</type>
+          <constraints>
+            <constraint name="vgr:structures" type="se.vgregion.alfresco.repo.constraints.DocumentStructureConstraint" />
+          </constraints>
+        </property>
+        <property name="vgr:dc.type.document.structure.id">
+          <type>d:text</type>
+        </property>
+        <property name="vgr:dc.type.templatename">
+          <type>d:text</type>
+        </property>
+        <!-- APELON -->
+        <property name="vgr:dc.type.record">
+          <type>d:text</type>
+        </property>
+        <property name="vgr:dc.type.record.id">
+          <type>d:text</type>
+        </property>
+        <property name="vgr:dc.type.process.name">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+        <property name="vgr:dc.type.file.process">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+        <property name="vgr:dc.type.file">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+
+        <!-- This and the next need to be in tuples -->
+        <!-- Start group -->
+        <property name="vgr:dc.type.document.serie">
+          <type>d:text</type>
+          <!-- <multiple>true</multiple> -->
+        </property>
+        <property name="vgr:dc.type.document.id">
+          <type>d:text</type>
+        </property>
+        <!-- End group -->
+
+        <!-- ######################################### -->
+        <!-- DC.Format -->
+        <!-- ######################################### -->
+
+        <property name="vgr:dc.format.extent">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+        <!-- Replicated field -->
+        <property name="vgr:dc.format.extent.mimetype">
+          <type>d:text</type>
+        </property>
+        <property name="vgr:dc.format.extent.mimetype.native">
+          <type>d:text</type>
+        </property>
+        <!-- Replicated field -->
+        <property name="vgr:dc.format.extension">
+          <type>d:text</type>
+        </property>
+        <property name="vgr:dc.format.extension.native">
+          <type>d:text</type>
+        </property>
+
+        <!-- ######################################### -->
+        <!-- DC.Identifier -->
+        <!-- ######################################### -->
+
+        <property name="vgr:dc.identifier.diarie.id">
+          <type>d:text</type>
+        </property>
+        <property name="vgr:dc.identifier">
+          <type>d:text</type>
+          <index enabled="true">
+            <atomic>true</atomic>
+            <stored>false</stored>
+            <tokenised>false</tokenised>
+          </index>
+        </property>
+        <property name="vgr:dc.identifier.native">
+          <type>d:text</type>
+        </property>
+        <property name="vgr:dc.identifier.temp">
+          <type>d:text</type>
+        </property>
+        <property name="vgr:dc.identifier.checksum">
+          <type>d:text</type>
+        </property>
+        <property name="vgr:dc.identifier.checksum.native">
+          <type>d:text</type>
+        </property>
+        <!-- Replicated field -->
+        <property name="vgr:dc.identifier.documentid">
+          <type>d:text</type>
+        </property>
+        <!-- Replicated field -->
+        <property name="vgr:dc.identifier.version">
+          <type>d:text</type>
+        </property>
+        <property name="vgr:dc.identifier.location">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+
+        <!-- ######################################### -->
+        <!-- DC.Source -->
+        <!-- ######################################### -->
+
+        <property name="vgr:dc.source">
+          <type>d:text</type>
+          <index enabled="true">
+            <atomic>true</atomic>
+            <stored>false</stored>
+            <tokenised>false</tokenised>
+          </index>
+        </property>
+
+        <property name="vgr:dc.source.temp">
+          <type>d:text</type>
+        </property>
+
+        <property name="vgr:dc.source.documentid">
+          <type>d:text</type>
+        </property>
+
+        <property name="vgr:dc.source.origin">
+          <type>d:text</type>
+          <mandatory>true</mandatory>
+          <default>Alfresco</default>
+        </property>
+
+        <!-- ######################################### -->
+        <!-- DC.Language -->
+        <!-- ######################################### -->
+
+        <!-- APELON -->
+        <property name="vgr:dc.language">
+          <type>d:text</type>
+          <multiple>true</multiple>
+          <constraints>
+            <constraint name="vgr:languages" type="se.vgregion.alfresco.repo.constraints.ApelonNodeTypeConstraint">
+              <parameter name="nodeType">
+                <value>apelon:language</value>
+              </parameter>
+            </constraint>
+          </constraints>
+        </property>
+
+        <!-- ######################################### -->
+        <!-- DC.Relation -->
+        <!-- ######################################### -->
+
+        <property name="vgr:dc.relation.isversionof">
+          <type>d:text</type>
+        </property>
+        <property name="vgr:dc.relation.replaces">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+
+        <!-- ######################################### -->
+        <!-- DC.Coverage -->
+        <!-- ######################################### -->
+
+        <!-- APELON -->
+        <property name="vgr:dc.coverage.hsacode">
+          <type>d:text</type>
+          <multiple>true</multiple>
+          <constraints>
+            <constraint name="vgr:verksamhetsKoder" type="se.vgregion.alfresco.repo.constraints.HsaCodeConstraint" />
+          </constraints>
+        </property>
+
+        <property name="vgr:dc.coverage.hsacode.id">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+
+        <!-- ######################################### -->
+        <!-- DC.Audience -->
+        <!-- ######################################### -->
+
+        <!-- APELON -->
+        <!-- TODO: Develop a Share GUI for this -->
+        <property name="vgr:dc.audience">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+        <property name="vgr:dc.audience.id">
+          <type>d:text</type>
+          <multiple>true</multiple>
+        </property>
+
+        <!-- ######################################### -->
+        <!-- DC.Status -->
+        <!-- ######################################### -->
+
+        <!-- APELON -->
+        <property name="vgr:vgr.status.document">
+          <type>d:text</type>
+          <index enabled="true">
+            <atomic>false</atomic>
+            <stored>false</stored>
+            <tokenised>false</tokenised>
+          </index>
+          <constraints>
+            <constraint name="vgr:statuses" type="se.vgregion.alfresco.repo.constraints.StatusDocumentConstraint" />
+          </constraints>
+        </property>
+
+        <property name="vgr:vgr.status.document.id">
+          <type>d:text</type>
+        </property>
+
+        <!-- deprecated -->
+        <property name="vgr:hc.status.document">
+          <type>d:text</type>
+        </property>
+
+        <!-- ######################################### -->
+        <!-- DC.Rights -->
+        <!-- ######################################### -->
+
+        <property name="vgr:dc.rights.accessrights">
+          <type>d:text</type>
+          <multiple>true</multiple>
+          <default>Intranät</default>
+          <constraints>
+            <constraint ref="vgr:accessRights" />
+          </constraints>
+        </property>
+
+      </properties>
+
+    </aspect>
+
+    <!-- ################################################# -->
+    <!-- Aspect for the published documents in the Storage -->
+    <!-- ################################################# -->
+
+    <aspect name="vgr:published">
+      <properties>
+        <!-- This property is set when the published document has been sent to the PuSH server -->
+        <property name="vgr:pushed-for-publish">
+          <type>d:datetime</type>
+        </property>
+        <!-- This property is set when the document that should be unpublished has been sent to the PuSH server -->
+        <property name="vgr:pushed-for-unpublish">
+          <type>d:datetime</type>
+        </property>
+
+        <!-- This property is used to indicate the current status of the publishing and is set through a REST API -->
+        <property name="vgr:publish-status">
+          <type>d:text</type>
+        </property>
+        <!-- This property is used to indicate the current status of the publishing and is set through a REST API -->
+        <property name="vgr:unpublish-status">
+          <type>d:text</type>
+        </property>
+      </properties>
+    </aspect>
+
+    <!-- ############################################ -->
+    <!-- Aspect for the overriding the mandatory flag -->
+    <!-- ############################################ -->
+
+    <aspect name="vgr:standard">
+      <parent>vgr:metadata</parent>
+      <overrides>
+        <property name="vgr:dc.title">
+          <mandatory>true</mandatory>
+        </property>
+        <property name="vgr:dc.type.record">
+          <mandatory>true</mandatory>
+        </property>
+      </overrides>
+    </aspect>
+
+    <!-- ############################################ -->
+    <!-- Aspect for the documents coming from VGR Dok -->
+    <!-- ############################################ -->
+
+    <aspect name="vgr:vgrdok">
+      <properties>
+        <property name="vgr:vgr_dok_version">
+          <type>d:text</type>
+          <index enabled="true">
+            <atomic>true</atomic>
+            <stored>false</stored>
+            <tokenised>false</tokenised>
+          </index>
+        </property>
+        <property name="vgr:vgr_dok_document_id">
+          <type>d:text</type>
+          <index enabled="true">
+            <atomic>true</atomic>
+            <stored>false</stored>
+            <tokenised>false</tokenised>
+          </index>
+        </property>
+        <property name="vgr:vgr_dok_universal_id">
+          <type>d:text</type>
+        </property>
+        <property name="vgr:vgr_dok_filepath">
+          <type>d:text</type>
+        </property>
+        <property name="vgr:vgr_dok_moved_to_path">
+          <description>True if the document is moved to it's final folder,
+            reads the vgr:vgrDokFilePath property.
+          </description>
+          <type>d:boolean</type>
+          <default>false</default>
+        </property>
+        <property name="vgr:vgr_dok_moved_to_version">
+          <description>True if the document is moved the correct version
+            hierarchy.
+          </description>
+          <type>d:boolean</type>
+          <default>false</default>
+        </property>
+        <property name="vgr:vgr_dok_document_status">
+          <type>d:text</type>
+        </property>
+        <property name="vgr:vgr_dok_publish_type">
+          <type>d:text</type>
+        </property>
+      </properties>
+    </aspect>
+
+    <!-- ################################################## -->
+    <!-- Aspect for folders that's to be a 'watched' folder -->
+    <!-- ################################################## -->
+
+    <aspect name="vgr:watched">
+      <title>Övervakad folder</title>
+    </aspect>
+
+    <!-- ############################################################### -->
+    <!-- Aspect for extending the cm:person with VGR specific properties -->
+    <!-- ############################################################### -->
+
+    <aspect name="vgr:person">
+      <properties>
+        <property name="vgr:responsibility_code">
+          <type>d:text</type>
+        </property>
+        <property name="vgr:organization_dn">
+          <type>d:text</type>
+        </property>
+      </properties>
+    </aspect>
+
+    <!-- ########################################################################## -->
+    <!-- Aspect for letting the system know that documents should be auto published -->
+    <!-- ########################################################################## -->
+
+    <aspect name="vgr:auto-publish">
+      <title>Automatisk publicering</title>
+      <properties>
+        <property name="vgr:auto_publish_major_version">
+          <type>d:boolean</type>
+        </property>
+        <property name="vgr:auto_publish_all_versions">
+          <type>d:boolean</type>
+        </property>
+      </properties>
+    </aspect>
+
+    <!-- ######################################################################### -->
+    <!-- Aspect for controlling whether validity reminders has been sent out or not -->
+    <!-- ######################################################################### -->
+
+    <aspect name="vgr:validity-checked">
+      <title>Giltighetstidskontroll</title>
+      <properties>
+        <property name="vgr:sent-emails">
+          <type>d:int</type>
+        </property>
+      </properties>
+    </aspect>
+
+  </aspects>
+
+</model>

@@ -1,8 +1,0 @@
-<webscript>
-  <shortname>Get a list of Record Creators from KIV</shortname>
-  <description>Get a list of Record Creators from KIV</description>
-  <url>/vgr/kiv/findRecordsCreators</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction allow="readonly">required</transaction>
-</webscript>

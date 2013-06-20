@@ -1,5 +1,0 @@
-<webscript>
-  <shortname>Clear the EHCache</shortname>
-  <description>Clears all the EHCache instances</description>
-  <url>/vgr/clearcache</url>
-</webscript>

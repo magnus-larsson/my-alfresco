@@ -1,6 +1,0 @@
-<webscript>
-   <shortname>Save custom preference as site dashboard properties</shortname>
-   <description>Saves the tcustom preference as site dashboard properties</description>
-   <format default="json"/>
-   <url>/components/site/site-preferences</url>
-</webscript>

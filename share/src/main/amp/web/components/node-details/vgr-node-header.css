@@ -1,0 +1,19 @@
+.node-header img.status-icon {
+   padding: 12px 5px 0 0; float: left;
+}
+
+.node-header .node-action .onReloadDocumentClick a {
+   background: transparent url(../documentlibrary/actions/document-reload-16.png) no-repeat scroll 12px 4px; padding-left: 32px;
+}
+
+.node-header .node-info {
+   width: 77%;
+}
+
+.node-header .node-action {
+   width: 23%;
+}
+
+.node-header .node-info span.title-note {
+   color: #606060; font-weight: normal; padding-left: 5px; font-size: 13px;
+}

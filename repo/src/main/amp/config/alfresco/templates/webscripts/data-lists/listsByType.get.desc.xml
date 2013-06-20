@@ -1,0 +1,11 @@
+<webscript>
+  <shortname>Get a list of data lists by type</shortname>
+  <description>
+      Get a list of data lists of the same type and that user has create rights 
+      on, i.e. lists that a row can be moved to.
+  </description>
+  <url>/vgr/data-lists/bytype/site/{site}/{type}</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <family>VGR</family>
+</webscript>

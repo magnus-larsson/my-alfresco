@@ -1,9 +1,11 @@
 package se.vgregion.alfresco.repo.admin.patch.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.search.ResultSet;
@@ -40,29 +42,37 @@ public class FixDcSourceDocumentIdPatchTest {
     final ResultSet searchResult = context.mock(ResultSet.class);
 
     final ResultSetRow row = context.mock(ResultSetRow.class);
+    
+    final BehaviourFilter behaviourFilter = context.mock(BehaviourFilter.class);
 
     final List<ResultSetRow> nodes = new ArrayList<ResultSetRow>();
     nodes.add(row);
 
     final NodeRef publishedNodeRef = new NodeRef("workspace://SpacesStore/07586684-19fe-4ab9-aa84-d39f518005f2");
-
+    
+    final Collection<String> linkList = new ArrayList<String>();
+    linkList.add(link);
+    
     final FixDcSourceDocumentIdPatch patch = new FixDcSourceDocumentIdPatch();
     patch.setSearchService(searchService);
     patch.setNodeService(nodeService);
-
+    patch.setBehaviourFilter(behaviourFilter);
     context.checking(new Expectations() {
       {
         oneOf(searchService).query(with(any(SearchParameters.class)));
         will(returnValue(searchResult));
         oneOf(searchResult).iterator();
         will(returnIterator(nodes));
-        oneOf(row).getValue(ContentModel.PROP_COPY_REFERENCE);
+        oneOf(searchResult).close();
+        oneOf(row).getValue(ContentModel.PROP_REFERENCE);
         will(returnValue(null));
         oneOf(row).getValue(VgrModel.PROP_IDENTIFIER);
-        will(returnValue(link));
+        will(returnValue(linkList));
         oneOf(row).getNodeRef();
         will(returnValue(publishedNodeRef));
         oneOf(nodeService).setProperty(publishedNodeRef, VgrModel.PROP_SOURCE_DOCUMENTID, documentId);
+        oneOf(behaviourFilter).disableBehaviour();
+        oneOf(behaviourFilter).enableBehaviour();
       }
     });
 

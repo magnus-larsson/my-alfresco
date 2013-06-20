@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+<!-- 
+  <bean id="vgr.patch.fixDocumentTypes" class="se.vgregion.alfresco.repo.admin.patch.impl.FixDocumentTypesPatch" parent="basePatch">
+    <property name="id" value="vgr.patch.fixDocumentTypes" />
+    <property name="description" value="vgr.patch.fixDocumentTypes.description" />
+    <property name="fixesFromSchema" value="0" />
+    <property name="fixesToSchema" value="4017" />
+    <property name="targetSchema" value="4018" />
+    <property name="applyToTenants" value="false" />
+    <property name="permissionService" ref="permissionService" />
+    <property name="searchService" ref="searchService" />
+    <property name="nodeService" ref="nodeService" />
+    <property name="siteService" ref="siteService" />
+    <property name="fileFolderService" ref="fileFolderService" />
+  </bean>
+
+  <bean id="vgr.patch.fixFolderAspect" class="se.vgregion.alfresco.repo.admin.patch.impl.FixFolderAspectPatch" parent="basePatch">
+    <property name="id" value="vgr.patch.fixFolderAspect" />
+    <property name="description" value="vgr.patch.fixFolderAspect.description" />
+    <property name="fixesFromSchema" value="0" />
+    <property name="fixesToSchema" value="4017" />
+    <property name="targetSchema" value="4018" />
+    <property name="applyToTenants" value="false" />
+    <property name="permissionService" ref="permissionService" />
+    <property name="searchService" ref="searchService" />
+    <property name="nodeService" ref="nodeService" />
+    <property name="siteService" ref="siteService" />
+    <property name="fileFolderService" ref="fileFolderService" />
+  </bean>
+
+  <bean id="vgr.patch.fixVersionNames" class="se.vgregion.alfresco.repo.admin.patch.impl.FixVersionNamesPatch" parent="basePatch">
+    <property name="id" value="vgr.patch.fixVersionNames" />
+    <property name="description" value="vgr.patch.fixVersionNames.description" />
+    <property name="fixesFromSchema" value="0" />
+    <property name="fixesToSchema" value="4019" />
+    <property name="targetSchema" value="4020" />
+    <property name="applyToTenants" value="false" />
+    <property name="versionService" ref="VersionService" />
+    <property name="contentService" ref="ContentService" />
+  </bean>
+
+  <bean id="vgr.patch.removeSynchronisedUsers" class="se.vgregion.alfresco.repo.admin.patch.impl.RemoveSynchronisedUsersPatch" parent="basePatch">
+    <property name="id" value="vgr.patch.removeSynchronisedUsers" />
+    <property name="description" value="vgr.patch.removeSynchronisedUsers.description" />
+    <property name="fixesFromSchema" value="0" />
+    <property name="fixesToSchema" value="4019" />
+    <property name="targetSchema" value="4020" />
+    <property name="applyToTenants" value="false" />
+    <property name="personService" ref="personService" />
+    <property name="siteService" ref="siteService" />
+  </bean>
+
+  <bean id="vgr.patch.fixDcSourceDocumentId" class="se.vgregion.alfresco.repo.admin.patch.impl.FixDcSourceDocumentIdPatch" parent="basePatch">
+    <property name="id" value="vgr.patch.fixDcSourceDocumentId" />
+    <property name="description" value="vgr.patch.fixDcSourceDocumentId.description" />
+    <property name="fixesFromSchema" value="0" />
+    <property name="fixesToSchema" value="4019" />
+    <property name="targetSchema" value="4020" />
+    <property name="applyToTenants" value="false" />
+    <property name="force" value="true" />
+    <property name="behaviourFilter" ref="policyBehaviourFilter" />
+  </bean>
+
+  <bean id="vgr.patch.fixMissingIdentifierVersion" class="se.vgregion.alfresco.repo.admin.patch.impl.FixMissingIdentifierVersionPatch" parent="basePatch">
+    <property name="id" value="vgr.patch.fixMissingIdentifierVersion" />
+    <property name="description" value="vgr.patch.fixMissingIdentifierVersion.description" />
+    <property name="fixesFromSchema" value="0" />
+    <property name="fixesToSchema" value="4019" />
+    <property name="targetSchema" value="4020" />
+    <property name="applyToTenants" value="false" />
+    <property name="force" value="true" />
+    <property name="behaviourFilter" ref="policyBehaviourFilter" />
+  </bean>
+
+  <bean id="vgr.patch.fixDcSourceOrigin" class="se.vgregion.alfresco.repo.admin.patch.impl.FixDcSourceOriginPatch" parent="basePatch">
+    <property name="id" value="vgr.patch.fixDcSourceOrigin" />
+    <property name="description" value="vgr.patch.fixDcSourceOrigin.description" />
+    <property name="fixesFromSchema" value="0" />
+    <property name="fixesToSchema" value="4019" />
+    <property name="targetSchema" value="4020" />
+    <property name="applyToTenants" value="false" />
+    <property name="force" value="true" />
+    <property name="behaviourFilter" ref="policyBehaviourFilter" />
+  </bean>
+
+  <bean id="vgr.patch.copySourceIdentifierToTempProperties" class="se.vgregion.alfresco.repo.admin.patch.impl.CopySourceIdentifierToTempPropertiesPatch"
+    parent="basePatch">
+    <property name="id" value="vgr.patch.copySourceIdentifierToTempProperties" />
+    <property name="description" value="vgr.patch.copySourceIdentifierToTempProperties.description" />
+    <property name="fixesFromSchema" value="0" />
+    <property name="fixesToSchema" value="4019" />
+    <property name="targetSchema" value="4020" />
+    <property name="applyToTenants" value="false" />
+    <property name="force" value="true" />
+    <property name="behaviourFilter" ref="policyBehaviourFilter" />
+  </bean>
+ -->
+  <!-- This patch must be run LAST after all other things has been run -->
+  <!-- To run this patch, the vgrModel.xml MUST be changed so that dc.source and dc.identifier no longer has multiple=true -->
+<!-- 
+  <bean id="vgr.patch.copyTempPropertiesToSourceIdentifier" class="se.vgregion.alfresco.repo.admin.patch.impl.CopyTempPropertiesToSourceIdentifierPatch"
+    parent="basePatch">
+    <property name="id" value="vgr.patch.copyTempPropertiesToSourceIdentifier" />
+    <property name="description" value="vgr.patch.copyTempPropertiesToSourceIdentifier.description" />
+    <property name="fixesFromSchema" value="0" />
+    <property name="fixesToSchema" value="4019" />
+    <property name="targetSchema" value="4020" />
+    <property name="applyToTenants" value="false" />
+    <property name="force" value="true" />
+    <property name="behaviourFilter" ref="policyBehaviourFilter" />
+  </bean>
+
+  <bean id="vgr.patch.fixDcTypeRecordId" 
+        class="se.vgregion.alfresco.repo.admin.patch.impl.FixDcTypeRecordIdPatch" 
+        parent="basePatch"
+        p:apelonService-ref="vgr.apelonService" 
+        p:behaviourFilter-ref="policyBehaviourFilter" 
+        p:force="true" 
+        p:applyToTenants="false" 
+        p:targetSchema="4020"
+        p:fixesToSchema="4019" 
+        p:fixesFromSchema="0"
+        p:id="vgr.patch.fixDcTypeRecordId"
+        p:description="vgr.patch.fixDcTypeRecordId.description" />
+
+  <bean id="vgr.patch.fixDcCoverageHsaCodeId" 
+        class="se.vgregion.alfresco.repo.admin.patch.impl.FixDcCoverageHsaCodeIdPatch" 
+        parent="basePatch"
+        p:apelonService-ref="vgr.apelonService" 
+        p:behaviourFilter-ref="policyBehaviourFilter" 
+        p:force="true" 
+        p:applyToTenants="false" 
+        p:targetSchema="4020"
+        p:fixesToSchema="4019" 
+        p:fixesFromSchema="0"
+        p:id="vgr.patch.fixDcCoverageHsaCodeId"
+        p:description="vgr.patch.fixDcCoverageHsaCodeId.description" />
+
+  <bean id="vgr.patch.fixDcDocumentStatusId" 
+        class="se.vgregion.alfresco.repo.admin.patch.impl.FixDcDocumentStatusIdPatch" 
+        parent="basePatch"
+        p:apelonService-ref="vgr.apelonService" 
+        p:behaviourFilter-ref="policyBehaviourFilter" 
+        p:force="true" 
+        p:applyToTenants="false" 
+        p:targetSchema="4020"
+        p:fixesToSchema="4019" 
+        p:fixesFromSchema="0"
+        p:id="vgr.patch.FixDcDocumentStatusId"
+        p:description="vgr.patch.fixDcDocumentStatusId.description" />
+
+  <bean id="vgr.patch.fixDcCreatorForUnitId" 
+        class="se.vgregion.alfresco.repo.admin.patch.impl.FixDcCreatorForUnitIdPatch" 
+        parent="basePatch"
+        p:behaviourFilter-ref="policyBehaviourFilter" 
+        p:force="true" 
+        p:applyToTenants="false" 
+        p:targetSchema="4020"
+        p:fixesToSchema="4019" 
+        p:fixesFromSchema="0"
+        p:id="vgr.patch.fixDcCreatorForUnitId"
+        p:description="vgr.patch.fixDcCreatorForUnitId.description" />
+
+  <bean id="vgr.patch.fixDcCreatorRecordsCreatorId" 
+        class="se.vgregion.alfresco.repo.admin.patch.impl.FixDcCreatorRecordsCreatorIdPatch" 
+        parent="basePatch"
+        p:behaviourFilter-ref="policyBehaviourFilter" 
+        p:force="true" 
+        p:applyToTenants="false" 
+        p:targetSchema="4020"
+        p:fixesToSchema="4019" 
+        p:fixesFromSchema="0"
+        p:id="vgr.patch.fixDcCreatorRecordsCreatorId"
+        p:description="vgr.patch.fixDcCreatorRecordsCreatorId.description" />
+
+  <bean id="vgr.patch.fixDcPublisherForUnitId" 
+        class="se.vgregion.alfresco.repo.admin.patch.impl.FixDcPublisherForUnitIdPatch" 
+        parent="basePatch"
+        p:behaviourFilter-ref="policyBehaviourFilter" 
+        p:force="true" 
+        p:applyToTenants="false" 
+        p:targetSchema="4020"
+        p:fixesToSchema="4019" 
+        p:fixesFromSchema="0"
+        p:id="vgr.patch.fixDcPublisherForUnitId"
+        p:description="vgr.patch.fixDcPublisherForUnitId.description" />
+
+  <bean id="vgr.patch.extendPerson" 
+        class="se.vgregion.alfresco.repo.admin.patch.impl.ExtendPersonPatch" 
+        parent="basePatch"
+        p:personService-ref="personService"
+        p:retryingTransactionHelper-ref="retryingTransactionHelper"
+        p:force="true" 
+        p:applyToTenants="false" 
+        p:targetSchema="4020"
+        p:fixesToSchema="4019" 
+        p:fixesFromSchema="0"
+        p:id="vgr.patch.extendPerson"
+        p:description="vgr.patch.extendPerson.description" />
+
+  <bean id="vgr.patch.switchIdentifierAttachmentInline" 
+        class="se.vgregion.alfresco.repo.admin.patch.impl.SwitchIdentifierAttachmentInlinePatch" 
+        parent="basePatch"
+        p:behaviourFilter-ref="policyBehaviourFilter"
+        p:force="true" 
+        p:applyToTenants="false" 
+        p:targetSchema="4020"
+        p:fixesToSchema="4019" 
+        p:fixesFromSchema="0"
+        p:id="vgr.patch.switchIdentifierAttachmentInline"
+        p:description="vgr.patch.switchIdentifierAttachmentInline.description" />
+
+  <bean id="vgr.patch.fixVgrDocumentComments" 
+        class="se.vgregion.alfresco.repo.admin.patch.impl.FixVgrDocumentCommentsPatch" 
+        parent="basePatch"
+        p:behaviourFilter-ref="policyBehaviourFilter"
+        p:force="true" 
+        p:applyToTenants="false" 
+        p:targetSchema="4020"
+        p:fixesToSchema="4019" 
+        p:fixesFromSchema="0"
+        p:id="vgr.patch.fixVgrDocumentComments"
+        p:description="vgr.patch.fixVgrDocumentComments.description" />
+ -->
+</beans>

@@ -1,0 +1,7 @@
+.document-links .url-text {
+   border-top: 1px solid #ccc; border-bottom: 1px solid #ccc; padding: 5px 0; word-wrap: break-word;
+}
+
+.document-links .cb-copy-button {
+   margin-top: 5px;
+}

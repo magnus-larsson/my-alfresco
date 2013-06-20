@@ -1,0 +1,9 @@
+<webscript>
+  <shortname>Get children of a document structure in apelon</shortname>
+  <description>Get children of a document structure in our locally cached Apelon.</description>
+  <url>/vgr/apelon/documentStructureChildren</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction allow="readonly">required</transaction>
+  <family>VGR</family>
+</webscript>

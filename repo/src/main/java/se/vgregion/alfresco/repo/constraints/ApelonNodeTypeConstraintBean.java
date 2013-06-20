@@ -15,48 +15,54 @@ import se.vgregion.alfresco.repo.model.VgrModel;
 /**
  * Bean for getting list of values for a specific node type from the Apelon
  * Service.
- *
+ * 
  * @author Niklas Ekman (niklas.ekman@redpill-linpro.com)
  */
 public class ApelonNodeTypeConstraintBean extends AbstractConstraintBean {
 
   private static final Logger LOG = Logger.getLogger(ApelonNodeTypeConstraintBean.class);
 
+  protected ThreadLocal<List<String>> _allowedValues = new ThreadLocal<List<String>>();
+
   protected ApelonService _apelonService;
 
-  public void setApelonService(final ApelonService apelonService) {
+  public void setApelonService(ApelonService apelonService) {
     _apelonService = apelonService;
   }
 
   /**
    * Get allowed values from the Vocabulary Service for the passed node type.
-   *
+   * 
    * @param nodeType
    *          The nodeType to get the values for
    * @return A {@link List} of strings
    */
-  public List<String> getAllowedValues(final String nodeType) {
+  public List<String> getAllowedValues(String nodeType) {
+    if (_allowedValues.get() != null) {
+      return _allowedValues.get();
+    }
+
+    _allowedValues.set(new ArrayList<String>());
+
     Assert.hasText(nodeType);
 
-    final List<String> result = new ArrayList<String>();
-
     try {
-      final List<NodeRef> nodes = _apelonService.getNodes(nodeType);
+      List<NodeRef> nodes = _apelonService.getNodes(nodeType);
 
-      for (final NodeRef nodeRef : nodes) {
-        final String value = getValue(nodeRef);
+      for (NodeRef nodeRef : nodes) {
+        String value = getValue(nodeRef);
 
-        result.add(StringUtils.isNotBlank(value) ? value : "");
+        _allowedValues.get().add(StringUtils.isNotBlank(value) ? value : "");
       }
-    } catch (final Exception ex) {
+    } catch (Exception ex) {
       LOG.warn(ex.getMessage(), ex);
     }
 
-    return result;
+    return _allowedValues.get();
   }
 
-  protected String getValue(final NodeRef nodeRef) {
-    final Serializable name = getName(nodeRef);
+  protected String getValue(NodeRef nodeRef) {
+    Serializable name = getName(nodeRef);
 
     return name != null ? name.toString() : "";
   }
@@ -74,7 +80,7 @@ public class ApelonNodeTypeConstraintBean extends AbstractConstraintBean {
 
   /*
    * (non-Javadoc)
-   *
+   * 
    * @see
    * org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
    */

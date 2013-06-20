@@ -3,8 +3,11 @@ package se.vgregion.alfresco.repo.storage.impl;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 
 import org.alfresco.error.AlfrescoRuntimeException;
@@ -40,9 +43,11 @@ import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.OwnableService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.thumbnail.ThumbnailService;
+import org.alfresco.util.VersionNumber;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.extensions.surf.util.I18NUtil;
 import org.springframework.util.Assert;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
@@ -183,8 +188,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     final String oldName = (String) _nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
     final String newName = getUniqueName(finalFolder, oldName);
 
-    // disable the auditable aspect in order to prevent the last updated user to
-    // be "system"
+    // disable the auditable aspect in order to prevent the last updated user to be "system"
     _behaviourFilter.disableBehaviour(ContentModel.ASPECT_AUDITABLE);
 
     // we don't want to up the version, so we disable the versionalbe aspect
@@ -209,7 +213,8 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     _nodeService.setProperty(nodeRef, VgrModel.PROP_PUBLISHER, _serviceUtils.getRepresentation(username));
     _nodeService.setProperty(nodeRef, VgrModel.PROP_PUBLISHER_ID, username);
 
-    // check if this file has been published before, i.e. we've published it,
+    // check if this file has been published before, i.e. we've published
+    // it,
     // then revoked it, and are now publishing again
     final NodeRef publishedNodeRef = getPublishedNodeRef(nodeRef);
 
@@ -269,7 +274,8 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
           _nodeService.setProperty(newNode, VgrModel.PROP_IDENTIFIER, identifier);
           _nodeService.setProperty(nodeRef, VgrModel.PROP_IDENTIFIER, identifier);
 
-          // set the field "DC.source" when publishing on the source nodeRef,
+          // set the field "DC.source" when publishing on the source
+          // nodeRef,
           // this is a link to the document in "Lagret"
           final String documentSource = _serviceUtils.getDocumentSource(nodeRef);
           _nodeService.setProperty(newNode, VgrModel.PROP_SOURCE, documentSource);
@@ -338,7 +344,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
     return result;
   }
-
+  
   /**
    * Finds all the published documents for a specific source document id.
    * 
@@ -502,6 +508,8 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
       @Override
       public Void doWork() throws Exception {
+        _behaviourFilter.disableBehaviour(ContentModel.ASPECT_VERSIONABLE);
+
         try {
           Date now = new Date();
 
@@ -536,6 +544,8 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
         } catch (final Exception ex) {
           LOG.error(ex.getMessage(), ex);
           throw new RuntimeException(ex);
+        } finally {
+          _behaviourFilter.enableBehaviour(ContentModel.ASPECT_VERSIONABLE);
         }
 
         return null;
@@ -548,7 +558,8 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
   @Override
   public void moveToStorage(final NodeRef nodeRef) {
-    // here's a very, very slim risk that the Storage folder is not created...
+    // here's a very, very slim risk that the Storage folder is not
+    // created...
     assertPublishable(nodeRef);
 
     // create the folder structure <year>/<month>/<day>
@@ -605,8 +616,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
   @Override
   public boolean createPdfRendition(final NodeRef nodeRef, final boolean async) {
-    // must first check whether the nodeRef can be transformed into a PDF/A or
-    // not...
+    // must first check whether the nodeRef can be transformed into a PDF/A or not...
     if (!pdfaRendable(nodeRef)) {
       return false;
     }
@@ -622,7 +632,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     }
 
     // If there's nothing currently registered to generate thumbnails for the
-    // specified mimetype, then log a message and bail out
+    //  specified mimetype, then log a message and bail out
     String mimeType = _serviceUtils.getMimetype(nodeRef);
 
     Serializable value = _nodeService.getProperty(nodeRef, ContentModel.PROP_CONTENT);
@@ -660,8 +670,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     // folder
     NodeRef parentNodeRef = _nodeService.getPrimaryParent(nodeRef).getParentRef();
 
-    // if (!_serviceUtils.isSiteAdmin(nodeRef) && !_serviceUtils.isAdmin() &&
-    // !_serviceUtils.isSiteCollaborator(nodeRef)) {
+    // if (!_serviceUtils.isSiteAdmin(nodeRef) && !_serviceUtils.isAdmin() && !_serviceUtils.isSiteCollaborator(nodeRef)) {
     if (_permissionService.hasPermission(parentNodeRef, PermissionService.CREATE_CHILDREN) != AccessStatus.ALLOWED) {
       throw new AlfrescoRuntimeException("Only site administrators, site collaborators and system wide administrators can publish to storage.");
     }
@@ -679,7 +688,8 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
       // dc.type.record must be set
       Assert.hasText((String) _nodeService.getProperty(nodeRef, VgrModel.PROP_TYPE_RECORD), "The published document must have a 'dc.type.record' property.");
 
-      // dc.publisher.forunit or dc.publisher.project-assignment must be set
+      // dc.publisher.forunit or dc.publisher.project-assignment must be
+      // set
       @SuppressWarnings("unchecked")
       List<String> publisherForunit = (List<String>) _nodeService.getProperty(nodeRef, VgrModel.PROP_PUBLISHER_FORUNIT);
 
@@ -764,7 +774,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
       @Override
       public Boolean execute() throws Throwable {
-        _behaviourFilter.disableAllBehaviours();
+        _behaviourFilter.disableBehaviour();
 
         final NodeRef nodeRef = node.getNodeRef();
 
@@ -786,7 +796,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
           return false;
         }
 
-        _behaviourFilter.enableAllBehaviours();
+        _behaviourFilter.enableBehaviour();
 
         LOG.info("Create PDF/A for: " + nodeRef);
 
@@ -798,4 +808,105 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     return _retryingTransactionHelper.doInTransaction(execution, false, true);
   }
 
+  @Override
+  public NodeRef getLatestPublishedStorageVersion(final String nodeRef) {
+    List<ResultSetRow> originalRows = getStorageVersions(nodeRef);
+    List<ResultSetRow> rows = new ArrayList<ResultSetRow>();
+      for (final ResultSetRow row : originalRows) {
+        // only add published nodes to this list
+        if (!_serviceUtils.isPublished(row.getNodeRef())) {
+          continue;
+        }
+
+        rows.add(row);
+      }
+    
+    Collections.sort(rows, new Comparator<ResultSetRow>() {
+
+      @Override
+      public int compare(final ResultSetRow row1, final ResultSetRow row2) {
+        final String label1 = (String) _nodeService.getProperty(row1.getNodeRef(), VgrModel.PROP_IDENTIFIER_VERSION);
+
+        final String label2 = (String) _nodeService.getProperty(row2.getNodeRef(), VgrModel.PROP_IDENTIFIER_VERSION);
+
+        // sort the list descending (ie. most recent first)
+        return new VersionNumber(label2).compareTo(new VersionNumber(label1));
+      }
+
+    });
+
+    return rows.size() > 0 ? rows.get(0).getNodeRef() : null;
+  }
+  
+  @Override
+  public NodeRef getLatestStorageVersion(final String nodeRef) {
+    List<ResultSetRow> rows = getStorageVersions(nodeRef);
+    return rows.size() > 0 ? rows.get(0).getNodeRef() : null;
+  }
+
+  @Override
+  public NodeRef getPublishedStorageVersion(final String nodeRef, final String version) {
+    final String query = "TYPE:\"vgr:document\" AND ASPECT:\"vgr:published\" AND vgr:dc_x002e_source_x002e_documentid:\"" + nodeRef + "\" AND vgr:dc_x002e_identifier_x002e_version:\"" + version
+        + "\"";
+
+    final SearchParameters searchParameters = new SearchParameters();
+    searchParameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
+    searchParameters.setLanguage(SearchService.LANGUAGE_FTS_ALFRESCO);
+    searchParameters.setQuery(query);
+
+    final ResultSet nodes = _searchService.query(searchParameters);
+
+    try {
+      final NodeRef document = nodes.length() > 0 ? nodes.getNodeRef(0) : null;
+
+      if (document == null) {
+        return null;
+      }
+
+      return _serviceUtils.isPublished(document) ? document : null;
+    } finally {
+      ServiceUtils.closeQuietly(nodes);
+    }
+  }
+
+  @Override
+  public List<ResultSetRow> getStorageVersions(String nodeRef) {
+    final String query = "TYPE:\"vgr:document\" AND ASPECT:\"vgr:published\" AND (vgr:dc_x002e_source_x002e_documentid:\"" + nodeRef + "\" OR vgr:dc_x002e_identifier_x002e_documentid:\"" + nodeRef + "\")";
+
+    final Locale locale = new Locale("sv");
+    I18NUtil.setLocale(locale);
+
+    final SearchParameters searchParameters = new SearchParameters();
+    searchParameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
+    searchParameters.setLanguage(SearchService.LANGUAGE_FTS_ALFRESCO);
+    searchParameters.setQuery(query);
+    searchParameters.addSort("vgr:dc.identifier.version", true);
+
+    final ResultSet nodes = _searchService.query(searchParameters);
+
+    final List<ResultSetRow> rows = new ArrayList<ResultSetRow>();
+
+    try {
+      for (final ResultSetRow row : nodes) {
+        rows.add(row);
+      }
+    } finally {
+      ServiceUtils.closeQuietly(nodes);
+    }
+
+    Collections.sort(rows, new Comparator<ResultSetRow>() {
+
+      @Override
+      public int compare(final ResultSetRow row1, final ResultSetRow row2) {
+        final String label1 = (String) _nodeService.getProperty(row1.getNodeRef(), VgrModel.PROP_IDENTIFIER_VERSION);
+
+        final String label2 = (String) _nodeService.getProperty(row2.getNodeRef(), VgrModel.PROP_IDENTIFIER_VERSION);
+
+        // sort the list descending (ie. most recent first)
+        return new VersionNumber(label2).compareTo(new VersionNumber(label1));
+      }
+
+    });
+    return rows;
+  }
 }

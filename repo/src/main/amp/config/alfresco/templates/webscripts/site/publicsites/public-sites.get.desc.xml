@@ -1,0 +1,10 @@
+<!-- @overridden projects/slingshot/config/alfresco/site-webscripts/org/alfresco/components/dashlets/my-sites.get.desc.xml -->
+<webscript>
+  <shortname>Sites</shortname>
+  <description>Get a colleciton of the public sites in the repository.  The collection can be filtered by name and/or site preset.</description>
+  <url>/vgr/public-sites?nf={namefilter?}&amp;spf={sitepresetfilter?}&amp;size={pagesize?}&amp;pos={position?}</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction allow="readonly">required</transaction>
+  <family>VGR</family>
+</webscript>

@@ -1,8 +1,0 @@
-<webscript>
-  <shortname>Check for possible clashes in inherited properties</shortname>
-  <description>Check for possible clashes in inherited properties, i.e would a move/copy overwrite a property</description>
-  <url>/vgr/inheritance/check</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

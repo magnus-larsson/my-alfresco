@@ -1,0 +1,126 @@
+<extension>
+  <modules>
+
+    <module>
+      <id>VGR Global</id>
+      <auto-deploy>true</auto-deploy>
+
+      <!-- Base evaluator that decides if any of the component bindings should be used at all -->
+      <evaluator type="site.module.evaluator">
+        <params>
+          <sites>.*</sites>
+          <sitePresets>site-dashboard</sitePresets>
+          <applyForNonSites>true</applyForNonSites>
+        </params>
+      </evaluator>
+
+      <!-- Apply the following customizations when the base evaluator above passes -->
+      <customizations>
+        <customization>
+          <targetPackageRoot>org.alfresco</targetPackageRoot>
+          <sourcePackageRoot>se.vgregion.alfresco.customizations</sourcePackageRoot>
+        </customization>
+      </customizations>
+
+      <configurations>
+        <config evaluator="string-compare" condition="DocumentLibrary" replace="true">
+          <create-content>
+            <content id="document" label="menu.create-content.vgr-document" type="pagelink" index="10" icon="text">
+              <param name="page">create-content?destination={nodeRef}&amp;itemId=vgr:document</param>
+            </content>
+          </create-content>
+
+          <create-content-by-template>false</create-content-by-template>
+        </config>
+      </configurations>
+
+      <components>
+        <!-- Hide Publishing area in document details -->
+        <component>
+          <scope>template</scope>
+          <region-id>document-publishing</region-id>
+          <source-id>document-details</source-id>
+          <sub-components>
+            <sub-component id="default">
+              <evaluations>
+                <evaluation id="vgr-hide">
+                  <render>false</render>
+                </evaluation>
+              </evaluations>
+            </sub-component>
+          </sub-components>
+        </component>
+
+        <!-- Hide sync area in document details -->
+        <component>
+          <scope>template</scope>
+          <region-id>document-sync</region-id>
+          <source-id>document-details</source-id>
+          <sub-components>
+            <sub-component id="default">
+              <evaluations>
+                <evaluation id="vgr-hide">
+                  <render>false</render>
+                </evaluation>
+              </evaluations>
+            </sub-component>
+          </sub-components>
+        </component>
+
+        <!-- Hide workflows area in document details -->
+        <component>
+          <scope>template</scope>
+          <region-id>document-workflows</region-id>
+          <source-id>document-details</source-id>
+          <sub-components>
+            <sub-component id="default">
+              <evaluations>
+                <evaluation id="vgr-hide">
+                  <render>false</render>
+                </evaluation>
+              </evaluations>
+            </sub-component>
+          </sub-components>
+        </component>
+
+        <!-- Hide sync area in folder details -->
+        <component>
+          <scope>template</scope>
+          <region-id>folder-sync</region-id>
+          <source-id>folder-details</source-id>
+          <sub-components>
+            <sub-component id="default">
+              <evaluations>
+                <evaluation id="vgr-hide">
+                  <render>false</render>
+                </evaluation>
+              </evaluations>
+            </sub-component>
+          </sub-components>
+        </component>
+
+        <component>
+          <scope>template</scope>
+          <region-id>people-finder</region-id>
+          <source-id>invite</source-id>
+          <sub-components>
+            <sub-component id="default">
+              <evaluations>
+                <evaluation id="vgr-default">
+                  <url>/components/people-finder/people-finder</url>
+                  <properties>
+                    <setFocus>true</setFocus>
+                    <addButtonSuffix>&gt;&gt;</addButtonSuffix>
+                    <dataWebScript>vgr/sites/[siteId]/potentialmembers?authorityType=USER</dataWebScript>
+                  </properties>
+                </evaluation>
+              </evaluations>
+            </sub-component>
+          </sub-components>
+        </component>
+      </components>
+
+    </module>
+
+  </modules>
+</extension>

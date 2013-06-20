@@ -1,0 +1,11 @@
+<webscript>
+   <shortname>Get People</shortname>
+   <description>
+      Get collection of people stored in the repository by a list of nodeRefs
+   </description>
+   <url>/vgr/peoplebyemail?email={email}</url>
+   <format default="json">argument</format>
+   <authentication>user</authentication>
+   <transaction allow="readonly">required</transaction>
+   <family>VGR</family>
+</webscript>

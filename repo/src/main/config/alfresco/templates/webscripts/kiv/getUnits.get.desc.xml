@@ -1,8 +1,0 @@
-<webscript>
-  <shortname>Get a list of units from a list of HSAID</shortname>
-  <description>Get a list of units from a list of HSAID</description>
-  <url>/vgr/kiv/units</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction allow="readonly">required</transaction>
-</webscript>

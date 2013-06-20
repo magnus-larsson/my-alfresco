@@ -4,11 +4,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.servlet.http.HttpSession;
+
 import org.alfresco.web.site.SlingshotUserFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.extensions.surf.FrameworkUtil;
 import org.springframework.extensions.surf.RequestContext;
+import org.springframework.extensions.surf.ServletUtil;
 import org.springframework.extensions.surf.exception.ConnectorServiceException;
 import org.springframework.extensions.surf.exception.UserFactoryException;
 import org.springframework.extensions.surf.site.AlfrescoUser;
@@ -92,7 +94,9 @@ public class VgrUserFactory extends SlingshotUserFactory {
 
       writer.endObject();
 
-      final Connector conn = FrameworkUtil.getConnector(context, ALFRESCO_ENDPOINT_ID);
+      HttpSession httpSession = ServletUtil.getSession();
+
+      Connector conn = getServiceRegistry().getConnectorService().getConnector(ALFRESCO_ENDPOINT_ID, context.getUserId(), httpSession);
 
       final ConnectorContext c = new ConnectorContext(HttpMethod.POST);
 

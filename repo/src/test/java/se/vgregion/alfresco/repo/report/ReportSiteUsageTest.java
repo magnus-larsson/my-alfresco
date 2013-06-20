@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.activities.ActivityService;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
@@ -28,6 +29,7 @@ import org.junit.Test;
 
 public class ReportSiteUsageTest {
   Mockery context;
+  ServiceRegistry serviceRegistry;
   NodeService nodeService;
   FileFolderService fileFolderService;
   SiteService siteService;
@@ -42,6 +44,7 @@ public class ReportSiteUsageTest {
   public void setUp() throws Exception {
 
     context = new Mockery();
+    serviceRegistry = context.mock(ServiceRegistry.class);
     nodeService = context.mock(NodeService.class);
     fileFolderService = context.mock(FileFolderService.class);
     siteService = context.mock(SiteService.class);
@@ -61,8 +64,20 @@ public class ReportSiteUsageTest {
     listFolderInfoNonEmpty.add(fileInfo);
     listFolderInfoNonEmpty.add(fileInfo);
     listFolderInfoNonEmpty.add(fileInfo);
+
+    rsu.setActivityService(activityService);
+    rsu.setFileFolderService(fileFolderService);
+    rsu.setNodeService(nodeService);
+    rsu.setSiteService(siteService);
+
     context.checking(new Expectations() {
       {
+        allowing(serviceRegistry).getNodeService();
+        will(returnValue(nodeService));
+
+        allowing(serviceRegistry).getFileFolderService();
+        will(returnValue(fileFolderService));
+
         allowing(fileFolderService).searchSimple(siteNodeRef1, ReportSiteUsage.DOCUMENT_LIBRARY);
         will(returnValue(siteNodeRef1));
 
@@ -105,13 +120,18 @@ public class ReportSiteUsageTest {
     ReportSiteUsage rsu = new ReportSiteUsage();
     NodeRef siteNodeRef1 = new NodeRef(WORKSPACE_AND_STORE + DUMMY_NODE_ID_1);
     NodeRef siteNodeRef2 = new NodeRef("fail" + WORKSPACE_AND_STORE + DUMMY_NODE_ID_2);
+    rsu.setActivityService(activityService);
+    rsu.setFileFolderService(fileFolderService);
+    rsu.setNodeService(nodeService);
+    rsu.setSiteService(siteService);
+
     context.checking(new Expectations() {
       {
         allowing(nodeService).exists(with(any(NodeRef.class)));
         will(returnValue(false));
       }
     });
-
+    
     try {
       rsu.getSiteSize(siteNodeRef1);
       fail();
@@ -132,13 +152,24 @@ public class ReportSiteUsageTest {
 
     final NodeRef siteNodeRef = new NodeRef(WORKSPACE_AND_STORE + DUMMY_NODE_ID_1);
 
+    rsu.setActivityService(activityService);
+    rsu.setFileFolderService(fileFolderService);
+    rsu.setNodeService(nodeService);
+    rsu.setSiteService(siteService);
+
     final List<FileInfo> listFolderInfoNonEmpty = new ArrayList<FileInfo>();
     listFolderInfoNonEmpty.add(fileInfo);
 
     context.checking(new Expectations() {
       {
+        allowing(serviceRegistry).getNodeService();
+        will(returnValue(nodeService));
+
         allowing(nodeService).exists(with(any(NodeRef.class)));
         will(returnValue(true));
+
+        allowing(serviceRegistry).getFileFolderService();
+        will(returnValue(fileFolderService));
 
         allowing(fileFolderService).searchSimple(siteNodeRef, ReportSiteUsage.DOCUMENT_LIBRARY);
         will(returnValue(siteNodeRef));
@@ -171,8 +202,22 @@ public class ReportSiteUsageTest {
 
     final NodeRef siteNodeRef1 = new NodeRef(WORKSPACE_AND_STORE + DUMMY_NODE_ID_1);
     final NodeRef siteNodeRef2 = new NodeRef(WORKSPACE_AND_STORE + DUMMY_NODE_ID_2);
+    final String shortname1 = "site1";
+    final String shortname2 = "site2";
+
+    rsu.setActivityService(activityService);
+    rsu.setFileFolderService(fileFolderService);
+    rsu.setNodeService(nodeService);
+    rsu.setSiteService(siteService);
+
     context.checking(new Expectations() {
       {
+        allowing(serviceRegistry).getNodeService();
+        will(returnValue(nodeService));
+
+        allowing(serviceRegistry).getSiteService();
+        will(returnValue(siteService));
+
         allowing(nodeService).exists(with(any(NodeRef.class)));
         will(returnValue(true));
 
@@ -191,8 +236,20 @@ public class ReportSiteUsageTest {
     assertEquals(0, rsu.getNumberOfSiteMembers(siteInfo));
 
     setUp();
+
+    rsu.setActivityService(activityService);
+    rsu.setFileFolderService(fileFolderService);
+    rsu.setNodeService(nodeService);
+    rsu.setSiteService(siteService);
+
     context.checking(new Expectations() {
       {
+        allowing(serviceRegistry).getNodeService();
+        will(returnValue(nodeService));
+
+        allowing(serviceRegistry).getSiteService();
+        will(returnValue(siteService));
+
         allowing(nodeService).exists(with(any(NodeRef.class)));
         will(returnValue(true));
 
@@ -218,8 +275,20 @@ public class ReportSiteUsageTest {
     ReportSiteUsage rsu = new ReportSiteUsage();
 
     final NodeRef siteNodeRef1 = new NodeRef(WORKSPACE_AND_STORE + DUMMY_NODE_ID_1);
+
+    rsu.setActivityService(activityService);
+    rsu.setFileFolderService(fileFolderService);
+    rsu.setNodeService(nodeService);
+    rsu.setSiteService(siteService);
+
     context.checking(new Expectations() {
       {
+        allowing(serviceRegistry).getNodeService();
+        will(returnValue(nodeService));
+
+        allowing(serviceRegistry).getSiteService();
+        will(returnValue(siteService));
+
         allowing(nodeService).exists(with(any(NodeRef.class)));
         will(returnValue(false));
 
@@ -240,6 +309,10 @@ public class ReportSiteUsageTest {
     ReportSiteUsage rsu = new ReportSiteUsage();
 
     rsu.setActivityService(activityService);
+    rsu.setFileFolderService(fileFolderService);
+    rsu.setNodeService(nodeService);
+    rsu.setSiteService(siteService);
+
     context.checking(new Expectations() {
       {
         allowing(nodeService).exists(with(any(NodeRef.class)));
@@ -256,7 +329,12 @@ public class ReportSiteUsageTest {
     assertNull(rsu.getLastActivityOnSite(siteInfo));
 
     setUp();
+
     rsu.setActivityService(activityService);
+    rsu.setFileFolderService(fileFolderService);
+    rsu.setNodeService(nodeService);
+    rsu.setSiteService(siteService);
+
     final Date testDate = new Date();
     context.checking(new Expectations() {
       {

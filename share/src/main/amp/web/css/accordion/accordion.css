@@ -1,0 +1,59 @@
+dl.bd-menu {
+   overflow: hidden; margin: 0; padding: 0; padding: 1em 0.2em 0 0.6em;
+}
+
+dl.bd-menu dt.a-m-t,dl.bd-menu dt.a-m-t2,.a-m-t-c {
+   display: block; padding: 0.3em 0.6em; color: #515d6b; text-decoration: none; background-color: #eeeeee; position: relative; cursor: pointer;
+}
+
+dl.bd-menu dt.a-m-t a,.a-m-t-c a {
+   
+}
+
+dl.bd-menu dt.a-m-t-hover {
+   
+}
+
+dl.bd-menu dt.a-m-t-down {
+   
+}
+
+html.bd-menu-js dt.a-m-t,.a-m-t-c {
+   cursor: pointer; zoom: 1;
+}
+
+dl.bd-menu dd.a-m-d {
+   padding: 1em 0.2em 0 0.6em; border: 1px solid #eeeeee; _zoom: 1;
+}
+
+html.bd-menu-js dd.a-m-d {
+   display: none;
+}
+
+html.bd-menu-js dd.a-m-d-expand {
+   display: block;
+}
+
+html.bd-menu-js dd.a-m-d-before-expand {
+   display: block; position: relative; z-index: -1; opacity: 0; height: auto !important; visibility: hidden; overflow: visible;
+}
+
+html.bd-menu-js dt.a-m-t-expand {
+   
+}
+
+html.bd-menu-js dd.a-m-d-anim {
+   overflow: hidden; display: block;
+}
+
+dl.bd-menu dd.a-m-d .bd {
+   
+}
+
+dl.bd-menu .a-m-t .indicator {
+   display: block; width: 14px; height: 14px; background: url(../../../yui/assets/skins/default/sprite.png) 0 -350px; position: absolute; right: 0.5em; top: 20%;
+}
+
+dl.bd-menu .a-m-t-expand .indicator {
+   background: url(../../../yui/assets/skins/default/sprite.png) 0 -400px;
+}

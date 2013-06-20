@@ -1,0 +1,6 @@
+<webscript>
+  <shortname>Admin Console PuSH Reports</shortname>
+  <description>Administration Console - PuSH Reports</description>
+  <url>/components/console/push-reports</url>
+  <family>admin-console</family>
+</webscript>

@@ -1,8 +1,0 @@
-<webscript>
-  <shortname>Get a list of keywords from a list of ids</shortname>
-  <description>Get a list of keywords from a list of ids</description>
-  <url>/vgr/apelon/keywords</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

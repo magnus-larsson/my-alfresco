@@ -1,0 +1,565 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+  <!-- activate the load time weaver for weaving aspects into classes and also accessing private mehtods -->
+  <context:load-time-weaver />
+
+  <!-- This is a helper bean for getting hold of the current application context and making it available with a static method -->
+  <bean id="vgr.applicationContextHolder" class="se.vgregion.alfresco.repo.utils.ApplicationContextHolder" />
+
+  <bean id="vgr.abstractConstraint" class="se.vgregion.alfresco.repo.constraints.AbstractConstraintBean" abstract="true" p:nodeService-ref="NodeService" />
+
+  <bean id="vgr.storageService" class="se.vgregion.alfresco.repo.storage.impl.StorageServiceImpl">
+    <property name="nodeService" ref="NodeService" />
+    <property name="fileFolderService" ref="FileFolderService" />
+    <property name="serviceRegistry" ref="ServiceRegistry" />
+    <property name="permissionService" ref="PermissionService" />
+    <property name="copyService" ref="CopyService" />
+    <property name="serviceUtils" ref="vgr.serviceUtils" />
+    <property name="behaviourFilter" ref="policyBehaviourFilter" />
+    <property name="globalProperties" ref="global-properties" />
+    <property name="storageNodeRef" value="${vgr.storage.noderef}" />
+    <property name="contentService" ref="ContentService" />
+    <property name="searchService" ref="SearchService" />
+    <property name="dictionaryService" ref="DictionaryService" />
+    <property name="retryingTransactionHelper" ref="retryingTransactionHelper" />
+    <property name="thumbnailService" ref="ThumbnailService" />
+    <property name="actionService" ref="ActionService" />
+    <property name="ownableService" ref="OwnableService" />
+    <property name="renditionService" ref="RenditionService" />
+  </bean>
+
+  <bean id="vgr.storageScript" parent="baseJavaScriptExtension" class="se.vgregion.alfresco.repo.scripts.ScriptStorageService">
+    <property name="storageService" ref="vgr.storageService" />
+    <property name="extensionName" value="storage" />
+  </bean>
+
+  <!-- Controller for the web script Clear Cache -->
+  <bean id="webscript.clearcache.clearcache.get" class="se.vgregion.alfresco.repo.scripts.ClearCache" parent="webscript">
+    <property name="cacheManagers">
+      <list>
+        <ref bean="internalEHCacheManager" />
+      </list>
+    </property>
+  </bean>
+
+  <!-- Controller for the web script Published -->
+  <bean id="webscript.feed.document.published.get" class="se.vgregion.alfresco.repo.scripts.Published" parent="webscript">
+    <property name="globalProperties" ref="global-properties" />
+  </bean>
+
+  <!-- Controller for the web script Published -->
+  <bean id="webscript.probe.probe.get" class="com.redpill.alfresco.clusterprobe.repo.ProbeScript" parent="webscript.com.redpill.alfresco.clusterprobe.probe.get" />
+
+
+  <!-- Need to override the "registerContentWithVersionService" to replace the version label calculation done for cm:content alternatively create a new bean for all custom content types. -->
+
+  <bean id="registerContentWithVersionService" class="org.alfresco.repo.version.VersionServiceVersionLabelRegistrationBean" init-method="register" depends-on="vgr.dictionaryBootstrap">
+    <property name="versionService">
+      <ref bean="versionService" />
+    </property>
+    <property name="namespacePrefixResolver">
+      <ref bean="namespaceService" />
+    </property>
+    <property name="typeQName">
+      <value>vgr:document</value>
+    </property>
+    <property name="policy">
+      <ref bean="vgr.configurableSerialVersionLabelPolicy" />
+    </property>
+  </bean>
+
+  <!-- **** -->
+  <!-- I18N -->
+  <!-- ***** -->
+
+  <bean id="vgr.resourceBundles" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+    <property name="resourceBundles">
+      <list>
+        <value>alfresco.module.vgr-repo.context.messages.vgr-patches</value>
+        <value>alfresco.module.vgr-repo.context.messages.vgr-mail</value>
+        <value>alfresco.module.vgr-repo.context.messages.vgr-data-list-model</value>
+      </list>
+    </property>
+  </bean>
+
+  <bean id="invitationResourceBundles" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+    <property name="resourceBundles">
+      <list>
+        <value>alfresco.module.vgr-repo.context.messages.invitation-service</value>
+      </list>
+    </property>
+  </bean>
+
+  <bean id="activitiesResourceBundles" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+    <property name="resourceBundles">
+      <list>
+        <value>alfresco.messages.activities-service</value>
+        <value>alfresco.messages.activity-list</value>
+        <value>alfresco.module.vgr-repo.context.messages.activity-list</value>
+        <value>alfresco.messages.slingshot</value>
+      </list>
+    </property>
+  </bean>
+
+  <!-- *********************************** -->
+  <!-- LDAP search in the Portal Directory -->
+  <!-- *********************************** -->
+
+  <bean id="vgr.contextSource" class="org.springframework.ldap.pool.factory.PoolingContextSource">
+    <property name="contextSource" ref="vgr.contextSourceTarget" />
+    <property name="dirContextValidator" ref="vgr.dirContextValidator" />
+    <property name="testOnBorrow" value="true" />
+    <property name="testWhileIdle" value="true" />
+  </bean>
+
+  <bean id="vgr.dirContextValidator" class="org.springframework.ldap.pool.validation.DefaultDirContextValidator" />
+
+  <bean id="vgr.contextSourceTarget" class="org.springframework.ldap.core.support.LdapContextSource">
+    <property name="url" value="${ldap.authentication.java.naming.provider.url}" />
+    <property name="userDn" value="${ldap.synchronization.java.naming.security.principal}" />
+    <property name="password" value="${ldap.synchronization.java.naming.security.credentials}" />
+    <property name="base" value="${ldap.synchronization.userSearchBase}" />
+    <property name="pooled" value="false" />
+  </bean>
+
+  <bean id="vgr.ldapTemplate" class="org.springframework.ldap.core.LdapTemplate">
+    <property name="contextSource" ref="vgr.contextSource" />
+  </bean>
+
+  <bean id="vgr.portalLdapService" class="se.vgregion.alfresco.repo.ldap.impl.PortalLdapServiceImpl">
+    <property name="ldapTemplate" ref="vgr.ldapTemplate" />
+    <property name="usernameAttribute" value="${ldap.synchronization.userIdAttributeName}" />
+    <property name="firstnameAttribute" value="${ldap.synchronization.userFirstNameAttributeName}" />
+    <property name="lastnameAttribute" value="${ldap.synchronization.userLastNameAttributeName}" />
+    <property name="organisationAttribute" value="${ldap.synchronization.userOrganizationalIdAttributeName}" />
+    <property name="emailAttribute" value="${ldap.synchronization.userEmailAttributeName}" />
+  </bean>
+
+  <bean id="vgr.portalLdapScript" parent="baseJavaScriptExtension" class="se.vgregion.alfresco.repo.scripts.ScriptPortalLdapService">
+    <property name="portalLdapService" ref="vgr.portalLdapService" />
+    <property name="userRegistrySynchronizer" ref="userRegistrySynchronizer" />
+    <property name="extensionName" value="portalLdap" />
+    <property name="personService" ref="personService" />
+    <property name="nodeService" ref="NodeService" />
+  </bean>
+
+  <!-- *************************************** -->
+  <!-- Overridden bean for extending mimetypes -->
+  <!-- *************************************** -->
+
+  <bean id="mimetypeConfigService" class="org.springframework.extensions.config.xml.XMLConfigService" init-method="init">
+    <constructor-arg>
+      <bean class="org.springframework.extensions.config.source.UrlConfigSource">
+        <constructor-arg>
+          <list>
+            <value>classpath:alfresco/mimetype/mimetype-map.xml</value>
+            <value>classpath:alfresco/mimetype/mimetype-map-openoffice.xml</value>
+            <value>classpath:alfresco/mimetype/mimetype-custom-extensions.xml</value>
+          </list>
+        </constructor-arg>
+      </bean>
+    </constructor-arg>
+  </bean>
+
+  <!-- ****************************** -->
+  <!-- Bean for publish files to feed -->
+  <!-- ****************************** -->
+
+  <bean id="vgr.pushService" class="se.vgregion.alfresco.repo.push.impl.PushServiceImpl">
+    <property name="feedUrl" value="${vgr.feed.url}" />
+    <property name="pushServerUrl" value="${vgr.pushserver.url}" />
+    <property name="dumpFeed" value="false" />
+    <property name="serviceUtils" ref="vgr.serviceUtils" />
+    <property name="searchService" ref="SearchService" />
+  </bean>
+
+  <bean id="vgr.pushServiceScript" parent="baseJavaScriptExtension" class="se.vgregion.alfresco.repo.scripts.ScriptPushService">
+    <property name="extensionName" value="pushService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="behaviourFilter" ref="policyBehaviourFilter" />
+  </bean>
+
+  <bean id="vgr.pushJmsService" class="se.vgregion.alfresco.repo.push.impl.PushJmsServiceImpl">
+    <property name="nodeService" ref="NodeService" />
+    <property name="queueName" value="${vgr.pushJms.queueName}" />
+    <property name="consumerRemoteUrl" value="${vgr.pushJms.consumerRemoteUrl}" />
+    <property name="producerLocalUrl" value="${vgr.pushJms.producerLocalUrl}" />
+    <property name="vgrHdrSenderId" value="${vgr.pushJms.vgrHdrSenderId}" />
+    <property name="vgrHdrReceiverId" value="${vgr.pushJms.vgrHdrReceiverId}" />
+    <property name="vgrHdrMessageTypeVersion" value="${vgr.pushJms.VgrHdrMessageTypeVersion}" />
+  </bean>
+
+  <!-- *********************************** -->
+  <!-- Service bean for all things related -->
+  <!-- *********************************** -->
+
+  <bean id="vgr.serviceUtils" class="se.vgregion.alfresco.repo.utils.ServiceUtils">
+    <property name="transactionService" ref="TransactionService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="authenticationService" ref="AuthenticationService" />
+    <property name="personService" ref="PersonService" />
+    <property name="lockService" ref="LockService" />
+    <property name="dictionaryService" ref="DictionaryService" />
+    <property name="searchService" ref="SearchService" />
+    <property name="siteService" ref="siteService" />
+    <property name="mimetypeService" ref="MimetypeService" />
+    <property name="contentService" ref="ContentService" />
+    <property name="fileFolderService" ref="FileFolderService" />
+    <property name="globalProperties" ref="global-properties" />
+    <property name="permissionService" ref="PermissionService" />
+    <property name="authorityService" ref="AuthorityService" />
+    <property name="behaviourFilter" ref="policyBehaviourFilter" />
+  </bean>
+
+  <bean id="vgr.serviceUtilsScript" parent="baseJavaScriptExtension" class="se.vgregion.alfresco.repo.scripts.ScriptServiceUtils">
+    <property name="extensionName" value="serviceUtils" />
+    <property name="serviceRegistry" ref="ServiceRegistry" />
+    <property name="serviceUtils" ref="vgr.serviceUtils" />
+    <property name="siteService" ref="SiteService" />
+  </bean>
+
+  <!-- **************************** -->
+  <!-- Bean for VGR dok and WEB dok -->
+  <!-- **************************** -->
+
+  <bean id="webscript.webdok.webdok.get" class="se.vgregion.alfresco.repo.scripts.WebDok" parent="webscript.org.alfresco.cmis.content.get">
+    <property name="searchService" ref="SearchService" />
+    <property name="serviceUtils" ref="vgr.serviceUtils" />
+    <property name="thumbnailService" ref="ThumbnailService" />
+    <property name="storageService" ref="vgr.storageService" />
+  </bean>
+
+  <bean id="webscript.vgrdok.migrate.get" class="se.vgregion.alfresco.repo.scripts.Migrate" parent="webscript">
+    <property name="baseFolder" value="${vgr.vgrdok.import.path}" />
+    <property name="fileFolderService" ref="FileFolderService" />
+    <property name="siteService" ref="SiteService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="checkOutCheckInService" ref="CheckoutCheckinService" />
+    <property name="versionService" ref="VersionService" />
+    <property name="serviceUtils" ref="vgr.serviceUtils" />
+    <property name="contentService" ref="ContentService" />
+    <property name="searchService" ref="SearchService" />
+    <property name="storageService" ref="vgr.storageService" />
+    <property name="onlyMetadata" value="false" />
+  </bean>
+
+  <bean id="vgr.vgrDokScript" parent="baseJavaScriptExtension" class="se.vgregion.alfresco.repo.scripts.ScriptVgrDok">
+    <property name="extensionName" value="vgrDok" />
+    <property name="serviceUtils" ref="vgr.serviceUtils" />
+    <property name="searchService" ref="SearchService" />
+    <property name="storageService" ref="vgr.storageService" />
+    <property name="nodeService" ref="NodeService" />
+  </bean>
+
+  <!-- ************************************************ -->
+  <!-- Overridden beans for supporting , in multivalues -->
+  <!-- ************************************************ -->
+
+  <bean id="nodeFormProcessor" class="se.vgregion.alfresco.repo.forms.processor.node.VgrNodeFormProcessor" parent="baseFormProcessor">
+    <property name="filterRegistry" ref="nodeFilterRegistry" />
+    <property name="matchPattern" value="node" />
+  </bean>
+
+  <bean id="vgrPropertyFieldProcessor" class="se.vgregion.alfresco.repo.forms.processor.node.VgrPropertyFieldProcessor" parent="qnameFieldProcessor" />
+
+  <!-- *************************** -->
+  <!-- KIV value specific services -->
+  <!-- *************************** -->
+
+  <bean id="vgr.kivService" class="se.vgregion.alfresco.repo.constraints.impl.KivServiceImpl">
+    <property name="ldapTemplate" ref="vgr.ldapTemplate" />
+    <property name="serviceUtils" ref="vgr.serviceUtils" />
+  </bean>
+
+  <bean id="vgr.kivScript" parent="baseJavaScriptExtension" class="se.vgregion.alfresco.repo.scripts.ScriptKivService">
+    <property name="kivService" ref="vgr.kivService" />
+    <property name="kivUnitSynchronisation" ref="vgr.KivUnitSynchronisation" />
+    <property name="extensionName" value="kiv" />
+  </bean>
+
+  <bean id="vgr.KivUnitSynchronisation" class="se.vgregion.alfresco.repo.constraints.sync.KivUnitSynchronisationImpl">
+    <property name="kivService" ref="vgr.kivService" />
+    <property name="searchService" ref="searchService" />
+    <property name="nodeService" ref="nodeService" />
+    <property name="fileFolderService" ref="FileFolderService" />
+    <property name="jobLockService" ref="jobLockService" />
+    <property name="transactionService" ref="TransactionService" />
+  </bean>
+
+  <!-- ***************************** -->
+  <!-- Bean for the metadata service -->
+  <!-- ***************************** -->
+
+  <bean id="vgr.metadata-writer.service" class="org.redpill.alfresco.module.metadatawriter.services.impl.MetadataServiceImpl" init-method="register" parent="metadata-writer.abstract.service">
+    <constructor-arg type="java.lang.String" value="vgr.metadata-writer.service" />
+    <constructor-arg type="java.util.List">
+      <list></list>
+    </constructor-arg>
+    <constructor-arg type="java.util.Properties">
+      <props>
+        <prop key="Title">vgr:dc.title</prop>
+        <prop key="DC:identifier.documentid">vgr:dc.identifier.documentid</prop>
+        <prop key="nodeRef">sys:node-uuid</prop>
+      </props>
+    </constructor-arg>
+  </bean>
+
+  <!-- ********************************************* -->
+  <!-- Bean for the VGR specific content.get service -->
+  <!-- ********************************************* -->
+
+  <bean id="webscript.se.vgregion.storage.content.get" class="se.vgregion.alfresco.repo.scripts.StorageContentGet" parent="webscript">
+    <property name="namespaceService" ref="NamespaceService" />
+    <property name="permissionService" ref="PermissionService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="contentService" ref="ContentService" />
+    <property name="dictionaryService" ref="DictionaryService" />
+    <property name="mimetypeService" ref="MimetypeService" />
+    <property name="CMISRenditionService" ref="CMISRenditionService" />
+    <property name="serviceUtils" ref="vgr.serviceUtils" />
+    <property name="thumbnailService" ref="ThumbnailService" />
+    <property name="storageService" ref="vgr.storageService" />
+  </bean>
+
+  <!-- ********************************************* -->
+  <!-- Bean for the VGR specific content.get service -->
+  <!-- ********************************************* -->
+
+  <bean id="vgr.contentUrlScript" parent="baseJavaScriptExtension" class="se.vgregion.alfresco.repo.scripts.ContentUrlResolver">
+    <property name="extensionName" value="contentUrlResolver" />
+    <property name="fileFolderService" ref="FileFolderService" />
+  </bean>
+
+  <!-- ******************************************* -->
+  <!-- Script bean to expose alfresco-global.properties to webscripts -->
+  <!-- ******************************************* -->
+
+  <bean id="vgr.global.properties" parent="baseJavaScriptExtension" class="se.vgregion.alfresco.repo.scripts.ScriptGlobalProperties">
+    <property name="properties" ref="global-properties" />
+    <property name="extensionName" value="properties" />
+  </bean>
+
+  <!-- Controller for the web script AcceptInvitation -->
+  <bean id="webscript.invite.accept.get" class="se.vgregion.alfresco.repo.scripts.AcceptInvitation" parent="webscript">
+    <property name="invitationService" ref="InvitationService" />
+    <property name="authenticationService" ref="AuthenticationService" />
+  </bean>
+
+  <!-- Controller for the web script RejectInvitation -->
+  <bean id="webscript.invite.reject.get" class="se.vgregion.alfresco.repo.scripts.RejectInvitation" parent="webscript">
+    <property name="invitationService" ref="InvitationService" />
+    <property name="authenticationService" ref="AuthenticationService" />
+  </bean>
+
+  <!-- Controller for the web script Invitations -->
+  <bean id="webscript.invite.invitations.get" class="se.vgregion.alfresco.repo.scripts.Invitations" parent="webscript">
+    <property name="invitationService" ref="InvitationService" />
+    <property name="authenticationService" ref="AuthenticationService" />
+    <property name="siteService" ref="siteService" />
+  </bean>
+
+  <!-- *************************************************** -->
+  <!-- Rendering engine for rendering PDF/A compliant PDFs -->
+  <!-- *************************************************** -->
+
+  <bean id="pdfa" class="se.vgregion.alfresco.repo.rendition.executer.PdfaRenderingEngine" parent="baseRenderingAction" />
+
+  <bean id="pdfapilot" class="se.vgregion.alfresco.repo.rendition.executer.PdfaPilotRenderingEngine" parent="baseRenderingAction">
+    <property name="policyBehaviourFilter" ref="policyBehaviourFilter" />
+  </bean>
+
+  <!-- *************************************************** -->
+  <!-- Rendering engine for rendering PDF/A compliant PDFs -->
+  <!-- *************************************************** -->
+
+  <bean id="metadataExtracterScript" class="se.vgregion.alfresco.repo.scripts.ScriptMetadataExtracter" parent="baseJavaScriptExtension">
+    <property name="extensionName" value="metadataExtracter" />
+    <property name="metadataExtracterRegistry" ref="metadataExtracterRegistry" />
+    <property name="mimetypeService" ref="MimetypeService" />
+  </bean>
+
+  <!-- **************************************************************** -->
+  <!-- Overridden bean for implementing external users specific for VGR -->
+  <!-- **************************************************************** -->
+
+  <bean id="vgr.externalUsersInvitationService" class="org.alfresco.repo.invitation.ExternalUsersInvitationServiceImpl" p:authenticationService-ref="AuthenticationService"
+    p:externalUsersService-ref="vgr.externalUsers" p:namespaceService-ref="NamespaceService" p:invitationService-ref="invitationService" p:workflowService-ref="WorkflowService" p:personService-ref="PersonService"
+    p:permissionService-ref="PermissionService" p:siteService-ref="SiteService" p:nodeService-ref="NodeService" p:userSynchronizer-ref="vgr.userSynchronizer" p:userRegistrySynchronizer-ref="userRegistrySynchronizer"
+    p:serviceUtils-ref="vgr.serviceUtils" />
+
+  <bean id="vgr.invitationServiceInterceptor" class="se.vgregion.alfresco.repo.invitation.InvitationServiceInterceptor" p:externalActivation="${vgr.external.activation}"
+    p:externalUsersInvitationService-ref="vgr.externalUsersInvitationService" />
+
+  <bean id="InvitationService" class="org.springframework.aop.framework.ProxyFactoryBean" p:targetName="invitationService">
+    <property name="proxyInterfaces">
+      <list>
+        <value>org.alfresco.service.cmr.invitation.InvitationService</value>
+      </list>
+    </property>
+    <property name="interceptorNames">
+      <list>
+        <idref bean="InvitationService_transaction" />
+        <idref bean="AuditMethodInterceptor" />
+        <idref bean="exceptionTranslator" />
+        <idref bean="InvitationService_security" />
+        <idref local="vgr.invitationServiceInterceptor" />
+      </list>
+    </property>
+  </bean>
+
+  <bean id="vgr.userSynchronizer" class="se.vgregion.alfresco.repo.security.UserSynchronizer" p:applicationContextManager-ref="Authentication" p:authorityService-ref="authorityService"
+    p:personService-ref="personService" p:ruleService-ref="ruleService" p:transactionService-ref="transactionService" p:zone="${vgr.external.users.zone}" />
+
+  <!-- ****************************************************** -->
+  <!-- Thumbnail definition that is actually a PDF preview :) -->
+  <!-- ****************************************************** -->
+
+  <bean name="pdfaPilot.pdfOptions" class="org.redpill.alfresco.repo.content.transform.PdfaPilotTransformationOptions">
+    <property name="readLimitTimeMs" value="-1" />
+    <property name="maxSourceSizeKBytes" value="-1" />
+    <property name="readLimitKBytes" value="-1" />
+    <property name="pageLimit" value="-1" />
+    <property name="maxPages" value="-1" />
+    <property name="includeEmbedded" value="true" />
+    <property name="optimize" value="true" />
+    <property name="level" value="" />
+    <property name="timeoutMs" value="300000" />
+  </bean>
+
+  <bean id="thumbnail.register.pdf" class="org.alfresco.repo.thumbnail.ThumbnailDefinitionSpringRegisterer">
+    <property name="thumbnailRegistry" ref="thumbnailRegistry" />
+    <property name="thumbnailDefinition">
+      <bean class="org.alfresco.repo.thumbnail.ThumbnailDefinition">
+        <property name="name" value="pdf" />
+        <property name="mimetype" value="application/pdf" />
+        <property name="runAs" value="System" />
+        <property name="failureHandlingOptions" ref="standardFailureOptions" />
+        <property name="transformationOptions" ref="pdfaPilot.pdfOptions" />
+      </bean>
+    </property>
+  </bean>
+
+  <!-- ********************************************************** -->
+  <!-- Thumbnail definition that is actually a PDF/A rendition :) -->
+  <!-- ********************************************************** -->
+
+  <bean name="pdfaPilot.pdfaOptions" class="org.redpill.alfresco.repo.content.transform.PdfaPilotTransformationOptions">
+    <property name="readLimitTimeMs" value="-1" />
+    <property name="maxSourceSizeKBytes" value="-1" />
+    <property name="readLimitKBytes" value="-1" />
+    <property name="pageLimit" value="-1" />
+    <property name="maxPages" value="-1" />
+    <property name="includeEmbedded" value="true" />
+    <property name="optimize" value="false" />
+    <property name="level" value="1b" />
+    <property name="timeoutMs" value="300000" />
+  </bean>
+
+  <bean id="thumbnail.register.pdfa" class="org.alfresco.repo.thumbnail.ThumbnailDefinitionSpringRegisterer">
+    <property name="thumbnailRegistry" ref="thumbnailRegistry" />
+    <property name="thumbnailDefinition">
+      <bean class="org.alfresco.repo.thumbnail.ThumbnailDefinition">
+        <property name="name" value="pdfa" />
+        <property name="mimetype" value="application/pdf" />
+        <property name="runAs" value="System" />
+        <property name="failureHandlingOptions" ref="standardFailureOptions" />
+        <property name="transformationOptions" ref="pdfaPilot.pdfaOptions" />
+      </bean>
+    </property>
+  </bean>
+
+  <bean id="thumbnailRenditionConvertor" class="se.vgregion.alfresco.repo.thumbnail.CustomThumbnailRenditionConvertor">
+    <property name="renditionService" ref="renditionService" />
+  </bean>
+
+  <!-- ***************************************************************************************************** -->
+  <!-- Report site statistics web script and utility classes -->
+  <!-- ***************************************************************************************************** -->
+
+  <bean id="webscript.reports.sites.sites.get" class="se.vgregion.alfresco.repo.scripts.SitesReport" parent="webscript">
+    <property name="siteService" ref="SiteService" />
+  </bean>
+
+  <bean id="vgr.siteReport" class="se.vgregion.alfresco.repo.scripts.ScriptSiteReport" parent="baseJavaScriptExtension">
+    <property name="extensionName" value="siteReport" />
+    <property name="siteService" ref="SiteService" />
+    <property name="reportSiteUsage" ref="vgr.reportSiteUsage" />
+  </bean>
+
+  <bean id="vgr.reportSiteUsage" class="se.vgregion.alfresco.repo.report.ReportSiteUsage">
+    <property name="activityService" ref="activityService" />
+    <property name="fileFolderService" ref="FileFolderService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="siteService" ref="SiteService" />
+  </bean>
+
+  <!-- ***************************************************************************************************** -->
+  <!-- Report active users statistics web script and utility classes -->
+  <!-- ***************************************************************************************************** -->
+
+  <bean id="webscript.reports.users.activeusers.get" class="se.vgregion.alfresco.repo.scripts.ActiveUsersReport" parent="webscript">
+    <property name="activeUsers" ref="vgr.reportActiveUsers" />
+  </bean>
+
+  <bean id="vgr.reportActiveUsers" class="se.vgregion.alfresco.repo.report.ActiveUsers">
+    <property name="nodeService" ref="NodeService" />
+    <property name="personService" ref="PersonService" />
+    <property name="auditService" ref="AuditService" />
+  </bean>
+
+  <!-- ***************************************************************************************************** -->
+  <!-- Reset password service, webscript definitions and javascript proxy object -->
+  <!-- ***************************************************************************************************** -->
+
+  <bean id="vgr.resetPasswordService" class="se.vgregion.alfresco.repo.resetpassword.impl.ResetPasswordServiceImpl">
+    <property name="siteService" ref="SiteService" />
+    <property name="personService" ref="PersonService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="authorityService" ref="AuthorityService" />
+    <property name="mutableAuthenticationService" ref="AuthenticationService" />
+    <property name="sendMailService" ref="vgr.sendMailService" />
+    <property name="globalProperties" ref="global-properties" />
+  </bean>
+
+  <bean id="webscript.resetpassword.resetpassword.put" class="se.vgregion.alfresco.repo.scripts.SiteAdminResetUserPassword" parent="webscript">
+    <property name="resetPasswordService" ref="vgr.resetPasswordService" />
+  </bean>
+
+  <bean id="vgr.javascriptResetPasswordService" parent="baseJavaScriptExtension" class="se.vgregion.alfresco.repo.resetpassword.JavascriptCompatibleResetPasswordService">
+    <property name="resetPasswordService" ref="vgr.resetPasswordService" />
+    <property name="extensionName" value="resetPasswordService" />
+  </bean>
+
+  <!-- ***************************************************************************************************** -->
+  <!-- Send mail service -->
+  <!-- ***************************************************************************************************** -->
+
+  <bean id="vgr.sendMailService" class="se.vgregion.alfresco.repo.mail.impl.SendMailServiceImpl">
+    <property name="actionService" ref="ActionService" />
+  </bean>
+
+  <!-- ***************************************************************************************************** -->
+  <!-- Publish status web scripts -->
+  <!-- ***************************************************************************************************** -->
+
+  <bean id="webscript.publishtostorage.publishstatus.post" class="se.vgregion.alfresco.repo.scripts.SetPublishStatus" parent="webscript">
+    <property name="globalProperties" ref="global-properties" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="behaviourFilter" ref="policyBehaviourFilter" />
+  </bean>
+
+  <bean id="webscript.publishtostorage.publishstatus.get" class="se.vgregion.alfresco.repo.scripts.GetPublishStatus" parent="webscript">
+    <property name="storageService" ref="vgr.storageService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="serviceUtils" ref="vgr.serviceUtils" />
+  </bean>
+
+  <bean id="webscript.publishtostorage.publishreport.get" class="se.vgregion.alfresco.repo.scripts.ScriptGetDocumentsPublishReport" parent="webscript">
+    <property name="pushService" ref="vgr.pushService" />
+    <property name="nodeService" ref="NodeService" />
+  </bean>
+
+</beans>

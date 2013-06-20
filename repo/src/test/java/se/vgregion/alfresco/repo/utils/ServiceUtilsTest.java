@@ -14,6 +14,8 @@ import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Rule;
 import org.junit.Test;
 
+import se.vgregion.alfresco.repo.model.VgrModel;
+
 public class ServiceUtilsTest {
 
   @Rule
@@ -68,14 +70,14 @@ public class ServiceUtilsTest {
 
     context.checking(new Expectations() {
       {
-        oneOf(nodeService).getProperty(publishedNodeRef, ContentModel.PROP_COPY_REFERENCE);
+        oneOf(nodeService).getProperty(publishedNodeRef, VgrModel.PROP_SOURCE_DOCUMENTID);
         will(returnValue(sourceNodeRef));
       }
     });
 
     final String source = utils.getDocumentIdentifier(publishedNodeRef);
 
-    assertEquals("https://www.myserver.com/repo/service/vgr/storage/node/content/workspace/SpacesStore/sourceNodeRef?a=true&guest=true", source);
+    assertEquals("https://www.myserver.com/repo/service/vgr/storage/node/content/workspace/SpacesStore/sourceNodeRef?a=false&guest=true", source);
 
     context.assertIsSatisfied();
   }
@@ -94,7 +96,7 @@ public class ServiceUtilsTest {
 
     context.checking(new Expectations() {
       {
-        oneOf(nodeService).getProperty(publishedNodeRef, ContentModel.PROP_COPY_REFERENCE);
+        oneOf(nodeService).getProperty(publishedNodeRef, VgrModel.PROP_SOURCE_DOCUMENTID);
         will(returnValue(null));
       }
     });
@@ -103,7 +105,7 @@ public class ServiceUtilsTest {
       utils.getDocumentIdentifier(publishedNodeRef);
       throw new RuntimeException("Must not come here...");
     } catch (final RuntimeException ex) {
-      assertTrue(ex.getMessage().indexOf("has no cm:source") > 0);
+      assertTrue(ex.getMessage(), ex.getMessage().indexOf("has no vgr:dc.source.documentid") > 0);
     }
 
     context.assertIsSatisfied();

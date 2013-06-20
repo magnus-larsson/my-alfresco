@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>Get the unit of the current user</shortname>
+  <url>/vgr/kiv/userunit</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction allow="readonly">required</transaction>
+  <family>VGR</family>
+</webscript>

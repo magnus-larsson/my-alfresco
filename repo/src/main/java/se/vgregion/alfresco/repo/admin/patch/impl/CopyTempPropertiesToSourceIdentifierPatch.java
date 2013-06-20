@@ -25,7 +25,7 @@ public class CopyTempPropertiesToSourceIdentifierPatch extends AbstractPatch {
 
   @Override
   protected String applyInternal() throws Exception {
-    _behaviourFilter.disableAllBehaviours();
+    _behaviourFilter.disableBehaviour();
 
     final String query = "TYPE:\"vgr:document\"";
 

@@ -1,0 +1,224 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+  <bean id="vgr.clusteredExecuter" class="se.vgregion.alfresco.repo.jobs.ClusteredExecuter" abstract="true">
+    <property name="jobLockService" ref="jobLockService" />
+    <property name="transactionService" ref="TransactionService" />
+    <property name="lockTTL" value="30000" />
+    <property name="repositoryState" ref="repositoryState" />
+  </bean>
+
+  <bean id="vgr.templateActionModelFactory" class="org.alfresco.repo.action.scheduled.FreeMarkerWithLuceneExtensionsModelFactory">
+    <property name="serviceRegistry" ref="ServiceRegistry" />
+  </bean>
+
+  <bean id="vgr.SiteCleanupJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <property name="jobClass" value="org.alfresco.repo.jscript.ExecuteScriptJob" />
+    <property name="jobDataAsMap">
+      <map>
+        <entry key="scriptLocation">
+          <bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+            <constructor-arg value="alfresco/module/vgr-repo/context/scripts/siteCleanup.js" />
+          </bean>
+        </entry>
+        <entry key="scriptService" value-ref="ScriptService" />
+        <entry key="authenticationComponent" value-ref="authenticationComponent" />
+        <entry key="templateActionModelFactory" value-ref="vgr.templateActionModelFactory" />
+      </map>
+    </property>
+  </bean>
+
+  <bean id="vgr.SiteCleanupJobTrigger" class="org.alfresco.util.CronTriggerBean">
+    <property name="jobDetail" ref="vgr.SiteCleanupJob" />
+    <property name="scheduler" ref="schedulerFactory" />
+    <!-- cron expression is set to fire every second minute -->
+    <property name="cronExpression" value="0 0/2 * * * ?" />
+  </bean>
+
+  <!-- *********************************************************************** -->
+  <!-- Job for synchronizing the Apelon and KIV unit data source with Alfresco -->
+  <!-- *********************************************************************** -->
+
+  <bean id="vgr.apelonSynchronisationJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <property name="jobClass" value="se.vgregion.alfresco.repo.jobs.ApelonSynchronisationJob" />
+    <property name="jobDataAsMap">
+      <map>
+        <entry key="synchronisations">
+          <list>
+            <ref bean="vgr.apelonRecordTypeSynchronisation" />
+            <ref bean="vgr.apelonDocumentTypeSynchronisation" />
+            <ref bean="vgr.apelonDocumentStatusSynchronisation" />
+            <ref bean="vgr.apelonLanguageSynchronisation" />
+            <ref bean="vgr.apelonHsacodeSynchronisation" />
+          </list>
+        </entry>
+      </map>
+    </property>
+  </bean>
+
+  <bean id="vgr.apelonSweMeSHSynchronisationJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <property name="jobClass" value="se.vgregion.alfresco.repo.jobs.ApelonSynchronisationJob" />
+    <property name="jobDataAsMap">
+      <map>
+        <entry key="synchronisations">
+          <list>
+            <ref bean="vgr.apelonSweMeSHSynchronisation" />
+          </list>
+        </entry>
+      </map>
+    </property>
+  </bean>
+
+  <bean id="vgr.kivUnitSynchronisationJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <property name="jobClass" value="se.vgregion.alfresco.repo.jobs.KivUnitSynchronisationJob" />
+    <property name="jobDataAsMap">
+      <map>
+        <entry key="kivUnitSynchronisation" value-ref="vgr.KivUnitSynchronisation" />
+      </map>
+    </property>
+  </bean>
+
+  <bean id="vgr.apelonSynchronisationTrigger" class="org.alfresco.util.CronTriggerBean">
+    <property name="jobDetail" ref="vgr.apelonSynchronisationJobDetail" />
+    <property name="scheduler" ref="schedulerFactory" />
+    <!-- cron expression is set to fire at 01:00 every day -->
+    <property name="cronExpression" value="0 0 1 1/1 * ? *" />
+  </bean>
+
+  <bean id="vgr.apelonSweMeSHSynchronisationTrigger" class="org.alfresco.util.CronTriggerBean">
+    <property name="jobDetail" ref="vgr.apelonSweMeSHSynchronisationJobDetail" />
+    <property name="scheduler" ref="schedulerFactory" />
+    <!-- cron expression is set to fire at 04:00 first monday of each month -->
+    <property name="cronExpression" value="0 0 4 ? 1/1 MON#1 *" />
+  </bean>
+
+  <bean id="vgr.kivUnitSynchronisationTrigger" class="org.alfresco.util.CronTriggerBean">
+    <property name="jobDetail" ref="vgr.kivUnitSynchronisationJobDetail" />
+    <property name="scheduler" ref="schedulerFactory" />
+    <!-- cron expression is set to fire at 01:00 every day -->
+    <property name="cronExpression" value="0 0 1 1/1 * ? *" />
+  </bean>
+
+  <!-- *********************************************************************** -->
+  <!-- Job for synchronizing the Apelon and KIV unit data source with Alfresco -->
+  <!-- *********************************************************************** -->
+
+  <bean id="vgr.pushToPubSubHubBubServer" class="se.vgregion.alfresco.repo.push.PushToPubSubHubBubServer" parent="vgr.clusteredExecuter">
+    <property name="searchService" ref="SearchService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="behaviourFilter" ref="policyBehaviourFilter" />
+    <property name="pushService" ref="vgr.pushService" />
+    <property name="test" value="${vgr.pushserver.test}" />
+    <property name="pushJmsService" ref="vgr.pushJmsService" />
+  </bean>
+
+  <bean id="vgr.pushServerJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <property name="jobClass" value="se.vgregion.alfresco.repo.jobs.PushServerJob" />
+    <property name="jobDataAsMap">
+      <map>
+        <entry key="pushToPubSubHubBubServer" value-ref="vgr.pushToPubSubHubBubServer" />
+      </map>
+    </property>
+  </bean>
+
+  <bean id="vgr.pushServerTrigger" class="org.alfresco.util.CronTriggerBean">
+    <property name="jobDetail" ref="vgr.pushServerJobDetail" />
+    <property name="scheduler" ref="schedulerFactory" />
+    <!-- cron expression is set to fire every minute -->
+    <property name="cronExpression" value="0 0/1 * 1/1 * ? *" />
+  </bean>
+
+  <!-- ********************************************************************************* -->
+  <!-- Job for create PDF/A copy for all the files which support it and does not have it -->
+  <!-- ********************************************************************************* -->
+
+  <bean id="vgr.generateArchivePdfs" class="se.vgregion.alfresco.repo.storage.GenerateArchivePdfs" parent="vgr.clusteredExecuter">
+    <property name="storageService" ref="vgr.storageService" />
+  </bean>
+
+  <bean id="vgr.patch.generateArchivePdfsJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <property name="jobClass" value="se.vgregion.alfresco.repo.jobs.GenerateArchivePdfsJob" />
+    <property name="jobDataAsMap">
+      <map>
+        <entry key="generateArchivePdfs" value-ref="vgr.generateArchivePdfs" />
+      </map>
+    </property>
+  </bean>
+
+  <bean id="vgr.patch.fixGenerateArchivePdfsTrigger" class="org.alfresco.util.CronTriggerBean">
+    <property name="jobDetail" ref="vgr.patch.generateArchivePdfsJobDetail" />
+    <property name="scheduler" ref="schedulerFactory" />
+    <!-- cron expression is set to fire at 05:00 every day -->
+    <property name="cronExpression" value="0 0 5 1/1 * ? *" />
+  </bean>
+
+  <!-- ************************************************** -->
+  <!-- Job to see if any documents should be auto deleted -->
+  <!-- ************************************************** -->
+
+  <bean id="vgr.autoDeleter" class="se.vgregion.alfresco.repo.jobs.AutoDeleter" parent="vgr.clusteredExecuter">
+    <property name="nodeService" ref="NodeService" />
+    <property name="fileFolderService" ref="FileFolderService" />
+    <property name="searchService" ref="SearchService" />
+  </bean>
+
+  <bean id="vgr.autoDeleteJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <property name="jobClass" value="se.vgregion.alfresco.repo.jobs.AutoDeleteJob" />
+    <property name="jobDataAsMap">
+      <map>
+        <entry key="autoDeleter" value-ref="vgr.autoDeleter" />
+      </map>
+    </property>
+  </bean>
+
+  <bean id="vgr.autoDeleteTrigger" class="org.alfresco.util.CronTriggerBean">
+    <property name="jobDetail" ref="vgr.autoDeleteJobDetail" />
+    <property name="scheduler" ref="schedulerFactory" />
+    <!-- cron expression is set to fire at 04:00 every day -->
+    <property name="cronExpression" value="0 0 4 1/1 * ? *" />
+  </bean>
+
+  <!-- *************************************************************** -->
+  <!-- Job to check validity on vgr:document nodes and send out emails -->
+  <!-- *************************************************************** -->
+
+  <bean id="vgr.validityChecker" class="se.vgregion.alfresco.repo.jobs.ValidityChecker" parent="vgr.clusteredExecuter">
+    <property name="searchService" ref="SearchService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="sendMailService" ref="vgr.sendMailService" />
+    <property name="mailFrom" value="${mail.from.default}" />
+    <property name="emails">
+      <list>
+        <map>
+          <entry key="daysBefore" value="${vgr.mail.validity-checker.first.daysBefore}" />
+          <entry key="subject" value="vgr.mail.validity-checker.first.subject" />
+          <entry key="body" value="vgr.mail.validity-checker.first.body" />
+        </map>
+        <map>
+          <entry key="daysBefore" value="${vgr.mail.validity-checker.second.daysBefore}" />
+          <entry key="subject" value="vgr.mail.validity-checker.second.subject" />
+          <entry key="body" value="vgr.mail.validity-checker.second.body" />
+        </map>
+      </list>
+    </property>
+  </bean>
+
+  <bean id="vgr.validityCheckerJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <property name="jobClass" value="se.vgregion.alfresco.repo.jobs.ValidityCheckerJob" />
+    <property name="jobDataAsMap">
+      <map>
+        <entry key="validityChecker" value-ref="vgr.validityChecker" />
+      </map>
+    </property>
+  </bean>
+
+  <bean id="vgr.validityCheckerTrigger" class="org.alfresco.util.CronTriggerBean">
+    <property name="jobDetail" ref="vgr.validityCheckerJobDetail" />
+    <property name="scheduler" ref="schedulerFactory" />
+    <!-- cron expression is set to fire at 08:00 every day -->
+    <property name="cronExpression" value="0 0 08 1/1 * ? *" />
+  </bean>
+
+</beans>

@@ -17,6 +17,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.site.SiteInfo;
 import org.alfresco.service.cmr.site.SiteService;
 import org.alfresco.util.TempFileProvider;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.mozilla.javascript.Scriptable;
 import org.springframework.beans.factory.InitializingBean;
@@ -34,7 +35,7 @@ public class ScriptServiceUtils extends BaseScopableProcessorExtension implement
 
   protected ServiceRegistry _serviceRegistry;
 
- 
+
   public void setSiteService(final SiteService siteService) {
     _siteService = siteService;
   }
@@ -132,6 +133,10 @@ public class ScriptServiceUtils extends BaseScopableProcessorExtension implement
 
   public void disableAllBehaviours() {
     _serviceUtils.disableAllBehaviours();
+  }
+
+  public String removeExtension(String filename) {
+    return FilenameUtils.removeExtension(filename);
   }
 
 }

@@ -1,0 +1,483 @@
+<alfresco-config>
+
+  <config>
+    <forms>
+      <constraint-handlers>
+        <constraint type="APELON" validation-handler="Alfresco.forms.validation.inList" event="blur" />
+        <constraint type="APELON_FIND_NODES" validation-handler="Alfresco.forms.validation.inList" event="blur" />
+        <constraint type="APELON_NODE_TYPE" validation-handler="Alfresco.forms.validation.inList" event="blur" />
+      </constraint-handlers>
+    </forms>
+  </config>
+
+  <!-- Global config section -->
+  <config replace="true">
+    <probe-host>localhost</probe-host>
+
+    <flags>
+      <!-- Developer debugging setting to turn on DEBUG mode for client scripts in the browser -->
+      <client-debug>true</client-debug>
+
+      <!-- LOGGING can always be toggled at runtime when in DEBUG mode (Ctrl, Ctrl, Shift, Shift). This flag automatically activates logging on page load. -->
+      <client-debug-autologging>false</client-debug-autologging>
+    </flags>
+
+    <!-- override menu so that repository can be hidden when not admin -->
+    <header>
+      <app-items>
+        <!-- defaults: icon="{id}.png" label="header.{id}.label" description="header.{id}.description" -->
+        <item type="link" id="my-dashboard">{userdashboardpage}</item>
+        <item type="js" id="sites">Alfresco.module.Sites</item>
+        <item type="link" id="people">/people-finder</item>
+        <item type="link" id="repository" condition="conditionRepositoryRootNode" permission="admin">/repository</item>
+        <item type="container" id="more">
+          <container-group id="my">
+            <!-- <item type="link" id="my-tasks">/my-tasks</item> -->
+            <!-- <item type="link" id="my-workflows">/my-workflows</item> -->
+            <item type="link" id="my-content">/user/user-content</item>
+            <item type="link" id="my-sites">/user/user-sites</item>
+            <item type="link" id="my-profile">{userprofilepage}</item>
+            <!-- <item type="js" id="saved-searches" condition="false">Alfresco.module.SavedSearches</item> -->
+          </container-group>
+          <container-group id="tools" permission="admin">
+            <item type="link" id="application">/console/admin-console/application</item>
+            <item type="link" id="groups">/console/admin-console/groups</item>
+            <item type="link" id="replication-jobs" condition="!conditionEditionTeam">/console/admin-console/replication-jobs</item>
+            <item type="link" id="repository">/console/admin-console/repository</item>
+            <item type="link" id="users">/console/admin-console/users</item>
+            <item type="link" id="trashcan">/console/admin-console/trashcan</item>
+            <item type="link" id="more">/console/admin-console/</item>
+          </container-group>
+        </item>
+        <item type="link" id="my-sites">/user/user-sites</item>
+      </app-items>
+      <user-items>
+        <item type="container" id="user" icon="" description="">
+          <container-group id="usermenu" label="">
+            <item type="user" id="status">{userprofilepage}</item>
+            <item type="link" id="my-profile">{userprofilepage}</item>
+            <item type="link" id="change-password" condition="user.capabilities.isMutable">/user/change-password</item>
+            <item type="external-link" id="help-external" icon="help.png">{share-help-external}</item>
+            <item type="external-link" id="help-internal" icon="help.png">{share-help-internal}</item>
+            <item type="link" id="logout" condition="!context.externalAuthentication">/dologout</item>
+          </container-group>
+        </item>
+        <item type="js" id="tycktill" label="Tyck till" icon="">Alfresco.thirdparty.module.TyckTill</item>
+        <item type="container" id="help" icon="">
+          <container-group id="helpmenu" label="">
+            <item type="external-link" id="help-external" icon="help.png">{share-help-external}</item>
+            <item type="external-link" id="help-internal" icon="help.png">{share-help-internal}</item>
+          </container-group>
+        </item>
+      </user-items>
+      <dependencies>
+        <css src="/modules/create-site.css" />
+        <css src="/modules/vgr-create-site.css" />
+        <css src="/modules/header/sites.css" />
+        <js src="/modules/create-site.js" />
+        <js src="/modules/vgr-create-site.js" />
+        <js src="/modules/header/sites.js" />
+        <js src="/modules/header/vgr-sites.js" />
+        <js src="/modules/header/tycktill.js" />
+      </dependencies>
+    </header>
+
+    <!-- misc configuration -->
+    <kivurl>http://sokikiv.vgregion.se/sokikiv/visaperson?vgrid={id}</kivurl>
+  </config>
+
+  <config evaluator="string-compare" condition="WebFramework">
+    <web-framework>
+      <!-- SpringSurf Autowire Runtime Settings -->
+      <!-- Developers can set mode to 'development' to disable; SpringSurf caches, FreeMarker template caching and Rhino JavaScript compilation. -->
+      <autowire>
+        <!-- Pick the mode: "production" or "development" -->
+        <mode>development</mode>
+      </autowire>
+
+      <module-deployment>
+        <!-- Allow extension modules with <auto-deploy> set to true to be automatically deployed -->
+        <mode>manual</mode>
+        <enable-auto-deploy-modules>true</enable-auto-deploy-modules>
+      </module-deployment>
+
+      <!-- This is the user factory we use to provide the user object in share with the specific properties for VGR -->
+      <defaults>
+        <user-factory>webframework.factory.user.vgr</user-factory>
+      </defaults>
+    </web-framework>
+  </config>
+
+  <config evaluator="string-compare" condition="AdvancedSearch">
+    <advanced-search>
+      <forms>
+        <form labelId="search.form.label.vgr_document" descriptionId="search.form.desc.vgr_document">vgr:document</form>
+      </forms>
+    </advanced-search>
+  </config>
+
+  <!-- Document Library config section -->
+  <config evaluator="string-compare" condition="DocumentLibrary">
+
+    <!-- <tree> -->
+    <!-- Whether the folder Tree component should enumerate child folders or not. This is a relatively expensive operation, so should be set to "false" for Repositories with broad folder structures. -->
+    <!-- <evaluate-child-folders>false</evaluate-child-folders> -->
+
+    <!-- Optionally limit the number of folders shown in treeview throughout Share. -->
+    <!-- <maximum-folder-count>-1</maximum-folder-count> -->
+    <!-- </tree> -->
+
+    <!-- Used by the "Manage Aspects" action For custom aspects, remember to also add the relevant i18n string(s) cm_myaspect=My Aspect -->
+    <aspects>
+      <!-- Aspects that a user can see -->
+      <visible>
+
+      </visible>
+
+      <!-- Aspects that a user can add. Same as "visible" if left empty -->
+      <addable></addable>
+
+      <!-- Aspects that a user can remove. Same as "visible" if left empty -->
+      <removeable></removeable>
+    </aspects>
+
+    <!-- Used by the "Change Type" action Define valid subtypes using the following example: <type name="cm:content"> <subtype name="cm:mysubtype" /> </type> Remember to also add the relevant i18n string(s): 
+      cm_mysubtype=My SubType -->
+    <types>
+      <type name="cm:content">
+        <subtype name="vgr:document" />
+      </type>
+
+      <!-- <type name="cm:folder"> </type> -->
+    </types>
+
+    <!-- If set, will present a WebDAV link for the current item on the Document and Folder details pages. Also used to generate the "View in Alfresco Explorer" action for folders. -->
+    <!-- <repository-url>http://localhost:8080/alfresco</repository-url> -->
+
+    <!-- Google Docs™ integration -->
+    <google-docs>
+      <!-- Enable/disable the Google Docs UI integration (Extra types on Create Content menu, Google Docs actions). -->
+      <enabled>false</enabled>
+
+      <!-- The mimetypes of documents Google Docs allows you to create via the Share interface. The I18N label is created from the "type" attribute, e.g. google-docs.doc=Google Docs&trade; Document -->
+      <creatable-types>
+        <creatable type="doc">application/msword</creatable>
+        <creatable type="xls">application/vnd.ms-excel</creatable>
+        <creatable type="ppt">application/vnd.ms-powerpoint</creatable>
+      </creatable-types>
+    </google-docs>
+
+    <!-- File upload configuration -->
+    <file-upload>
+      <!-- Adobe Flash™ In certain environments, an HTTP request originating from Flash cannot be authenticated using an existing session. See: http://bugs.adobe.com/jira/browse/FP-4830 For these cases, 
+        it is useful to disable the Flash-based uploader for Share Document Libraries. -->
+      <adobe-flash-enabled>true</adobe-flash-enabled>
+    </file-upload>
+
+    <indicators>
+      <indicator id="vgr-publish-status-placeholder" index="39" icon="loading.gif">
+        <evaluator>evaluator.doclib.indicator.vgr-publish-status</evaluator>
+      </indicator>
+      <indicator id="auto-publish-all-versions" index="39">
+        <evaluator>evaluator.doclib.indicator.auto-publish-all-versions</evaluator>
+      </indicator>
+      <indicator id="auto-publish-major-version" index="39">
+        <evaluator>evaluator.doclib.indicator.auto-publish-major-version</evaluator>
+      </indicator>
+    </indicators>
+  </config>
+
+  <!-- DocLibCustom section -->
+  <config evaluator="string-compare" condition="DocLibCustom">
+    <dependencies>
+      <js src="/components/documentlibrary/vgr-publish-status.js" />
+    </dependencies>
+  </config>
+
+  <!-- Repository Library config section -->
+  <config evaluator="string-compare" condition="RepositoryLibrary" replace="true">
+    <!-- Root nodeRef or xpath expression for top-level folder. e.g. alfresco://user/home, /app:company_home/st:sites/cm:site1 If using an xpath expression, ensure it is properly ISO9075 encoded here. -->
+    <root-node>alfresco://company/home</root-node>
+
+    <tree>
+      <!-- Whether the folder Tree component should enumerate child folders or not. This is a relatively expensive operation, so should be set to "false" for Repositories with broad folder structures. -->
+      <evaluate-child-folders>false</evaluate-child-folders>
+
+      <!-- Optionally limit the number of folders shown in treeview throughout Share. -->
+      <!-- <maximum-folder-count>500</maximum-folder-count> -->
+    </tree>
+  </config>
+
+  <!-- share help urls -->
+  <config evaluator="string-compare" condition="HelpPages">
+    <help-pages>
+      <share-help-external>http://www.vgregion.se/alfresco</share-help-external>
+      <share-help-internal>http://intra.vgregion.se/alfresco</share-help-internal>
+      <share-tutorial>http://www.vgregion.se/alfresco</share-tutorial>
+    </help-pages>
+  </config>
+
+  <!-- Custom DocLibActions config section -->
+  <config evaluator="string-compare" condition="DocLibActions">
+
+    <!-- Action definitions -->
+    <actions>
+
+      <action id="action-header-edit" type="header">
+        <permissions>
+          <permission allow="true">Write</permission>
+        </permissions>
+        <evaluator negate="true">evaluator.doclib.action.isLocked</evaluator>
+      </action>
+
+      <action id="action-header-publish" type="header">
+        <permissions>
+          <permission allow="true">Write</permission>
+        </permissions>
+        <evaluator>evaluator.doclib.metadata.showPublishHeader</evaluator>
+        <evaluator negate="true">evaluator.doclib.action.isWorkingCopy</evaluator>
+        <evaluator negate="true">evaluator.doclib.metadata.isLocked</evaluator>
+      </action>
+
+      <action id="action-header-manage" type="header" />
+
+      <action id="action-header-origin" type="header">
+        <evaluator>evaluator.doclib.action.isWorkingCopy</evaluator>
+      </action>
+
+      <action id="document-publish-to-storage" type="javascript" label="actions.document.publish-to-storage">
+        <param name="function">onActionPublishToStorage</param>
+        <permissions>
+          <permission allow="true">Write</permission>
+        </permissions>
+        <evaluator>evaluator.doclib.metadata.canPublish</evaluator>
+        <evaluator negate="true">evaluator.doclib.action.isWorkingCopy</evaluator>
+        <evaluator negate="true">evaluator.doclib.metadata.isLocked</evaluator>
+      </action>
+
+      <action id="document-unpublish-from-storage" type="javascript" label="actions.document.unpublish-from-storage">
+        <param name="function">onActionUnpublishFromStorage</param>
+        <permissions>
+          <permission allow="true">Write</permission>
+        </permissions>
+        <evaluator>evaluator.doclib.metadata.canUnpublish</evaluator>
+        <evaluator negate="true">evaluator.doclib.action.isWorkingCopy</evaluator>
+        <evaluator negate="true">evaluator.doclib.metadata.isLocked</evaluator>
+      </action>
+
+      <action id="document-unpublish-old-from-storage" type="javascript" label="actions.document.unpublish-old-from-storage" icon="document-unpublish-from-storage">
+        <param name="function">onActionUnpublishFromStorage</param>
+        <permissions>
+          <permission allow="true">Write</permission>
+        </permissions>
+        <evaluator>evaluator.doclib.metadata.canUnpublishOld</evaluator>
+        <evaluator negate="true">evaluator.doclib.action.isWorkingCopy</evaluator>
+        <evaluator negate="true">evaluator.doclib.metadata.isLocked</evaluator>
+      </action>
+
+      <action id="folder-auto-publish" type="javascript" label="actions.folder.auto-publish" icon="auto-publish-all-versions-indicator">
+        <param name="function">onActionAutoPublish</param>
+        <permissions>
+          <permission allow="true">Write</permission>
+        </permissions>
+      </action>
+
+      <!-- Upload new version -->
+      <action id="document-upload-new-version" type="javascript" label="actions.document.upload-new-version">
+        <param name="function">onActionCheckInNewVersion</param>
+        <permissions>
+          <permission allow="true">Write</permission>
+        </permissions>
+        <evaluator>evaluator.doclib.action.upload</evaluator>
+        <evaluator>evaluator.doclib.action.editableByCurrentUser</evaluator>
+        <evaluator negate="true">evaluator.doclib.metadata.isLocked</evaluator>
+      </action>
+
+      <!-- Upload new version -->
+      <action id="document-create-final-version" type="javascript" label="actions.document.create-final-version">
+        <param name="function">onActionCreateFinalVersion</param>
+        <permissions>
+          <permission allow="true">Write</permission>
+        </permissions>
+        <evaluator>evaluator.doclib.action.editableByCurrentUser</evaluator>
+        <evaluator negate="true">evaluator.doclib.action.isWorkingCopy</evaluator>
+        <evaluator negate="true">evaluator.doclib.metadata.isLocked</evaluator>
+      </action>
+
+      <!-- Cancel editing (unlock) -->
+      <action id="document-unlock-vti" type="javascript" label="actions.document.unlock" icon="document-unlock">
+        <param name="function">onActionCancelEditing</param>
+        <permissions>
+          <permission allow="true">CancelCheckOut</permission>
+        </permissions>
+        <evaluator negate="true">evaluator.doclib.action.isWorkingCopy</evaluator>
+        <evaluator>evaluator.doclib.metadata.isVtiLocked</evaluator>
+      </action>
+    </actions>
+
+    <actionGroups>
+      <actionGroup id="document-browse">
+        <action index="110" id="document-view-content">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="130" id="document-edit-properties">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="170" id="document-approve">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="180" id="document-reject">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="190" id="document-inline-edit">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+
+        <action index="202" id="document-publish-to-storage" />
+        <action index="203" id="document-unpublish-from-storage" />
+        <action index="203" id="document-unpublish-old-from-storage" />
+
+        <action index="211" id="document-create-final-version" />
+
+        <action index="280" id="document-assign-workflow">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="295" id="document-unlock-vti" />
+        <action index="300" id="document-publish">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="330" id="document-cloud-sync">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="340" id="document-cloud-unsync">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="350" id="document-view-in-cloud">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="360" id="document-request-sync">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <!-- This must only be visible when the document is checked out -->
+        <action index="140" id="document-upload-new-version">
+          <evaluator>evaluator.doclib.action.isWorkingCopy</evaluator>
+        </action>
+      </actionGroup>
+
+      <actionGroup id="document-details">
+        <action index="110" id="document-view-content">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="119" id="action-header-edit" label="actions.document.label.edit" />
+        <action index="139" id="action-header-origin" label="actions.document.label.origin" />
+        <action index="160" id="document-approve">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="170" id="document-reject">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="180" id="document-inline-edit">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="201" id="document-create-final-version" />
+        <action index="202" id="action-header-publish" label="actions.document.label.publish" />
+        <action index="203" id="document-publish-to-storage" />
+        <action index="204" id="document-unpublish-from-storage" />
+        <action index="205" id="document-unpublish-old-from-storage" />
+        <action index="239" id="action-header-manage" label="actions.document.label.copy" />
+        <action index="270" id="document-assign-workflow">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="285" id="document-unlock-vti" />
+        <action index="310" id="document-manage-aspects">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="320" id="document-change-type">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="330" id="document-cloud-sync">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="340" id="document-cloud-unsync">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="350" id="document-view-in-cloud">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="360" id="document-request-sync">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="340" id="document-publish">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <!-- This must only be visible when the document is checked out -->
+        <action index="130" id="document-upload-new-version">
+          <evaluator>evaluator.doclib.action.isWorkingCopy</evaluator>
+        </action>
+      </actionGroup>
+
+      <actionGroup id="folder-browse">
+        <action index="120" id="document-approve" icon="folder-approve">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="130" id="document-reject" icon="folder-reject">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="210" id="document-manage-aspects" label="actions.folder.manage-aspects">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="220" id="document-view-in-source-repository" label="actions.folder.view-source-repository" />
+        <action index="360" id="document-cloud-sync">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="370" id="document-cloud-unsync">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="380" id="document-view-in-cloud">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="390" id="document-request-sync">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="400" id="folder-auto-publish" />
+      </actionGroup>
+
+      <actionGroup id="folder-details">
+        <action index="110" id="document-approve" icon="folder-approve">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="120" id="document-reject" icon="folder-reject">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="190" id="document-manage-aspects" label="actions.folder.manage-aspects">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="200" id="document-change-type" label="actions.folder.change-type">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="210" id="view-in-explorer">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="220" id="document-view-in-source-repository" label="actions.folder.view-source-repository" />
+        <action index="360" id="document-cloud-sync">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="370" id="document-cloud-unsync">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="380" id="document-view-in-cloud">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="390" id="document-request-sync">
+          <evaluator>evaluator.doclib.action.disableAction</evaluator>
+        </action>
+        <action index="400" id="folder-auto-publish" />
+      </actionGroup>
+    </actionGroups>
+  </config>
+
+  <config evaluator="string-compare" condition="CSRFPolicy" replace="true">
+    <filter />
+  </config>
+
+</alfresco-config>

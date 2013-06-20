@@ -1,0 +1,9 @@
+<webscript>
+  <shortname>Delete ALL People except admin and guest</shortname>
+  <description></description>
+  <url>/vgr/deletepeople</url>
+  <format default="json">argument</format>
+  <authentication>admin</authentication>
+  <transaction>none</transaction>
+  <family>VGR</family>
+</webscript>

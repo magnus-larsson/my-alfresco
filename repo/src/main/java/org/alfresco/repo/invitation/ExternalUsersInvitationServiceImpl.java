@@ -1,13 +1,26 @@
 package org.alfresco.repo.invitation;
 
+import java.io.Serializable;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import net.sf.acegisecurity.Authentication;
+
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.security.sync.UserRegistrySynchronizer;
 import org.alfresco.repo.site.SiteModel;
 import org.alfresco.repo.workflow.WorkflowModel;
-import org.alfresco.service.cmr.invitation.*;
+import org.alfresco.service.cmr.invitation.Invitation;
+import org.alfresco.service.cmr.invitation.InvitationException;
+import org.alfresco.service.cmr.invitation.InvitationExceptionForbidden;
+import org.alfresco.service.cmr.invitation.InvitationExceptionUserError;
+import org.alfresco.service.cmr.invitation.InvitationService;
+import org.alfresco.service.cmr.invitation.NominatedInvitation;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
@@ -28,12 +41,10 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.extensions.surf.util.I18NUtil;
 import org.springframework.util.Assert;
+
 import se.vgregion.alfresco.repo.security.ExternalUsersService;
 import se.vgregion.alfresco.repo.security.UserSynchronizer;
 import se.vgregion.alfresco.repo.utils.ServiceUtils;
-
-import java.io.Serializable;
-import java.util.*;
 
 /**
  * This class is an overridden class from the original InvitationServiceImpl
@@ -134,21 +145,21 @@ public class ExternalUsersInvitationServiceImpl implements InitializingBean, Ext
    */
   @Override
   public NominatedInvitation startNominatedInvite(final String inviteeFirstName, final String inviteeLastName, final String inviteeEmail,
-                                                  final String inviteeUserName, final Invitation.ResourceType resourceType, final String siteShortName, final String inviteeSiteRole,
-                                                  final String serverPath, final String acceptUrl, final String rejectUrl) {
+      final String inviteeUserName, final Invitation.ResourceType resourceType, final String siteShortName, final String inviteeSiteRole,
+      final String serverPath, final String acceptUrl, final String rejectUrl) {
     return AuthenticationUtil.runAs(new RunAsWork<NominatedInvitation>() {
       @Override
       public NominatedInvitation doWork() throws Exception {
         return doStartNominatedInvite(inviteeFirstName, inviteeLastName, inviteeEmail, inviteeUserName, resourceType, siteShortName, inviteeSiteRole,
-                serverPath, acceptUrl, rejectUrl);
+            serverPath, acceptUrl, rejectUrl);
       }
 
     }, AuthenticationUtil.getFullyAuthenticatedUser());
   }
 
   private NominatedInvitation doStartNominatedInvite(final String inviteeFirstName, final String inviteeLastName, final String inviteeEmail,
-                                                     String inviteeUserName, final Invitation.ResourceType resourceType, final String siteShortName, final String inviteeSiteRole,
-                                                     final String serverPath, final String acceptUrl, final String rejectUrl) {
+      String inviteeUserName, final Invitation.ResourceType resourceType, final String siteShortName, final String inviteeSiteRole,
+      final String serverPath, final String acceptUrl, final String rejectUrl) {
 
     // get the inviter user name (the name of user web script is executed
     // under)
@@ -160,8 +171,8 @@ public class ExternalUsersInvitationServiceImpl implements InitializingBean, Ext
 
     if (logger.isDebugEnabled()) {
       logger.debug("startInvite() inviterUserName=" + inviterUserName + " inviteeUserName=" + inviteeUserName + " inviteeFirstName="
-              + inviteeFirstName + " inviteeLastName=" + inviteeLastName + " inviteeEmail=" + inviteeEmail + " siteShortName=" + siteShortName
-              + " inviteeSiteRole=" + inviteeSiteRole);
+          + inviteeFirstName + " inviteeLastName=" + inviteeLastName + " inviteeEmail=" + inviteeEmail + " siteShortName=" + siteShortName
+          + " inviteeSiteRole=" + inviteeSiteRole);
     }
 
     //
@@ -180,7 +191,7 @@ public class ExternalUsersInvitationServiceImpl implements InitializingBean, Ext
 
       inviteeUserName = null;
 
-      final Set<NodeRef> peopleWithInviteeEmail = _personService.getPeopleFilteredByProperty(ContentModel.PROP_EMAIL, inviteeEmail);
+      final Set<NodeRef> peopleWithInviteeEmail = _personService.getPeopleFilteredByProperty(ContentModel.PROP_EMAIL, inviteeEmail, 1000);
 
       if (peopleWithInviteeEmail.size() > 0) {
         // get person already existing who has the given
@@ -341,9 +352,9 @@ public class ExternalUsersInvitationServiceImpl implements InitializingBean, Ext
     //
     final String wfTaskName = wfTasks.get(0).name;
     final QName wfTaskNameQName = QName.createQName(wfTaskName, _namespaceService);
-    final QName inviteToSiteTaskQName = WorkflowModelNominatedInvitation.WF_INVITE_TASK_INVITE_TO_SITE;
+    final QName inviteToSiteTaskQName = WorkflowModelNominatedInvitation.WF_TASK_INVITE_TO_SITE;
     if (!wfTaskNameQName.equals(inviteToSiteTaskQName)) {
-      final Object objs[] = {wfPathId, WorkflowModelNominatedInvitation.WF_INVITE_TASK_INVITE_TO_SITE};
+      final Object objs[] = {wfPathId, WorkflowModelNominatedInvitation.WF_TASK_INVITE_TO_SITE};
       throw new InvitationException("invitation.error.wrong_first_task", objs);
     }
 
@@ -379,10 +390,10 @@ public class ExternalUsersInvitationServiceImpl implements InitializingBean, Ext
       throw err;
     }
 
-    final NominatedInvitationImpl result = new NominatedInvitationImpl(workflowProps);
-    result.setTicket(inviteTicket);
-    result.setInviteId(workflowId);
-    result.setSentInviteDate(new Date());
+    workflowProps.put(WorkflowModelNominatedInvitation.WF_PROP_INVITE_TICKET, inviteTicket);
+
+    final NominatedInvitationImpl result = new NominatedInvitationImpl(workflowId, new Date(), workflowProps);
+
     return result;
   }
 
@@ -423,7 +434,7 @@ public class ExternalUsersInvitationServiceImpl implements InitializingBean, Ext
    * @return invitee user name
    */
   private String createInviteePerson(final String inviteeFirstName, final String inviteeLastName, final String inviteeEmail,
-                                     final String siteShortName) {
+      final String siteShortName) {
     final String inviteeUserName = createExternalUser(inviteeFirstName, inviteeLastName, inviteeEmail, siteShortName);
 
     AuthenticationUtil.runAs(new RunAsWork<Object>() {

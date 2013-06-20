@@ -35,6 +35,8 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
 
   private BehaviourFilter _behaviourFilter;
 
+  private PushJmsService _pushJmsService;
+
   private boolean _test = false;
 
   public void setPushService(PushService pushService) {
@@ -57,6 +59,10 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
     _test = test;
   }
 
+  public void setPushJmsService(PushJmsService _pushJmsService) {
+    this._pushJmsService = _pushJmsService;
+  }
+
   @Override
   protected String getJobName() {
     return "Push to pubsubhubbub server";
@@ -64,16 +70,72 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
 
   @Override
   protected void executeInternal() {
-    final RetryingTransactionCallback<Void> execution = new RetryingTransactionCallback<Void>() {
+    final String now = formatNow();
 
+    // Get the actual nodes we want to push
+    final RetryingTransactionCallback<List<NodeRef>> executionSelectPublished = new RetryingTransactionCallback<List<NodeRef>>() {
+      @Override
+      public List<NodeRef> execute() throws Throwable {
+        return findPublishedDocuments(now);
+      }
+    };
+
+    final RetryingTransactionCallback<List<NodeRef>> executionSelectUnpublished = new RetryingTransactionCallback<List<NodeRef>>() {
+      @Override
+      public List<NodeRef> execute() throws Throwable {
+        return findUnpublishedDocuments(now);
+      }
+    };
+
+    final List<NodeRef> publishedDocuments = AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<List<NodeRef>>() {
+      @Override
+      public List<NodeRef> doWork() throws Exception {
+        return _transactionService.getRetryingTransactionHelper().doInTransaction(executionSelectPublished, true, false);
+      }
+    }, AuthenticationUtil.getSystemUserName());
+
+    final List<NodeRef> unpublishedDocuments = AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<List<NodeRef>>() {
+      @Override
+      public List<NodeRef> doWork() throws Exception {
+        return _transactionService.getRetryingTransactionHelper().doInTransaction(executionSelectUnpublished, true, false);
+      }
+    }, AuthenticationUtil.getSystemUserName());
+
+    final RetryingTransactionCallback<Void> executionUpdate = new RetryingTransactionCallback<Void>() {
       @Override
       public Void execute() throws Throwable {
-        // first all documents must have a current "cm:modified" flag
-        executeUpdate();
+        executeUpdate(publishedDocuments, unpublishedDocuments);
+        return null;
+      }
+    };
 
-        // after that, push the files to the push server
-        executePush();
+    // Push the nodes
+    final RetryingTransactionCallback<Boolean> executionPush = new RetryingTransactionCallback<Boolean>() {
+      @Override
+      public Boolean execute() throws Throwable {
+        if (_test || _pushService.pingPush()) {
+          // We need to commit the updates before we can push the documents so
+          // that we can guarantee that the Push server reads the correct
+          // results from the feed
+          AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>() {
+            @Override
+            public Void doWork() throws Exception {
+              return _transactionService.getRetryingTransactionHelper().doInTransaction(executionUpdate, false, true);
+            }
+          }, AuthenticationUtil.getSystemUserName());
+          return executePush(publishedDocuments, unpublishedDocuments);
+        } else {
+          return false;
+        }
+      }
+    };
 
+    // Send to JMS
+    final RetryingTransactionCallback<Void> executionJms = new RetryingTransactionCallback<Void>() {
+      @Override
+      public Void execute() throws Throwable {
+        _pushJmsService.pushToJms(publishedDocuments, VgrModel.PROP_PUSHED_FOR_PUBLISH);
+        _pushJmsService.pushToJms(unpublishedDocuments, VgrModel.PROP_PUSHED_FOR_UNPUBLISH);
         return null;
       }
     };
@@ -82,44 +144,92 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
 
       @Override
       public Void doWork() throws Exception {
-        _transactionService.getRetryingTransactionHelper().doInTransaction(execution, false, true);
-
+        if (_transactionService.getRetryingTransactionHelper().doInTransaction(executionPush, false, true).booleanValue()) {
+          // Only send to JMS if the push action went well
+          _transactionService.getRetryingTransactionHelper().doInTransaction(executionJms, true, true);
+        }
         return null;
       }
 
     }, AuthenticationUtil.getSystemUserName());
   }
 
-  private void executeUpdate() {
+  private void executeUpdate(List<NodeRef> publishedDocuments, List<NodeRef> unpublishedDocuments) {
     // disable all behaviours, we can't have the modified date updated for
     // this...
-    _behaviourFilter.disableAllBehaviours();
+    _behaviourFilter.disableBehaviour();
 
-    String now = formatNow();
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Setting cm:modified property for all published documents");
+    }
+    setUpdatedProperty(publishedDocuments);
 
-    // set the "cm:modified" property for all published documents
-    setUpdatedProperty(findPublishedDocuments(now));
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Setting cm:modified property for all unpublished documents");
+    }
+    setUpdatedProperty(unpublishedDocuments);
 
-    // set the "cm:modified" property for all unpublished documents
-    setUpdatedProperty(findUnpublishedDocuments(now));
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Setting pushed properties for all published documents");
+    }
+    setPublishStatusProperties(publishedDocuments, VgrModel.PROP_PUSHED_FOR_PUBLISH);
 
-    _behaviourFilter.enableAllBehaviours();
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Setting pushed properties for all unpublished documents");
+    }
+    setPublishStatusProperties(unpublishedDocuments, VgrModel.PROP_PUSHED_FOR_UNPUBLISH);
+
+    _behaviourFilter.enableBehaviour();
   }
 
-  private void executePush() {
+  protected void setPublishStatusProperties(List<NodeRef> nodeRefs, QName property) {
+    for (NodeRef nodeRef : nodeRefs) {
+      refreshLock();
+      _nodeService.setProperty(nodeRef, property, new Date());
+      if (VgrModel.PROP_PUSHED_FOR_PUBLISH.equals(property)) {
+        _nodeService.setProperty(nodeRef, VgrModel.PROP_PUBLISH_STATUS, null);
+      } else {
+        _nodeService.setProperty(nodeRef, VgrModel.PROP_UNPUBLISH_STATUS, null);
+      }
+    }
+  }
+
+  private Boolean executePush(List<NodeRef> publishedDocuments, List<NodeRef> unpublishedDocuments) {
     // disable all behaviours, we can't have the modified date updated for
     // this...
-    _behaviourFilter.disableAllBehaviours();
+    _behaviourFilter.disableBehaviour();
 
-    String now = formatNow();
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Sending published and unpublished documents to PuSH server");
+    }
 
-    // send the published documents to the push server
-    sendToPush(findPublishedDocuments(now), VgrModel.PROP_PUSHED_FOR_PUBLISH);
+    List<NodeRef> concatenatedList = new ArrayList<NodeRef>();
+    concatenatedList.addAll(publishedDocuments);
+    concatenatedList.addAll(unpublishedDocuments);
 
-    // send the unpublished documents to the push server
-    sendToPush(findUnpublishedDocuments(now), VgrModel.PROP_PUSHED_FOR_UNPUBLISH);
+    boolean pushed = _pushService.pushFiles(concatenatedList) || _test;
 
-    _behaviourFilter.enableAllBehaviours();
+    if (!pushed) {
+      if (LOG.isDebugEnabled()) {
+        for (NodeRef nodeRef : concatenatedList) {
+          LOG.debug("For some reason the node ref '" + nodeRef + "' could not be pushed.");
+        }
+      }
+    } else {
+      for (NodeRef nodeRef : publishedDocuments) {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Pushed NodeRef " + nodeRef + " to property " + VgrModel.PROP_PUSHED_FOR_PUBLISH);
+        }
+      }
+      for (NodeRef nodeRef : unpublishedDocuments) {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Pushed NodeRef " + nodeRef + " to property " + VgrModel.PROP_PUSHED_FOR_UNPUBLISH);
+        }
+      }
+    }
+
+    _behaviourFilter.enableBehaviour();
+    return pushed;
   }
 
   private String formatNow() {
@@ -141,35 +251,7 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
   protected void setUpdatedProperty(List<NodeRef> nodeRefs) {
     for (NodeRef nodeRef : nodeRefs) {
       refreshLock();
-
       _nodeService.setProperty(nodeRef, ContentModel.PROP_MODIFIED, new Date());
-    }
-  }
-
-  private void sendToPush(List<NodeRef> nodeRefs, QName property) {
-    // report the files as pushed either if they're really pushed or if the
-    // service is set to test mode
-    boolean pushed = _pushService.pushFiles(nodeRefs) || _test;
-
-    if (!pushed) {
-      if (LOG.isDebugEnabled()) {
-
-        for (NodeRef nodeRef : nodeRefs) {
-          LOG.debug("For some reason the node ref '" + nodeRef + "' could not be pushed.");
-        }
-      }
-
-      return;
-    }
-
-    for (NodeRef nodeRef : nodeRefs) {
-      refreshLock();
-
-      _nodeService.setProperty(nodeRef, property, new Date());
-
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("NodeRef pushed to '" + property + "': " + nodeRef);
-      }
     }
   }
 

@@ -1,0 +1,53 @@
+.form-container .form-warningtext {
+   padding: 1em !important; margin-top: 1em; font-style: italic; color: #ef6700; border: 1px solid #c2c2c2 !important; background-color: #f5fff2; width: 800px; display: none;
+}
+
+.metadata .form-container input {
+   width: 35em;
+}
+
+.metadata .form-container textarea {
+   width: 30em;
+}
+
+.form-container select {
+   width: auto; min-width: 30em; max-width: 790px;
+}
+
+.metadata .form-container select {
+   min-width: 35em;
+}
+
+.form-container select[multiple] {
+   width: auto; min-width: 30em; max-width: 790px;
+}
+
+.metadata.form-container select[multiple] {
+   min-width: 35em;
+}
+
+.form-container .form-field {
+   margin: 0 0 1em 0;
+}
+
+.form-container .mandatory-indicator {
+   color: #cc0000; font-weight: bolder; font-size: 110%; margin-left: 0.4em; margin-right: 0.4em;
+}
+
+.form-container label .help-icon img {
+   vertical-align: -3px;
+}
+
+.form-container .date-entry,.metadata .form-container .date-entry {
+   width: 6em; margin-bottom: 0.1em;
+}
+
+.form-container .time-entry,.metadata .form-container .time-entry {
+   width: 3em; margin-bottom: 0.1em;
+}
+
+/* IE dissapearing form fields bug */
+/* http://stackoverflow.com/questions/151528/totally-lost-textarea-in-ie7-disappears-when-i-mouse-over/152633#152633 */
+.form-container form * {
+   zoom: 1;
+}

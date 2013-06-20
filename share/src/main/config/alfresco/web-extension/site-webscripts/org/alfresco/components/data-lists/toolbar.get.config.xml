@@ -1,8 +1,0 @@
-<toolbar>
-  <!-- <![CDATA[ @overridden projects/slingshot/config/alfresco/site-webscripts/org/alfresco/components/data-lists/toolbar.get.config.xml ]]> -->
-  <actionSet>
-    <action type="action-link" id="onActionDuplicate" permission="create" label="menu.selected-items.duplicate" />
-    <action type="action-link" id="onActionDelete" permission="delete" label="menu.selected-items.delete" />
-    <action type="action-link" id="onActionMove" permission="create" label="menu.selected-items.move-row" />
-  </actionSet>
-</toolbar>

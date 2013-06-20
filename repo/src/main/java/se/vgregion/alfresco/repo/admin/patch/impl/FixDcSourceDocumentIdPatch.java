@@ -32,7 +32,7 @@ public class FixDcSourceDocumentIdPatch extends AbstractPatch {
 
   @Override
   protected String applyInternal() throws Exception {
-    _behaviourFilter.disableAllBehaviours();
+    _behaviourFilter.disableBehaviour();
 
     final String query = "TYPE:\"vgr:document\" AND ASPECT:\"vgr:published\"";
 
@@ -47,7 +47,11 @@ public class FixDcSourceDocumentIdPatch extends AbstractPatch {
 
     try {
       for (final ResultSetRow document : documents) {
-        final Serializable source = document.getValue(ContentModel.PROP_COPY_REFERENCE);
+        // The field ContentModel.PROP_COPY_REFERENCE has been removed in 4.1.x
+        // and I replace it with ContentModel.PROP_REFERENCE instead. This may
+        // not be correct but as this patch is just for historical use it's not
+        // that important.
+        final Serializable source = document.getValue(ContentModel.PROP_REFERENCE);
 
         Serializable sourceDocumentId;
 
@@ -90,6 +94,7 @@ public class FixDcSourceDocumentIdPatch extends AbstractPatch {
       }
     } finally {
       ServiceUtils.closeQuietly(documents);
+      _behaviourFilter.enableBehaviour();
     }
 
     return I18NUtil.getMessage(MSG_SUCCESS);

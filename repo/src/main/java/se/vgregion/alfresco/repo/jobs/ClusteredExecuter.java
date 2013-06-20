@@ -1,5 +1,6 @@
 package se.vgregion.alfresco.repo.jobs;
 
+import org.alfresco.repo.admin.RepositoryState;
 import org.alfresco.repo.lock.JobLockService;
 import org.alfresco.repo.lock.LockAcquisitionException;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
@@ -27,6 +28,8 @@ public abstract class ClusteredExecuter implements InitializingBean {
 
   protected TransactionService _transactionService;
 
+  protected RepositoryState _repositoryState;
+
   public void setJobLockService(JobLockService jobLockService) {
     _jobLockService = jobLockService;
   }
@@ -39,10 +42,28 @@ public abstract class ClusteredExecuter implements InitializingBean {
     _transactionService = transactionService;
   }
 
+  public void setRepositoryState(RepositoryState repositoryState) {
+    _repositoryState = repositoryState;
+  }
+
   public void execute() {
     // Bypass if the system is in read-only mode
     if (_transactionService.isReadOnly()) {
       LOG.debug(getJobName() + " bypassed; the system is read-only.");
+
+      return;
+    }
+
+    // Bypass if the system is bootstrapping
+    if (_repositoryState != null && _repositoryState.isBootstrapping()) {
+      LOG.debug(getJobName() + " bypassed; the system is bootstrapping.");
+
+      return;
+    }
+
+    // bypass if there already exists a lock
+    if (hasLock()) {
+      LOG.debug(getJobName() + " bypassed; a lock already exists.");
 
       return;
     }
@@ -101,6 +122,45 @@ public abstract class ClusteredExecuter implements InitializingBean {
     _jobLockService.releaseLock(lockToken, getLockQName());
 
     _lockThreadLocal.remove();
+  }
+
+  /**
+   * Method for checking whether a lock exists or not. There are currently no
+   * good ways of doing this, so a try...catch procedure is used.
+   * 
+   * @return
+   */
+  protected boolean hasLock() {
+    boolean hasLock = false;
+
+    String lockToken = _lockThreadLocal.get();
+
+    if (StringUtils.isBlank(lockToken)) {
+      return false;
+    }
+
+    RetryingTransactionCallback<String> txnWork = new RetryingTransactionCallback<String>() {
+
+      @Override
+      public String execute() throws Exception {
+        return _jobLockService.getLock(getLockQName(), _lockTTL);
+      }
+
+    };
+
+    try {
+      lockToken = _transactionService.getRetryingTransactionHelper().doInTransaction(txnWork, false, true);
+    } catch (Exception ex) {
+      hasLock = true;
+    } finally {
+      // silently release the lock, ignoring all errors
+      try {
+        _jobLockService.releaseLock(lockToken, getLockQName());
+      } catch (Exception ex) {
+      }
+    }
+
+    return hasLock;
   }
 
   protected String createLock() {

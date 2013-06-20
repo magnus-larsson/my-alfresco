@@ -1,0 +1,7 @@
+.action-header {
+   margin-top: 1em; font-size: 110%; cursor: default;
+}
+
+.action-header span {
+   background-image: none; border: none; background-color: transparent; color: #333; cursor: default; margin-top: 1em; display: block;
+}

@@ -55,7 +55,7 @@ public class FixDcCoverageHsaCodeIdPatch extends AbstractPatch implements Initia
   }
 
   private String doApply() {
-    _behaviourFilter.disableAllBehaviours();
+    _behaviourFilter.disableBehaviour();
 
     final String query = "TYPE:\"vgr:document\" AND (ISUNSET:\"vgr:dc.coverage.hsacode.id\" OR ISNULL:\"vgr:dc.coverage.hsacode.id\")";
 
