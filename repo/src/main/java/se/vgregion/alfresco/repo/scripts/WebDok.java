@@ -225,6 +225,10 @@ public class WebDok extends ContentGet {
       rows.add(row);
     }
 
+    if (rows.size() == 0) {
+      return null;
+    }
+
     Collections.sort(rows, new Comparator<ResultSetRow>() {
 
       @Override
