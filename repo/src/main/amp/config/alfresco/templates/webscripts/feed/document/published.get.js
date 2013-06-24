@@ -100,13 +100,15 @@ function getDocumentItem(node) {
 	  var published = now <= safeAvailableTo && now >= safeAvailableFrom;
 	  
 	  var requestId;
-    if (node.properties["vgr:pushed-for-unpublish"] == null && node.properties["vgr:pushed-for-publish"] == null) {
-      requestId = "";
-    } else if (node.properties["vgr:pushed-for-unpublish"] == null) {
+    if (published && node.properties["vgr:pushed-for-publish"]!=null) {
       requestId = "publish" + "_" + "workspace://SpacesStore/" + node.id + "_" + node.properties["vgr:pushed-for-publish"].getTime();
-    } else {
+    } else if (!published && node.properties["vgr:pushed-for-unpublish"]!=null) {
       requestId = "unpublish" + "_" + "workspace://SpacesStore/" + node.id + "_" + node.properties["vgr:pushed-for-unpublish"].getTime();
+    } else {
+      //Document has not been pushed yet, skip it
+      return null;
     }
+
 	  
 	  // change the language to ISO standard
 	  for each (var language in node.properties["vgr:dc.language"]) {
