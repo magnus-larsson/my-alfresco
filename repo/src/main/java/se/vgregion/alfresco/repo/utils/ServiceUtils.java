@@ -973,23 +973,40 @@ public class ServiceUtils implements InitializingBean {
     final long safeAvailableTo = availableTo != null ? availableTo.getTime() : now;
 
     final boolean published = now <= safeAvailableTo && now >= safeAvailableFrom;
-    
-    final boolean publishStatus = "ok".equalsIgnoreCase((String)_nodeService.getProperty(nodeRef, VgrModel.PROP_PUBLISH_STATUS));
 
-    return published && publishStatus;
+    // This is not strictly needed for checking if the document is published to storage or not
+    // so it should not be here...
+    // final boolean publishStatus = "ok".equalsIgnoreCase((String)_nodeService.getProperty(nodeRef, VgrModel.PROP_PUBLISH_STATUS));
+
+    return published; // && publishStatus;
   }
 
+  /**
+   * @deprecated use {@link #disableBehaviour()} instead.
+   */
+  @Deprecated
   public void disableAllBehaviours() {
-    // find site name
     AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>() {
 
       @Override
       public Void doWork() throws Exception {
-        _behaviourFilter.disableAllBehaviours();
+        _behaviourFilter.disableBehaviour();
         return null;
       }
 
     }, AuthenticationUtil.getSystemUserName());
+  }
+
+  public void disableBehaviour() {
+    AuthenticationUtil.runAsSystem(new AuthenticationUtil.RunAsWork<Void>() {
+
+      @Override
+      public Void doWork() throws Exception {
+        _behaviourFilter.disableBehaviour();
+        return null;
+      }
+
+    });
   }
 
   public static void closeQuietly(ResultSet resultSet) {
