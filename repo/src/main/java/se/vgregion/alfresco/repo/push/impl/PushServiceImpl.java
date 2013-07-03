@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -173,16 +172,6 @@ public class PushServiceImpl implements PushService, InitializingBean {
     return sdf.format(date);
   }
 
-  private Date parseStringDate(String stringDate) {
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-
-    try {
-      return sdf.parse(stringDate);
-    } catch (ParseException ex) {
-      throw new RuntimeException(ex);
-    }
-  }
-
   private String findPublishedDocumentsByStatusQuery(String startDate, String endDate, String publishStatus, String unpublishStatus) {
     StringBuffer query = new StringBuffer();
 
@@ -204,27 +193,27 @@ public class PushServiceImpl implements PushService, InitializingBean {
 
     if (startDate == "" && endDate == "") {
       // Include records not pushed yet in the result
-      query.append("(ISNULL:\"pushed-for-publish\" OR ");
-      query.append("ISNULL:\"pushed-for-unpublish\") ");
+      query.append("(ISNULL:\"vgr:pushed-for-publish\" OR ");
+      query.append("ISNULL:\"vgr:pushed-for-unpublish\") ");
     } else {
       // When we have a start or end date, show only documents scheduled for publish/unpublish
-      query.append("(vgr\\:pushed\\-for\\-publish:[" + queryStartDate + " TO " + queryEndDate + "] OR ");    
+      query.append("(vgr\\:pushed\\-for\\-publish:[" + queryStartDate + " TO " + queryEndDate + "] OR ");
       query.append("vgr\\:pushed\\-for\\-unpublish:[" + queryStartDate + " TO " + queryEndDate + "]) ");
     }
     // query.append("vgr\\:pushed\\-for\\-unpublish:[" + queryStartDate +
     // " TO "+ queryEndDate +"] AND ");
-    if (publishStatus.length() == 0) {
+    if (publishStatus == null) {
       query.append("AND ISNULL:\"vgr:publish-status\" ");
     } else if (publishStatus.length() > 0 && !"any".equalsIgnoreCase(publishStatus)){
       query.append("AND vgr\\:publish\\-status: \"" + publishStatus + "\" ");
     }
-    
-    if (unpublishStatus.length() == 0) {
+
+    if (unpublishStatus == null) {
       query.append("AND ISNULL:\"vgr:unpublish-status\" ");
     } else if (unpublishStatus.length() > 0 && !"any".equalsIgnoreCase(unpublishStatus)){
       query.append("AND vgr\\:unpublish\\-status: \"" + unpublishStatus + "\" ");
     }
-    
+
     if (LOG.isDebugEnabled()) {
       LOG.debug("Query for finding documents scheduled for publishing/unpublishing: " + query.toString());
     }

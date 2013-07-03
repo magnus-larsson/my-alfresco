@@ -101,9 +101,9 @@
     <property name="cronExpression" value="0 0 1 1/1 * ? *" />
   </bean>
 
-  <!-- *********************************************************************** -->
-  <!-- Job for synchronizing the Apelon and KIV unit data source with Alfresco -->
-  <!-- *********************************************************************** -->
+  <!-- ****************************************************************** -->
+  <!-- Job for pushing documents to the push server for publish/unpublish -->
+  <!-- ****************************************************************** -->
 
   <bean id="vgr.pushToPubSubHubBubServer" class="se.vgregion.alfresco.repo.push.PushToPubSubHubBubServer" parent="vgr.clusteredExecuter">
     <property name="searchService" ref="SearchService" />
@@ -128,6 +128,33 @@
     <property name="scheduler" ref="schedulerFactory" />
     <!-- cron expression is set to fire every minute -->
     <property name="cronExpression" value="0 0/1 * 1/1 * ? *" />
+  </bean>
+
+  <!-- ****************************************************************** -->
+  <!-- Job for re-pushing documents to the push server for publish/unpublish -->
+  <!-- ****************************************************************** -->
+
+  <bean id="vgr.repushToPubSubHubBubServer" class="se.vgregion.alfresco.repo.push.RepushToPubSubHubBubServer" parent="vgr.clusteredExecuter">
+    <property name="nodeService" ref="NodeService" />
+    <property name="behaviourFilter" ref="policyBehaviourFilter" />
+    <property name="pushService" ref="vgr.pushService" />
+    <property name="maxRepushCount" value="${vgr.push.max-repush-count}"/>
+  </bean>
+
+  <bean id="vgr.repushServerJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <property name="jobClass" value="se.vgregion.alfresco.repo.jobs.RepushServerJob" />
+    <property name="jobDataAsMap">
+      <map>
+        <entry key="repushToPubSubHubBubServer" value-ref="vgr.repushToPubSubHubBubServer" />
+      </map>
+    </property>
+  </bean>
+
+  <bean id="vgr.repushServerTrigger" class="org.alfresco.util.CronTriggerBean">
+    <property name="jobDetail" ref="vgr.repushServerJobDetail" />
+    <property name="scheduler" ref="schedulerFactory" />
+    <!-- cron expression is set to fire every 10 minutes -->
+    <property name="cronExpression" value="0 0/10 * 1/1 * ? *" />
   </bean>
 
   <!-- ********************************************************************************* -->

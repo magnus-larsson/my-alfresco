@@ -55,6 +55,7 @@ public interface VgrModel {
   public static final QName PROP_PUBLISHER_ID = QName.createQName(VGR_URI, "dc.publisher.id");
   public static final QName PROP_PUSHED_FOR_PUBLISH = QName.createQName(VGR_URI, "pushed-for-publish");
   public static final QName PROP_PUSHED_FOR_UNPUBLISH = QName.createQName(VGR_URI, "pushed-for-unpublish");
+  public static final QName PROP_PUSHED_COUNT = QName.createQName(VGR_URI, "pushed-count");
   public static final QName PROP_PUBLISH_STATUS = QName.createQName(VGR_URI, "publish-status");
   public static final QName PROP_UNPUBLISH_STATUS = QName.createQName(VGR_URI, "unpublish-status");
   public static final QName PROP_DATE_AVAILABLE_TO = QName.createQName(VGR_URI, "dc.date.availableto");

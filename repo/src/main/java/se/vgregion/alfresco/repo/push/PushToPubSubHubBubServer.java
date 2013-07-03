@@ -179,7 +179,33 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
     }
     setPublishStatusProperties(unpublishedDocuments, VgrModel.PROP_PUSHED_FOR_UNPUBLISH);
 
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Increasing vgr:pushed-count with 1 for all published documents");
+    }
+    increasePushedCount(publishedDocuments);
+
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Increasing vgr:pushed-count with 1 for all published documents");
+    }
+    increasePushedCount(unpublishedDocuments);
+
     _behaviourFilter.enableBehaviour();
+  }
+
+  protected void increasePushedCount(List<NodeRef> nodeRefs) {
+    for (NodeRef nodeRef : nodeRefs) {
+      refreshLock();
+
+      Integer pushedCount = (Integer) _nodeService.getProperty(nodeRef, VgrModel.PROP_PUSHED_COUNT);
+
+      if (pushedCount == null) {
+        pushedCount = 0;
+      }
+
+      pushedCount++;
+
+      _nodeService.setProperty(nodeRef, VgrModel.PROP_PUSHED_COUNT, pushedCount);
+    }
   }
 
   protected void setPublishStatusProperties(List<NodeRef> nodeRefs, QName property) {
