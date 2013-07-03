@@ -1,0 +1,17 @@
+<alfresco-config area="mimetype-map">
+
+  <config evaluator="string-compare" condition="Mimetype Map">
+    <mimetypes>
+      <mimetype mimetype="video/mpeg" display="MPEG Video">
+        <extension default="true">mpg</extension>
+        <extension>mpeg</extension>
+        <extension>mpe</extension>
+        <extension>mod</extension>
+      </mimetype>
+      <mimetype mimetype="application/x-mswinurl" display="Internet Shortcut">
+        <extension default="true">url</extension>
+      </mimetype>
+    </mimetypes>
+  </config>
+
+</alfresco-config>
