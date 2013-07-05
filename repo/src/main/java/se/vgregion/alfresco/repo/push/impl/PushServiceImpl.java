@@ -163,6 +163,24 @@ public class PushServiceImpl implements PushService, InitializingBean {
     }
   }
 
+  @Override
+  /*
+   * (non-Javadoc)
+   * 
+   * @see se.vgregion.alfresco.repo.push.PushService#findErroneousPushedFiles(java.util.Date, java.util.Date, java.lang.Integer, java.lang.Integer)
+   */
+  public List<NodeRef> findErroneousPushedFiles(Integer count, Integer minimumPushAge) {
+    String query = findErroneousPublishedDocuments(count, minimumPushAge);
+
+    ResultSet result = findDocuments(query);
+
+    try {
+      return result.getNodeRefs();
+    } finally {
+      ServiceUtils.closeQuietly(result);
+    }
+  }
+
   private String formatDate(Date date) {
     if (date == null) {
       return "";
@@ -170,6 +188,40 @@ public class PushServiceImpl implements PushService, InitializingBean {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     return sdf.format(date);
+  }
+
+  private String findErroneousPublishedDocuments(Integer count, Integer minimumPushAge) {
+    StringBuffer query = new StringBuffer();
+
+    Date now = new Date();
+
+    query.append("TYPE:\"vgr:document\" AND ");
+    query.append("ASPECT:\"vgr:published\" ");
+
+    query.append("AND vgr:dc\\.date\\.availablefrom:[MIN TO \"" + formatDate(now) + "\"] AND ");
+    query.append("(ISNULL:\"vgr:dc.date.availableto\" OR ISUNSET:\"vgr:dc.date.availableto\" OR vgr:dc\\.date\\.availableto:[\"" + formatDate(now) + "\" TO MAX]) ");
+
+    if (count != null) {
+      query.append("AND (vgr\\:pushed\\-count:[MIN TO " + (count - 1) + "] OR ISNULL:\"vgr:pushed-count\" OR ISUNSET:\"vgr:pushed-count\") ");
+    }
+
+    if (minimumPushAge != null && minimumPushAge > 0) {
+      String endDate = "\"" + formatDate(new Date(System.currentTimeMillis() - minimumPushAge * 60 * 1000)) + "\"";
+
+      query.append("AND ((-vgr\\:publish\\-status:\"OK\" AND -vgr\\:unpublish\\-status:\"OK\" AND vgr\\:pushed\\-for\\-publish:[MIN TO " + endDate + "]) OR ");
+      query.append("(-vgr\\:unpublish\\-status:\"OK\" AND vgr\\:pushed\\-for\\-unpublish:[MIN TO " + endDate + "])) ");
+    } else {
+      query.append("AND ((-vgr\\:publish\\-status:\"OK\" AND -vgr\\:unpublish\\-status:\"OK\") OR ");
+      query.append("-vgr\\:unpublish\\-status:\"OK\") ");
+    }
+
+    System.out.println(query);
+
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Query for finding erroneous published/unpublished documents: " + query.toString());
+    }
+
+    return query.toString();
   }
 
   private String findPublishedDocumentsByStatusQuery(String startDate, String endDate, String publishStatus, String unpublishStatus) {
@@ -204,13 +256,13 @@ public class PushServiceImpl implements PushService, InitializingBean {
     // " TO "+ queryEndDate +"] AND ");
     if (publishStatus == null) {
       query.append("AND ISNULL:\"vgr:publish-status\" ");
-    } else if (publishStatus.length() > 0 && !"any".equalsIgnoreCase(publishStatus)){
+    } else if (publishStatus.length() > 0 && !"any".equalsIgnoreCase(publishStatus)) {
       query.append("AND vgr\\:publish\\-status: \"" + publishStatus + "\" ");
     }
 
     if (unpublishStatus == null) {
       query.append("AND ISNULL:\"vgr:unpublish-status\" ");
-    } else if (unpublishStatus.length() > 0 && !"any".equalsIgnoreCase(unpublishStatus)){
+    } else if (unpublishStatus.length() > 0 && !"any".equalsIgnoreCase(unpublishStatus)) {
       query.append("AND vgr\\:unpublish\\-status: \"" + unpublishStatus + "\" ");
     }
 
@@ -228,11 +280,16 @@ public class PushServiceImpl implements PushService, InitializingBean {
     searchParameters.setLanguage(SearchService.LANGUAGE_FTS_ALFRESCO);
     searchParameters.setQuery(query.toString());
 
+    long start = System.currentTimeMillis();
+
     ResultSet result = _searchService.query(searchParameters);
+
+    long total = System.currentTimeMillis() - start;
 
     if (LOG.isDebugEnabled()) {
       LOG.debug("Documents found for query: " + query.toString());
       LOG.debug("Count: " + result.length());
+      LOG.debug("Time to execute: " + total + " ms");
       LOG.debug("");
     }
 

@@ -12,11 +12,14 @@ import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransacti
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.util.ParameterCheck;
+import org.apache.log4j.Logger;
 
 import se.vgregion.alfresco.repo.jobs.ClusteredExecuter;
 import se.vgregion.alfresco.repo.model.VgrModel;
 
 public class RepushToPubSubHubBubServer extends ClusteredExecuter {
+
+  private static final Logger LOG = Logger.getLogger(RepushToPubSubHubBubServer.class);
 
   private PushService _pushService;
 
@@ -25,6 +28,11 @@ public class RepushToPubSubHubBubServer extends ClusteredExecuter {
   private BehaviourFilter _behaviourFilter;
 
   private int _maxRepushCount = 10;
+
+  /**
+   * The minimum time (in minutes) that must have passed for a document before a re-push is tried. Default time is set to 20 minutes.
+   */
+  private int _minimumPushAge = 20;
 
   @Override
   protected String getJobName() {
@@ -55,31 +63,19 @@ public class RepushToPubSubHubBubServer extends ClusteredExecuter {
   protected void doExecute() {
     refreshLock();
 
-    Date start = new Date(1);
-    Date end = new Date();
-
     List<NodeRef> pushed = new ArrayList<NodeRef>();
 
-    pushed.addAll(_pushService.findPushedFiles("ERROR", null, start, end));
-    pushed.addAll(_pushService.findPushedFiles(null, "ERROR", start, end));
-    pushed.addAll(_pushService.findPushedFiles("ERROR", "ERROR", start, end));
-    pushed.addAll(_pushService.findPushedFiles("ERROR", "", start, end));
-    pushed.addAll(_pushService.findPushedFiles("", "ERROR", start, end));
+    pushed.addAll(_pushService.findErroneousPushedFiles(_maxRepushCount, _minimumPushAge));
+
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Found '" + pushed.size() + "' documents eligable for re-push.");
+    }
 
     for (NodeRef nodeRef : pushed) {
       refreshLock();
 
-      Integer count = (Integer) _nodeService.getProperty(nodeRef, VgrModel.PROP_PUSHED_COUNT);
-
-      System.out.println(count);
-
-      if (count == null) {
-        count = 1;
-      }
-
-      // there's a limit of the number of times a document can be re-pushed.
-      if (count >= _maxRepushCount) {
-        continue;
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Adding '" + nodeRef + "' to be re-pushed...");
       }
 
       _behaviourFilter.disableBehaviour();
@@ -108,6 +104,10 @@ public class RepushToPubSubHubBubServer extends ClusteredExecuter {
 
   public void setMaxRepushCount(int maxRepushCount) {
     _maxRepushCount = maxRepushCount;
+  }
+
+  public void setMinimumPushAge(int minimumPushAge) {
+    _minimumPushAge = minimumPushAge;
   }
 
   @Override

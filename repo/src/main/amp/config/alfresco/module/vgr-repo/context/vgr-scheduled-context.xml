@@ -1,7 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
   <bean id="vgr.clusteredExecuter" class="se.vgregion.alfresco.repo.jobs.ClusteredExecuter" abstract="true">
     <property name="jobLockService" ref="jobLockService" />
@@ -138,7 +137,8 @@
     <property name="nodeService" ref="NodeService" />
     <property name="behaviourFilter" ref="policyBehaviourFilter" />
     <property name="pushService" ref="vgr.pushService" />
-    <property name="maxRepushCount" value="${vgr.push.max-repush-count}"/>
+    <property name="maxRepushCount" value="${vgr.push.max-repush-count}" />
+    <property name="minimumPushAge" value="${vgr.push.minimum-push-age}" />
   </bean>
 
   <bean id="vgr.repushServerJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">

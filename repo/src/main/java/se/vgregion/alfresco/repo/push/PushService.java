@@ -7,17 +7,21 @@ import org.alfresco.service.cmr.repository.NodeRef;
 
 public interface PushService {
 
-  public boolean pingPush();
-  
-  public boolean pushFile(NodeRef nodeRef);
+  boolean pingPush();
 
-  public boolean pushFiles(List<NodeRef> nodeRefs);
+  boolean pushFile(NodeRef nodeRef);
+
+  boolean pushFiles(List<NodeRef> nodeRefs);
 
   /**
    * Find files pushed for publishing, limit results by status.
+   * 
    * @param publishStatus
    * @param unpublishStatus
    * @return
    */
-  public List<NodeRef> findPushedFiles(String publishStatus, String unpublishStatus, Date startTime, Date endTime);
+  List<NodeRef> findPushedFiles(String publishStatus, String unpublishStatus, Date startTime, Date endTime);
+
+  List<NodeRef> findErroneousPushedFiles(Integer count, Integer minimumPushAge);
+
 }
