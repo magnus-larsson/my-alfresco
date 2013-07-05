@@ -215,8 +215,6 @@ public class PushServiceImpl implements PushService, InitializingBean {
       query.append("-vgr\\:unpublish\\-status:\"OK\") ");
     }
 
-    System.out.println(query);
-
     if (LOG.isDebugEnabled()) {
       LOG.debug("Query for finding erroneous published/unpublished documents: " + query.toString());
     }

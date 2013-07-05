@@ -1,6 +1,5 @@
 package se.vgregion.alfresco.repo.push;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -63,9 +62,7 @@ public class RepushToPubSubHubBubServer extends ClusteredExecuter {
   protected void doExecute() {
     refreshLock();
 
-    List<NodeRef> pushed = new ArrayList<NodeRef>();
-
-    pushed.addAll(_pushService.findErroneousPushedFiles(_maxRepushCount, _minimumPushAge));
+    List<NodeRef> pushed = _pushService.findErroneousPushedFiles(_maxRepushCount, _minimumPushAge);
 
     if (LOG.isDebugEnabled()) {
       LOG.debug("Found '" + pushed.size() + "' documents eligable for re-push.");
