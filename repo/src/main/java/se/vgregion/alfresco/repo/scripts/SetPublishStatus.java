@@ -132,21 +132,21 @@ public class SetPublishStatus extends DeclarativeWebScript implements Initializi
       final String aType = type;
       final NodeRef aNodeRef = nodeRef;
       AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>() {
-        
+
 
         @Override
         public Void doWork() throws Exception {
-          _behaviourFilter.disableAllBehaviours();
+          _behaviourFilter.disableBehaviour();
           if (TYPE_PUBLISH_STATUS.equals(aType)) {
             nodeService.setProperty(aNodeRef, VgrModel.PROP_PUBLISH_STATUS, publishingStatus);
           } else {
             nodeService.setProperty(aNodeRef, VgrModel.PROP_UNPUBLISH_STATUS, publishingStatus);
           }
-          _behaviourFilter.enableAllBehaviours();
+          _behaviourFilter.enableBehaviour();
           return null;
         }
       }, AuthenticationUtil.getSystemUserName());
-      
+
     }
 
     model.put("result", "OK");

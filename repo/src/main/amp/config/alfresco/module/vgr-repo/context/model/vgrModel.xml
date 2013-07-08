@@ -843,6 +843,12 @@
         <property name="vgr:unpublish-status">
           <type>d:text</type>
         </property>
+        
+        <!-- This property is used for counting the number of times a document has been "pushed" -->
+        <property name="vgr:pushed-count">
+          <type>d:int</type>
+          <default>0</default> 
+        </property>
       </properties>
     </aspect>
 

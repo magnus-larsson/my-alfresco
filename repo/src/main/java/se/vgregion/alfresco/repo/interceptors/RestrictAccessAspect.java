@@ -97,9 +97,7 @@ public class RestrictAccessAspect {
   }
 
   /**
-   * Extracts the IP adress of the caller. If there's an "x-forwarded-for"
-   * header set, that one is used cause that is set by proxies, load balancers
-   * and the like.
+   * Extracts the IP adress of the caller. If there's an "x-forwarded-for" header set, that one is used cause that is set by proxies, load balancers and the like.
    * 
    * @param request
    *          the http servlet request
@@ -131,6 +129,11 @@ public class RestrictAccessAspect {
     // first of all, if the node is not in the Storage, continue using the
     // regular security
     if (!nodeService.hasAspect(nodeRef, VgrModel.ASPECT_PUBLISHED)) {
+      return false;
+    }
+
+    // then, if it's not a vgr:document, then also exit...
+    if (!nodeService.getType(nodeRef).isMatch(VgrModel.TYPE_VGR_DOCUMENT)) {
       return false;
     }
 

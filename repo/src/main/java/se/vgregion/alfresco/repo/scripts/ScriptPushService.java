@@ -9,9 +9,9 @@ import org.alfresco.repo.jscript.ValueConverter;
 import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.util.ParameterCheck;
 import org.mozilla.javascript.Scriptable;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.Assert;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
 
@@ -30,7 +30,7 @@ public class ScriptPushService extends BaseScopableProcessorExtension implements
   }
 
   public void send(final Scriptable documents) {
-    _behaviourFilter.disableAllBehaviours();
+    _behaviourFilter.disableBehaviour();
 
     final ValueConverter converter = new ValueConverter();
 
@@ -46,8 +46,8 @@ public class ScriptPushService extends BaseScopableProcessorExtension implements
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    Assert.notNull(_nodeService);
-    Assert.notNull(_behaviourFilter);
+    ParameterCheck.mandatory("nodeService", _nodeService);
+    ParameterCheck.mandatory("behaviourFilter", _behaviourFilter);
   }
 
 }

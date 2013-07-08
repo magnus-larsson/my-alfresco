@@ -68,9 +68,10 @@ public abstract class ClusteredExecuter implements InitializingBean {
       return;
     }
 
-    createLock();
 
     try {
+      createLock();
+
       LOG.debug(getJobName() + " started.");
 
       refreshLock();
@@ -92,7 +93,11 @@ public abstract class ClusteredExecuter implements InitializingBean {
         LOG.debug("   " + getJobName() + " aborted.");
       }
     } finally {
-      releaseLock();
+      try {
+        releaseLock();
+      } catch (Exception ex) {
+        // just swallow the exception here...
+      }
     }
   }
 

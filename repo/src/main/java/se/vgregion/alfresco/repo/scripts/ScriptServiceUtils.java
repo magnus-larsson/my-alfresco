@@ -131,8 +131,16 @@ public class ScriptServiceUtils extends BaseScopableProcessorExtension implement
     Assert.notNull(_serviceUtils);
   }
 
+  /**
+   * @deprecated use {@link #disableBehaviour()} instead.
+   */
+  @Deprecated
   public void disableAllBehaviours() {
-    _serviceUtils.disableAllBehaviours();
+    _serviceUtils.disableBehaviour();
+  }
+
+  public void disableBehaviour() {
+    _serviceUtils.disableBehaviour();
   }
 
   public String removeExtension(String filename) {

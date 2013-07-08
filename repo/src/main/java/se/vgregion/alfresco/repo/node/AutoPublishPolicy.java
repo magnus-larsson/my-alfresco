@@ -2,6 +2,8 @@ package se.vgregion.alfresco.repo.node;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
+import org.alfresco.repo.node.NodeServicePolicies.OnUpdateNodePolicy;
 import org.alfresco.repo.policy.Behaviour;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
@@ -15,11 +17,9 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.storage.StorageService;
-
-import static org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
-import static org.alfresco.repo.node.NodeServicePolicies.OnUpdateNodePolicy;
 
 public class AutoPublishPolicy extends AbstractPolicy implements OnCreateNodePolicy, OnUpdateNodePolicy {
 
@@ -162,11 +162,11 @@ public class AutoPublishPolicy extends AbstractPolicy implements OnCreateNodePol
     }
 
     try {
-      _behaviourFilter.disableAllBehaviours();
+      _behaviourFilter.disableBehaviour();
 
       _storageService.publishToStorage(fileNodeRef);
 
-      _behaviourFilter.enableAllBehaviours();
+      _behaviourFilter.enableBehaviour();
     } catch (AlfrescoRuntimeException ex) {
       LOG.debug("Publish to storage failed cause document misses some properties.");
     }
