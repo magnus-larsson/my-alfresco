@@ -5,6 +5,7 @@
    <script type="text/javascript">//<![CDATA[
       new Alfresco.DocumentActions("${el}").setOptions(
       {
+         <#if repositoryUrl??>repositoryUrl: "${repositoryUrl}",</#if>
          nodeRef: "${nodeRef?js_string}",
          siteId: <#if site??>"${site?js_string}"<#else>null</#if>,
          containerId: "${container?js_string}",

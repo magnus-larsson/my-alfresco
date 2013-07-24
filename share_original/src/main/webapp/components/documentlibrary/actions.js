@@ -76,7 +76,7 @@
          var editDetails = new Alfresco.module.SimpleDialog(this.id + "-editDetails-" + Alfresco.util.generateDomId());
 
          editDetails.setOptions({
-            width: "40em",
+            width: "auto",
             templateUrl: templateUrl,
             actionUrl: null,
             destroyOnHide: true,

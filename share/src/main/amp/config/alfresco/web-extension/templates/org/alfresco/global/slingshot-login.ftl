@@ -40,7 +40,7 @@
       </div>
       <div style="padding-top:12px">
          <span class="login-copyright">
-            &copy; 2005-2012 Alfresco Software Inc. All rights reserved.
+            &copy; 2005-2013 Alfresco Software Inc. All rights reserved.
          </span>
       </div>
    </div>
@@ -95,7 +95,7 @@
       panel.render(document.body);
       panel.center();
       
-      Dom.get("success").value += window.location.hash;
+      Dom.get("success").value += location.href.indexOf("#") > -1 ? location.href.substr(location.href.indexOf("#")) : "";
       Dom.get(<#if lastUsername??>"password"<#else>"username"</#if>).focus();
    });
    

@@ -22,6 +22,7 @@
  */
 
 const DEFAULT_MAX_RESULTS = 250;
+const DEFAULT_PAGE_SIZE = 50;
 const SITES_SPACE_QNAME_PATH = "/app:company_home/st:sites/";
 const DISCUSSION_QNAMEPATH = "/fm:discussion";
 const COMMENT_QNAMEPATH = DISCUSSION_QNAMEPATH + "/cm:Comments";
@@ -62,11 +63,10 @@ function getPersonDisplayName(userId)
       return personDataCache[userId];
    }
    
-   var displayName = "";
-   var person = people.getPerson(userId);
-   if (person != null)
+   var displayName = people.getPersonFullName(userId);
+   if (displayName == null)
    {
-      displayName = person.properties.firstName + " " + person.properties.lastName;
+      displayName = "";
    }
    personDataCache[userId] = displayName;
    return displayName;
@@ -483,9 +483,9 @@ function getItem(siteId, containerId, pathParts, node)
    }
    else
    {
-      switch ("" + containerId)
+      switch ("" + containerId.toLowerCase())
       {
-         case "documentLibrary":
+         case "documentlibrary":
             item = getDocumentItem(siteId, containerId, pathParts, node);
             break;
          case "blog":
@@ -530,13 +530,13 @@ function getItem(siteId, containerId, pathParts, node)
 function splitQNamePath(node, rootNodeDisplayPath, rootNodeQNamePath)
 {
    var path = node.qnamePath,
-       displayPath = node.displayPath.split("/"),
+       displayPath = utils.displayPath(node).split("/"),
        parts = null;
    
    // restructure the display path of the node if we have an overriden root node
    if (rootNodeDisplayPath != null && path.indexOf(rootNodeQNamePath) === 0)
    {
-      var nodeDisplayPath = node.displayPath.split("/");
+      var nodeDisplayPath = utils.displayPath(node).split("/");
       nodeDisplayPath = nodeDisplayPath.splice(rootNodeDisplayPath.length);
       nodeDisplayPath.unshift("");
       displayPath = nodeDisplayPath;
@@ -571,22 +571,22 @@ function splitQNamePath(node, rootNodeDisplayPath, rootNodeQNamePath)
  * 
  * @return the final search results object
  */
-function processResults(nodes, maxResults, rootNode)
+function processResults(nodes, maxPageResults, startIndex, rootNode)
 {
    // empty cache state
    processedCache = {};
    var results = [],
-      added = 0,
+      added = processed = failed = 0,
       parts,
       item,
-      failed = 0,
-      rootNodeDisplayPath = rootNode ? rootNode.displayPath.split("/") : null,
+      rootNodeDisplayPath = rootNode ? utils.displayPath(rootNode).split("/") : null,
       rootNodeQNamePath = rootNode ? rootNode.qnamePath : null;
    
    if (logger.isLoggingEnabled())
       logger.log("Processing resultset of length: " + nodes.length);
    
-   for (var i = 0, j = nodes.length; i < j && added < maxResults; i++)
+   startIndex = startIndex ? startIndex : 0;
+   for (var i = 0, j = nodes.length; i < j; i++)
    {
       /**
        * For each node we extract the site/container qname path and then
@@ -596,8 +596,11 @@ function processResults(nodes, maxResults, rootNode)
       item = getItem(parts[0], parts[1], parts[2], nodes[i]);
       if (item !== null)
       {
+         if (processed++ >= startIndex && added < maxPageResults)
+      {
          results.push(item);
          added++;
+      }
       }
       else
       {
@@ -610,6 +613,12 @@ function processResults(nodes, maxResults, rootNode)
    
    return (
    {
+      paging:
+      {
+         totalRecords: results.length,
+         totalRecordsUpper: nodes.length - failed,
+         startIndex: startIndex
+      },
       items: results
    });
 }
@@ -1032,7 +1041,7 @@ function getSearchResults(params)
       nodes = [];
    }
    
-   return processResults(nodes, params.maxResults, rootNode);
+   return processResults(nodes, params.pageSize, params.startIndex, rootNode);
 }
 
 /**

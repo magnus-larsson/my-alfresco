@@ -22,6 +22,7 @@
       repositoryBrowsing: ${(rootNode??)?string},
       useTitle: ${(useTitle!true)?string},
       userIsSiteManager: ${(userIsSiteManager!false)?string},
+      isReadOnly: ${isReadOnly?string},
       containerType: "${containerType!""}"
    }).setMessages(
       ${messages}

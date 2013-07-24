@@ -95,17 +95,16 @@ function main()
 
             case "uploaddirectory":
                uploadDirectory = fnFieldValue(field);
-               if (uploadDirectory !== null)
+               if ((uploadDirectory !== null) && (uploadDirectory.length() > 0))
                {
-                  // Remove any leading "/" from the uploadDirectory
-                  if (uploadDirectory.substr(0, 1) == "/")
-                  {
-                     uploadDirectory = uploadDirectory.substr(1);
-                  }
-                  // Ensure uploadDirectory ends with "/" if not the root folder
-                  if ((uploadDirectory.length > 0) && (uploadDirectory.substring(uploadDirectory.length - 1) != "/"))
+                  if (uploadDirectory.charAt(uploadDirectory.length() - 1) != "/")
                   {
                      uploadDirectory = uploadDirectory + "/";
+                  }
+                  // Remove any leading "/" from the uploadDirectory
+                  if (uploadDirectory.charAt(0) == "/")
+                  {
+                     uploadDirectory = uploadDirectory.substr(1);
                   }
                }
                break;
@@ -252,6 +251,16 @@ function main()
          updateNode.properties.content.guessEncoding();
          // check it in again, with supplied version history note
          updateNode = updateNode.checkin(description, majorVersion);
+         if (aspects.length != 0)
+         {
+            for (i = 0; i < aspects.length; i++)
+            {
+               if (!updateNode.hasAspect(aspects[i]))
+               {
+                  updateNode.addAspect(aspects[i]);
+               }
+            }
+         }
 
          // Extract the metadata
          // (The overwrite policy controls which if any parts of
@@ -301,8 +310,7 @@ function main()
                // Record the file details ready for generating the response
                model.document = existingFile;
 
-               // We're finished - bail out here
-               formdata.cleanup();
+               // MNT-8745 fix: Do not clean formdata temp files to allow for retries. Temp files will be deleted later when GC call DiskFileItem#finalize() method or by temp file cleaner.
                return;
             }
             else
@@ -340,10 +348,14 @@ function main()
          /**
           * Create a new file.
           */
-         var newFile = destNode.createFile(filename);
+         var newFile;
          if (contentType !== null)
          {
-            newFile.specializeType(contentType);
+         newFile = destNode.createFile(filename, contentType);
+         }
+         else
+         {
+          newFile = destNode.createFile(filename);
          }
          writeContent(newFile.properties.content, content, tempFilename);
 
@@ -384,8 +396,7 @@ function main()
          model.document = newFile;
       }
       
-      // final cleanup of temporary resources created during request processing
-      formdata.cleanup();
+      // MNT-8745 fix: Do not clean formdata temp files to allow for retries. Temp files will be deleted later when GC call DiskFileItem#finalize() method or by temp file cleaner.
    }
    catch (e)
    {
