@@ -235,6 +235,7 @@
           <permission allow="true">Write</permission>
         </permissions>
         <evaluator>evaluator.doclib.metadata.showPublishHeader</evaluator>
+        <evaluator negate="true">evaluator.doclib.metadata.isPublishedAspect</evaluator>
         <evaluator negate="true">evaluator.doclib.action.isWorkingCopy</evaluator>
         <evaluator negate="true">evaluator.doclib.metadata.isLocked</evaluator>
       </action>
@@ -251,6 +252,7 @@
           <permission allow="true">Write</permission>
         </permissions>
         <evaluator>evaluator.doclib.metadata.canPublish</evaluator>
+        <evaluator negate="true">evaluator.doclib.metadata.isPublishedAspect</evaluator>
         <evaluator negate="true">evaluator.doclib.action.isWorkingCopy</evaluator>
         <evaluator negate="true">evaluator.doclib.metadata.isLocked</evaluator>
       </action>
@@ -261,6 +263,7 @@
           <permission allow="true">Write</permission>
         </permissions>
         <evaluator>evaluator.doclib.metadata.canUnpublish</evaluator>
+        <evaluator negate="true">evaluator.doclib.metadata.isPublishedAspect</evaluator>
         <evaluator negate="true">evaluator.doclib.action.isWorkingCopy</evaluator>
         <evaluator negate="true">evaluator.doclib.metadata.isLocked</evaluator>
       </action>
@@ -271,6 +274,7 @@
           <permission allow="true">Write</permission>
         </permissions>
         <evaluator>evaluator.doclib.metadata.canUnpublishOld</evaluator>
+        <evaluator negate="true">evaluator.doclib.metadata.isPublishedAspect</evaluator>
         <evaluator negate="true">evaluator.doclib.action.isWorkingCopy</evaluator>
         <evaluator negate="true">evaluator.doclib.metadata.isLocked</evaluator>
       </action>
