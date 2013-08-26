@@ -32,5 +32,22 @@
       <artifactId>vgr-soa-client</artifactId>
       <version>1.1</version>
     </dependency>
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+      <version>2.6</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>1.4</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>${alfresco.groupId}</groupId>
+      <artifactId>alfresco-enterprise-repository</artifactId>
+      <version>${alfresco.version}</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 </project>

@@ -21,6 +21,12 @@
       <artifactId>alfresco-opencmis-extension</artifactId>
       <version>0.4</version>
     </dependency>
+    <dependency>
+      <groupId>${alfresco.groupId}</groupId>
+      <artifactId>alfresco-enterprise-repository</artifactId>
+      <version>${alfresco.version}</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <repositories>
