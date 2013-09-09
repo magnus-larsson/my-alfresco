@@ -96,6 +96,9 @@ function getDocumentItem(node) {
 	  var availableTo = node.properties["vgr:dc.date.availableto"];
 	  var safeAvailableFrom = availableFrom != null ? availableFrom.getTime() : 0;
 	  var safeAvailableTo = availableTo != null ? availableTo.getTime() : now;
+	  // TODO: switch to this one after the release of the upgrade to 4.1.5
+	  // var accessRights = serviceUtils.parseAccessRights(node.properties["vgr:dc.rights.accessrights"]);
+	  var accessRights = parseAccessRights(node.properties["vgr:dc.rights.accessrights"]);
 	  
 	  var published = now <= safeAvailableTo && now >= safeAvailableFrom;
 	  
@@ -105,7 +108,7 @@ function getDocumentItem(node) {
     } else if (!published && node.properties["vgr:pushed-for-unpublish"]!=null) {
       requestId = "unpublish" + "_" + "workspace://SpacesStore/" + node.id + "_" + node.properties["vgr:pushed-for-unpublish"].getTime();
     } else {
-      //Document has not been pushed yet, skip it
+      // Document has not been pushed yet, skip it
       return null;
     }
 
@@ -201,7 +204,7 @@ function getDocumentItem(node) {
        ,audience_id : node.properties["vgr:dc.audience.id"]
        ,status_document : node.properties["vgr:vgr.status.document"]
        ,status_document_id : node.properties["vgr:vgr.status.document.id"]
-       ,rights_accessrights : node.properties["vgr:dc.rights.accessrights"]
+       ,rights_accessrights : accessRights
        ,identifier_location : node.properties["vgr:dc.identifier.location"]
        ,downloadUrl                     : documentUrl
        ,objectType                      : "document"
@@ -212,6 +215,28 @@ function getDocumentItem(node) {
    }
    
    return item;
+}
+
+function parseAccessRights(accessRights) {
+   if (!accessRights) {
+      return "";
+   }
+   
+   if (accessRights.length == 0) {
+      return "";
+   }
+   
+   if (accessRights.length == 1) {
+      return accessRights[0];
+   }
+   
+   for each (var accessRight in accessRights) {
+      if (accessRight == "Internet") {
+         return "Internet";
+      }
+   }
+   
+   return accessRight[0];
 }
 
 function getIsoUtcDate(date) {
