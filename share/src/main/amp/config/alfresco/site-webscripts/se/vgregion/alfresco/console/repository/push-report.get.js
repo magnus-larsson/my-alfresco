@@ -32,6 +32,15 @@ function main() {
    
    model.from_time = from_hour + ":00";
    model.to_time = to_hour + ":00";
+   
+   
+   var theConfig = config.scoped["Console"]["sentinelUrl"];
+   
+   if (theConfig !== null) {
+     model.sentinelUrl = theConfig.value;
+   } else {
+     model.sentinelUrl = "";
+   }
 }
 
 main();

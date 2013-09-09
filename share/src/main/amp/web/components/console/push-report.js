@@ -151,17 +151,28 @@ if (typeof RL == "undefined" || !RL) {
               }
             });
           }
+          
+          function onSentinelButtonClick(p_oEvent) {
+            var url = sentinelUrl.replace("#placeholder#", nodeRef);
+            var win=window.open(url, '_blank');
+            win.focus();
+            
+          }
 
-          var oPushButton1 = new YAHOO.widget.Button("pushbutton1");
-
-          cell.innerHTML = '<div id="pushbutton' + (pushButtonCounter) + '-container"></div>';
+          cell.innerHTML = '<div id="actionbuttons' + (pushButtonCounter) + '-container"></div>';
           var oPushButton = new YAHOO.widget.Button({
             label : parent.msg("label.repushBtn.title"),
             id : "pushbutton" + pushButtonCounter,
-            container : "pushbutton" + (pushButtonCounter) + "-container"
+            container : "actionbuttons" + (pushButtonCounter) + "-container"
+          });
+          var oSentinelButton = new YAHOO.widget.Button({
+            label : parent.msg("label.sentinelBtn.title"),
+            id : "sentinelbutton" + pushButtonCounter,
+            container : "actionbuttons" + (pushButtonCounter) + "-container"
           });
           pushButtonCounter = pushButtonCounter + 1;
           oPushButton.on("click", onPushButtonClick);
+          oSentinelButton.on("click", onSentinelButtonClick);
         };
 
         var columnDefinitions = [ {
