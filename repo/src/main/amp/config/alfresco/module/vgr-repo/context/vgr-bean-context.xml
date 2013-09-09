@@ -543,5 +543,12 @@
     <property name="pushService" ref="vgr.pushService" />
     <property name="nodeService" ref="NodeService" />
   </bean>
+  
+  <bean id="webscript.publishtostorage.repush.post" class="se.vgregion.alfresco.repo.scripts.Repush" parent="webscript">
+    <property name="storageService" ref="vgr.storageService" />
+    <property name="pushService" ref="vgr.pushService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="behaviourFilter" ref="policyBehaviourFilter" />
+  </bean>
 
 </beans>

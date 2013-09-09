@@ -15,11 +15,8 @@
   <name>VGR Alfresco Base Project</name>
 
   <modules>
-    <module>webpreviewer</module>
     <module>repo</module>
     <module>share</module>
-    <module>migration</module>
-    <module>cmisclient</module>
   </modules>
 
   <build>
