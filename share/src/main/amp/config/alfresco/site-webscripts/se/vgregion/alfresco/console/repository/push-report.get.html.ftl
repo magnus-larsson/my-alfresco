@@ -1,5 +1,6 @@
 <#assign el=args.htmlid?html>
 <script type="text/javascript">//<![CDATA[
+	var sentinelUrl = "${sentinelUrl?js_string}";
    new RL.PushReport("${el}").setMessages(
       ${messages}
    );
