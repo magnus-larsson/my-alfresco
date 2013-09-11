@@ -35,6 +35,9 @@
     <!-- cron expression is set to fire every second minute -->
     <property name="cronExpression" value="0 0/2 * * * ?" />
   </bean>
+  
+  
+  
 
   <!-- *********************************************************************** -->
   <!-- Job for synchronizing the Apelon and KIV unit data source with Alfresco -->

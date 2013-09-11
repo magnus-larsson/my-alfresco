@@ -9,7 +9,6 @@
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/res/components/documentlibrary/publish-to-storage-action-ie.css" />
 <![endif]-->
 
-<@script type="text/javascript" src="${page.url.context}/res/components/documentlibrary/publish-to-storage-action.js"></@script>
 <@script type="text/javascript" src="${page.url.context}/res/components/documentlibrary/publish-to-storage.js"></@script>
 
 <@script type="text/javascript" src="${page.url.context}/res/modules/documentlibrary/vgr-copy-move-to.js"></@script>

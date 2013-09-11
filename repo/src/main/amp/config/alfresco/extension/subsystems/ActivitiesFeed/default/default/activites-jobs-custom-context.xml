@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+  <bean id="feedNotifierTrigger" class="org.alfresco.util.CronTriggerBean">
+    <property name="jobDetail" ref="feedNotifierJobDetail" />
+    <property name="scheduler" ref="schedulerFactory" />
+    <!-- cron expression is set to fire every second minute -->
+    <property name="cronExpression" value="${vgr.customFeedNotifierCron}" />
+  </bean>
+
+</beans>

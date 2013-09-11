@@ -1,4 +1,4 @@
-// @overridden projects/slingshot/source/web/components/dashlet/my-docs-editing.js
+// @overridden projects/slingshot/source/web/components/dashlets/my-docs-editing.js
 
 /**
  * Copyright (C) 2005-2012 Alfresco Software Limited.

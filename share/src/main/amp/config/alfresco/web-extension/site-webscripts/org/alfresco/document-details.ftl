@@ -1,4 +1,4 @@
-<#-- @overridden projects/slingshot/config/alfresco/site-webscripts/org/alfresco/document-details.ftl -->
+<#-- @overridden projects/slingshot/config/alfresco/templates/org/alfresco/document-details.ftl -->
 
 <#include "include/alfresco-template.ftl" />
 <@templateHeader>

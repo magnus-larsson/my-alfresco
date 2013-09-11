@@ -1,5 +1,5 @@
 <#-- Customised File -->
-<#-- @overridden remote-api/config/alfresco/templates/webscripts/org/alfresco/repository/form/form.lib.ftl -->
+<#-- @overridden projects/web-framework-commons/config/alfresco/site-webscripts/org/alfresco/components/form/form.lib.ftl -->
 <#-- Alfresco Version: 4.1.4 -->
 <#-- Modification: ov -->
 

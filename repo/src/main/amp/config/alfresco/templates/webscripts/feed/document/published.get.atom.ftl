@@ -99,7 +99,7 @@
     <@outputMultiple values=row.audience_id tag="dcterms:audience.id" />
     <@outputSingle value=row.status_document tag="VGR:status.document" />
     <@outputSingle value=row.status_document_id tag="VGR:status.document.id" />
-    <@outputMultiple values=row.rights_accessrights tag="DC:rights.accessrights" />
+    <@outputSingle value=row.rights_accessrights tag="DC:rights.accessrights" />
     <@outputMultiple values=row.identifier_location tag="DC:identifier.location" />
   </entry>
 </#list>

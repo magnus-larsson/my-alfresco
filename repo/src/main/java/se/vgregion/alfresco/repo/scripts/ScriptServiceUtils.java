@@ -35,7 +35,6 @@ public class ScriptServiceUtils extends BaseScopableProcessorExtension implement
 
   protected ServiceRegistry _serviceRegistry;
 
-
   public void setSiteService(final SiteService siteService) {
     _siteService = siteService;
   }
@@ -68,8 +67,7 @@ public class ScriptServiceUtils extends BaseScopableProcessorExtension implement
 
   private Site createSite(final SiteInfo siteInfo) {
     try {
-      final Constructor<?> constructor = Site.class
-          .getDeclaredConstructor(SiteInfo.class, ServiceRegistry.class, SiteService.class, Scriptable.class);
+      final Constructor<?> constructor = Site.class.getDeclaredConstructor(SiteInfo.class, ServiceRegistry.class, SiteService.class, Scriptable.class);
 
       ReflectionUtils.makeAccessible(constructor);
 
@@ -87,8 +85,7 @@ public class ScriptServiceUtils extends BaseScopableProcessorExtension implement
     return _serviceUtils.getDocumentIdentifier(new NodeRef(nodeRef));
   }
 
-  public Map<String, String> listMembers(final String shortName, final String nameFilter, final String roleFilter, final int size,
-      final boolean collapseGroups) {
+  public Map<String, String> listMembers(final String shortName, final String nameFilter, final String roleFilter, final int size, final boolean collapseGroups) {
     return _serviceUtils.listSiteMembers(shortName, nameFilter, roleFilter, size, collapseGroups);
   }
 
@@ -122,6 +119,29 @@ public class ScriptServiceUtils extends BaseScopableProcessorExtension implement
     } finally {
       IOUtils.closeQuietly(inputStream);
     }
+  }
+
+  /**
+   * Parses the supplied accessRights string. If no value is supplied an empty string is returned. If a list with just one entry is supplied, that value is returned. If more than one value is in the
+   * list, if Internet is in the list that value is returned, otherwise the first value in the list is returned.
+   * 
+   * @param accessRights
+   * @return
+   */
+  public String parseAccessRights(List<String> accessRights) {
+    if (accessRights == null || accessRights.size() == 0) {
+      return "";
+    }
+
+    if (accessRights.size() == 1) {
+      return accessRights.get(0);
+    }
+
+    if (accessRights.contains("Internet")) {
+      return "Internet";
+    }
+
+    return accessRights.get(0);
   }
 
   @Override

@@ -1,3 +1,5 @@
+<#-- @overridden projects/web-framework-commons/config/alfresco/site-webscripts/org/alfresco/components/form/form.lib.ftl -->
+
 <#macro renderFormsRuntime formId>
    <script type="text/javascript">//<![CDATA[
       new Alfresco.FormUI("${formId}", "${args.htmlid?js_string}").setOptions(

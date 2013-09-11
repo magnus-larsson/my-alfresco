@@ -1,4 +1,3 @@
-// @overridden projects/slingshot/config/alfresco/site-webscripts/org/alfresco/components/dashlets/my-sites.get.js
 function main()
 {
     // Get the filter parameters

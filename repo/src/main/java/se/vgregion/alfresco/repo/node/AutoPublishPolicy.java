@@ -6,6 +6,8 @@ import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnUpdateNodePolicy;
 import org.alfresco.repo.policy.Behaviour;
 import org.alfresco.repo.policy.JavaBehaviour;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.TransactionListener;
@@ -62,7 +64,7 @@ public class AutoPublishPolicy extends AbstractPolicy implements OnCreateNodePol
   public void onCreateNode(ChildAssociationRef childAssocRef) {
     NodeRef folderNodeRef = childAssocRef.getParentRef();
 
-    FileInfo folder = _fileFolderService.getFileInfo(folderNodeRef);
+    FileInfo folder = getFileInfo(folderNodeRef);
 
     if (folder == null) {
       return;
@@ -79,6 +81,16 @@ public class AutoPublishPolicy extends AbstractPolicy implements OnCreateNodePol
     doPublish(folderNodeRef, childAssocRef.getChildRef());
   }
 
+  private FileInfo getFileInfo(final NodeRef folderNodeRef) {
+    return AuthenticationUtil.runAsSystem(new RunAsWork<FileInfo>() {
+
+      @Override
+      public FileInfo doWork() throws Exception {
+        return _fileFolderService.getFileInfo(folderNodeRef);
+      }
+    });
+  }
+
   @Override
   public void onUpdateNode(NodeRef fileNodeRef) {
     if (!_nodeService.exists(fileNodeRef)) {
@@ -87,7 +99,7 @@ public class AutoPublishPolicy extends AbstractPolicy implements OnCreateNodePol
 
     NodeRef folderNodeRef = _nodeService.getPrimaryParent(fileNodeRef).getParentRef();
 
-    FileInfo folder = _fileFolderService.getFileInfo(folderNodeRef);
+    FileInfo folder = getFileInfo(folderNodeRef);
 
     if (folder == null) {
       return;

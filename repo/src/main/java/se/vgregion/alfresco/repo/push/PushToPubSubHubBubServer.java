@@ -185,7 +185,7 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
     increasePushedCount(publishedDocuments);
 
     if (LOG.isDebugEnabled()) {
-      LOG.debug("Increasing vgr:pushed-count with 1 for all published documents");
+      LOG.debug("Increasing vgr:pushed-count with 1 for all unpublished documents");
     }
     increasePushedCount(unpublishedDocuments);
 
