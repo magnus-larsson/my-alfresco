@@ -50,9 +50,13 @@ public class VgrContentGet extends ContentGet {
   }
 
   private String extractFilename(NodeRef nodeRef) {
-    final String extension = _serviceUtils.getFileExtension(nodeRef);
-
     String filename = (String) nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
+
+    String extension = _serviceUtils.getFileExtension(nodeRef);
+
+    if (".bin".equalsIgnoreCase(extension)) {
+      extension = "." + FilenameUtils.getExtension(filename);
+    }
 
     filename = FilenameUtils.getBaseName(filename);
 

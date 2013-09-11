@@ -132,7 +132,7 @@
 
       // Load the UI template from the server
       Alfresco.util.Ajax.request({
-        url: templateUrl,
+        url: templateUrl + "?noCache=" + new Date().getTime(),
         dataObj: {htmlId: this.id },
         successCallback: {
           fn: this.onTemplateLoaded,
@@ -569,7 +569,7 @@
 
       // Load the UI template from the server
       Alfresco.util.Ajax.request({
-        url: templateUrl,
+        url: templateUrl + "?noCache=" + new Date().getTime(),
         dataObj: { htmlId: this.id },
         successCallback: {
           fn: this.onTemplateLoaded,
@@ -624,7 +624,7 @@
 
       // load the current settings
       Alfresco.util.Ajax.request({
-        url: this.options.loadUrl,
+        url: this.options.loadUrl + "?noCache=" + new Date().getTime(),
         responseContentType: Alfresco.util.Ajax.JSON,
         dataObj: { 'folder': this.options.folder.nodeRef },
         successCallback: {
