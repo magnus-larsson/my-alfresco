@@ -259,6 +259,7 @@ public class PushServiceImpl implements PushService, InitializingBean {
 
     if (unpublishStatus == null || unpublishStatus.length() == 0) {
       query.append("AND ISNULL:\"vgr:unpublish-status\" ");
+      query.append("AND ISNOTNULL:\"vgr:pushed-for-unpublish\" ");
     } else if (unpublishStatus.length() > 0 && !"any".equalsIgnoreCase(unpublishStatus)) {
       query.append("AND vgr\\:unpublish\\-status: \"" + unpublishStatus + "\" ");
     }
