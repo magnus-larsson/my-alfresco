@@ -24,7 +24,7 @@
 			"modifiedBy": "${item.modifiedBy}",
 			"size": ${item.size?c},
          "permissions" : {
-            "published": <#if item.pub??>${item.pub.published?js_string}<#else>""</#if>,
+            "published": <#if item.pub??>${item.pub.published?string}<#else>""</#if>,
             "unpublished": <#if item.pub??>${(!item.pub.published)?string}<#else>""</#if>,
             "published-before": <#if item.pub??>${item.pub.hasbeen?string}<#else>""</#if>,
             "will-be-published": <#if item.pub??>${item.pub.future?string}<#else>""</#if>,
