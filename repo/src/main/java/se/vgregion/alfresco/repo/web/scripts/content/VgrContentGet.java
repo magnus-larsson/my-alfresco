@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.web.scripts.content.ContentGet;
+import org.alfresco.repo.webdav.WebDAVHelper;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.io.FilenameUtils;
@@ -62,6 +63,21 @@ public class VgrContentGet extends ContentGet {
 
     // return "\"" + filename + extension + "\"";
     return filename + extension;
+  }
+
+  @Override
+  protected void setAttachment(WebScriptResponse res, boolean attach, String attachFileName) {
+    if (attach) {
+      String headerValue = "attachment";
+      
+      if (StringUtils.isNotBlank(attachFileName)) {
+        headerValue += "; filename*=UTF-8''" + WebDAVHelper.encodeURL(attachFileName) + "; filename=\"" + attachFileName + "\"";
+      }
+
+      // set header based on filename - will force a Save As from the browse if it doesn't recognize it
+      // this is better than the default response of the browser trying to display the contents
+      res.setHeader("Content-Disposition", headerValue);
+    }
   }
 
 }
