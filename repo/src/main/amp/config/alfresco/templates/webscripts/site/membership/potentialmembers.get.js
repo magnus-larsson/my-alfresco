@@ -1,3 +1,5 @@
+<import resource="classpath:/alfresco/templates/webscripts/people/people.lib.js">
+
 // @overridden projects/remote-api/config/alfresco/templates/webscripts/org/alfresco/repository/site/membership/potentialmembers.get.js
 
 function main() {
@@ -27,26 +29,17 @@ function main() {
          query = "TYPE:\"cm:person\" AND (firstName:'" + firstName + "' AND lastName:'" + lastName + "')";
       }
 
-      var sort1 = {
-         column : "@{http://www.alfresco.org/model/content/1.0}firstName",
-         ascending : false
-      };
-
-      var sort2 = {
-         column : "@{http://www.alfresco.org/model/content/1.0}lastName",
-         ascending : false
-      };
-
       var def = {
          query : query,
          store : "workspace://SpacesStore",
-         language : "fts-alfresco",
-         sort : [ sort1, sort2 ]
+         language : "fts-alfresco"
       };
 
       // Get the collection of people
       peopleFound = search.query(def);
 
+      peopleLibrary.sortPersonList(peopleFound);
+      
       var criteria = {
          resourceName : siteShortName
       };
