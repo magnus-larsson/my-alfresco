@@ -39,7 +39,7 @@ function doQuery(filter,maxResults) {
 
     peopleLibrary.sortPersonList(result);
     
-    return search.query(def);
+    return result;
 }  
 
 
