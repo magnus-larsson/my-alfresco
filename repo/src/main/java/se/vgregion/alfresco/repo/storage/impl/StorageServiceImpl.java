@@ -880,7 +880,6 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     searchParameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
     searchParameters.setLanguage(SearchService.LANGUAGE_FTS_ALFRESCO);
     searchParameters.setQuery(query);
-    searchParameters.addSort("vgr:dc.identifier.version", true);
 
     final ResultSet nodes = _searchService.query(searchParameters);
 

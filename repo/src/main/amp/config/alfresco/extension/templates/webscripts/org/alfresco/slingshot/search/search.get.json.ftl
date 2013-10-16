@@ -4,6 +4,9 @@
 
 <#escape x as jsonUtils.encodeJSONString(x)>
 {
+  "totalRecords": ${data.paging.totalRecords?c},
+  "totalRecordsUpper": ${data.paging.totalRecordsUpper?c},
+  "startIndex": ${data.paging.startIndex?c},
 	"items":
 	[
 		<#list data.items as item>
@@ -21,13 +24,13 @@
 			"modifiedBy": "${item.modifiedBy}",
 			"size": ${item.size?c},
          "permissions" : {
-            "published": ${item.pub.published?string},
-            "unpublished": ${(!item.pub.published)?string},
-            "published-before": ${item.pub.hasbeen?string},
-            "will-be-published": ${item.pub.future?string},
-            "older-version-published": ${item.pub.publishedold?string},
-            "no-source-and-published": ${item.no_source_and_published?string},
-            "unknown-source-and-published": ${item.unknown_source_and_published?string}
+            "published": <#if item.pub??>${item.pub.published?string}<#else>""</#if>,
+            "unpublished": <#if item.pub??>${(!item.pub.published)?string}<#else>""</#if>,
+            "published-before": <#if item.pub??>${item.pub.hasbeen?string}<#else>""</#if>,
+            "will-be-published": <#if item.pub??>${item.pub.future?string}<#else>""</#if>,
+            "older-version-published": <#if item.pub??>${item.pub.publishedold?string}<#else>""</#if>,
+            "no-source-and-published": <#if item.no_source_and_published??>${item.no_source_and_published?string}<#else>""</#if>,
+            "unknown-source-and-published": <#if item.unknown_source_and_published??>${item.unknown_source_and_published?string}<#else>""</#if>
          },
 			<#if item.site??>
 			"site":

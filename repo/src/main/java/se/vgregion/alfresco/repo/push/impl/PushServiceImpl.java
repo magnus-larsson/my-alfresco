@@ -167,7 +167,9 @@ public class PushServiceImpl implements PushService, InitializingBean {
   /*
    * (non-Javadoc)
    * 
-   * @see se.vgregion.alfresco.repo.push.PushService#findErroneousPushedFiles(java.util.Date, java.util.Date, java.lang.Integer, java.lang.Integer)
+   * @see
+   * se.vgregion.alfresco.repo.push.PushService#findErroneousPushedFiles(java
+   * .util.Date, java.util.Date, java.lang.Integer, java.lang.Integer)
    */
   public List<NodeRef> findErroneousPushedFiles(Integer count, Integer minimumPushAge) {
     String query = findErroneousPublishedDocuments(count, minimumPushAge);
@@ -227,10 +229,7 @@ public class PushServiceImpl implements PushService, InitializingBean {
 
     query.append("TYPE:\"vgr:document\" AND ");
     query.append("ASPECT:\"vgr:published\" AND ");
-    // query.append("vgr:dc\\.date\\.availablefrom:[MIN TO \"" + startDate +
-    // "\"] AND ");
-    // query.append("(ISNULL:\"vgr:dc.date.availableto\" OR vgr:dc\\.date\\.availableto:[\""
-    // + startDate + "\" TO MAX]) AND ");
+
     String queryStartDate = "MIN";
     if (startDate != "") {
       queryStartDate = "\"" + startDate + "\"";
@@ -246,20 +245,21 @@ public class PushServiceImpl implements PushService, InitializingBean {
       query.append("(ISNULL:\"vgr:pushed-for-publish\" OR ");
       query.append("ISNULL:\"vgr:pushed-for-unpublish\") ");
     } else {
-      // When we have a start or end date, show only documents scheduled for publish/unpublish
+      // When we have a start or end date, show only documents scheduled for
+      // publish/unpublish
       query.append("(vgr\\:pushed\\-for\\-publish:[" + queryStartDate + " TO " + queryEndDate + "] OR ");
       query.append("vgr\\:pushed\\-for\\-unpublish:[" + queryStartDate + " TO " + queryEndDate + "]) ");
     }
-    // query.append("vgr\\:pushed\\-for\\-unpublish:[" + queryStartDate +
-    // " TO "+ queryEndDate +"] AND ");
-    if (publishStatus == null) {
+
+    if (publishStatus == null || publishStatus.length() == 0) {
       query.append("AND ISNULL:\"vgr:publish-status\" ");
     } else if (publishStatus.length() > 0 && !"any".equalsIgnoreCase(publishStatus)) {
       query.append("AND vgr\\:publish\\-status: \"" + publishStatus + "\" ");
     }
 
-    if (unpublishStatus == null) {
+    if (unpublishStatus == null || unpublishStatus.length() == 0) {
       query.append("AND ISNULL:\"vgr:unpublish-status\" ");
+      query.append("AND ISNOTNULL:\"vgr:pushed-for-unpublish\" ");
     } else if (unpublishStatus.length() > 0 && !"any".equalsIgnoreCase(unpublishStatus)) {
       query.append("AND vgr\\:unpublish\\-status: \"" + unpublishStatus + "\" ");
     }

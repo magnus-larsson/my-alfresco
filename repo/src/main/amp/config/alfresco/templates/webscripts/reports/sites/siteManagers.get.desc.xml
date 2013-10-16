@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>Sites Report - get list of site managers for a site</shortname>
+  <url>/vgr/reports/siteManagers</url>
+  <format default="json">argument</format>
+  <authentication>admin</authentication>
+  <transaction allow="readonly">required</transaction>
+  <family>VGR</family>
+</webscript>
