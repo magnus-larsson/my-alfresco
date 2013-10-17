@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.search.ResultSetRow;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.VersionNumber;
 import org.apache.log4j.Logger;
@@ -73,8 +72,8 @@ public class GetPublishStatus extends DeclarativeWebScript implements Initializi
     }
     NodeRef nodeRef = null;
     
-    List<ResultSetRow> storageVersions = storageService.getStorageVersions(documentId);
-    NodeRef latestPublishedStorageVersion = storageVersions.size() > 0 ? storageVersions.get(0).getNodeRef() : null;
+    List<NodeRef> storageVersions = storageService.getStorageVersions(documentId);
+    NodeRef latestPublishedStorageVersion = storageVersions.size() > 0 ? storageVersions.get(0) : null;
     
     if (documentId.contains("workspace://SpacesStore")) {
       try {
@@ -109,9 +108,9 @@ public class GetPublishStatus extends DeclarativeWebScript implements Initializi
       return model;
     }
     boolean someVersionIsPublished = false;
-    for (ResultSetRow storageVersion : storageVersions) {
+    for (NodeRef storageVersion : storageVersions) {
       // only add published nodes to this list
-      if (serviceUtils.isPublished(storageVersion.getNodeRef())) {
+      if (serviceUtils.isPublished(storageVersion)) {
         someVersionIsPublished = true;
         break;
       }
