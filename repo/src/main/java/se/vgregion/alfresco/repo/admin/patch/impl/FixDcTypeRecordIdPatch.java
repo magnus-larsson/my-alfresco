@@ -52,7 +52,7 @@ public class FixDcTypeRecordIdPatch extends AbstractPatch implements Initializin
   }
 
   private String doApply() {
-    _behaviourFilter.disableAllBehaviours();
+    _behaviourFilter.disableBehaviour();
 
     final String query = "TYPE:\"vgr:document\" AND (ISUNSET:\"vgr:dc.type.record.id\" OR ISNULL:\"vgr:dc.type.record.id\")";
 

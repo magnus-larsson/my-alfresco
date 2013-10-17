@@ -105,7 +105,7 @@ public class FixDcSourceAndIdentifierJob extends AbstractPatchJob {
 
       @Override
       public Boolean execute() throws Throwable {
-        _behaviourFilter.disableAllBehaviours();
+        _behaviourFilter.disableBehaviour();
 
         final NodeRef nodeRef = node.getNodeRef();
 

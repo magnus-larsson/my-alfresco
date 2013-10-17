@@ -31,7 +31,7 @@ public class FixDcSourceOriginPatch extends AbstractPatch {
 
   @Override
   protected String applyInternal() throws Exception {
-    _behaviourFilter.disableAllBehaviours();
+    _behaviourFilter.disableBehaviour();
 
     final String query = "TYPE:\"vgr:document\" AND ASPECT:\"vgr:published\" AND (ISUNSET:\"vgr:dc.source.origin\" OR ISNULL:\"vgr:dc.source.origin\")";
 

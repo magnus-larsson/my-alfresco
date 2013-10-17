@@ -45,7 +45,7 @@ public class FixDcPublisherForUnitIdPatch extends AbstractPatch implements Initi
   }
 
   private String doApply() {
-    _behaviourFilter.disableAllBehaviours();
+    _behaviourFilter.disableBehaviour();
 
     final ResultSet documents = queryDocuments();
 

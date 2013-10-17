@@ -46,7 +46,7 @@ public class FixDcCreatorForUnitIdPatch extends AbstractPatch implements Initial
   }
 
   private String doApply() {
-    _behaviourFilter.disableAllBehaviours();
+    _behaviourFilter.disableBehaviour();
 
     final ResultSet documents = queryDocuments();
 
