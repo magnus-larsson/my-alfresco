@@ -62,6 +62,6 @@ public interface StorageService {
    *          Original document id
    * @return
    */
-  public List<ResultSetRow> getStorageVersions(final String nodeRef);
+  public List<NodeRef> getStorageVersions(final String nodeRef);
 
 }

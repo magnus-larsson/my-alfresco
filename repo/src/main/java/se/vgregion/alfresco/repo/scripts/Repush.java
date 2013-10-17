@@ -1,6 +1,5 @@
 package se.vgregion.alfresco.repo.scripts;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,7 +11,6 @@ import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.search.ResultSetRow;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.extensions.webscripts.Cache;
@@ -63,17 +61,19 @@ public class Repush extends DeclarativeWebScript implements InitializingBean {
     
     //Process all versions from the node up until latest version
     List<NodeRef> nodesToRepush = new ArrayList<NodeRef>();
-    final List<ResultSetRow> storageVersions = storageService.getStorageVersions(documentId); //Sorted
+    final List<NodeRef> storageVersions = storageService.getStorageVersions(documentId); //Sorted
     
     boolean hasMatch = false;
     //Invert the list as it is sorted descending
     for (int i = storageVersions.size()-1;i>=0;i--) {
-      ResultSetRow storageVersion = storageVersions.get(i);
-      if (storageNodeRef.equals(storageVersion.getNodeRef())) {
+      NodeRef storageVersion = storageVersions.get(i);
+      
+      if (storageNodeRef.equals(storageVersion)) {
         hasMatch = true;
       }
+      
       if (hasMatch) {
-        nodesToRepush.add(storageVersion.getNodeRef());
+        nodesToRepush.add(storageVersion);
       }
     }
     final List<NodeRef> nodesToRepushS = nodesToRepush;

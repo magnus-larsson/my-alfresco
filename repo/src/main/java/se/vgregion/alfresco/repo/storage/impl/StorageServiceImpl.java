@@ -344,7 +344,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
     return result;
   }
-  
+
   /**
    * Finds all the published documents for a specific source document id.
    * 
@@ -554,8 +554,6 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     }, AuthenticationUtil.getSystemUserName());
   }
 
-
-
   @Override
   public void moveToStorage(final NodeRef nodeRef) {
     // here's a very, very slim risk that the Storage folder is not
@@ -631,8 +629,8 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
       throw new RuntimeException("The thumbnail name pdfa is not registered");
     }
 
-    // If there's nothing currently registered to generate thumbnails for the
-    //  specified mimetype, then log a message and bail out
+    // If there's nothing currently registered to generate thumbnails for the specified mimetype, then log a message and
+    // bail out
     String mimeType = _serviceUtils.getMimetype(nodeRef);
 
     Serializable value = _nodeService.getProperty(nodeRef, ContentModel.PROP_CONTENT);
@@ -666,11 +664,9 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   }
 
   private void assertPublishable(final NodeRef nodeRef) {
-    // must get the nodeRef to see if the user has create permission in that
-    // folder
+    // must get the nodeRef to see if the user has create permission in that folder
     NodeRef parentNodeRef = _nodeService.getPrimaryParent(nodeRef).getParentRef();
 
-    // if (!_serviceUtils.isSiteAdmin(nodeRef) && !_serviceUtils.isAdmin() && !_serviceUtils.isSiteCollaborator(nodeRef)) {
     if (_permissionService.hasPermission(parentNodeRef, PermissionService.CREATE_CHILDREN) != AccessStatus.ALLOWED) {
       throw new AlfrescoRuntimeException("Only site administrators, site collaborators and system wide administrators can publish to storage.");
     }
@@ -810,54 +806,42 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
   @Override
   public NodeRef getLatestPublishedStorageVersion(final String nodeRef) {
-    List<ResultSetRow> originalRows = getStorageVersions(nodeRef);
-    List<ResultSetRow> rows = new ArrayList<ResultSetRow>();
-      for (final ResultSetRow row : originalRows) {
-        // only add published nodes to this list
-        if (!_serviceUtils.isPublished(row.getNodeRef())) {
-          continue;
-        }
+    List<NodeRef> originalRows = getStorageVersions(nodeRef);
 
-        rows.add(row);
-      }
-    
-    Collections.sort(rows, new Comparator<ResultSetRow>() {
+    List<NodeRef> rows = new ArrayList<NodeRef>();
 
-      @Override
-      public int compare(final ResultSetRow row1, final ResultSetRow row2) {
-        final String label1 = (String) _nodeService.getProperty(row1.getNodeRef(), VgrModel.PROP_IDENTIFIER_VERSION);
-
-        final String label2 = (String) _nodeService.getProperty(row2.getNodeRef(), VgrModel.PROP_IDENTIFIER_VERSION);
-
-        // sort the list descending (ie. most recent first)
-        return new VersionNumber(label2).compareTo(new VersionNumber(label1));
+    for (final NodeRef row : originalRows) {
+      // only add published nodes to this list
+      if (!_serviceUtils.isPublished(row)) {
+        continue;
       }
 
-    });
+      rows.add(row);
+    }
 
-    return rows.size() > 0 ? rows.get(0).getNodeRef() : null;
-  }
-  
-  @Override
-  public NodeRef getLatestStorageVersion(final String nodeRef) {
-    List<ResultSetRow> rows = getStorageVersions(nodeRef);
-    return rows.size() > 0 ? rows.get(0).getNodeRef() : null;
+    return rows.size() > 0 ? rows.get(0) : null;
   }
 
   @Override
-  public NodeRef getPublishedStorageVersion(final String nodeRef, final String version) {
-    final String query = "TYPE:\"vgr:document\" AND ASPECT:\"vgr:published\" AND vgr:dc_x002e_source_x002e_documentid:\"" + nodeRef + "\" AND vgr:dc_x002e_identifier_x002e_version:\"" + version
-        + "\"";
+  public NodeRef getLatestStorageVersion(String nodeRef) {
+    List<NodeRef> rows = getStorageVersions(nodeRef);
 
-    final SearchParameters searchParameters = new SearchParameters();
+    return rows.size() > 0 ? rows.get(0) : null;
+  }
+
+  @Override
+  public NodeRef getPublishedStorageVersion(String nodeRef, String version) {
+    String query = "TYPE:\"vgr:document\" AND ASPECT:\"vgr:published\" AND vgr:dc_x002e_source_x002e_documentid:\"" + nodeRef + "\" AND vgr:dc_x002e_identifier_x002e_version:\"" + version + "\"";
+
+    SearchParameters searchParameters = new SearchParameters();
     searchParameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
     searchParameters.setLanguage(SearchService.LANGUAGE_FTS_ALFRESCO);
     searchParameters.setQuery(query);
 
-    final ResultSet nodes = _searchService.query(searchParameters);
+    ResultSet nodes = _searchService.query(searchParameters);
 
     try {
-      final NodeRef document = nodes.length() > 0 ? nodes.getNodeRef(0) : null;
+      NodeRef document = nodes.length() > 0 ? nodes.getNodeRef(0) : null;
 
       if (document == null) {
         return null;
@@ -870,42 +854,50 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   }
 
   @Override
-  public List<ResultSetRow> getStorageVersions(String nodeRef) {
-    final String query = "TYPE:\"vgr:document\" AND ASPECT:\"vgr:published\" AND (vgr:dc_x002e_source_x002e_documentid:\"" + nodeRef + "\" OR vgr:dc_x002e_identifier_x002e_documentid:\"" + nodeRef + "\")";
+  public List<NodeRef> getStorageVersions(String nodeRef) {
+    String query = "TYPE:\"vgr:document\" AND ASPECT:\"vgr:published\" AND (vgr:dc_x002e_source_x002e_documentid:\"" + nodeRef + "\" OR vgr:dc_x002e_identifier_x002e_documentid:\"" + nodeRef + "\")";
 
-    final Locale locale = new Locale("sv");
+    Locale locale = new Locale("sv");
     I18NUtil.setLocale(locale);
 
-    final SearchParameters searchParameters = new SearchParameters();
+    SearchParameters searchParameters = new SearchParameters();
     searchParameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
     searchParameters.setLanguage(SearchService.LANGUAGE_FTS_ALFRESCO);
     searchParameters.setQuery(query);
 
-    final ResultSet nodes = _searchService.query(searchParameters);
+    ResultSet nodes = _searchService.query(searchParameters);
 
-    final List<ResultSetRow> rows = new ArrayList<ResultSetRow>();
+    List<ResultSetRow> rows = new ArrayList<ResultSetRow>();
+    List<NodeRef> result = new ArrayList<NodeRef>();
 
+    // don't really know how to do this, we need to have a sorted list AND we
+    // need to return just nodeRefs because we have to close the resultSet.
     try {
-      for (final ResultSetRow row : nodes) {
+      for (ResultSetRow row : nodes) {
         rows.add(row);
+      }
+
+      Collections.sort(rows, new Comparator<ResultSetRow>() {
+
+        @Override
+        public int compare(ResultSetRow row1, ResultSetRow row2) {
+          String label1 = (String) _nodeService.getProperty(row1.getNodeRef(), VgrModel.PROP_IDENTIFIER_VERSION);
+
+          String label2 = (String) _nodeService.getProperty(row2.getNodeRef(), VgrModel.PROP_IDENTIFIER_VERSION);
+
+          // sort the list descending (ie. most recent first)
+          return new VersionNumber(label2).compareTo(new VersionNumber(label1));
+        }
+
+      });
+
+      for (ResultSetRow row : rows) {
+        result.add(row.getNodeRef());
       }
     } finally {
       ServiceUtils.closeQuietly(nodes);
     }
 
-    Collections.sort(rows, new Comparator<ResultSetRow>() {
-
-      @Override
-      public int compare(final ResultSetRow row1, final ResultSetRow row2) {
-        final String label1 = (String) _nodeService.getProperty(row1.getNodeRef(), VgrModel.PROP_IDENTIFIER_VERSION);
-
-        final String label2 = (String) _nodeService.getProperty(row2.getNodeRef(), VgrModel.PROP_IDENTIFIER_VERSION);
-
-        // sort the list descending (ie. most recent first)
-        return new VersionNumber(label2).compareTo(new VersionNumber(label1));
-      }
-
-    });
-    return rows;
+    return result;
   }
 }
