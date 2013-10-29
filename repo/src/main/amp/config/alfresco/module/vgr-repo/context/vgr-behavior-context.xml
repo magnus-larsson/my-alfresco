@@ -1,91 +1,143 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-  <bean id="vgr.abstractPolicy" class="se.vgregion.alfresco.repo.node.AbstractPolicy" abstract="true">
-    <property name="nodeService" ref="NodeService" />
-    <property name="permissionService" ref="PermissionService" />
-    <property name="policyComponent" ref="policyComponent" />
-    <property name="serviceUtils" ref="vgr.serviceUtils" />
-    <property name="behaviourFilter" ref="policyBehaviourFilter" />
-    <property name="lockService" ref="LockService" />
-  </bean>
+	<bean id="vgr.abstractPolicy" class="se.vgregion.alfresco.repo.node.AbstractPolicy"
+		abstract="true">
+		<property name="nodeService" ref="NodeService" />
+		<property name="permissionService" ref="PermissionService" />
+		<property name="policyComponent" ref="policyComponent" />
+		<property name="serviceUtils" ref="vgr.serviceUtils" />
+		<property name="behaviourFilter" ref="policyBehaviourFilter" />
+		<property name="lockService" ref="LockService" />
+	</bean>
 
-  <bean id="vgr.onCreateSite" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">
-    <property name="policyName" value="{http://www.alfresco.org}onCreateNode" />
-    <property name="className" value="{http://www.alfresco.org/model/site/1.0}site" />
-    <property name="behaviour">
-      <bean class="org.alfresco.repo.jscript.ScriptBehaviour" parent="scriptBehaviour">
-        <property name="location">
-          <bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
-            <constructor-arg>
-              <value>alfresco/module/vgr-repo/context/scripts/onCreateSite.js</value>
-            </constructor-arg>
-          </bean>
-        </property>
-      </bean>
-    </property>
-  </bean>
+	<bean id="vgr.onCreateSite"
+		class="org.alfresco.repo.policy.registration.ClassPolicyRegistration"
+		parent="policyRegistration">
+		<property name="policyName" value="{http://www.alfresco.org}onCreateNode" />
+		<property name="className" value="{http://www.alfresco.org/model/site/1.0}site" />
+		<property name="behaviour">
+			<bean class="org.alfresco.repo.jscript.ScriptBehaviour" parent="scriptBehaviour">
+				<property name="location">
+					<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+						<constructor-arg>
+							<value>alfresco/module/vgr-repo/context/scripts/onCreateSite.js
+							</value>
+						</constructor-arg>
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
 
-  <bean id="vgr.checksumUpdatePolicy" class="se.vgregion.alfresco.repo.node.ChecksumUpdatePolicy" depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy" />
+	<bean id="vgr.checksumUpdatePolicy" class="se.vgregion.alfresco.repo.node.ChecksumUpdatePolicy"
+		depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy" />
 
-  <bean id="vgr.propertyReplicationPolicy" class="se.vgregion.alfresco.repo.node.PropertyReplicationPolicy" depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy" />
+	<bean id="vgr.propertyReplicationPolicy"
+		class="se.vgregion.alfresco.repo.node.PropertyReplicationPolicy"
+		depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy" />
 
-  <bean id="vgr.createSiteFolderPolicy" class="se.vgregion.alfresco.repo.node.CreateSiteFolderPolicy" depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy" />
+	<bean id="vgr.createSiteFolderPolicy" class="se.vgregion.alfresco.repo.node.CreateSiteFolderPolicy"
+		depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy" />
 
-  <bean id="vgr.createSiteDocumentPolicy" class="se.vgregion.alfresco.repo.node.CreateSiteDocumentPolicy" depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy">
-    <property name="dictionaryService" ref="DictionaryService" />
-  </bean>
+	<bean id="vgr.createSiteDocumentPolicy" class="se.vgregion.alfresco.repo.node.CreateSiteDocumentPolicy"
+		depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy">
+		<property name="dictionaryService" ref="DictionaryService" />
+	</bean>
 
-  <bean id="vgr.updateSiteFolderMetadataPolicy" class="se.vgregion.alfresco.repo.node.UpdateSiteFolderMetadataPolicy" depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy"
-    p:fileFolderService-ref="FileFolderService" />
+	<bean id="vgr.updateSiteFolderMetadataPolicy"
+		class="se.vgregion.alfresco.repo.node.UpdateSiteFolderMetadataPolicy"
+		depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy"
+		p:fileFolderService-ref="FileFolderService" />
 
-  <bean id="vgr.changeTypePolicy" class="se.vgregion.alfresco.repo.node.ChangeTypePolicy" depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy" />
+	<bean id="vgr.changeTypePolicy" class="se.vgregion.alfresco.repo.node.ChangeTypePolicy"
+		depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy" />
 
-  <bean id="vgr.defaultSwedishLanguagePolicy" class="se.vgregion.alfresco.repo.node.DefaultSwedishLanguagePolicy" depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy" />
+	<bean id="vgr.defaultSwedishLanguagePolicy"
+		class="se.vgregion.alfresco.repo.node.DefaultSwedishLanguagePolicy"
+		depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy" />
 
-  <bean id="vgr.enableMetadataWriterPolicy" class="se.vgregion.alfresco.repo.node.EnableMetadataWriterPolicy" depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy">
-    <property name="metadataContentFactory" ref="metadata-writer.contentFactory" />
-  </bean>
+	<bean id="vgr.enableMetadataWriterPolicy"
+		class="se.vgregion.alfresco.repo.node.EnableMetadataWriterPolicy"
+		depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy">
+		<property name="metadataContentFactory" ref="metadata-writer.contentFactory" />
+	</bean>
 
-  <bean id="vgr.moveWatchedDocuments" class="se.vgregion.alfresco.repo.node.MoveWatchedDocumentsPolicy" depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy">
-    <property name="storageService" ref="vgr.storageService" />
-  </bean>
+	<bean id="vgr.moveWatchedDocuments"
+		class="se.vgregion.alfresco.repo.node.MoveWatchedDocumentsPolicy"
+		depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy">
+		<property name="storageService" ref="vgr.storageService" />
+	</bean>
 
-  <!-- Configuration done to replace the original version label calculation with a more flexible one that allows for setting parameters. -->
+	<!-- Configuration done to replace the original version label calculation 
+		with a more flexible one that allows for setting parameters. -->
 
-  <bean id="vgr.configurableSerialVersionLabelPolicy" class="se.vgregion.alfresco.repo.node.version.common.versionlabel.ConfigurableSerialVersionLabelPolicy" init-method="init"
-    p:serviceUtils-ref="vgr.serviceUtils" p:lockService-ref="LockService" p:policyComponent-ref="policyComponent" p:nodeService-ref="NodeService">
-    <constructor-arg>
-      <props>
-        <prop key="delimiter">.</prop>
-        <prop key="startmajor">0</prop>
-        <prop key="startminor">1</prop>
-      </props>
-    </constructor-arg>
-  </bean>
+	<bean id="vgr.configurableSerialVersionLabelPolicy"
+		class="se.vgregion.alfresco.repo.node.version.common.versionlabel.ConfigurableSerialVersionLabelPolicy"
+		init-method="init" p:serviceUtils-ref="vgr.serviceUtils"
+		p:lockService-ref="LockService" p:policyComponent-ref="policyComponent"
+		p:nodeService-ref="NodeService">
+		<constructor-arg>
+			<props>
+				<prop key="delimiter">.</prop>
+				<prop key="startmajor">0</prop>
+				<prop key="startminor">1</prop>
+			</props>
+		</constructor-arg>
+	</bean>
 
-  <bean id="vgr.watchedDocumentUpdate" class="se.vgregion.alfresco.repo.node.WatchedDocumentUpdatePolicy" depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy">
-    <property name="storageService" ref="vgr.storageService" />
-    <property name="origins">
-      <set>
-        <value>Barium</value>
-      </set>
-    </property>
-  </bean>
+	<bean id="vgr.watchedDocumentUpdate"
+		class="se.vgregion.alfresco.repo.node.WatchedDocumentUpdatePolicy"
+		depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy">
+		<property name="storageService" ref="vgr.storageService" />
+		<property name="origins">
+			<set>
+				<value>Barium</value>
+			</set>
+		</property>
+	</bean>
 
-  <bean id="vgr.extendPersonPolicy" class="se.vgregion.alfresco.repo.node.ExtendPersonPolicy" parent="vgr.abstractPolicy" depends-on="vgr.dictionaryBootstrap" />
+	<bean id="vgr.extendPersonPolicy" class="se.vgregion.alfresco.repo.node.ExtendPersonPolicy"
+		parent="vgr.abstractPolicy" depends-on="vgr.dictionaryBootstrap">
+		<property name="threadPoolExecutor" ref="vgr.extendPersonThreadPoolExecutor" />
+		<property name="transactionService" ref="TransactionService" /> 
+		<property name="kivWsEndpoint" value="${kiv.address}" />
+		<property name="kivWsUsername" value="${kiv.username}" />
+		<property name="kivWsPassword" value="${kiv.password}" />
+	</bean>
 
-  <bean id="vgr.autoPublishPolicy" class="se.vgregion.alfresco.repo.node.AutoPublishPolicy" parent="vgr.abstractPolicy" depends-on="vgr.dictionaryBootstrap" p:fileFolderService-ref="FileFolderService"
-    p:storageService-ref="vgr.storageService" p:transactionService-ref="TransactionService" />
+	<bean id="vgr.extendPersonThreadPoolExecutor" class="org.alfresco.util.ThreadPoolExecutorFactoryBean">
+		<property name="poolName">
+			<value>extendPersonThreadPool</value>
+		</property>
+		<property name="corePoolSize">
+			<value>2</value>
+		</property>
+		<property name="maximumPoolSize">
+			<value>5</value>
+		</property>
+		<property name="threadPriority">
+			<value>5</value>
+		</property>
+	</bean>
 
-  <bean id="vgr.addPdfaPolicy" class="se.vgregion.alfresco.repo.node.AddPdfaPolicy" parent="vgr.abstractPolicy" depends-on="vgr.dictionaryBootstrap">
-    <property name="contentService" ref="ContentService" />
-  </bean>
+	<bean id="vgr.autoPublishPolicy" class="se.vgregion.alfresco.repo.node.AutoPublishPolicy"
+		parent="vgr.abstractPolicy" depends-on="vgr.dictionaryBootstrap"
+		p:fileFolderService-ref="FileFolderService" p:storageService-ref="vgr.storageService"
+		p:transactionService-ref="TransactionService" />
 
-  <bean id="vgr.preventPublishedDuplicatesPolicy" class="se.vgregion.alfresco.repo.node.PreventPublishedDuplicatesPolicy" parent="vgr.abstractPolicy" depends-on="vgr.dictionaryBootstrap">
-    <property name="searchService" ref="SearchService" />
-  </bean>
+	<bean id="vgr.addPdfaPolicy" class="se.vgregion.alfresco.repo.node.AddPdfaPolicy"
+		parent="vgr.abstractPolicy" depends-on="vgr.dictionaryBootstrap">
+		<property name="contentService" ref="ContentService" />
+	</bean>
+
+	<bean id="vgr.preventPublishedDuplicatesPolicy"
+		class="se.vgregion.alfresco.repo.node.PreventPublishedDuplicatesPolicy"
+		parent="vgr.abstractPolicy" depends-on="vgr.dictionaryBootstrap">
+		<property name="searchService" ref="SearchService" />
+	</bean>
 
 </beans>

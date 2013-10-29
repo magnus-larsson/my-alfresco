@@ -1,0 +1,15 @@
+<ser:searchPersonEmployment xmlns:ser="http://services.ws.vgregion.se/"> 
+	 <!--Optional:--> 
+	 <ser:filterPerson>(vgr-id={vgrId})</ser:filterPerson>
+	 <ser:attributesPerson> 
+	    <!--Zero or more repetitions:--> 
+		<ser:string>mail</ser:string>   
+		<ser:string>vgr-id</ser:string> 
+	 </ser:attributesPerson>
+	 <!--Optional:--> 
+	 <ser:directory>KIV</ser:directory> 
+	 <!--Optional:--> 
+	 <ser:searchbase>ou=Personal,o=VGR</ser:searchbase> 
+	 <!--Optional:--> 
+	 <ser:searchscope>2</ser:searchscope> 
+</ser:searchPersonEmployment> 
