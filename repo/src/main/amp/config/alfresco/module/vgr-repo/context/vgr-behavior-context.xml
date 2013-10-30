@@ -99,14 +99,12 @@
 			</set>
 		</property>
 	</bean>
-
+<!-- 
 	<bean id="vgr.extendPersonPolicy" class="se.vgregion.alfresco.repo.node.ExtendPersonPolicy"
 		parent="vgr.abstractPolicy" depends-on="vgr.dictionaryBootstrap">
 		<property name="threadPoolExecutor" ref="vgr.extendPersonThreadPoolExecutor" />
-		<property name="transactionService" ref="TransactionService" /> 
-		<property name="kivWsEndpoint" value="${kiv.address}" />
-		<property name="kivWsUsername" value="${kiv.username}" />
-		<property name="kivWsPassword" value="${kiv.password}" />
+		<property name="transactionService" ref="TransactionService" />
+		<property name="kivWsClient" ref="vgr.kivWsClient" />
 	</bean>
 
 	<bean id="vgr.extendPersonThreadPoolExecutor" class="org.alfresco.util.ThreadPoolExecutorFactoryBean">
@@ -123,7 +121,7 @@
 			<value>5</value>
 		</property>
 	</bean>
-
+ -->
 	<bean id="vgr.autoPublishPolicy" class="se.vgregion.alfresco.repo.node.AutoPublishPolicy"
 		parent="vgr.abstractPolicy" depends-on="vgr.dictionaryBootstrap"
 		p:fileFolderService-ref="FileFolderService" p:storageService-ref="vgr.storageService"

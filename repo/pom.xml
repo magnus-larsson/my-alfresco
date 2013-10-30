@@ -62,6 +62,10 @@
 					<groupId>org.slf4j</groupId>
 					<artifactId>slf4j-api</artifactId>
 				</exclusion>
+				<exclusion>
+				  <groupId>commons-net</groupId>
+				  <artifactId>commons-net</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -85,6 +89,13 @@
 					<artifactId>hamcrest-core</artifactId>
 				</exclusion>
 			</exclusions>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>xmlunit</groupId>
+			<artifactId>xmlunit</artifactId>
+			<version>1.4</version>
 			<scope>test</scope>
 		</dependency>
 

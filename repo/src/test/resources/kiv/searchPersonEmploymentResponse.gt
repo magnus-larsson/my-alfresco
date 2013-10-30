@@ -1,0 +1,244 @@
+<ns1:searchPersonEmploymentResponse xmlns:ns1="http://services.ws.vgregion.se/" xmlns:ns2="http://objects.ws.vgregion.se"  xmlns:ns3="http://cxf.apache.org/arrays" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:test="http://www.w3.org/2001/XMLSchema" xmlns:ns4="http://www.w3.org/2001/XMLSchema-instance">
+         <ns1:return>
+            <ns2:Person>
+               <ns2:attributes>
+                  <ns1:entry>
+                     <ns1:key>mail</ns1:key>
+                     <ns1:value>
+                        <ns3:anyType ns4:type="xsd:string">rickard.dehlin@vgregion.se</ns3:anyType>
+                     </ns1:value>
+                  </ns1:entry>
+                  <ns1:entry>
+                     <ns1:key>vgr-id</ns1:key>
+                     <ns1:value>
+                        <ns3:anyType ns4:type="xsd:string">ricde</ns3:anyType>
+                     </ns1:value>
+                  </ns1:entry>
+               </ns2:attributes>
+               <ns2:dn>cn=ricde,ou=Personal,o=VGR</ns2:dn>
+               <ns2:employments>
+                  <ns2:Employment>
+                     <ns2:attributes>
+                        <ns1:entry>
+                           <ns1:key>vgroverwriteattr</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">FTN</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>vgranstform</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">1</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>vgrmodifyersname</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">cn=regan3,ou=Personal,o=VGR</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>labeleduri</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">http://www.vgregion.se/it</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>patitlecode</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">502010</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>vgransvarsnummer</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">Z60230</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>vgrorgrel</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">SE2321000131-E000000006249</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>hsapostaladdress</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">Regionservice$VGR IT$Bergfotsgatan 2 A$ $431 35$Mölndal</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>vgrtitlecode</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">50611</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>vgrobjectapprovedby</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">evael2</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>hsastreetaddress</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">Bergfotsgatan 2 A$431 35$Mölndal$VGR IT Hus 7</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>facsimiletelephonenumber</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">+4631278412</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>patitlecode_TEXT</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">Systemutvecklare</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>vgrobjectapprovaltime</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">20100511121953Z</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>title</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">IT-arkitekt</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>vgranstform_TEXT</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">Tillsvidareanställd</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>vgrobjectsource</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">100</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>vgrmodifytimestamp</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">20130301100007Z</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>vgrformansgrupp</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">11</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>vgrao3kod</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">708</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>vgrformansgrupp_TEXT</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">Heltid</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>mobiletelephonenumber</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">+46736601604</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>createtimestamp</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">20081105130414Z</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>ou</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">Infrastruktur 6023</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>modifiersname</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">cn=vgms0213,ou=System,o=VGR</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>hsasedfswitchboardtelephoneno</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">+4650162000</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>l</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">Mölndal</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>creatorsname</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">cn=kivmeta01,ou=System,o=VGR</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>vgrstrukturperson</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">ou=Infrastruktur 6023,ou=Infrastruktur,ou=VGR IT,ou=Regionstyrelsen,ou=Org,o=VGR</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>hsasedfinvoiceaddress</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">Västra Götalandsregionen$VGR IT$Fe 960$ $405 83$Göteborg</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>hsapublictelephonenumber</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">+46104737452</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>cn</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">1322277616900000032-708-Z60230-50611</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>vgrobjectsource_TEXT</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">Heroma(J),Västfolket(N), Systemgenererat</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>modifytimestamp</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">20131004072026Z</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>vgrao3kod_TEXT</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">VGR IT</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                        <ns1:entry>
+                           <ns1:key>hsainternaladdress</ns1:key>
+                           <ns1:value>
+                              <ns3:anyType ns4:type="xsd:string">VGR IT$Bergfotsgatan 2 A, hus 7$Mölndal</ns3:anyType>
+                           </ns1:value>
+                        </ns1:entry>
+                     </ns2:attributes>
+                     <ns2:dn>cn=1322277616900000032-708-Z60230-50611,cn=ricde,ou=Personal,o=VGR</ns2:dn>
+                  </ns2:Employment>
+               </ns2:employments>
+            </ns2:Person>
+         </ns1:return>
+      </ns1:searchPersonEmploymentResponse>
