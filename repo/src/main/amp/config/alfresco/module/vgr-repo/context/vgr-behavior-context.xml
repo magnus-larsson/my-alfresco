@@ -99,7 +99,7 @@
 			</set>
 		</property>
 	</bean>
-<!-- 
+
 	<bean id="vgr.extendPersonPolicy" class="se.vgregion.alfresco.repo.node.ExtendPersonPolicy"
 		parent="vgr.abstractPolicy" depends-on="vgr.dictionaryBootstrap">
 		<property name="threadPoolExecutor" ref="vgr.extendPersonThreadPoolExecutor" />
@@ -121,7 +121,7 @@
 			<value>5</value>
 		</property>
 	</bean>
- -->
+	
 	<bean id="vgr.autoPublishPolicy" class="se.vgregion.alfresco.repo.node.AutoPublishPolicy"
 		parent="vgr.abstractPolicy" depends-on="vgr.dictionaryBootstrap"
 		p:fileFolderService-ref="FileFolderService" p:storageService-ref="vgr.storageService"
