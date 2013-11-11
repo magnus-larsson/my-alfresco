@@ -31,17 +31,21 @@ public class KivWsClient {
 
   private static final String ORGANIZATION_DN = "vgrstrukturperson";
   private static final String OU = "ou";
+  private static final String RESPONSIBILITY_CODE = "vgransvarsnummer";
 
   private WebServiceTemplate webServiceTemplate;
   private static final Logger LOG = Logger.getLogger(KivWsClient.class);
 
-  public KivWsClient(String username, String password) {
+  public KivWsClient(String username, String password) throws Exception {
     webServiceTemplate = new WebServiceTemplate();
+
     CommonsHttpMessageSender sender = new CommonsHttpMessageSender();
     sender.setCredentials(new UsernamePasswordCredentials(username, password));
+    sender.afterPropertiesSet();
     webServiceTemplate.setMessageSender(sender);
+    webServiceTemplate.afterPropertiesSet();
   }
-  
+
   public void setEndpointUri(String uri) {
     webServiceTemplate.setDefaultUri(uri);
   }
@@ -64,7 +68,18 @@ public class KivWsClient {
     return writer.toString();
   }
 
-  public String searchPersonEmployment(String vgrId, String department) throws IOException, JAXBException {
+  /**
+   * Fetch a persons employment by vgrId and responsibilityCode
+   * 
+   * @param vgrId
+   *          The vgr id of the person
+   * @param responsibilityCode
+   *          The responsibility code of the person
+   * @return the organizationDn for the user (vgrstrukturperson)
+   * @throws IOException
+   * @throws JAXBException
+   */
+  public String searchPersonEmployment(String vgrId, String responsibilityCode) throws IOException, JAXBException {
     String message = getTemplate("kiv/searchPersonEmployment.gt");
     message = message.replace("{vgrId}", vgrId);
     StringWriter sw = new StringWriter();
@@ -80,31 +95,34 @@ public class KivWsClient {
     JAXBElement<ArrayOfPerson> return1 = response.getReturn();
     List<Person> persons = return1.getValue().getPerson();
     if (persons.size() != 1) {
-      throw new AlfrescoRuntimeException("SearchPersonEmploymentResponse: Expected: 1, Actual: " + persons.size());
+      throw new AlfrescoRuntimeException("Query: vgrId: " + vgrId + " responsibilityCode:" + responsibilityCode + ", SearchPersonEmploymentResponse: Expected: 1, Actual: " + persons.size());
     }
     Person person = persons.get(0);
     List<Employment> employments = person.getEmployments().getValue().getEmployment();
-    Iterator<Employment> it = employments.iterator();
+    Iterator<Employment> employmentsIt = employments.iterator();
     String organizationDN = "";
-    while (it.hasNext()) {
-      Employment next = it.next();
-      List<Entry> entries = next.getAttributes().getValue().getEntry();
-      Iterator<Entry> it2 = entries.iterator();
+    while (employmentsIt.hasNext()) {
+      Employment employment = employmentsIt.next();
+      List<Entry> entries = employment.getAttributes().getValue().getEntry();
+      Iterator<Entry> entriesIt = entries.iterator();
       String vgrstrukturperson = "";
       String ou = "";
-      while (it2.hasNext()) {
-        Entry next2 = it2.next();
-        if (ORGANIZATION_DN.equalsIgnoreCase(next2.getKey())) {
-          vgrstrukturperson = (String) next2.getValue().getAnyType().get(0);
-        } else if (OU.equalsIgnoreCase(next2.getKey())) {
-          ou = (String) next2.getValue().getAnyType().get(0);
+      String vgransvarsnummer = "";
+      while (entriesIt.hasNext()) {
+        Entry entry = entriesIt.next();
+        if (ORGANIZATION_DN.equalsIgnoreCase(entry.getKey())) {
+          vgrstrukturperson = (String) entry.getValue().getAnyType().get(0);
+        } else if (OU.equalsIgnoreCase(entry.getKey())) {
+          ou = (String) entry.getValue().getAnyType().get(0);
+        } else if (RESPONSIBILITY_CODE.equalsIgnoreCase(entry.getKey())) {
+          vgransvarsnummer = (String) entry.getValue().getAnyType().get(0);
         }
         if (ou.length() > 0 && vgrstrukturperson.length() > 0) {
           break;
         }
       }
 
-      if (department.equalsIgnoreCase(ou)) {
+      if (responsibilityCode.equalsIgnoreCase(vgransvarsnummer)) {
         organizationDN = vgrstrukturperson;
       }
     }
@@ -122,7 +140,7 @@ public class KivWsClient {
   public WebServiceTemplate getWebServiceTemplate() {
     return webServiceTemplate;
   }
-  
+
   public void setWebServiceTemplate(WebServiceTemplate webServiceTemplate) {
     this.webServiceTemplate = webServiceTemplate;
   }

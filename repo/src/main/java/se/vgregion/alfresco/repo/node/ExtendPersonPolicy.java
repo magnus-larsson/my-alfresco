@@ -1,16 +1,8 @@
 package se.vgregion.alfresco.repo.node;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.MalformedURLException;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
@@ -26,17 +18,12 @@ import org.alfresco.repo.transaction.TransactionListenerAdapter;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.transaction.TransactionService;
-import org.apache.commons.io.IOUtils;
-import org.apache.cxf.jaxb.JAXBUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.springframework.util.Assert;
 
 import se.vgregion.alfresco.repo.kivclient.KivWsClient;
 import se.vgregion.alfresco.repo.model.VgrModel;
-//import se.vgregion.client.VGRegionWebServiceClient;
-import se.vgregion.ws.services.VGRException;
-import se.vgregion.ws.services.ObjectFactory;
-import se.vgregion.ws.services.SearchPersonEmployment;
 
 /**
  * Attach additional information to the person object
@@ -49,6 +36,7 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
   private static final String KEY_PERSON_INFO = ExtendPersonPolicy.class.getName() + ".personInfoUpdate";
   private static final Logger LOG = Logger.getLogger(ExtendPersonPolicy.class);
   private KivWsClient kivWsClient;
+  private static Boolean initialized = false;
 
   @Override
   public void onUpdateNode(final NodeRef nodeRef) {
@@ -128,13 +116,14 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
     super.afterPropertiesSet();
 
     Assert.notNull(threadPoolExecutor);
+    if (!initialized) {
+      _policyComponent.bindClassBehaviour(OnUpdateNodePolicy.QNAME, ContentModel.TYPE_PERSON, new JavaBehaviour(this, "onUpdateNode", NotificationFrequency.TRANSACTION_COMMIT));
 
-    _policyComponent.bindClassBehaviour(OnUpdateNodePolicy.QNAME, ContentModel.TYPE_PERSON, new JavaBehaviour(this, "onUpdateNode", NotificationFrequency.TRANSACTION_COMMIT));
+      _policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, ContentModel.TYPE_PERSON, new JavaBehaviour(this, "onCreateNode", NotificationFrequency.TRANSACTION_COMMIT));
+      initialized = true;
 
-    _policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, ContentModel.TYPE_PERSON, new JavaBehaviour(this, "onCreateNode", NotificationFrequency.TRANSACTION_COMMIT));
-
+    }
     this.transactionListener = new UpdatePersonInfoTransactionListener();
-
   }
 
   /**
@@ -153,16 +142,19 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
   }
 
   /**
-   * Updates the person user
+   * Updates the person user with additional details from KIV
    */
   public class PersonInfoUpdater implements Runnable {
     private NodeRef personNodeRef;
     private JAXBContext jaxbContext = null;
-    
+
     public PersonInfoUpdater(NodeRef personNodeRef) {
       this.personNodeRef = personNodeRef;
     }
 
+    /**
+     * Runner
+     */
     public void run() {
       AuthenticationUtil.runAs(new RunAsWork<Void>() {
         public Void doWork() throws Exception {
@@ -179,25 +171,54 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
         }
       }, AuthenticationUtil.getSystemUserName());
     }
-    
 
     /**
      * Internal function to allow for unit testing
      * 
-     * @throws VGRException 
-     * @throws JAXBException 
-     * @throws IOException 
      */
-    public void runInternal() throws VGRException, JAXBException, IOException {
+    public void runInternal() {
       if (LOG.isDebugEnabled()) {
         LOG.debug("Handling person info update for " + personNodeRef);
       }
-      String vgrId="ricde";
-      String department = "Infrastruktur 6023";
-      String searchPersonEmployment = kivWsClient.searchPersonEmployment(vgrId, department);
-      
-      
-   }
+
+      String responsibiltyCode = (String) _nodeService.getProperty(personNodeRef, VgrModel.PROP_PERSON_RESPONSIBILITY_CODE);
+      String userName = (String) _nodeService.getProperty(personNodeRef, ContentModel.PROP_USERNAME);
+      if (userName != null && userName.length() > 0) {
+        if (responsibiltyCode != null && responsibiltyCode.length() > 0) {
+          String organizationDn;
+          try {
+            organizationDn = kivWsClient.searchPersonEmployment(userName, responsibiltyCode);
+            if (organizationDn != null && organizationDn.length() > 0) {
+              _behaviourFilter.disableBehaviour(personNodeRef);
+              _nodeService.setProperty(personNodeRef, VgrModel.PROP_PERSON_ORGANIZATION_DN, organizationDn);
+
+              String[] ous = organizationDn.split(",");
+              ArrayUtils.reverse(ous);
+              String org = "";
+              for (int i = 0; i < ous.length; i++) {
+                String ou = ous[i].split("=")[1];
+                org = org + ou;
+                if (i < ous.length - 2) {
+                  org = org + "/";
+                }
+              }
+              _nodeService.setProperty(personNodeRef, ContentModel.PROP_ORGANIZATION, org);
+              _nodeService.setProperty(personNodeRef, ContentModel.PROP_ORGID, org);
+              _behaviourFilter.enableBehaviour(personNodeRef);
+            } else {
+              LOG.warn("User organzationDn is empty for user: " + userName);
+            }
+          } catch (Exception e) {
+            LOG.error("Error while searching for person employment", e);
+          }
+
+        } else {
+          LOG.warn("User responsibility code is not available for user: " + userName);
+        }
+      } else {
+        LOG.warn("Username could not be found for " + personNodeRef);
+      }
+    }
   }
 
 }

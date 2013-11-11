@@ -138,5 +138,9 @@ public interface VgrModel {
   public static final QName PROP_AUTO_DELETABLE_MIMETYPES = QName.createQName(VGR_URI, "mimetypes");
 
   public static final QName PROP_SENT_EMAILS = QName.createQName(VGR_URI, "sent-emails");
+  
+  public static final QName PROP_PERSON_RESPONSIBILITY_CODE = QName.createQName(VGR_URI, "responsibility_code");
+  public static final QName PROP_PERSON_ORGANIZATION_DN = QName.createQName(VGR_URI, "organization_dn");
+  
 
 }
