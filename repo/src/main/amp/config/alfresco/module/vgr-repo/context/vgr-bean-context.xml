@@ -257,9 +257,24 @@
   <!-- KIV value specific services -->
   <!-- *************************** -->
 
-  <bean id="vgr.kivService" class="se.vgregion.alfresco.repo.constraints.impl.KivServiceImpl">
-    <property name="ldapTemplate" ref="vgr.ldapTemplate" />
-    <property name="serviceUtils" ref="vgr.serviceUtils" />
+  <bean id="vgr.kivService" class="se.vgregion.alfresco.repo.constraints.impl.KivServiceWSImpl">
+    <property name="kivWsClient" ref="vgr.kivWsClient" />
+    
+  </bean>
+  
+  <bean id="vgr.kivUnitSearchThreadPoolExecutor" class="org.alfresco.util.ThreadPoolExecutorFactoryBean">
+    <property name="poolName">
+      <value>kivUnitSearchThreadPool</value>
+    </property>
+    <property name="corePoolSize">
+      <value>2</value>
+    </property>
+    <property name="maximumPoolSize">
+      <value>${vgr.kivUnitSearchMaxThreadPoolSize}</value>
+    </property>
+    <property name="threadPriority">
+      <value>5</value>
+    </property>
   </bean>
 
   <bean id="vgr.kivScript" parent="baseJavaScriptExtension" class="se.vgregion.alfresco.repo.scripts.ScriptKivService">
@@ -275,6 +290,7 @@
     <property name="fileFolderService" ref="FileFolderService" />
     <property name="jobLockService" ref="jobLockService" />
     <property name="transactionService" ref="TransactionService" />
+    <property name="threadPoolExecutor" ref="vgr.kivUnitSearchThreadPoolExecutor" />
   </bean>
 
   <!-- ***************************** -->

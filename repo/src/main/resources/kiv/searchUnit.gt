@@ -1,0 +1,18 @@
+<ser:searchUnit xmlns:ser="http://services.ws.vgregion.se/">
+  <!--Optional:-->
+  <ser:filter>({filter})</ser:filter>
+  <!--Optional:-->
+  <ser:attributes> 
+    <!--Zero or more repetitions:--> 
+    <ser:string>ou</ser:string> 
+    <ser:string>hsaIdentity</ser:string>
+    <ser:string>vgrModifyTimestamp</ser:string>
+  </ser:attributes>
+
+  <!--Optional:-->
+  <ser:directory>KIV</ser:directory>
+  <!--Optional:-->
+  <ser:searchbase>{searchBase}</ser:searchbase>
+  <!--Optional:-->
+  <ser:searchscope>1</ser:searchscope>
+</ser:searchUnit>

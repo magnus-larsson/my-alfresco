@@ -6,10 +6,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
+import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -29,6 +32,7 @@ import se.vgregion.alfresco.repo.constraints.KivService;
 import se.vgregion.alfresco.repo.jobs.ClusteredExecuter;
 import se.vgregion.alfresco.repo.model.KivUnit;
 import se.vgregion.alfresco.repo.model.VgrModel;
+import se.vgregion.alfresco.repo.node.ExtendPersonPolicy.PersonInfoUpdater;
 import se.vgregion.alfresco.repo.utils.ServiceUtils;
 
 public class KivUnitSynchronisationImpl extends ClusteredExecuter implements InitializingBean, KivUnitSynchronisation {
@@ -42,6 +46,8 @@ public class KivUnitSynchronisationImpl extends ClusteredExecuter implements Ini
   private NodeService _nodeService;
 
   private FileFolderService _fileFolderService;
+
+  private ThreadPoolExecutor _threadPoolExecutor;
 
   public void setKivService(final KivService kivService) {
     _kivService = kivService;
@@ -99,7 +105,22 @@ public class KivUnitSynchronisationImpl extends ClusteredExecuter implements Ini
     if (units.size() > 0) {
       synchroniseUnits(actualNodes, units);
     }
-
+    int jobsInQueue = _threadPoolExecutor.getQueue().size();
+    int activeCount = _threadPoolExecutor.getActiveCount();
+    while (jobsInQueue > 0 || activeCount > 0) {
+      try {
+        refreshLock();
+        Thread.sleep(1000);
+        if (LOG.isTraceEnabled()) {
+          LOG.trace("Waiting for jobs to complete. Jobs in queue: " + jobsInQueue + " Active jobs: " + activeCount);
+        }
+        // refreshLock();
+      } catch (InterruptedException e) {
+        LOG.error("Error while trying to sleep thread", e);
+      }
+      jobsInQueue = _threadPoolExecutor.getQueue().size();
+      activeCount = _threadPoolExecutor.getActiveCount();
+    }
     deleteRemovedUnits(actualNodes);
   }
 
@@ -149,20 +170,15 @@ public class KivUnitSynchronisationImpl extends ClusteredExecuter implements Ini
 
       }, false, true);
 
-      final List<KivUnit> subunits = _kivService.findOrganisationalUnits(unit.getDistinguishedName());
+      Runnable runnable = new KivSearcher(unit, actualNodes);
+      _threadPoolExecutor.execute(runnable);
 
-      if (subunits.size() > 0) {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("Processing " + subunits.size() + " subunits for " + unit.getDistinguishedName());
-        }
-
-        synchroniseUnits(actualNodes, subunits, unit);
-      }
     }
+
   }
 
   private void synchroniseUnit(final List<NodeRef> actualNodes, final KivUnit unit, final NodeRef parentNodeRef) {
-    refreshLock();
+    // refreshLock();
 
     NodeRef nodeRef = findNodeRef(unit);
 
@@ -298,8 +314,7 @@ public class KivUnitSynchronisationImpl extends ClusteredExecuter implements Ini
 
     final String validLocalName = QName.createValidLocalName(unit.getOrganisationalUnit());
 
-    final NodeRef unitNodeRef = _nodeService.createNode(parent, ContentModel.ASSOC_CONTAINS, QName.createQName(uri, validLocalName),
-        VgrModel.TYPE_KIV_UNIT).getChildRef();
+    final NodeRef unitNodeRef = _nodeService.createNode(parent, ContentModel.ASSOC_CONTAINS, QName.createQName(uri, validLocalName), VgrModel.TYPE_KIV_UNIT).getChildRef();
 
     _nodeService.addProperties(unitNodeRef, properties);
 
@@ -325,8 +340,7 @@ public class KivUnitSynchronisationImpl extends ClusteredExecuter implements Ini
 
     final String validLocalName = QName.createValidLocalName("units");
 
-    final NodeRef kivTypeNode = _nodeService.createNode(kivStorageNode, ContentModel.ASSOC_CONTAINS, QName.createQName(uri, validLocalName),
-        ContentModel.TYPE_FOLDER).getChildRef();
+    final NodeRef kivTypeNode = _nodeService.createNode(kivStorageNode, ContentModel.ASSOC_CONTAINS, QName.createQName(uri, validLocalName), ContentModel.TYPE_FOLDER).getChildRef();
 
     _nodeService.setProperty(kivTypeNode, ContentModel.PROP_NAME, "Units");
 
@@ -357,8 +371,7 @@ public class KivUnitSynchronisationImpl extends ClusteredExecuter implements Ini
 
     final String validLocalName = QName.createValidLocalName("kiv");
 
-    final NodeRef kivStorageNode = _nodeService.createNode(dataDictionaryNode, ContentModel.ASSOC_CONTAINS, QName.createQName(uri, validLocalName),
-        ContentModel.TYPE_FOLDER).getChildRef();
+    final NodeRef kivStorageNode = _nodeService.createNode(dataDictionaryNode, ContentModel.ASSOC_CONTAINS, QName.createQName(uri, validLocalName), ContentModel.TYPE_FOLDER).getChildRef();
 
     _nodeService.setProperty(kivStorageNode, ContentModel.PROP_NAME, "Kiv");
 
@@ -441,6 +454,45 @@ public class KivUnitSynchronisationImpl extends ClusteredExecuter implements Ini
     synchroniseInternal();
   }
 
+  public class KivSearcher implements Runnable {
+
+    private final KivUnit unit;
+    private final List<NodeRef> actualNodes;
+
+    public KivSearcher(final KivUnit unit, final List<NodeRef> actualNodes) {
+      this.unit = unit;
+      this.actualNodes = actualNodes;
+    }
+
+    @Override
+    public void run() {
+      AuthenticationUtil.runAs(new RunAsWork<Void>() {
+        public Void doWork() throws Exception {
+          return _transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Void>() {
+
+            @Override
+            public Void execute() throws Throwable {
+              final List<KivUnit> subunits = _kivService.findOrganisationalUnits(unit.getDistinguishedName());
+
+              if (subunits.size() > 0) {
+                if (LOG.isDebugEnabled()) {
+                  LOG.debug("Processing " + subunits.size() + " subunits for " + unit.getDistinguishedName());
+                }
+
+                synchroniseUnits(actualNodes, subunits, unit);
+              }
+              return null;
+            }
+
+          }, true, false);
+
+        }
+      }, AuthenticationUtil.getSystemUserName());
+
+    }
+
+  }
+
   /*
    * (non-Javadoc)
    * 
@@ -454,6 +506,15 @@ public class KivUnitSynchronisationImpl extends ClusteredExecuter implements Ini
     Assert.notNull(_kivService);
     Assert.notNull(_searchService);
     Assert.notNull(_nodeService);
+    Assert.notNull(_threadPoolExecutor);
+  }
+
+  public ThreadPoolExecutor getThreadPoolExecutor() {
+    return _threadPoolExecutor;
+  }
+
+  public void setThreadPoolExecutor(ThreadPoolExecutor threadPoolExecutor) {
+    this._threadPoolExecutor = threadPoolExecutor;
   }
 
 }
