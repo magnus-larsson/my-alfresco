@@ -22,6 +22,7 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.springframework.ws.client.WebServiceIOException;
 import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.transport.http.CommonsHttpMessageSender;
 
@@ -32,7 +33,6 @@ import se.vgregion.ws.objects.Employment;
 import se.vgregion.ws.objects.Person;
 import se.vgregion.ws.objects.Unit;
 import se.vgregion.ws.services.SearchPersonEmploymentResponse;
-import se.vgregion.ws.services.SearchUnit;
 import se.vgregion.ws.services.SearchUnitResponse;
 import se.vgregion.ws.services.String2ArrayOfAnyTypeMap.Entry;
 
@@ -43,9 +43,15 @@ public class KivWsClient {
   private static final String RESPONSIBILITY_CODE = "vgransvarsnummer";
   private static final String HSA_IDENTITY = "hsaIdentity";
   private static final String VGR_MODIFY_TIMESTAMP = "vgrModifyTimestamp";
+  private static final int DEFAULT_RETRY_COUNT = 5;
+  private static final int DEFAULT_RETRY_WAIT = 5;
 
   private WebServiceTemplate webServiceTemplate;
   private static final Logger LOG = Logger.getLogger(KivWsClient.class);
+  
+  private int _retryCount = DEFAULT_RETRY_COUNT;
+  
+  private int _retryWait = DEFAULT_RETRY_WAIT * 1000;
 
   public KivWsClient(String username, String password) throws Exception {
     webServiceTemplate = new WebServiceTemplate();
@@ -158,17 +164,62 @@ public class KivWsClient {
     }
     message = message.replace("{filter}", filter);
 
-    final String base = StringUtils.isBlank(searchBase) ? "ou=Org,o=VGR" : searchBase;
+    String base = StringUtils.isBlank(searchBase) ? "ou=Org,o=VGR" : searchBase;
+    
+    base = StringUtils.replace(base, "/", "\\/");
+    base = StringUtils.replace(base, "&", "&amp;");
+    
     message = message.replace("{searchBase}", base);
-    StringWriter sw = new StringWriter();
+    
+    
     if (LOG.isTraceEnabled()) {
       LOG.trace("Request: " + message);
     }
-    StreamSource source = new StreamSource(new StringReader(message));
-    StreamResult result = new StreamResult(sw);
+    
+    int retries = 0;
 
-    webServiceTemplate.sendSourceAndReceiveToResult(source, result);
+    StreamSource source;
+    
+    StreamResult result;
 
+    StringWriter sw = null;
+
+    while (true) {
+      try {
+        sw = new StringWriter();
+        
+        source = new StreamSource(new StringReader(message));
+        
+        result = new StreamResult(sw);
+
+        webServiceTemplate.sendSourceAndReceiveToResult(source, result);
+        
+        break;
+      } catch (WebServiceIOException ex) {
+        if (retries >= _retryCount) {
+          LOG.error(ex.getMessage(), ex);
+          
+          return kivUnits;
+        }
+        
+        retries++;
+
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Failed sendSourceAndReceiveToResult(), trying again...");
+        }
+        
+        if (LOG.isTraceEnabled()) {
+          LOG.trace(ex.getMessage(), ex);
+        }
+
+        try {
+          Thread.sleep(_retryWait);
+        } catch (InterruptedException ie) {
+          throw new RuntimeException(ie);
+        }
+      }
+    }
+    
     SearchUnitResponse searchUnitResponse = XmlToObject(sw.toString(), SearchUnitResponse.class);
     JAXBElement<ArrayOfUnit> response = searchUnitResponse.getReturn();
     List<Unit> units = response.getValue().getUnit();
@@ -213,4 +264,13 @@ public class KivWsClient {
   public void setWebServiceTemplate(WebServiceTemplate webServiceTemplate) {
     this.webServiceTemplate = webServiceTemplate;
   }
+  
+  public void setRetryCount(int retryCount) {
+    _retryCount = retryCount;
+  }
+  
+  public void setRetryWait(int retryWait) {
+    _retryWait = retryWait;
+  }
+  
 }
