@@ -1,5 +1,6 @@
 package se.vgregion.alfresco.repo.model;
 
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 public class KivUnit {
@@ -9,6 +10,8 @@ public class KivUnit {
   private String _hsaIdentity;
 
   private String _distinguishedName;
+
+  private NodeRef _nodeRef;
 
   public String getOrganisationalUnit() {
     return _organisationalUnit;
@@ -32,6 +35,14 @@ public class KivUnit {
 
   public void setDistinguishedName(final String distinguishedName) {
     _distinguishedName = distinguishedName;
+  }
+
+  public NodeRef getNodeRef() {
+    return _nodeRef;
+  }
+
+  public void setNodeRef(NodeRef nodeRef) {
+    _nodeRef = nodeRef;
   }
 
   @Override
