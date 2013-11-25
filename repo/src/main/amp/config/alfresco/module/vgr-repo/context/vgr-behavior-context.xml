@@ -24,8 +24,7 @@
 				<property name="location">
 					<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
 						<constructor-arg>
-							<value>alfresco/module/vgr-repo/context/scripts/onCreateSite.js
-							</value>
+							<value>alfresco/module/vgr-repo/context/scripts/onCreateSite.js</value>
 						</constructor-arg>
 					</bean>
 				</property>
