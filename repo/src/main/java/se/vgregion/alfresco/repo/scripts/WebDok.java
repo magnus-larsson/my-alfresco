@@ -256,7 +256,7 @@ public class WebDok extends ContentGet {
   }
 
   @Override
-  protected void setAttachment(final WebScriptResponse res, final boolean attach, final String attachFileName) {
+  protected void setAttachment(final WebScriptRequest req, final WebScriptResponse res, final boolean attach, final String attachFileName) {
     String headerValue = attach ? "attachment" : "inline";
 
     if (StringUtils.isNotBlank(attachFileName)) {

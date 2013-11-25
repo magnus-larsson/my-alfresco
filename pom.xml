@@ -13,7 +13,11 @@
   <version>2.1.1.1</version>
   <packaging>pom</packaging>
   <name>VGR Alfresco Base Project</name>
-
+  
+  <properties>
+    <alfresco.version>4.1.6</alfresco.version>
+  </properties>
+  
   <modules>
     <module>repo</module>
     <module>share</module>
