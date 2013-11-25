@@ -1,3 +1,7 @@
+/*
+ * @overridden projects/slingshot/source/web/components/dashlets/my-sites.js
+ */
+
 /**
  * Adding a endsWith function to String 
  */

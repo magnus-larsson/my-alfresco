@@ -1,3 +1,5 @@
+// @overridden projects/slingshot/source/web/components/documentlibrary/documentlist.js
+
 /**
  * Change the behaviour of the inline edit for the name, shouldn't edit cm:name, but instead edit vgr:dc.title and also remove the file extension as that is added in a behaviour to cm:name later when
  * the property is replicated.

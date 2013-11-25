@@ -92,7 +92,7 @@ function checkProcessedCache(key)
 /**
  * Returns an item outside of a site in the main repository.
  */
-function getRepositoryItem(folderPath, node)
+function getRepositoryItem(folderPath, node, populate)
 {
    // check whether we already processed this document
    if (checkProcessedCache("" + node.nodeRef.toString()))
@@ -107,6 +107,7 @@ function getRepositoryItem(folderPath, node)
    {
       if (node.isContainer || node.isDocument)
       {
+         if (!populate) return {};
          item =
          {
             nodeRef: node.nodeRef.toString(),
@@ -119,6 +120,7 @@ function getRepositoryItem(folderPath, node)
             modifiedByUser: node.properties["cm:modifier"],
             createdOn: node.properties["cm:created"],
             createdByUser: node.properties["cm:creator"],
+            mimetype: node.mimetype,
             path: folderPath.join("/")
          };
          item.modifiedBy = getPersonDisplayName(item.modifiedByUser);
@@ -142,7 +144,7 @@ function getRepositoryItem(folderPath, node)
 /**
  * Returns an item of the document library component.
  */
-function getDocumentItem(siteId, containerId, pathParts, node)
+function getDocumentItem(siteId, containerId, pathParts, node, populate)
 {
    // PENDING: how to handle comments? the document should
    //          be returned instead
@@ -160,6 +162,7 @@ function getDocumentItem(siteId, containerId, pathParts, node)
    {
       if (node.isContainer || node.isDocument)
       {
+         if (!populate) return {};
          item =
          {
             site: getSiteData(siteId),
@@ -174,6 +177,7 @@ function getDocumentItem(siteId, containerId, pathParts, node)
             modifiedByUser: node.properties["cm:modifier"],
             createdOn: node.properties["cm:created"],
             createdByUser: node.properties["cm:creator"],
+            mimetype: node.mimetype,
             path: pathParts.join("/")
          };
          item.modifiedBy = getPersonDisplayName(item.modifiedByUser);
@@ -194,13 +198,17 @@ function getDocumentItem(siteId, containerId, pathParts, node)
    return item;
 }
 
-function getBlogPostItem(siteId, containerId, pathParts, node)
+function getBlogPostItem(siteId, containerId, pathParts, node, populate)
 {
    /**
     * Investigate the rest of the path. the first item is the blog post, ignore everything that follows
     * are replies or folders
     */
    var site = siteService.getSite(siteId);
+   if (site === null)
+   {
+      return null;
+   }
    var container = site.getContainer(containerId);
    
    /**
@@ -228,6 +236,7 @@ function getBlogPostItem(siteId, containerId, pathParts, node)
    }
    
    // child is our blog post
+   if (!populate) return {};
    var item, t = null;
    item =
    {
@@ -250,7 +259,7 @@ function getBlogPostItem(siteId, containerId, pathParts, node)
    return item;
 }
 
-function getForumPostItem(siteId, containerId, pathParts, node)
+function getForumPostItem(siteId, containerId, pathParts, node, populate)
 {
    // try to find the first fm:topic node, that's what we return as search result
    var topicNode = node;
@@ -274,6 +283,7 @@ function getForumPostItem(siteId, containerId, pathParts, node)
    var postNode = topicNode.childAssocs["cm:contains"][0];
    
    // child is our forum post
+   if (!populate) return {};
    var item = t = null;
    item =
    {
@@ -297,7 +307,7 @@ function getForumPostItem(siteId, containerId, pathParts, node)
    return item;
 }
 
-function getCalendarItem(siteId, containerId, pathParts, node)
+function getCalendarItem(siteId, containerId, pathParts, node, populate)
 {
    // only process nodes of the correct type
    if (node.type != "{http://www.alfresco.org/model/calendar}calendarEvent")
@@ -311,6 +321,7 @@ function getCalendarItem(siteId, containerId, pathParts, node)
       return null;
    }
    
+   if (!populate) return {};
    var item, t = null;
    item =
    {
@@ -334,7 +345,7 @@ function getCalendarItem(siteId, containerId, pathParts, node)
    return item;
 }
 
-function getWikiItem(siteId, containerId, pathParts, node)
+function getWikiItem(siteId, containerId, pathParts, node, populate)
 {
    // only process documents
    if (!node.isDocument)
@@ -348,6 +359,7 @@ function getWikiItem(siteId, containerId, pathParts, node)
       return null;
    }
    
+   if (!populate) return {};
    var item, t = null;
    item =
    {
@@ -371,7 +383,7 @@ function getWikiItem(siteId, containerId, pathParts, node)
    return item;
 }
 
-function getLinkItem(siteId, containerId, pathParts, node)
+function getLinkItem(siteId, containerId, pathParts, node, populate)
 {
    // only process documents
    if (!node.isDocument)
@@ -389,6 +401,7 @@ function getLinkItem(siteId, containerId, pathParts, node)
    if (node.qnamePath.indexOf(COMMENT_QNAMEPATH) == -1 &&
        !(node.qnamePath.match(DISCUSSION_QNAMEPATH+"$") == DISCUSSION_QNAMEPATH))
    {
+      if (!populate) return {};
       item =
       {
          site: getSiteData(siteId),
@@ -412,7 +425,7 @@ function getLinkItem(siteId, containerId, pathParts, node)
    return item;
 }
 
-function getDataItem(siteId, containerId, pathParts, node)
+function getDataItem(siteId, containerId, pathParts, node, populate)
 {
    // make sure we haven't already added this item
    if (checkProcessedCache("" + node.nodeRef.toString()))
@@ -425,6 +438,7 @@ function getDataItem(siteId, containerId, pathParts, node)
    // data item can be either ba containing dl:dataList or any dl:dataListItem subtype
    if (node.type == "{http://www.alfresco.org/model/datalist/1.0}dataList")
    {
+      if (!populate) return {};
       // found a data list
       item =
       {
@@ -447,6 +461,7 @@ function getDataItem(siteId, containerId, pathParts, node)
    }
    else if (node.isSubType("{http://www.alfresco.org/model/datalist/1.0}dataListItem"))
    {
+      if (!populate) return {};
       // found a data list item
       item =
       {
@@ -474,37 +489,37 @@ function getDataItem(siteId, containerId, pathParts, node)
  * Delegates the extraction to the correct extraction function
  * depending on containerId.
  */
-function getItem(siteId, containerId, pathParts, node)
+function getItem(siteId, containerId, pathParts, node, populate)
 {
    var item = null;
    if (siteId == null)
    {
-      item = getRepositoryItem(pathParts, node);
+      item = getRepositoryItem(pathParts, node, populate);
    }
    else
    {
       switch ("" + containerId.toLowerCase())
       {
          case "documentlibrary":
-            item = getDocumentItem(siteId, containerId, pathParts, node);
+            item = getDocumentItem(siteId, containerId, pathParts, node, populate);
             break;
          case "blog":
-            item = getBlogPostItem(siteId, containerId, pathParts, node);
+            item = getBlogPostItem(siteId, containerId, pathParts, node, populate);
             break;
          case "discussions":
-            item = getForumPostItem(siteId, containerId, pathParts, node);
+            item = getForumPostItem(siteId, containerId, pathParts, node, populate);
             break;
          case "calendar":
-            item = getCalendarItem(siteId, containerId, pathParts, node);
+            item = getCalendarItem(siteId, containerId, pathParts, node, populate);
             break;
          case "wiki":
-            item = getWikiItem(siteId, containerId, pathParts, node);
+            item = getWikiItem(siteId, containerId, pathParts, node, populate);
             break;
          case "links":
-            item = getLinkItem(siteId, containerId, pathParts, node);
+            item = getLinkItem(siteId, containerId, pathParts, node, populate);
             break;
-         case "dataLists":
-            item = getDataItem(siteId, containerId, pathParts, node);
+         case "datalists":
+            item = getDataItem(siteId, containerId, pathParts, node, populate);
             break;
       }
    }
@@ -538,7 +553,10 @@ function splitQNamePath(node, rootNodeDisplayPath, rootNodeQNamePath)
    {
       var nodeDisplayPath = utils.displayPath(node).split("/");
       nodeDisplayPath = nodeDisplayPath.splice(rootNodeDisplayPath.length);
-      nodeDisplayPath.unshift("");
+      for (var i = 0; i < rootNodeQNamePath.split("/").length-1; i++)
+      {
+         nodeDisplayPath.unshift(null);
+      }
       displayPath = nodeDisplayPath;
    }
    
@@ -588,22 +606,40 @@ function processResults(nodes, maxPageResults, startIndex, rootNode)
    startIndex = startIndex ? startIndex : 0;
    for (var i = 0, j = nodes.length; i < j; i++)
    {
-      /**
-       * For each node we extract the site/container qname path and then
-       * let the per-container helper function decide what to do.
-       */
-      parts = splitQNamePath(nodes[i], rootNodeDisplayPath, rootNodeQNamePath);
-      item = getItem(parts[0], parts[1], parts[2], nodes[i]);
-      if (item !== null)
+      // For each node we extract the site/container qname path and then
+      // let the per-container helper function decide what to do.
+      try
       {
-         if (processed++ >= startIndex && added < maxPageResults)
-      {
-         results.push(item);
-         added++;
+         // We only want to populate node return structures if we are going to add the items to the results,
+         // so we skip (process, but don't populate or add to results) until we have reached the startIndex
+         // then we populate and add items up to the maxPageResults - after that we still need to process
+         // (but don't populate or add to results) each item to correctly calculate the totalRecordsUpper.
+         var populate = (processed >= startIndex && added < maxPageResults);
+         parts = splitQNamePath(nodes[i], rootNodeDisplayPath, rootNodeQNamePath);
+         item = getItem(parts[0], parts[1], parts[2], nodes[i], populate);
+         if (item !== null)
+         {
+            processed++;
+            if (populate)
+            {
+               results.push(item);
+               added++;
+            }
+         }
+         else
+         {
+            failed++;
+         }
       }
-      }
-      else
+      catch (e)
       {
+         // THOR-833
+         if (logger.isWarnLoggingEnabled() == true)
+         {
+            logger.warn("search.lib.js: Skipping node due to exception when processing query result: " + e);
+            logger.warn("..." + nodes[i].nodeRef);
+         }
+         
          failed++;
       }
    }
@@ -903,10 +939,18 @@ function getSearchResults(params)
                      formQuery += (first ? '(' : ' AND (');
                      formQuery += processMultiValue(propName, propValue, modePropValue, false);
                      formQuery += ')';
+                     first = false;
                   }
                   else
                   {
-                     formQuery += (first ? '' : ' AND ') + escapeQName(propName) + ':"' + propValue + '"';
+                     if (propValue.charAt(0) === '"' && propValue.charAt(propValue.length-1) === '"')
+                     {
+                        formQuery += (first ? '' : ' AND ') + escapeQName(propName) + ':' + propValue;
+                     }
+                     else
+                     {
+                        formQuery += (first ? '' : ' AND ') + escapeQName(propName) + ':\\"' + propValue + '\\"';
+                     }
                      first = false;
                   }
                }

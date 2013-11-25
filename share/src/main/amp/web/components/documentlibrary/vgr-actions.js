@@ -1,3 +1,7 @@
+/*
+ * @overridden projects/slingshot/source/web/components/documentlibrary/actions.js
+ */
+
 (function(renderAction) {
 
    var $html = Alfresco.util.encodeHTML;
@@ -184,6 +188,22 @@
 (function(onActionEditOnline) {
 
    Alfresco.doclib.Actions.prototype.onActionEditOnline = function(record, appProgID) {
+      //MNT-8609 Edit online fails for files which URL is too long      
+      if (!$isValueSet(record.onlineEditUrl))
+      {
+         record.onlineEditUrl = Alfresco.util.onlineEditUrl(this.doclistMetadata.custom.vtiServer, record.location);
+      }
+   
+      if (record.onlineEditUrl.length > 260)
+      {
+         Alfresco.util.PopupManager.displayMessage(
+         {
+            text: this.msg("message.edit-online.office.path.failure")
+         });
+         
+         return;
+      }
+
       var result = this._launchOnlineEditor(record);
 
       if (result == null) {

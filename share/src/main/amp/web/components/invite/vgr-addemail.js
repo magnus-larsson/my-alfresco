@@ -1,3 +1,5 @@
+// @overridden projects/slingshot/source/web/components/invite/addemail.js
+
 (function(onReady) {
 
    Alfresco.AddEmailInvite.prototype.addEmailButtonClick = function(e, p_obj) {

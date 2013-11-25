@@ -1,3 +1,5 @@
+// @overridden projects/slingshot/source/web/components/search/search.js
+
 (function(onReady) {
 
    Alfresco.Search.prototype.onReady = function() {

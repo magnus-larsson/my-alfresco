@@ -1,3 +1,5 @@
+// @overridden projects/slingshot/source/web/components/site-finder/site-finder.js
+
 (function(onReady) {
 
    Alfresco.SiteFinder.prototype.onReady = function() {

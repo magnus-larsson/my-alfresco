@@ -1,3 +1,5 @@
+// @overridden projects/web-framework-commons/source/web/components/form/form.js
+
 (function() {
 
    Alfresco.util.updateMultiSelectListValue = function(list, hiddenField, signalChange, optionSeparator) {

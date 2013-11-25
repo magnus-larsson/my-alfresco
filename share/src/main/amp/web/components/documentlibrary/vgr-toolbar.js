@@ -1,3 +1,5 @@
+// @overridden projects/slingshot/source/web/components/documentlibrary/toolbar.js
+
 (function(_handleSyncButtons) {
    
    var Dom = YAHOO.util.Dom;
