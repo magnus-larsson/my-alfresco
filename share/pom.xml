@@ -31,6 +31,12 @@
       <artifactId>alfresco-share</artifactId>
       <version>${alfresco.version}</version>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>${alfresco.groupId}</groupId>
+          <artifactId>alfresco-web-framework-commons</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>

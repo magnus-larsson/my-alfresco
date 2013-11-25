@@ -66,7 +66,7 @@ public class VgrContentGet extends ContentGet {
   }
 
   @Override
-  protected void setAttachment(WebScriptResponse res, boolean attach, String attachFileName) {
+  protected void setAttachment(final WebScriptRequest req, final WebScriptResponse res, boolean attach, String attachFileName) {
     if (attach) {
       String headerValue = "attachment";
       

@@ -288,6 +288,10 @@
 					<groupId>commons-jxpath</groupId>
 					<artifactId>commons-jxpath</artifactId>
 				</exclusion>
+        <exclusion>
+          <groupId>${alfresco.groupId}</groupId>
+          <artifactId>alfresco-web-framework-commons</artifactId>
+        </exclusion>
 			</exclusions>
 		</dependency>
 
