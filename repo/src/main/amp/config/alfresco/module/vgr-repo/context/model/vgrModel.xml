@@ -120,6 +120,9 @@
           </index>
         </property>
       </properties>
+      <mandatory-aspects>
+        <aspect>vgr:noarchive</aspect>
+      </mandatory-aspects>
     </type>
 
     <!-- Category Type for the property vgr:dc.type.document -->
@@ -222,6 +225,9 @@
           </index>
         </property>
       </properties>
+      <mandatory-aspects>
+        <aspect>vgr:noarchive</aspect>
+      </mandatory-aspects>
     </type>
 
     <!-- Data List - System maintenance messages -->
