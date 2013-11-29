@@ -187,7 +187,9 @@
 
 (function(onActionEditOnline) {
 
-   Alfresco.doclib.Actions.prototype.onActionEditOnline = function(record, appProgID) {
+   var $isValueSet = Alfresco.util.isValueSet;
+
+   Alfresco.doclib.Actions.prototype.onActionEditOnline = function(record) {
       //MNT-8609 Edit online fails for files which URL is too long      
       if (!$isValueSet(record.onlineEditUrl))
       {
