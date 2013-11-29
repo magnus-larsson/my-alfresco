@@ -375,9 +375,13 @@ public class KivUnitSynchronisationImpl extends ClusteredExecuter implements Ini
 
     final String validLocalName = QName.createValidLocalName("Västra Götalandsregionen");
 
-    final NodeRef kivVastraGotalandsregionenNode = _nodeService.createNode(kivTypeNode, ContentModel.ASSOC_CONTAINS, QName.createQName(uri, validLocalName), ContentModel.TYPE_FOLDER).getChildRef();
+    final NodeRef kivVastraGotalandsregionenNode = _nodeService.createNode(kivTypeNode, ContentModel.ASSOC_CONTAINS, QName.createQName(uri, validLocalName), VgrModel.TYPE_KIV_UNIT).getChildRef();
 
-    _nodeService.setProperty(kivVastraGotalandsregionenNode, ContentModel.PROP_NAME, "Västra Götalandsregionen");
+    _nodeService.setProperty(kivVastraGotalandsregionenNode, ContentModel.PROP_NAME, "Västra Götalandsregionen - SE2321000131-E000000000001");
+    _nodeService.setProperty(kivVastraGotalandsregionenNode, VgrModel.PROP_KIV_HSAIDENTITY, "SE2321000131-E000000000001");
+    _nodeService.setProperty(kivVastraGotalandsregionenNode, VgrModel.PROP_KIV_DN, "ou=Västra Götalandsregionen,ou=OrgExtended");
+    _nodeService.setProperty(kivVastraGotalandsregionenNode, VgrModel.PROP_KIV_OU, "Västra Götalandsregionen");
+    _nodeService.setProperty(kivVastraGotalandsregionenNode, VgrModel.PROP_KIV_MODIFIED, new Date());
 
     return kivVastraGotalandsregionenNode;
   }
