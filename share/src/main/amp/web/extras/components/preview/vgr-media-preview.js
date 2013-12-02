@@ -13,7 +13,20 @@
          // first add the toolbar to the src for Adobe Acrobat plugin
          var iframe = Dom.get(this.id + '-embed');
 
+         var success = false;
+
          if (iframe) {
+            // fiddle with the onreadystatechange and set to true to now when the iframe has loaded
+            var onreadystatechange = iframe.onreadystatechange;
+
+            iframe.onreadystatechange = function() {
+               if (onreadystatechange) {
+                  onreadystatechange.call(this);
+               }
+
+               success = true;
+            };
+
             iframe.src = iframe.src + '#toolbar=1';
          }
 
@@ -25,20 +38,43 @@
             // To slow and its is "blinking". So do it twice.
             YAHOO.lang.later(300, self.plugin, self.plugin._hideShowIframe);
 
+            // hide the preview if the iframe contains a div
             var checkExist = setInterval(function() {
-               if (!iframe.contentDocument.body.hasChildNodes()) {
+               if (!success) {
                   return;
                }
 
-               var first = iframe.contentDocument.body.firstChild;
+               try {
+                  var document = iframe.contentDocument || iframe.contentWindow.document;
+               } catch (error) {
+                  return;
+               }
+
+               if (!document) {
+                  return;
+               }
+
+               if (!document.body ||  !document.body.hasChildNodes()) {
+                  return;
+               }
+
+               var first = document.body.firstChild;
 
                if (first && first.nodeName && first.nodeName.toLowerCase() == 'div') {
                   Alfresco.thirdparty.hidePreview(self);
                   clearInterval(checkExist);
                }
             }, 500);
-         });
 
+            // check if success after a certain amount of time, and if not, hide the preview and show download link instead
+            setTimeout(function() {
+               if (success) {
+                  return;
+               }
+
+               Alfresco.thirdparty.hidePreview(self);
+            }, 10000);
+         });
 
          // Attach to links to capture action events (the yui buttons swallows the above)
          var buttons = Selector.query('span.yui-button button');
@@ -62,6 +98,25 @@
          var self = this;
 
          var _onGetDocumentFailure = Alfresco.WebPreview.prototype.Plugins.PdfJs.prototype._onGetDocumentFailure;
+         var _onGetDocumentSuccess = Alfresco.WebPreview.prototype.Plugins.PdfJs.prototype._onGetDocumentSuccess;
+         var _loadPdf = Alfresco.WebPreview.prototype.Plugins.PdfJs.prototype._loadPdf;
+         var success = false;
+
+         Alfresco.WebPreview.prototype.Plugins.PdfJs.prototype._onGetDocumentSuccess = function(pdf) {
+            success = true;
+
+            _onGetDocumentSuccess.call(this, pdf);
+         };
+
+         Alfresco.WebPreview.prototype.Plugins.PdfJs.prototype._loadPdf = function(params) {
+            _loadPdf.call(this, params);
+
+            setTimeout(function() {
+               if (!success) {
+                  Alfresco.thirdparty.hidePreview(self);
+               }
+            }, 10000);
+         };
 
          Alfresco.WebPreview.prototype.Plugins.PdfJs.prototype._onGetDocumentFailure = function(message, exception) {
             if (!exception) {
