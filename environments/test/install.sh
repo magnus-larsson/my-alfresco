@@ -49,6 +49,14 @@ chown -R $ALFRESCO_TOMCAT_USER:$ALFRESCO_TOMCAT_GROUP $ALFRESCO_TOMCAT_HOME_REPO
 chown -R $ALFRESCO_TOMCAT_USER:$ALFRESCO_TOMCAT_GROUP $ALFRESCO_TOMCAT_HOME_SHARE
 echo ""
 
+echo "Setting owership to the clamav log directory . . ."
+chown -R $ALFRESCO_TOMCAT_USER $CLAMAV_LOG_DIRECTORY
+echo ""
+
+echo "Restarting ClamAV Daemon"
+$CLAMAV_DAEMON_RESTART_SCRIPT
+echo ""
+
 echo "Starting Tomcat . . ."
 $ALFRESCO_TOMCAT_START_SCRIPT
 echo ""
