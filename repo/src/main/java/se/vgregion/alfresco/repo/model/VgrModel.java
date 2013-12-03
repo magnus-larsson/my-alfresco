@@ -6,6 +6,7 @@ import org.alfresco.service.namespace.QName;
 public interface VgrModel {
 
   public static final String VGR_URI = "http://www.vgregion.se/model/1.0";
+  public static final String VGR_SHORT = "vgr";
   public static final String APELON_URI = "http://www.vgregion.se/apelon/1.0";
   public static final String KIV_URI = "http://www.vgregion.se/kiv/1.0";
 
@@ -142,5 +143,8 @@ public interface VgrModel {
   public static final QName PROP_PERSON_RESPONSIBILITY_CODE = QName.createQName(VGR_URI, "responsibility_code");
   public static final QName PROP_PERSON_ORGANIZATION_DN = QName.createQName(VGR_URI, "organization_dn");
   
-
+  public static final QName ASPECT_THUMBNAIL_PHOTO = QName.createQName(VGR_URI, "thumbnail-photo-aspect");
+  public static final QName PROP_THUMBNAIL_PHOTO = QName.createQName(VGR_URI, "thumbnailPhoto");
+ 
+  
 }
