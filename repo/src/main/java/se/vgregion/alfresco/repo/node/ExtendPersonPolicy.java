@@ -1,5 +1,8 @@
 package se.vgregion.alfresco.repo.node;
 
+import java.io.ByteArrayInputStream;
+import java.io.Serializable;
+import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.xml.bind.JAXBContext;
@@ -15,9 +18,16 @@ import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.repo.transaction.TransactionListener;
 import org.alfresco.repo.transaction.TransactionListenerAdapter;
+import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.springframework.util.Assert;
@@ -33,23 +43,100 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
   private ThreadPoolExecutor threadPoolExecutor;
   private TransactionListener transactionListener;
   private TransactionService transactionService;
+  private ContentService contentService;
+
   private static final String KEY_PERSON_INFO = ExtendPersonPolicy.class.getName() + ".personInfoUpdate";
   private static final Logger LOG = Logger.getLogger(ExtendPersonPolicy.class);
   private KivWsClient kivWsClient;
   private static Boolean initialized = false;
+  private static String avatarName = "ad_avatar.jpg";
 
   @Override
   public void onUpdateNode(final NodeRef nodeRef) {
-    addPersonAspect(nodeRef);
+    addPersonAspects(nodeRef);
     updatePersonInfo(nodeRef);
+    updatePersonThumbnail(nodeRef);
   }
 
   @Override
   public void onCreateNode(final ChildAssociationRef childAssocRef) {
     final NodeRef nodeRef = childAssocRef.getChildRef();
 
-    addPersonAspect(nodeRef);
+    addPersonAspects(nodeRef);
     updatePersonInfo(nodeRef);
+    updatePersonThumbnail(nodeRef);
+  }
+
+  private void updatePersonThumbnail(final NodeRef nodeRef) {
+    if (LOG.isDebugEnabled())
+      LOG.debug("Checking if thumbnail is present for user: " + nodeRef);
+
+    Boolean hasThumbnail = AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Boolean>() {
+
+      @Override
+      public Boolean doWork() throws Exception {
+        // if the node is gone, exit
+        if (!_nodeService.exists(nodeRef)) {
+          return null;
+        }
+        String property = (String) _nodeService.getProperty(nodeRef, VgrModel.PROP_THUMBNAIL_PHOTO);
+        if (property != null && property.length() > 0) {
+          _behaviourFilter.disableBehaviour();
+          if (!_nodeService.hasAspect(nodeRef, ContentModel.ASPECT_PREFERENCES)) {
+            _nodeService.addAspect(nodeRef, ContentModel.ASPECT_PREFERENCES, null);
+          }
+          // Remove old image if there is one
+          List<ChildAssociationRef> childAssocs = _nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_PREFERENCE_IMAGE, RegexQNamePattern.MATCH_ALL);
+          for (ChildAssociationRef childAssoc : childAssocs) {
+            if (LOG.isDebugEnabled())
+              LOG.debug("Removing old avatar: " + childAssoc.getChildRef());
+            _nodeService.deleteNode(childAssoc.getChildRef());
+          }
+          // Add new image node and write the thumbnail data to it
+          NodeRef imageNodeRef = _nodeService.createNode(nodeRef, ContentModel.ASSOC_PREFERENCE_IMAGE, QName.createQName(avatarName), ContentModel.TYPE_CONTENT).getChildRef();
+          ContentWriter writer = contentService.getWriter(imageNodeRef, ContentModel.PROP_CONTENT, true);
+          byte[] decodeBase64 = Base64.decodeBase64(property);
+
+          ByteArrayInputStream BAIS = new ByteArrayInputStream(decodeBase64);
+          writer.setEncoding("UTF-8");
+          //writer.guessMimetype(avatarName);
+          writer.setMimetype("image/jpeg");
+          writer.putContent(BAIS);
+          
+
+          LOG.debug("Wr: " + writer.getMimetype());
+          //ContentReader reader = contentService.getReader(imageNodeRef, ContentModel.PROP_CONTENT);
+          //LOG.debug("Re: " + reader.getMimetype());
+
+          // Remove old avatar assoc if there is one
+          List<AssociationRef> targetAssocs = _nodeService.getTargetAssocs(nodeRef, ContentModel.ASSOC_AVATAR);
+          for (AssociationRef targetAssoc : targetAssocs) {
+            if (LOG.isDebugEnabled())
+              LOG.debug("Removing old avatar assoc: " + targetAssoc.getTargetRef());
+            _nodeService.removeAssociation(nodeRef, targetAssoc.getTargetRef(), ContentModel.ASSOC_AVATAR);
+          }
+          // Add an avatar association for backwards compatability
+          _nodeService.createAssociation(nodeRef, imageNodeRef, ContentModel.ASSOC_AVATAR);
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("Avatar node: " + imageNodeRef);
+          }
+          _behaviourFilter.enableBehaviour();
+          return true;
+        }
+
+        return false;
+      }
+    }, AuthenticationUtil.getSystemUserName());
+
+    if (hasThumbnail == null) {
+      LOG.debug("User does not exist");
+    } else if (Boolean.FALSE.equals(hasThumbnail)) {
+      LOG.debug("User does not have a thumbnail photo");
+    } else {
+      if (LOG.isInfoEnabled())
+        LOG.info("User have a thumbnail photo " + nodeRef);
+    }
+
   }
 
   /**
@@ -57,7 +144,7 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
    * 
    * @param nodeRef
    */
-  private void addPersonAspect(final NodeRef nodeRef) {
+  private void addPersonAspects(final NodeRef nodeRef) {
     AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>() {
 
       @Override
@@ -72,12 +159,14 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
         }
 
         // if the node already has the aspect, exit
-        if (_nodeService.hasAspect(nodeRef, VgrModel.ASPECT_PERSON)) {
-          return null;
+        if (!_nodeService.hasAspect(nodeRef, VgrModel.ASPECT_PERSON)) {
+          _nodeService.addAspect(nodeRef, VgrModel.ASPECT_PERSON, null);
         }
 
         // add the aspect
-        _nodeService.addAspect(nodeRef, VgrModel.ASPECT_PERSON, null);
+        if (!_nodeService.hasAspect(nodeRef, VgrModel.ASPECT_THUMBNAIL_PHOTO)) {
+          _nodeService.addAspect(nodeRef, VgrModel.ASPECT_THUMBNAIL_PHOTO, null);
+        }
 
         return null;
       }
@@ -103,12 +192,12 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
     this.transactionService = transactionService;
   }
 
-  public KivWsClient getKivWsClient() {
-    return kivWsClient;
-  }
-
   public void setKivWsClient(KivWsClient kivWsClient) {
     this.kivWsClient = kivWsClient;
+  }
+
+  public void setContentService(ContentService contentService) {
+    this.contentService = contentService;
   }
 
   @Override
@@ -116,6 +205,9 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
     super.afterPropertiesSet();
 
     Assert.notNull(threadPoolExecutor);
+    Assert.notNull(kivWsClient);
+    Assert.notNull(contentService);
+
     if (!initialized) {
       _policyComponent.bindClassBehaviour(OnUpdateNodePolicy.QNAME, ContentModel.TYPE_PERSON, new JavaBehaviour(this, "onUpdateNode", NotificationFrequency.TRANSACTION_COMMIT));
 

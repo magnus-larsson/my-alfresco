@@ -104,6 +104,7 @@
 		<property name="threadPoolExecutor" ref="vgr.extendPersonThreadPoolExecutor" />
 		<property name="transactionService" ref="TransactionService" />
 		<property name="kivWsClient" ref="vgr.kivWsClient" />
+    <property name="contentService" ref="ContentService" />
 	</bean>
 
 	<bean id="vgr.extendPersonThreadPoolExecutor" class="org.alfresco.util.ThreadPoolExecutorFactoryBean">

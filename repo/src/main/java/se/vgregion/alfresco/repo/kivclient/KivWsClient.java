@@ -99,15 +99,53 @@ public class KivWsClient {
   public String searchPersonEmployment(String vgrId, String responsibilityCode) throws IOException, JAXBException {
     String message = getTemplate("kiv/searchPersonEmployment.gt");
     message = message.replace("{vgrId}", vgrId);
-    StringWriter sw = new StringWriter();
     if (LOG.isTraceEnabled()) {
       LOG.trace("Request: " + message);
     }
-    StreamSource source = new StreamSource(new StringReader(message));
-    StreamResult result = new StreamResult(sw);
+    
+    int retries = 0;
+    
+    StringWriter sw = null;
+    
+    StreamSource source;
+    StreamResult result;
+    
+    while (true) {
+      try {
+        sw = new StringWriter();
+        
+        source = new StreamSource(new StringReader(message));
+        
+        result = new StreamResult(sw);
 
-    webServiceTemplate.sendSourceAndReceiveToResult(source, result);
+        webServiceTemplate.sendSourceAndReceiveToResult(source, result);
+        
+        break;
+      } catch (WebServiceIOException ex) {
+        if (retries >= _retryCount) {
+          LOG.error(ex.getMessage(), ex);
+          
+          return null;
+        }
+        
+        retries++;
 
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("(searchPersonEmployment) Failed sendSourceAndReceiveToResult(), trying again...");
+        }
+        
+        if (LOG.isTraceEnabled()) {
+          LOG.trace(ex.getMessage(), ex);
+        }
+
+        try {
+          Thread.sleep(_retryWait);
+        } catch (InterruptedException ie) {
+          throw new RuntimeException(ie);
+        }
+      }
+    }
+    
     SearchPersonEmploymentResponse response = XmlToObject(sw.toString(), SearchPersonEmploymentResponse.class);
     JAXBElement<ArrayOfPerson> return1 = response.getReturn();
     List<Person> persons = return1.getValue().getPerson();
@@ -205,7 +243,7 @@ public class KivWsClient {
         retries++;
 
         if (LOG.isDebugEnabled()) {
-          LOG.debug("Failed sendSourceAndReceiveToResult(), trying again...");
+          LOG.debug("(searchUnit) Failed sendSourceAndReceiveToResult(), trying again...");
         }
         
         if (LOG.isTraceEnabled()) {

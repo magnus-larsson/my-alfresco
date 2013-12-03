@@ -1006,7 +1006,19 @@
         </property>
       </properties>
     </aspect>
+    
+    <!-- ######################################################################### -->
+    <!-- Temporary aspect for storing thumbnail photo                              -->
+    <!-- ######################################################################### -->
 
+    <aspect name="vgr:thumbnail-photo-aspect">
+      <title>Temporära tumnagelfoton</title>
+      <properties>
+        <property name="vgr:thumbnailPhoto">
+          <type>d:text</type>
+        </property>
+      </properties>
+    </aspect>
   </aspects>
 
 </model>
