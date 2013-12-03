@@ -10,6 +10,8 @@
       onReady.call(this);
 
       if (this.plugin instanceof Alfresco.WebPreview.prototype.Plugins.Embed) {
+         var timeout = this.plugin.attributes.timeout ? this.plugin.attributes.timeout : 10;
+
          // first add the toolbar to the src for Adobe Acrobat plugin
          var iframe = Dom.get(this.id + '-embed');
 
@@ -73,7 +75,7 @@
                }
 
                Alfresco.thirdparty.hidePreview(self);
-            }, 10000);
+            }, timeout * 1000);
          });
 
          // Attach to links to capture action events (the yui buttons swallows the above)
@@ -95,6 +97,8 @@
       }
 
       if (this.plugin instanceof Alfresco.WebPreview.prototype.Plugins.PdfJs) {
+         var timeout = this.plugin.attributes.timeout ? this.plugin.attributes.timeout : 10;
+
          var self = this;
 
          var _onGetDocumentFailure = Alfresco.WebPreview.prototype.Plugins.PdfJs.prototype._onGetDocumentFailure;
@@ -115,7 +119,7 @@
                if (!success) {
                   Alfresco.thirdparty.hidePreview(self);
                }
-            }, 10000);
+            }, timeout * 1000);
          };
 
          Alfresco.WebPreview.prototype.Plugins.PdfJs.prototype._onGetDocumentFailure = function(message, exception) {
