@@ -33,7 +33,7 @@
     <@outputMultiple values=row.creator_forunit_id tag="DC:creator.forunit.id" />
     <@outputMultiple values=row.creator_recordscreator tag="DC:creator.recordscreator" />
     <@outputMultiple values=row.creator_recordscreator_id tag="DC:creator.recordscreator.id" />
-    <@outputSingle value=row.pubcreator_project_assignmentlisher tag="DC:creator.project-assignment" />
+    <@outputSingle value=row.creator_project_assignment tag="DC:creator.project-assignment" />
     <@outputSingle value=row.publisher tag="DC:publisher" />
     <@outputSingle value=row.publisher_id tag="DC:publisher.id" />
     <@outputMultiple values=row.publisher_forunit tag="DC:publisher.forunit" />
