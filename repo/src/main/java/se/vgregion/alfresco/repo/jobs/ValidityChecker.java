@@ -23,7 +23,7 @@ import org.springframework.util.Assert;
 
 import se.vgregion.alfresco.repo.mail.SendMailService;
 import se.vgregion.alfresco.repo.model.VgrModel;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class ValidityChecker extends ClusteredExecuter {
 
@@ -105,7 +105,7 @@ public class ValidityChecker extends ClusteredExecuter {
         _nodeService.setProperty(node, VgrModel.PROP_SENT_EMAILS, 1);
       }
     } finally {
-      ServiceUtils.closeQuietly(result);
+      ServiceUtilsImpl.closeQuietly(result);
     }
   }
 
@@ -135,7 +135,7 @@ public class ValidityChecker extends ClusteredExecuter {
         _nodeService.setProperty(node, VgrModel.PROP_SENT_EMAILS, 2);
       }
     } finally {
-      ServiceUtils.closeQuietly(result);
+      ServiceUtilsImpl.closeQuietly(result);
     }
   }
 

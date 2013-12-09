@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
 import org.springframework.extensions.surf.util.I18NUtil;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class FixDcSourceOriginPatch extends AbstractPatch {
 
@@ -65,7 +65,7 @@ public class FixDcSourceOriginPatch extends AbstractPatch {
         nodeService.setProperty(document.getNodeRef(), VgrModel.PROP_SOURCE_ORIGIN, origin);
       }
     } finally {
-      ServiceUtils.closeQuietly(documents);
+      ServiceUtilsImpl.closeQuietly(documents);
     }
 
     return I18NUtil.getMessage(MSG_SUCCESS);

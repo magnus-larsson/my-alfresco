@@ -53,7 +53,7 @@ import org.springframework.util.Assert;
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.storage.CreationCallback;
 import se.vgregion.alfresco.repo.storage.StorageService;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class StorageServiceImpl implements StorageService, InitializingBean {
 
@@ -71,7 +71,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
   private CopyService _copyService;
 
-  private ServiceUtils _serviceUtils;
+  private ServiceUtilsImpl _serviceUtils;
 
   private BehaviourFilter _behaviourFilter;
 
@@ -117,7 +117,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     _copyService = copyService;
   }
 
-  public void setServiceUtils(final ServiceUtils serviceUtils) {
+  public void setServiceUtils(final ServiceUtilsImpl serviceUtils) {
     _serviceUtils = serviceUtils;
   }
 
@@ -367,7 +367,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     try {
       return result.getNodeRefs();
     } finally {
-      ServiceUtils.closeQuietly(result);
+      ServiceUtilsImpl.closeQuietly(result);
     }
   }
 
@@ -408,7 +408,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
       return storage;
     } finally {
-      ServiceUtils.closeQuietly(nodes);
+      ServiceUtilsImpl.closeQuietly(nodes);
     }
   }
 
@@ -849,7 +849,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
       return _serviceUtils.isPublished(document) ? document : null;
     } finally {
-      ServiceUtils.closeQuietly(nodes);
+      ServiceUtilsImpl.closeQuietly(nodes);
     }
   }
 
@@ -895,7 +895,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
         result.add(row.getNodeRef());
       }
     } finally {
-      ServiceUtils.closeQuietly(nodes);
+      ServiceUtilsImpl.closeQuietly(nodes);
     }
 
     return result;

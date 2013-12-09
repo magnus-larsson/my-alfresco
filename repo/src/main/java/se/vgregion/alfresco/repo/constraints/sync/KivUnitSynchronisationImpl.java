@@ -40,7 +40,7 @@ import se.vgregion.alfresco.repo.jobs.ClusteredExecuter;
 import se.vgregion.alfresco.repo.model.KivUnit;
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.utils.ApplicationContextHolder;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class KivUnitSynchronisationImpl extends ClusteredExecuter implements InitializingBean, KivUnitSynchronisation {
 
@@ -478,7 +478,7 @@ public class KivUnitSynchronisationImpl extends ClusteredExecuter implements Ini
         result = nodeRefs.getNodeRef(0);
       }
     } finally {
-      ServiceUtils.closeQuietly(nodeRefs);
+      ServiceUtilsImpl.closeQuietly(nodeRefs);
     }
 
     return result;

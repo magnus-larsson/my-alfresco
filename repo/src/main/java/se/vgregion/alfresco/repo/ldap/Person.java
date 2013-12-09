@@ -1,6 +1,6 @@
 package se.vgregion.alfresco.repo.ldap;
 
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class Person {
 
@@ -55,7 +55,7 @@ public class Person {
   }
 
   public String getRepresentation() {
-    return ServiceUtils.getRepresentation(_firstName, _lastName, _userName, _organisation);
+    return ServiceUtilsImpl.getRepresentation(_firstName, _lastName, _userName, _organisation);
   }
 
   public String getEmail() {

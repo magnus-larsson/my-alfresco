@@ -30,7 +30,7 @@ import se.vgregion.alfresco.repo.constraints.ApelonService;
 import se.vgregion.alfresco.repo.jobs.ClusteredExecuter;
 import se.vgregion.alfresco.repo.model.ApelonNode;
 import se.vgregion.alfresco.repo.model.VgrModel;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class ApelonSynchronisationImpl extends ClusteredExecuter implements InitializingBean, ApelonSynchronisation {
 
@@ -195,7 +195,7 @@ public class ApelonSynchronisationImpl extends ClusteredExecuter implements Init
         result = nodeRefs.getNodeRef(0);
       }
     } finally {
-      ServiceUtils.closeQuietly(nodeRefs);
+      ServiceUtilsImpl.closeQuietly(nodeRefs);
     }
 
     return result;
@@ -452,7 +452,7 @@ public class ApelonSynchronisationImpl extends ClusteredExecuter implements Init
         return result.getNodeRef(0);
       }
     } finally {
-      ServiceUtils.closeQuietly(result);
+      ServiceUtilsImpl.closeQuietly(result);
     }
 
     NodeRef apelonStorageNode = getApelonStorageNode();
@@ -483,7 +483,7 @@ public class ApelonSynchronisationImpl extends ClusteredExecuter implements Init
         return result.getNodeRef(0);
       }
     } finally {
-      ServiceUtils.closeQuietly(result);
+      ServiceUtilsImpl.closeQuietly(result);
     }
 
     NodeRef dataDictionaryNode = getDataDictionaryNode();
@@ -507,7 +507,7 @@ public class ApelonSynchronisationImpl extends ClusteredExecuter implements Init
     try {
       return result.getNodeRef(0);
     } finally {
-      ServiceUtils.closeQuietly(result);
+      ServiceUtilsImpl.closeQuietly(result);
     }
   }
 

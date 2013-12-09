@@ -23,7 +23,7 @@ import org.springframework.extensions.surf.util.I18NUtil;
 import org.springframework.util.Assert;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class FixVgrDocumentCommentsPatch extends AbstractPatch implements InitializingBean {
 
@@ -65,7 +65,7 @@ public class FixVgrDocumentCommentsPatch extends AbstractPatch implements Initia
         LOG.debug("Patched comments " + document.getNodeRef());
       }
     } finally {
-      ServiceUtils.closeQuietly(documents);
+      ServiceUtilsImpl.closeQuietly(documents);
     }
 
     return I18NUtil.getMessage(MSG_SUCCESS);

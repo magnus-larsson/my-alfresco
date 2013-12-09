@@ -34,7 +34,7 @@ import se.vgr.metaservice.schema.response.v1.NodeListResponseObjectType;
 import se.vgregion.alfresco.repo.constraints.ApelonService;
 import se.vgregion.alfresco.repo.model.ApelonNode;
 import se.vgregion.alfresco.repo.model.VgrModel;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 import vocabularyservices.wsdl.metaservice_vgr_se.v2.FindNodesByNameRequest;
 import vocabularyservices.wsdl.metaservice_vgr_se.v2.FindNodesRequest;
 import vocabularyservices.wsdl.metaservice_vgr_se.v2.GetVocabularyRequest;
@@ -291,7 +291,7 @@ public class ApelonServiceImpl implements ApelonService {
         result.add(nodeRef);
       }
     } finally {
-      ServiceUtils.closeQuietly(resultSet);
+      ServiceUtilsImpl.closeQuietly(resultSet);
     }
 
     _cache.put(ApelonServiceImpl.RECORD_TYPE_LIST_CACHEKEY, result);
@@ -329,7 +329,7 @@ public class ApelonServiceImpl implements ApelonService {
         result.add(nodeRef);
       }
     } finally {
-      ServiceUtils.closeQuietly(resultSet);
+      ServiceUtilsImpl.closeQuietly(resultSet);
     }
 
     if (sort) {
@@ -414,7 +414,7 @@ public class ApelonServiceImpl implements ApelonService {
         result.add(nodeRef);
       }
     } finally {
-      ServiceUtils.closeQuietly(resultSet);
+      ServiceUtilsImpl.closeQuietly(resultSet);
     }
 
     if (sort) {
@@ -520,7 +520,7 @@ public class ApelonServiceImpl implements ApelonService {
 
       return recordTypeApelonNode;
     } finally {
-      ServiceUtils.closeQuietly(resultSet);
+      ServiceUtilsImpl.closeQuietly(resultSet);
     }
   }
 

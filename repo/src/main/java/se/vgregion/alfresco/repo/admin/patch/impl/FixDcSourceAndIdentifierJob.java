@@ -25,7 +25,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class FixDcSourceAndIdentifierJob extends AbstractPatchJob {
 
@@ -37,7 +37,7 @@ public class FixDcSourceAndIdentifierJob extends AbstractPatchJob {
 
   private BehaviourFilter _behaviourFilter;
 
-  private ServiceUtils _serviceUtils;
+  private ServiceUtilsImpl _serviceUtils;
 
   @Override
   public void execute(final JobExecutionContext context) throws JobExecutionException {
@@ -49,7 +49,7 @@ public class FixDcSourceAndIdentifierJob extends AbstractPatchJob {
     _patchId = (String) context.getJobDetail().getJobDataMap().get("patchId");
     _description = (String) context.getJobDetail().getJobDataMap().get("description");
     _descriptorService = (DescriptorService) context.getJobDetail().getJobDataMap().get("descriptorService");
-    _serviceUtils = (ServiceUtils) context.getJobDetail().getJobDataMap().get("serviceUtils");
+    _serviceUtils = (ServiceUtilsImpl) context.getJobDetail().getJobDataMap().get("serviceUtils");
 
     if (isPatchApplied()) {
       return;
@@ -94,7 +94,7 @@ public class FixDcSourceAndIdentifierJob extends AbstractPatchJob {
         count = changeNodeDcSourceAndIdentifier(document) ? count + 1 : count;
       }
     } finally {
-      ServiceUtils.closeQuietly(documents);
+      ServiceUtilsImpl.closeQuietly(documents);
     }
 
     return count;

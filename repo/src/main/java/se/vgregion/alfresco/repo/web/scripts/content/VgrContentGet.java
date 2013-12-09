@@ -30,13 +30,13 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
 
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class VgrContentGet extends ContentGet {
 
-  protected ServiceUtils _serviceUtils;
+  protected ServiceUtilsImpl _serviceUtils;
 
-  public void setServiceUtils(ServiceUtils serviceUtils) {
+  public void setServiceUtils(ServiceUtilsImpl serviceUtils) {
     _serviceUtils = serviceUtils;
   }
 

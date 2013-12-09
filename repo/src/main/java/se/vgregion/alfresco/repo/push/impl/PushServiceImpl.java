@@ -24,7 +24,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 import se.vgregion.alfresco.repo.push.PushService;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class PushServiceImpl implements PushService, InitializingBean {
 
@@ -36,7 +36,7 @@ public class PushServiceImpl implements PushService, InitializingBean {
 
   private String _feedUrl;
 
-  private ServiceUtils _serviceUtils;
+  private ServiceUtilsImpl _serviceUtils;
 
   private SearchService _searchService;
 
@@ -52,7 +52,7 @@ public class PushServiceImpl implements PushService, InitializingBean {
     _feedUrl = feedUrl;
   }
 
-  public void setServiceUtils(final ServiceUtils serviceUtils) {
+  public void setServiceUtils(final ServiceUtilsImpl serviceUtils) {
     _serviceUtils = serviceUtils;
   }
 
@@ -159,7 +159,7 @@ public class PushServiceImpl implements PushService, InitializingBean {
     try {
       return result.getNodeRefs();
     } finally {
-      ServiceUtils.closeQuietly(result);
+      ServiceUtilsImpl.closeQuietly(result);
     }
   }
 
@@ -179,7 +179,7 @@ public class PushServiceImpl implements PushService, InitializingBean {
     try {
       return result.getNodeRefs();
     } finally {
-      ServiceUtils.closeQuietly(result);
+      ServiceUtilsImpl.closeQuietly(result);
     }
   }
 
