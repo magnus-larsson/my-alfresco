@@ -33,9 +33,10 @@ import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.storage.StorageService;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 import java.io.*;
 import java.text.ParseException;
@@ -72,7 +73,7 @@ public class Migrate extends DeclarativeWebScript implements InitializingBean {
 
   protected VersionService _versionService;
 
-  protected ServiceUtils _serviceUtils;
+  protected ServiceUtilsImpl _serviceUtils;
 
   protected ContentService _contentService;
 
@@ -106,7 +107,7 @@ public class Migrate extends DeclarativeWebScript implements InitializingBean {
     _versionService = versionService;
   }
 
-  public void setServiceUtils(final ServiceUtils serviceUtils) {
+  public void setServiceUtils(final ServiceUtilsImpl serviceUtils) {
     _serviceUtils = serviceUtils;
   }
 
@@ -556,7 +557,7 @@ public class Migrate extends DeclarativeWebScript implements InitializingBean {
         throw new RuntimeException("The document '" + document.documentId + "' exists in more than one place.");
       }
     } finally {
-      ServiceUtils.closeQuietly(result);
+      ServiceUtilsImpl.closeQuietly(result);
     }
 
     return nodeRef;

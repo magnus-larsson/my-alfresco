@@ -21,7 +21,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class FixVgrStatusJob extends AbstractPatchJob {
 
@@ -87,7 +87,7 @@ public class FixVgrStatusJob extends AbstractPatchJob {
         count = changeNodeStatus(document) ? count + 1 : count;
       }
     } finally {
-      ServiceUtils.closeQuietly(documents);
+      ServiceUtilsImpl.closeQuietly(documents);
     }
 
     return count;

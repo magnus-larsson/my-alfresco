@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 import org.springframework.extensions.surf.util.I18NUtil;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 /**
  * Switches a=true -> a=false on all vgr:dc.identifier and
@@ -58,7 +58,7 @@ public class SwitchIdentifierAttachmentInlinePatch extends AbstractPatch {
         count++;
       }
     } finally {
-      ServiceUtils.closeQuietly(documents);
+      ServiceUtilsImpl.closeQuietly(documents);
     }
 
     LOG.info(property.toString() + " set for " + count + " nodes.");

@@ -25,13 +25,13 @@ import org.springframework.extensions.surf.util.Content;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class ScriptServiceUtils extends BaseScopableProcessorExtension implements InitializingBean {
 
   protected SiteService _siteService;
 
-  protected ServiceUtils _serviceUtils;
+  protected ServiceUtilsImpl _serviceUtils;
 
   protected ServiceRegistry _serviceRegistry;
 
@@ -39,7 +39,7 @@ public class ScriptServiceUtils extends BaseScopableProcessorExtension implement
     _siteService = siteService;
   }
 
-  public void setServiceUtils(final ServiceUtils serviceUtils) {
+  public void setServiceUtils(final ServiceUtilsImpl serviceUtils) {
     _serviceUtils = serviceUtils;
   }
 

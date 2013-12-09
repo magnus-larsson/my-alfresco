@@ -34,24 +34,38 @@ public interface VgrModel {
   public static final QName PROP_STATUS_DOCUMENT_ID = QName.createQName(VGR_URI, "vgr.status.document.id");
   public static final QName PROP_STATUS_DOCUMENT_OLD = QName.createQName(VGR_URI, "hc.status.document");
   public static final QName PROP_TITLE = QName.createQName(VGR_URI, "dc.title");
+  public static final QName PROP_TITLE_ALTERNATIVE = QName.createQName(VGR_URI, "dc.title.alternative");
   public static final QName PROP_TITLE_FILENAME = QName.createQName(VGR_URI, "dc.title.filename");
   public static final QName PROP_TITLE_FILENAME_NATIVE = QName.createQName(VGR_URI, "dc.title.filename.native");
   public static final QName PROP_IDENTIFIER = QName.createQName(VGR_URI, "dc.identifier");
   public static final QName PROP_IDENTIFIER_NATIVE = QName.createQName(VGR_URI, "dc.identifier.native");
+  public static final QName PROP_IDENTIFIER_CHECKSUM = QName.createQName(VGR_URI, "dc.identifier.native.checksum");
+  public static final QName PROP_IDENTIFIER_CHECKSUM_NATIVE = QName.createQName(VGR_URI, "dc.identifier.native.checksum.native");
   public static final QName PROP_IDENTIFIER_TEMP = QName.createQName(VGR_URI, "dc.identifier.temp");
   public static final QName PROP_IDENTIFIER_DOCUMENTID = QName.createQName(VGR_URI, "dc.identifier.documentid");
   public static final QName PROP_IDENTIFIER_VERSION = QName.createQName(VGR_URI, "dc.identifier.version");
+  public static final QName PROP_IDENTIFIER_DIARIE_ID = QName.createQName(VGR_URI, "dc.identifier.diarie.id");
+  public static final QName PROP_IDENTIFIER_LOCATION = QName.createQName(VGR_URI, "dc.identifier.location");
+  public static final QName PROP_FORMAT_EXTENT = QName.createQName(VGR_URI, "dc.format.extent");
   public static final QName PROP_FORMAT_EXTENT_MIMETYPE = QName.createQName(VGR_URI, "dc.format.extent.mimetype");
   public static final QName PROP_FORMAT_EXTENT_MIMETYPE_NATIVE = QName.createQName(VGR_URI, "dc.format.extent.mimetype.native");
   public static final QName PROP_FORMAT_EXTENT_EXTENSION = QName.createQName(VGR_URI, "dc.format.extension");
   public static final QName PROP_FORMAT_EXTENT_EXTENSION_NATIVE = QName.createQName(VGR_URI, "dc.format.extension.native");
+  public static final QName PROP_SUBJECT_AUTHOR_KEYWORDS = QName.createQName(VGR_URI, "dc.subject.authorkeywords");
+  public static final QName PROP_SUBJECT_KEYWORDS = QName.createQName(VGR_URI, "dc.subject.keywords");
+  public static final QName PROP_SUBJECT_KEYWORDS_ID = QName.createQName(VGR_URI, "dc.subject.keywords.id");
+             
+
   public static final QName PROP_CONTRIBUTOR_SAVEDBY = QName.createQName(VGR_URI, "dc.contributor.savedby");
   public static final QName PROP_CONTRIBUTOR_SAVEDBY_ID = QName.createQName(VGR_URI, "dc.contributor.savedby.id");
   public static final QName PROP_DATE_SAVED = QName.createQName(VGR_URI, "dc.date.saved");
+  public static final QName PROP_DATE_CREATED = QName.createQName(VGR_URI, "dc.date.created");
   public static final QName PROP_LANGUAGE = QName.createQName(VGR_URI, "dc.language");
   public static final QName PROP_ACCESS_RIGHT = QName.createQName(VGR_URI, "dc.rights.accessrights");
   public static final QName PROP_REPRESENTATION = QName.createQName(VGR_URI, "representation");
   public static final QName PROP_DATE_ISSUED = QName.createQName(VGR_URI, "dc.date.issued");
+  public static final QName PROP_DATE_ACCEPTED = QName.createQName(VGR_URI, "dc.date.accepted");
+  public static final QName PROP_DATE_CONTROLLED = QName.createQName(VGR_URI, "dc.date.controlled");
   public static final QName PROP_PUBLISHER = QName.createQName(VGR_URI, "dc.publisher");
   public static final QName PROP_PUBLISHER_ID = QName.createQName(VGR_URI, "dc.publisher.id");
   public static final QName PROP_PUSHED_FOR_PUBLISH = QName.createQName(VGR_URI, "pushed-for-publish");
@@ -59,12 +73,21 @@ public interface VgrModel {
   public static final QName PROP_PUSHED_COUNT = QName.createQName(VGR_URI, "pushed-count");
   public static final QName PROP_PUBLISH_STATUS = QName.createQName(VGR_URI, "publish-status");
   public static final QName PROP_UNPUBLISH_STATUS = QName.createQName(VGR_URI, "unpublish-status");
+  public static final QName PROP_DATE_VALID_TO = QName.createQName(VGR_URI, "dc.date.validto");
+  public static final QName PROP_DATE_VALID_FROM = QName.createQName(VGR_URI, "dc.date.validfrom");
   public static final QName PROP_DATE_AVAILABLE_TO = QName.createQName(VGR_URI, "dc.date.availableto");
   public static final QName PROP_DATE_AVAILABLE_FROM = QName.createQName(VGR_URI, "dc.date.availablefrom");
+  public static final QName PROP_DATE_COPYRIGHTED = QName.createQName(VGR_URI, "dc.date.copyrighted");
+  
   public static final QName PROP_SOURCE = QName.createQName(VGR_URI, "dc.source");
   public static final QName PROP_SOURCE_TEMP = QName.createQName(VGR_URI, "dc.source.temp");
   public static final QName PROP_SOURCE_DOCUMENTID = QName.createQName(VGR_URI, "dc.source.documentid");
   public static final QName PROP_SOURCE_ORIGIN = QName.createQName(VGR_URI, "dc.source.origin");
+  public static final QName PROP_RELATION_ISVERSIONOF = QName.createQName(VGR_URI, "dc.relation.isversionof");
+  public static final QName PROP_RELATION_REPLACES = QName.createQName(VGR_URI, "dc.relation.replaces");
+  public static final QName PROP_AUDIENCE = QName.createQName(VGR_URI, "dc.audience");
+  public static final QName PROP_AUDIENCE_ID = QName.createQName(VGR_URI, "dc.audience.id");
+  
   public static final QName PROP_DESCRIPTION = QName.createQName(VGR_URI, "dc.description");
   public static final QName PROP_CREATOR = QName.createQName(VGR_URI, "dc.creator");
   public static final QName PROP_CREATOR_ID = QName.createQName(VGR_URI, "dc.creator.id");
@@ -86,13 +109,32 @@ public interface VgrModel {
   public static final QName PROP_CREATOR_FORUNIT_ID = QName.createQName(VGR_URI, "dc.creator.forunit.id");
   public static final QName PROP_CREATOR_RECORDSCREATOR = QName.createQName(VGR_URI, "dc.creator.recordscreator");
   public static final QName PROP_CREATOR_RECORDSCREATOR_ID = QName.createQName(VGR_URI, "dc.creator.recordscreator.id");
+  public static final QName PROP_CREATOR_FREETEXT = QName.createQName(VGR_URI, "dc.creator.freetext");
+  public static final QName PROP_TYPE_PROCESS_NAME = QName.createQName(VGR_URI, "dc.type.process.name");
+  public static final QName PROP_TYPE_FILE_PROCESS = QName.createQName(VGR_URI, "dc.type.file.process");
+  public static final QName PROP_TYPE_FILE = QName.createQName(VGR_URI, "dc.type.file");
+
+  
+  
+  
   public static final QName PROP_CONTRIBUTOR_ACCEPTEDBY = QName.createQName(VGR_URI, "dc.contributor.acceptedby");
+  public static final QName PROP_CONTRIBUTOR_ACCEPTEDBY_ROLE = QName.createQName(VGR_URI, "dc.contributor.acceptedby.role");
+  public static final QName PROP_CONTRIBUTOR_ACCEPTEDBY_UNIT_FREETEXT = QName.createQName(VGR_URI, "dc.contributor.acceptedby.unit.freetext");
   public static final QName PROP_CONTRIBUTOR_ACCEPTEDBY_ID = QName.createQName(VGR_URI, "dc.contributor.acceptedby.id");
+  public static final QName PROP_CONTRIBUTOR_ACCEPTEDBY_FREETEXT = QName.createQName(VGR_URI, "dc.contributor.acceptedby.freetext");
   public static final QName PROP_CONTRIBUTOR_CONTROLLEDBY = QName.createQName(VGR_URI, "dc.contributor.controlledby");
+  public static final QName PROP_CONTRIBUTOR_CONTROLLEDBY_ROLE = QName.createQName(VGR_URI, "dc.contributor.controlledby.role");
+  public static final QName PROP_CONTRIBUTOR_CONTROLLEDBY_UNIT_FREETEXT = QName.createQName(VGR_URI, "dc.contributor.controlledby.unit.freetext");
   public static final QName PROP_CONTRIBUTOR_CONTROLLEDBY_ID = QName.createQName(VGR_URI, "dc.contributor.controlledby.id");
+  public static final QName PROP_CONTRIBUTOR_CONTROLLEDBY_FREETEXT = QName.createQName(VGR_URI, "dc.contributor.controlledby.freetext");
+  public static final QName PROP_CONTRIBUTOR_UNIT = QName.createQName(VGR_URI, "dc.dc.contributor.unit");
   public static final QName PROP_DOCUMENT_STRUCTURE = QName.createQName(VGR_URI, "dc.dc.type.document.structure");
   public static final QName PROP_DOCUMENT_STRUCTURE_ID = QName.createQName(VGR_URI, "dc.dc.type.document.structure.id");
+  public static final QName PROP_TYPE_TEMPLATENAME = QName.createQName(VGR_URI, "dc.dc.type.templatename");
+  
 
+  
+  
   // properties specific for the VGR Dok aspect
   public static final QName PROP_VGR_DOK_DOCUMENT_ID = QName.createQName(VGR_URI, "vgr_dok_document_id");
   public static final QName PROP_VGR_DOK_VERSION = QName.createQName(VGR_URI, "vgr_dok_version");

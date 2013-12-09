@@ -44,7 +44,7 @@ import org.springframework.util.Assert;
 
 import se.vgregion.alfresco.repo.security.ExternalUsersService;
 import se.vgregion.alfresco.repo.security.UserSynchronizer;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 /**
  * This class is an overridden class from the original InvitationServiceImpl
@@ -83,7 +83,7 @@ public class ExternalUsersInvitationServiceImpl implements InitializingBean, Ext
 
   private ExternalUsersService _externalUsersService;
 
-  private ServiceUtils _serviceUtils;
+  private ServiceUtilsImpl _serviceUtils;
 
   public void setUserSynchronizer(final UserSynchronizer userSynchronizer) {
     _userSynchronizer = userSynchronizer;
@@ -129,7 +129,7 @@ public class ExternalUsersInvitationServiceImpl implements InitializingBean, Ext
     _userRegistrySynchronizer = userRegistrySynchronizer;
   }
 
-  public void setServiceUtils(final ServiceUtils serviceUtils) {
+  public void setServiceUtils(final ServiceUtilsImpl serviceUtils) {
     _serviceUtils = serviceUtils;
   }
 

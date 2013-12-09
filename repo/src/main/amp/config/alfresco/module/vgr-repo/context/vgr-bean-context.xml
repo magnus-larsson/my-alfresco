@@ -188,7 +188,7 @@
   <!-- Service bean for all things related -->
   <!-- *********************************** -->
 
-  <bean id="vgr.serviceUtils" class="se.vgregion.alfresco.repo.utils.ServiceUtils">
+  <bean id="vgr.serviceUtils" class="se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl">
     <property name="transactionService" ref="TransactionService" />
     <property name="nodeService" ref="NodeService" />
     <property name="authenticationService" ref="AuthenticationService" />

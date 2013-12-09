@@ -19,7 +19,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public abstract class AbstractPolicy implements InitializingBean {
 
@@ -29,7 +29,7 @@ public abstract class AbstractPolicy implements InitializingBean {
 
   protected PolicyComponent _policyComponent;
 
-  protected ServiceUtils _serviceUtils;
+  protected ServiceUtilsImpl _serviceUtils;
 
   protected BehaviourFilter _behaviourFilter;
 
@@ -47,7 +47,7 @@ public abstract class AbstractPolicy implements InitializingBean {
     _permissionService = permissionService;
   }
 
-  public void setServiceUtils(final ServiceUtils serviceUtils) {
+  public void setServiceUtils(final ServiceUtilsImpl serviceUtils) {
     _serviceUtils = serviceUtils;
   }
 
