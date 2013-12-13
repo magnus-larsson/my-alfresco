@@ -28,8 +28,8 @@
             <div style="padding-top:16px">
                <input type="submit" id="btn-login" class="login-button" />
             </div>
-            <input type="hidden" id="success" name="success" value="${successUrl?html}"/>
-            <input type="hidden" name="failure" value="<#assign link>${url.context}/page/type/login</#assign>${link?html}?error=true"/>
+            <input type="hidden" id="success" name="success" value="${successUrl?replace("@","%40")?html}"/>
+            <input type="hidden" name="failure" value="<#assign link>${url.context}/page/type/login</#assign>${link?replace("@","%40")?html}?error=true"/>
          </fieldset>
       </form>
 </#if>

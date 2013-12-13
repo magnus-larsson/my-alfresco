@@ -1,7 +1,7 @@
 // @overridden projects/slingshot/source/web/modules/documentlibrary/permissions.js
 
 /**
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2012 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 /**
  * Document Library "Permissions" module for Document Library.
  * 
@@ -28,8 +28,8 @@
 (function()
 {
    /**
-   * YUI Library aliases
-   */
+    * YUI Library aliases
+    */
    var Dom = YAHOO.util.Dom;
 
    /**
@@ -46,7 +46,7 @@
    Alfresco.module.DoclibPermissions = function(htmlId)
    {
       Alfresco.module.DoclibPermissions.superclass.constructor.call(this, "Alfresco.module.DoclibPermissions", htmlId, ["button", "container", "connection", "json"]);
-
+      
       // Initialise prototype properties
       this.rolePickers = {};
       this.hiddenRoles = [];
@@ -196,7 +196,7 @@
             // Load the latest permissions for the document
             Alfresco.util.Ajax.jsonRequest(
             {
-               url: Alfresco.constants.URL_SERVICECONTEXT + "/components/document-details/document-permissions",
+               url: Alfresco.constants.URL_SERVICECONTEXT + "components/document-details/document-permissions",
                dataObj:
                {
                   nodeRef: this.options.files.node.nodeRef,
@@ -213,7 +213,7 @@
             });
          }
       },
-
+      
       /**
        * Event callback when permissions are refreshed
        *
