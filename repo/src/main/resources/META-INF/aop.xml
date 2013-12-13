@@ -19,7 +19,6 @@
   <aspects>
     <aspect name="se.vgregion.alfresco.repo.thumbnail.ThumbnailServiceAspect" />
     <aspect name="se.vgregion.alfresco.repo.interceptors.RestrictAccessAspect" />
-    <aspect name="se.vgregion.alfresco.repo.webdav.WebDAVMethodAspect" />
     <aspect name="se.vgregion.alfresco.repo.interceptors.LDAPUserRegistryAspect" />
   </aspects>
 
