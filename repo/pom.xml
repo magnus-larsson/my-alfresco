@@ -1,342 +1,311 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>se.vgregion.alfresco</groupId>
-		<artifactId>alfresco-vgr</artifactId>
-		<version>2.1.1.1</version>
-	</parent>
+  <parent>
+    <groupId>se.vgregion.alfresco</groupId>
+    <artifactId>alfresco-vgr</artifactId>
+    <version>2.1.1.1</version>
+  </parent>
 
-	<artifactId>alfresco-vgr-repo</artifactId>
-	<packaging>amp</packaging>
-	<name>VGR Alfresco Repo AMP Project</name>
+  <artifactId>alfresco-vgr-repo</artifactId>
+  <packaging>amp</packaging>
+  <name>VGR Alfresco Repo AMP Project</name>
 
-	<properties>
-		<module.id>vgr-repo</module.id>
-		<alfresco.client.war>alfresco</alfresco.client.war>
-		<tomcat.home>${tomcat.repo.home}</tomcat.home>
-	</properties>
+  <properties>
+    <module.id>vgr-repo</module.id>
+    <alfresco.client.war>alfresco</alfresco.client.war>
+    <tomcat.home>${tomcat.repo.home}</tomcat.home>
+  </properties>
 
-	<dependencies>
+  <dependencies>
 
-		<dependency>
-			<groupId>se.vgregion.icc.sd.docpublishing</groupId>
-			<artifactId>docpublishing-schemas</artifactId>
-			<version>1.0.2</version>
-		</dependency>
+    <dependency>
+      <groupId>se.vgregion.icc.sd.docpublishing</groupId>
+      <artifactId>docpublishing-schemas</artifactId>
+      <version>1.0.2</version>
+    </dependency>
 
-		<dependency>
-			<groupId>se.vgregion.icc.sd.kiv-ws-schemas</groupId>
-			<artifactId>kiv-ws-schemas</artifactId>
-			<version>1.0.0</version>
-		</dependency>
-		<!-- Not using the latest version to get the same deps as alfresco uses -->
-		<dependency>
-			<groupId>org.springframework.ws</groupId>
-			<artifactId>spring-ws</artifactId>
-			<version>2.0.2.RELEASE</version>
-			<classifier>all</classifier>
-		</dependency>
+    <dependency>
+      <groupId>se.vgregion.icc.sd.kiv-ws-schemas</groupId>
+      <artifactId>kiv-ws-schemas</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+    <!-- Not using the latest version to get the same deps as alfresco uses -->
+    <dependency>
+      <groupId>org.springframework.ws</groupId>
+      <artifactId>spring-ws</artifactId>
+      <version>2.0.2.RELEASE</version>
+      <classifier>all</classifier>
+    </dependency>
 
-		<dependency>
-			<groupId>javax.jms</groupId>
-			<artifactId>jms-api</artifactId>
-			<version>1.1-rev-1</version>
-		</dependency>
+    <dependency>
+      <groupId>javax.jms</groupId>
+      <artifactId>jms-api</artifactId>
+      <version>1.1-rev-1</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-core</artifactId>
-			<version>5.7.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>log4j</groupId>
-					<artifactId>log4j</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-				<exclusion>
-				  <groupId>commons-net</groupId>
-				  <artifactId>commons-net</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>se.vgregion</groupId>
-			<artifactId>metadata-client</artifactId>
-			<version>1.0.5</version>
-		</dependency>
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activemq-core</artifactId>
+      <version>5.7.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>commons-net</groupId>
+          <artifactId>commons-net</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
-		<dependency>
-			<groupId>se.vgregion</groupId>
-			<artifactId>kiv-client</artifactId>
-			<version>1.0.3</version>
-		</dependency>
+    <dependency>
+      <groupId>se.vgregion</groupId>
+      <artifactId>metadata-client</artifactId>
+      <version>1.0.5</version>
+    </dependency>
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.hamcrest</groupId>
-					<artifactId>hamcrest-core</artifactId>
-				</exclusion>
-			</exclusions>
-			<scope>test</scope>
-		</dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.hamcrest</groupId>
+          <artifactId>hamcrest-core</artifactId>
+        </exclusion>
+      </exclusions>
+      <scope>test</scope>
+    </dependency>
 
-		<dependency>
-			<groupId>xmlunit</groupId>
-			<artifactId>xmlunit</artifactId>
-			<version>1.4</version>
-			<scope>test</scope>
-		</dependency>
+    <dependency>
+      <groupId>xmlunit</groupId>
+      <artifactId>xmlunit</artifactId>
+      <version>1.4</version>
+      <scope>test</scope>
+    </dependency>
 
-		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-all</artifactId>
-			<version>1.3</version>
-			<scope>test</scope>
-		</dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-all</artifactId>
+      <version>1.3</version>
+      <scope>test</scope>
+    </dependency>
 
-		<dependency>
-			<groupId>org.jmock</groupId>
-			<artifactId>jmock</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.hamcrest</groupId>
-					<artifactId>hamcrest-core</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.hamcrest</groupId>
-					<artifactId>hamcrest-library</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.hamcrest</groupId>
-					<artifactId>hamcrest-unit-test</artifactId>
-				</exclusion>
-			</exclusions>
-			<scope>test</scope>
-		</dependency>
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.hamcrest</groupId>
+          <artifactId>hamcrest-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.hamcrest</groupId>
+          <artifactId>hamcrest-library</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.hamcrest</groupId>
+          <artifactId>hamcrest-unit-test</artifactId>
+        </exclusion>
+      </exclusions>
+      <scope>test</scope>
+    </dependency>
 
-		<dependency>
-			<groupId>org.jmock</groupId>
-			<artifactId>jmock-legacy</artifactId>
-			<scope>test</scope>
-		</dependency>
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock-legacy</artifactId>
+      <scope>test</scope>
+    </dependency>
 
-		<dependency>
-			<groupId>org.jmock</groupId>
-			<artifactId>jmock-junit4</artifactId>
-			<scope>test</scope>
-		</dependency>
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock-junit4</artifactId>
+      <scope>test</scope>
+    </dependency>
 
-		<dependency>
-			<groupId>org.springframework.ldap</groupId>
-			<artifactId>spring-ldap-core-tiger</artifactId>
-			<version>1.3.1.RELEASE</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>spring-tx</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-core</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-beans</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>commons-logging</artifactId>
-					<groupId>commons-logging</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>commons-lang</artifactId>
-					<groupId>commons-lang</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+    <dependency>
+      <groupId>org.springframework.ldap</groupId>
+      <artifactId>spring-ldap-core-tiger</artifactId>
+      <version>1.3.1.RELEASE</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>spring-tx</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-core</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-beans</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>commons-logging</artifactId>
+          <groupId>commons-logging</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>commons-lang</artifactId>
+          <groupId>commons-lang</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
-		<dependency>
-			<groupId>org.redpill-linpro.alfresco.module</groupId>
-			<artifactId>metadatawriter</artifactId>
-			<version>4.1.5.1</version>
-		</dependency>
+    <dependency>
+      <groupId>org.redpill-linpro.alfresco.module</groupId>
+      <artifactId>metadatawriter</artifactId>
+      <version>4.1.5.2</version>
+    </dependency>
 
-		<dependency>
-			<groupId>com.redpill-linpro.alfresco</groupId>
-			<artifactId>alfresco-cluster-probe</artifactId>
-			<version>1.0.1</version>
-		</dependency>
+    <dependency>
+      <groupId>com.redpill-linpro.alfresco</groupId>
+      <artifactId>alfresco-cluster-probe</artifactId>
+      <version>1.0.1</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>spring-surf</artifactId>
+          <groupId>org.springframework.extensions.surf</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
-		<dependency>
-			<groupId>org.alfresco</groupId>
-			<artifactId>jodconverter-core-3.0-beta-3-patched</artifactId>
-			<version>3.4.6.17-enterprise</version>
-			<scope>provided</scope>
-		</dependency>
+    <dependency>
+      <groupId>${alfresco.groupId}</groupId>
+      <artifactId>alfresco-enterprise-repository</artifactId>
+      <scope>provided</scope>
+      <version>${alfresco.version}</version>
+    </dependency>
 
+    <dependency>
+      <groupId>se.vgregion.icc.sd.portal</groupId>
+      <artifactId>portal-schemas</artifactId>
+      <version>1.0.16</version>
+    </dependency>
 
-		<dependency>
-			<groupId>${alfresco.groupId}</groupId>
-			<artifactId>alfresco-enterprise-repository</artifactId>
-			<scope>provided</scope>
-			<version>${alfresco.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>jsr311-api</artifactId>
+      <version>1.1.1</version>
+    </dependency>
 
-		<dependency>
-			<groupId>se.vgregion.icc.sd.portal</groupId>
-			<artifactId>portal-schemas</artifactId>
-			<version>1.0.16</version>
-		</dependency>
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjrt</artifactId>
+      <version>1.7.4</version>
+    </dependency>
 
-		<dependency>
-			<groupId>javax.ws.rs</groupId>
-			<artifactId>jsr311-api</artifactId>
-			<version>1.1.1</version>
-		</dependency>
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjweaver</artifactId>
+      <version>1.7.4</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.aspectj</groupId>
-			<artifactId>aspectjrt</artifactId>
-			<version>1.7.4</version>
-		</dependency>
+    <dependency>
+      <groupId>org.redpill-linpro.alfresco.repo.content.transform</groupId>
+      <artifactId>pdfa-pilot-converter</artifactId>
+      <version>1.0.3</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.aspectj</groupId>
-			<artifactId>aspectjweaver</artifactId>
-			<version>1.7.4</version>
-		</dependency>
+    <dependency>
+      <groupId>org.alfresco.enterprise</groupId>
+      <artifactId>000_pdfbox-1.7.1-rl</artifactId>
+      <version>3.4.10</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.redpill-linpro.alfresco.repo.content.transform</groupId>
-			<artifactId>pdfa-pilot-converter</artifactId>
-			<version>1.0.2</version>
-		</dependency>
+    <dependency>
+      <groupId>org.alfresco.enterprise</groupId>
+      <artifactId>000_fontbox-1.7.1</artifactId>
+      <version>3.4.10</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.alfresco.enterprise</groupId>
-			<artifactId>000_pdfbox-1.7.1-rl</artifactId>
-			<version>3.4.10</version>
-		</dependency>
+    <dependency>
+      <groupId>org.alfresco.enterprise</groupId>
+      <artifactId>000_jempbox-1.7.1</artifactId>
+      <version>3.4.10</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.alfresco.enterprise</groupId>
-			<artifactId>000_fontbox-1.7.1</artifactId>
-			<version>3.4.10</version>
-		</dependency>
+    <!-- javamelody-core -->
 
-		<dependency>
-			<groupId>org.alfresco.enterprise</groupId>
-			<artifactId>000_jempbox-1.7.1</artifactId>
-			<version>3.4.10</version>
-		</dependency>
+    <!-- itext, option to add PDF export -->
+    <dependency>
+      <groupId>com.lowagie</groupId>
+      <artifactId>itext</artifactId>
+      <version>2.1.7</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>bcmail-jdk14</artifactId>
+          <groupId>bouncycastle</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>bcprov-jdk14</artifactId>
+          <groupId>bouncycastle</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>bctsp-jdk14</artifactId>
+          <groupId>bouncycastle</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
-		<!-- javamelody-core -->
-		<dependency>
-			<groupId>net.bull.javamelody</groupId>
-			<artifactId>javamelody-core</artifactId>
-			<version>1.43.0</version>
-		</dependency>
+    <dependency>
+      <groupId>${alfresco.groupId}</groupId>
+      <artifactId>alfresco-remote-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
-		<!-- itext, option to add PDF export -->
-		<dependency>
-			<groupId>com.lowagie</groupId>
-			<artifactId>itext</artifactId>
-			<version>2.1.7</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>bcmail-jdk14</artifactId>
-					<groupId>bouncycastle</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>bcprov-jdk14</artifactId>
-					<groupId>bouncycastle</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>bctsp-jdk14</artifactId>
-					<groupId>bouncycastle</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<dependency>
-			<groupId>${alfresco.groupId}</groupId>
-			<artifactId>alfresco-remote-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>${alfresco.groupId}</groupId>
-			<artifactId>alfresco-web-client</artifactId>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>axis2</groupId>
-					<artifactId>addressing</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>commons-jxpath</groupId>
-					<artifactId>commons-jxpath</artifactId>
-				</exclusion>
+    <dependency>
+      <groupId>${alfresco.groupId}</groupId>
+      <artifactId>alfresco-web-client</artifactId>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>axis2</groupId>
+          <artifactId>addressing</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>commons-jxpath</groupId>
+          <artifactId>commons-jxpath</artifactId>
+        </exclusion>
         <exclusion>
           <groupId>${alfresco.groupId}</groupId>
           <artifactId>alfresco-web-framework-commons</artifactId>
         </exclusion>
-			</exclusions>
-		</dependency>
+      </exclusions>
+    </dependency>
 
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-			<version>3.0.5.RELEASE</version>
-			<scope>provided</scope>
-		</dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+      <version>3.0.5.RELEASE</version>
+      <scope>provided</scope>
+    </dependency>
 
-		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-			<version>2.6</version>
-		</dependency>
-	</dependencies>
-	<!-- <build> <plugins> <plugin> <groupId>org.apache.cxf</groupId> <artifactId>cxf-codegen-plugin</artifactId> 
-		<version>${cxfVersion}</version> <executions> <execution> <id>generate-sources</id> 
-		<phase>generate-sources</phase> <configuration> <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot> 
-		<wsdlOptions> <wsdlOption> <wsdl>${basedir}/src/main/resources/META-INF/wsdl/kivws.wsdl</wsdl> 
-		<extraargs> <extraarg>-client</extraarg> </extraargs> </wsdlOption> </wsdlOptions> 
-		</configuration> <goals> <goal>wsdl2java</goal> </goals> </execution> </executions> 
-		<dependencies> <dependency> <groupId>log4j</groupId> <artifactId>log4j</artifactId> 
-		<version>${log4jVersion}</version> <exclusions> <exclusion> <groupId>com.sun.jdmk</groupId> 
-		<artifactId>jmxtools</artifactId> </exclusion> <exclusion> <groupId>com.sun.jmx</groupId> 
-		<artifactId>jmxri</artifactId> </exclusion> </exclusions> </dependency> </dependencies> 
-		</plugin> <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>build-helper-maven-plugin</artifactId> 
-		<version>1.8</version> <executions> <execution> <id>add-source</id> <phase>generate-sources</phase> 
-		<goals> <goal>add-source</goal> </goals> <configuration> <sources> <source>${basedir}/target/generated/src/main/java</source> 
-		</sources> </configuration> </execution> </executions> </plugin> </plugins> 
-		<pluginManagement> <plugins> <plugin> <groupId>org.apache.maven.plugins</groupId> 
-		<artifactId>maven-compiler-plugin</artifactId> <version>${maven.compiler.version}</version> 
-		<configuration> <target>1.6</target> <source>1.6</source> <compilerArguments> 
-		<verbose /> </compilerArguments> </configuration> </plugin> </plugins> </pluginManagement> 
-		</build> -->
-	<repositories>
-		<repository>
-			<id>vgr-releases</id>
-			<url>http://nexus.vgregion.se:8081/nexus/content/repositories/releases</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+      <version>2.6</version>
+    </dependency>
+  </dependencies>
+
+  <repositories>
+    <repository>
+      <id>vgr-releases</id>
+      <url>http://nexus.vgregion.se:8081/nexus/content/repositories/releases</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
 </project>
