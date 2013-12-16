@@ -21,9 +21,10 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
+import se.vgregion.alfresco.repo.push.PuSHAtomFeedUtil;
 import se.vgregion.alfresco.repo.utils.ServiceUtils;
 
-public class PuSHAtomFeedUtil implements InitializingBean {
+public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil {
   public static final String NEWLINE = "\n";
   public static final String TAB = "  ";
   public static final String XML_START = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
@@ -197,13 +198,7 @@ public class PuSHAtomFeedUtil implements InitializingBean {
     multipleSet.add("DC:coverage.hsacode.id");
   }
 
-  /**
-   * Create a publish document atom feed
-   * 
-   * @param nodeRef
-   *          nodeRef of the publish document
-   * @return
-   */
+  @Override
   public String createPublishDocumentFeed(NodeRef nodeRef) {
     StringBuffer result = new StringBuffer();
     if (nodeService.exists(nodeRef)) {
@@ -220,13 +215,7 @@ public class PuSHAtomFeedUtil implements InitializingBean {
     return result.toString();
   }
 
-  /**
-   * Create an unpublish document atom feed
-   * 
-   * @param nodeRef
-   *          nodeRef of the unpublish document
-   * @return
-   */
+  @Override
   public String createUnPublishDocumentFeed(NodeRef nodeRef) {
     StringBuffer result = new StringBuffer();
     if (nodeService.exists(nodeRef)) {
