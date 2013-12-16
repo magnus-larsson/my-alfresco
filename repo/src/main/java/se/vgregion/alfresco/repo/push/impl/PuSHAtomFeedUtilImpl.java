@@ -10,8 +10,6 @@ import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
-import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.descriptor.Descriptor;
@@ -44,7 +42,6 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
   private NodeService nodeService;
   private ServiceUtils serviceUtils;
   private String downloadUrl;
-  private DictionaryService dictionaryService;
 
   private static final Map<String, QName> propertyMap = new HashMap<String, QName>();
   static {
