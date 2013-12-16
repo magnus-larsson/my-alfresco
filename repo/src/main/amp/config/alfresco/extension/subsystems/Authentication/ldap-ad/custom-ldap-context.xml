@@ -8,6 +8,8 @@
         <entry key="vgr:responsibility_code" value="${ldap.synchronization.vgrResponsibilityCode}" />
         <entry key="vgr:organization_dn" value="${ldap.synchronization.userOrganizationalIdAttributeNameDN}" />
         <entry key="vgr:thumbnailPhoto" value="${ldap.synchronization.thumbnailPhoto}" />
+        <entry key="cm:jobtitle" value="${ldap.synchronization.jobTitle}" />
+        <entry key="cm:location" value="${ldap.synchronization.location}" />
       </map>
     </property>
   </bean>
