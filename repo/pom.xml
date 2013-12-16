@@ -19,11 +19,11 @@
 
   <dependencies>
 
-    <dependency>
-      <groupId>se.vgregion.icc.sd.docpublishing</groupId>
-      <artifactId>docpublishing-schemas</artifactId>
-      <version>1.0.2</version>
-    </dependency>
+		<dependency>
+			<groupId>se.vgregion.icc.sd.docpublishing</groupId>
+			<artifactId>docpublishing-schemas</artifactId>
+			<version>1.0.3</version>
+		</dependency>
 
     <dependency>
       <groupId>se.vgregion.icc.sd.kiv-ws-schemas</groupId>

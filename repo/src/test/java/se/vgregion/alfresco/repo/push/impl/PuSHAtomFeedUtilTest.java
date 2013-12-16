@@ -25,7 +25,7 @@ import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.utils.ServiceUtils;
 
 public class PuSHAtomFeedUtilTest {
-  PuSHAtomFeedUtil puSHAtomFeedUtil;
+  PuSHAtomFeedUtilImpl puSHAtomFeedUtil;
   Mockery context;
   NodeService nodeService;
   Descriptor descriptor;
@@ -56,7 +56,7 @@ public class PuSHAtomFeedUtilTest {
         will(returnValue("Enterprise"));
       }
     });
-    puSHAtomFeedUtil = new PuSHAtomFeedUtil();
+    puSHAtomFeedUtil = new PuSHAtomFeedUtilImpl();
     puSHAtomFeedUtil.setDescriptorService(descriptorService);
     puSHAtomFeedUtil.setNodeService(nodeService);
     puSHAtomFeedUtil.setServiceUtils(serviceUtils);
@@ -87,13 +87,13 @@ public class PuSHAtomFeedUtilTest {
   @Test
   public void testCreateDataTag() {
     String createDataTag = puSHAtomFeedUtil.createDataTag("aName", "aValue", null);
-    assertEquals("test", PuSHAtomFeedUtil.TAB + "<aName>aValue</aName>" + PuSHAtomFeedUtil.NEWLINE, createDataTag);
+    assertEquals("test", PuSHAtomFeedUtilImpl.TAB + "<aName>aValue</aName>" + PuSHAtomFeedUtilImpl.NEWLINE, createDataTag);
   }
 
   @Test
   public void testCreateEntryDataTag() {
     String createDataTag = puSHAtomFeedUtil.createEntryDataTag("aName", "aValue", null);
-    assertEquals("test", PuSHAtomFeedUtil.TAB + PuSHAtomFeedUtil.TAB + "<aName>aValue</aName>" + PuSHAtomFeedUtil.NEWLINE, createDataTag);
+    assertEquals("test", PuSHAtomFeedUtilImpl.TAB + PuSHAtomFeedUtilImpl.TAB + "<aName>aValue</aName>" + PuSHAtomFeedUtilImpl.NEWLINE, createDataTag);
   }
 
   @Test 

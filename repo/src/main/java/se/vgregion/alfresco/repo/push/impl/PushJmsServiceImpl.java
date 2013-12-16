@@ -25,6 +25,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
+import se.vgregion.alfresco.repo.push.PuSHAtomFeedUtil;
 import se.vgregion.alfresco.repo.push.PushJmsService;
 import se.vgregion.docpublishing.publishdocumentevent.v1.PublishDocument;
 import se.vgregion.docpublishing.unpublishdocumentevent.v1.UnpublishDocument;
@@ -45,6 +46,7 @@ public class PushJmsServiceImpl implements PushJmsService, InitializingBean {
   private String _vgrHdrReceiverId;
   private String _vgrHdrMessageTypeVersion;
   private NodeService _nodeService;
+  private PuSHAtomFeedUtil _pushAtomFeedUtil;
 
   // Public for testing
   public static final String VGR_HDR_SENDER_ID = "vgrHdr_senderId";
@@ -53,11 +55,14 @@ public class PushJmsServiceImpl implements PushJmsService, InitializingBean {
   public static final String PUBLISH_DOCUMENT_EVENT = "PublishDocumentEvent";
   public static final String UNPUBLISH_DOCUMENT_EVENT = "UnpublishDocumentEvent";
   public static final String DOCUMENT_STATUS_EVENT = "DocumentStatusEvent";
+  public static final String FEED = "feed";
 
   public static final se.vgregion.docpublishing.publishdocumentevent.v1.ObjectFactory documentPublishObjectFactory = new se.vgregion.docpublishing.publishdocumentevent.v1.ObjectFactory();
   public static final se.vgregion.docpublishing.unpublishdocumentevent.v1.ObjectFactory documentUnPublishObjectFactory = new se.vgregion.docpublishing.unpublishdocumentevent.v1.ObjectFactory();
 
   // private BrokerService producerBroker;
+  
+  //To maintain cdata tags use something like this: https://jaxb.java.net/faq/JaxbCDATASample.java
   private String ObjectToXml(Object object) throws JAXBException {
     JAXBContext context = JAXBContext.newInstance(object.getClass());
 
@@ -110,6 +115,9 @@ public class PushJmsServiceImpl implements PushJmsService, InitializingBean {
           createPublishDocument.setSource((String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_ORIGIN));
           createPublishDocument.setSourceDocumentId((String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_DOCUMENTID));
           createPublishDocument.setRequestId(requestId);
+          String feedXml = _pushAtomFeedUtil.createPublishDocumentFeed(nodeRef);
+          feedXml = "<![CDATA[" + feedXml +"]]>";
+          createPublishDocument.setFeed(feedXml);
           if (LOG.isDebugEnabled()) {
             LOG.debug("PublishDocument contents: " + ObjectToXml(createPublishDocument));
           }
@@ -129,6 +137,9 @@ public class PushJmsServiceImpl implements PushJmsService, InitializingBean {
           createUnpublishDocument.setSource((String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_ORIGIN));
           createUnpublishDocument.setSourceDocumentId((String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_DOCUMENTID));
           createUnpublishDocument.setRequestId(requestId);
+          String feedXml = _pushAtomFeedUtil.createUnPublishDocumentFeed(nodeRef);
+          feedXml = "<![CDATA[" + feedXml +"]]>";
+          createUnpublishDocument.setFeed(feedXml);
           if (LOG.isDebugEnabled()) {
             LOG.debug("UnpublishDocument contents: " + ObjectToXml(createUnpublishDocument));
           }
@@ -186,6 +197,10 @@ public class PushJmsServiceImpl implements PushJmsService, InitializingBean {
     this._vgrHdrMessageTypeVersion = _vgrHdrMessageTypeVersion;
   }
 
+  public void setPushAtomFeedUtil(PuSHAtomFeedUtil pushAtomFeedUtil) {
+    this._pushAtomFeedUtil = pushAtomFeedUtil;
+  }
+
   public void setConsumerRemoteUrl(String _consumerRemoteUrl) {
     this._consumerRemoteUrl = _consumerRemoteUrl;
   }
@@ -201,6 +216,7 @@ public class PushJmsServiceImpl implements PushJmsService, InitializingBean {
     Assert.notNull(_vgrHdrReceiverId);
     Assert.notNull(_vgrHdrSenderId);
     Assert.notNull(_vgrHdrMessageTypeVersion);
+    Assert.notNull(_pushAtomFeedUtil);
     Assert.notNull(_consumerRemoteUrl);
     Assert.notNull(_nodeService);
   }
