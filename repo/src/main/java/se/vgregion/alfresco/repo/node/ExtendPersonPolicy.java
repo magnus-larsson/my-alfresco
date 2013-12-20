@@ -1,6 +1,7 @@
 package se.vgregion.alfresco.repo.node;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -95,7 +96,7 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
             if (LOG.isDebugEnabled()) {
               LOG.debug("Removing old avatar: " + childAssoc.getChildRef());
             }
-            
+
             _nodeService.deleteNode(childAssoc.getChildRef());
           }
 
@@ -237,20 +238,20 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
    * Transaction listener, fires off the new thread after transaction commit.
    */
   private class UpdatePersonInfoTransactionListener extends TransactionListenerAdapter {
-    
+
     @Override
     public void afterCommit() {
       NodeRef personNodeRef = (NodeRef) AlfrescoTransactionSupport.getResource(KEY_PERSON_INFO);
-      
+
       if (LOG.isDebugEnabled()) {
         LOG.debug("Requesting person info update for " + personNodeRef);
       }
-      
+
       Runnable runnable = new PersonInfoUpdater(personNodeRef);
-      
+
       _threadPoolExecutor.execute(runnable);
     }
-    
+
   }
 
   /**
@@ -274,7 +275,7 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
             @Override
             public Void execute() throws Throwable {
               runInternal();
-              
+
               return null;
             }
 
@@ -294,49 +295,47 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
       }
 
       String responsibiltyCode = (String) _nodeService.getProperty(_personNodeRef, VgrModel.PROP_PERSON_RESPONSIBILITY_CODE);
-      
+
       String userName = (String) _nodeService.getProperty(_personNodeRef, ContentModel.PROP_USERNAME);
-      
+
       if (StringUtils.isNotBlank(userName)) {
         if (responsibiltyCode != null && responsibiltyCode.length() > 0) {
           String organizationDn;
-          
+
           try {
             organizationDn = _kivWsClient.searchPersonEmployment(userName, responsibiltyCode);
-            
+
             if (organizationDn != null && organizationDn.length() > 0) {
               _behaviourFilter.disableBehaviour(_personNodeRef);
-              
-              _nodeService.setProperty(_personNodeRef, VgrModel.PROP_PERSON_ORGANIZATION_DN, organizationDn);
+              try {
+                _nodeService.setProperty(_personNodeRef, VgrModel.PROP_PERSON_ORGANIZATION_DN, organizationDn);
 
-              String[] ous = organizationDn.split(",");
-              
-              ArrayUtils.reverse(ous);
-              
-              String org = "";
-              
-              for (int i = 0; i < ous.length; i++) {
-                String ou = ous[i].split("=")[1];
-                
-                org = org + ou;
-                
-                if (i < ous.length - 2) {
-                  org = org + "/";
+                String[] ous = organizationDn.split(",");
+
+                ArrayUtils.reverse(ous);
+
+                List<String> result = new ArrayList<String>();
+
+                for (String ou : ous) {
+                  ou = ou.split("=")[1];
+
+                  result.add(ou);
                 }
+
+                String organization = StringUtils.join(result, "/");
+
+                _nodeService.setProperty(_personNodeRef, ContentModel.PROP_ORGANIZATION, organization);
+
+                _nodeService.setProperty(_personNodeRef, ContentModel.PROP_ORGID, organization);
+              } finally {
+                _behaviourFilter.enableBehaviour(_personNodeRef);
               }
-              
-              _nodeService.setProperty(_personNodeRef, ContentModel.PROP_ORGANIZATION, org);
-              
-              _nodeService.setProperty(_personNodeRef, ContentModel.PROP_ORGID, org);
-              
-              _behaviourFilter.enableBehaviour(_personNodeRef);
             } else {
               LOG.warn("User organzationDn is empty for user: " + userName);
             }
           } catch (Exception e) {
             LOG.error("Error while searching for person employment", e);
           }
-
         } else {
           LOG.warn("User responsibility code is not available for user: " + userName);
         }
