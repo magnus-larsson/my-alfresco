@@ -47,7 +47,7 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
   private static final String KEY_PERSON_INFO = ExtendPersonPolicy.class.getName() + ".personInfoUpdate";
   private static final Logger LOG = Logger.getLogger(ExtendPersonPolicy.class);
   private KivWsClient _kivWsClient;
-  private static Boolean initialized = false;
+  private static Boolean _initialized = false;
   private static String avatarName = "ad_avatar.jpg";
 
   @Override
@@ -223,14 +223,14 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
     Assert.notNull(_kivWsClient);
     Assert.notNull(_contentService);
 
-    if (!initialized) {
+    if (!_initialized) {
       _policyComponent.bindClassBehaviour(OnUpdateNodePolicy.QNAME, ContentModel.TYPE_PERSON, new JavaBehaviour(this, "onUpdateNode", NotificationFrequency.TRANSACTION_COMMIT));
 
       _policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, ContentModel.TYPE_PERSON, new JavaBehaviour(this, "onCreateNode", NotificationFrequency.TRANSACTION_COMMIT));
 
-      initialized = true;
-
+      _initialized = true;
     }
+    
     _transactionListener = new UpdatePersonInfoTransactionListener();
   }
 
