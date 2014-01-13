@@ -35,8 +35,11 @@
 </#if>
       <div style="padding-top:16px; width: 250px;">
          <span class="menu-item">
-            <a href="http://portalen.vgregion.se/web/vgregion/losenord" target="_blank">Om du är en användare som har vgregion e-postadress, kan du behöva klicka här för att aktivera ditt konto innan du kan logga in första gången.</a>
+            <a href="http://www.vgregion.se/alfresco" target="_blank">Problem att logga in?</a>
          </span>
+      </div>
+      <div style="padding-top:12px; width: 400px;">
+         Du loggar in till Alfresco med ditt VGR ID och samma lösenord som du använder för att logga in till din dator och nya e-posten Outlook.
       </div>
       <div style="padding-top:12px">
          <span class="login-copyright">
