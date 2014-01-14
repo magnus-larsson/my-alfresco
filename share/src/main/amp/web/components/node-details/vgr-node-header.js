@@ -1,3 +1,5 @@
+// @overridden projects/slingshot/source/web/components/node-details/node-header.js
+
 (function(onReady) {
 
    Alfresco.component.NodeHeader.prototype.onReady = function() {

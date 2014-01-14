@@ -1,0 +1,8 @@
+<webscript>
+   <shortname>Triggers update for all users in the system</shortname>
+   <url>/vgr/admin/trigger-user-update</url>
+   <format default="text">argument</format>
+   <authentication>admin</authentication>
+   <transaction>required</transaction>
+   <family>VGR</family>
+</webscript>

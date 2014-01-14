@@ -1,3 +1,5 @@
+// @overridden projects/slingshot/source/web/components/people-finder/people-finder.js
+
 (function(onReady) {
 
    var $html = Alfresco.util.encodeHTML;

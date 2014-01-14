@@ -14,14 +14,30 @@ function main() {
       
       if (filter && filter.length > 0) {
          if (userName.indexOf(filter) === 0) {
-            users.push(userName);
+            pushuser(users, userName);
          }
       } else {
-         users.push(userName);
+         pushuser(users, userName);
       }
    }
    
    model.users = users;
+}
+
+function pushuser(users, username) {
+   /*
+   if (username.indexOf('_') >= 0) {
+     return;
+   }
+   */
+  
+   var user = people.getPerson(username);
+  
+   if (!user) {
+     return;
+   }
+  
+   users.push(username);
 }
 
 main();

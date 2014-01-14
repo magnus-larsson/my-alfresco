@@ -120,6 +120,9 @@
           </index>
         </property>
       </properties>
+      <mandatory-aspects>
+        <aspect>vgr:noarchive</aspect>
+      </mandatory-aspects>
     </type>
 
     <!-- Category Type for the property vgr:dc.type.document -->
@@ -222,6 +225,9 @@
           </index>
         </property>
       </properties>
+      <mandatory-aspects>
+        <aspect>vgr:noarchive</aspect>
+      </mandatory-aspects>
     </type>
 
     <!-- Data List - System maintenance messages -->
@@ -678,10 +684,20 @@
         <!-- Replicated field -->
         <property name="vgr:dc.identifier.documentid">
           <type>d:text</type>
+          <index enabled="true">
+            <atomic>true</atomic>
+            <stored>false</stored>
+            <tokenised>false</tokenised>
+          </index>
         </property>
         <!-- Replicated field -->
         <property name="vgr:dc.identifier.version">
           <type>d:text</type>
+          <index enabled="true">
+            <atomic>true</atomic>
+            <stored>false</stored>
+            <tokenised>false</tokenised>
+          </index>
         </property>
         <property name="vgr:dc.identifier.location">
           <type>d:text</type>
@@ -707,6 +723,11 @@
 
         <property name="vgr:dc.source.documentid">
           <type>d:text</type>
+          <index enabled="true">
+            <atomic>true</atomic>
+            <stored>false</stored>
+            <tokenised>false</tokenised>
+          </index>
         </property>
 
         <property name="vgr:dc.source.origin">
@@ -785,7 +806,7 @@
         <property name="vgr:vgr.status.document">
           <type>d:text</type>
           <index enabled="true">
-            <atomic>false</atomic>
+            <atomic>true</atomic>
             <stored>false</stored>
             <tokenised>false</tokenised>
           </index>
@@ -838,16 +859,31 @@
         <!-- This property is used to indicate the current status of the publishing and is set through a REST API -->
         <property name="vgr:publish-status">
           <type>d:text</type>
+          <index enabled="true">
+            <atomic>true</atomic>
+            <stored>false</stored>
+            <tokenised>false</tokenised>
+          </index>
         </property>
         <!-- This property is used to indicate the current status of the publishing and is set through a REST API -->
         <property name="vgr:unpublish-status">
           <type>d:text</type>
+          <index enabled="true">
+            <atomic>true</atomic>
+            <stored>false</stored>
+            <tokenised>false</tokenised>
+          </index>
         </property>
-        
+
         <!-- This property is used for counting the number of times a document has been "pushed" -->
         <property name="vgr:pushed-count">
           <type>d:int</type>
-          <default>0</default> 
+          <default>0</default>
+          <index enabled="true">
+            <atomic>true</atomic>
+            <stored>false</stored>
+            <tokenised>false</tokenised>
+          </index>
         </property>
       </properties>
     </aspect>
@@ -970,7 +1006,19 @@
         </property>
       </properties>
     </aspect>
+    
+    <!-- ######################################################################### -->
+    <!-- Temporary aspect for storing thumbnail photo                              -->
+    <!-- ######################################################################### -->
 
+    <aspect name="vgr:thumbnail-photo-aspect">
+      <title>Temporära tumnagelfoton</title>
+      <properties>
+        <property name="vgr:thumbnailPhoto">
+          <type>d:text</type>
+        </property>
+      </properties>
+    </aspect>
   </aspects>
 
 </model>

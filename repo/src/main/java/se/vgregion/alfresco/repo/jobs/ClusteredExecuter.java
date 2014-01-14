@@ -108,6 +108,9 @@ public abstract class ClusteredExecuter implements InitializingBean {
    * @return Returns the lock token
    */
   protected void refreshLock() {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Refreshing lock");
+    }
     String lockToken = _lockThreadLocal.get();
 
     if (StringUtils.isBlank(lockToken)) {
@@ -118,6 +121,9 @@ public abstract class ClusteredExecuter implements InitializingBean {
   }
 
   protected void releaseLock() {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Releasing lock");
+    }
     String lockToken = _lockThreadLocal.get();
 
     if (StringUtils.isBlank(lockToken)) {

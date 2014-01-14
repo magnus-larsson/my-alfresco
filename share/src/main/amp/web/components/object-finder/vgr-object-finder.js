@@ -1,3 +1,5 @@
+// @overridden projects/web-framework-commons/source/web/components/object-finder/object-finder.js
+
 /**
  * TODO write some docs
  */

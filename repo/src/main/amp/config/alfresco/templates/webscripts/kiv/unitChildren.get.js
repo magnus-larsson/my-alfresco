@@ -19,7 +19,7 @@ if (code == null || code == 'null' || code == undefined || code == "" || code ==
     def.query = 'PATH:"/app:company_home/app:dictionary/app:kiv/app:units"';
 }
 else {
-    def.query = 'TYPE:"{http://www.vgregion.se/kiv/1.0}unit" AND {http://www.vgregion.se/kiv/1.0}hsaidentity:"' + code + '"';
+    def.query = 'TYPE:"kiv:unit" AND kiv:hsaidentity:"' + code + '"';
     
 }
 

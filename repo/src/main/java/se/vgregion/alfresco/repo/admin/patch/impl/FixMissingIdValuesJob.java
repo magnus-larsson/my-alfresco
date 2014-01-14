@@ -118,7 +118,7 @@ public class FixMissingIdValuesJob extends AbstractPatchJob {
 
         @Override
         public Boolean execute() throws Throwable {
-          _behaviourFilter.disableAllBehaviours();
+          _behaviourFilter.disableBehaviour();
 
           final NodeRef nodeRef = document.getNodeRef();
 

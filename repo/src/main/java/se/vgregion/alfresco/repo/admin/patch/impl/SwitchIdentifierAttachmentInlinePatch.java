@@ -35,7 +35,7 @@ public class SwitchIdentifierAttachmentInlinePatch extends AbstractPatch {
 
   @Override
   protected String applyInternal() throws Exception {
-    _behaviourFilter.disableAllBehaviours();
+    _behaviourFilter.disableBehaviour();
 
     executeIdentifierChange(VgrModel.PROP_IDENTIFIER);
 

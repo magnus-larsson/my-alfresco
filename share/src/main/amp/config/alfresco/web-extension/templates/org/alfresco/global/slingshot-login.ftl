@@ -28,15 +28,18 @@
             <div style="padding-top:16px">
                <input type="submit" id="btn-login" class="login-button" />
             </div>
-            <input type="hidden" id="success" name="success" value="${successUrl?html}"/>
-            <input type="hidden" name="failure" value="<#assign link>${url.context}/page/type/login</#assign>${link?html}?error=true"/>
+            <input type="hidden" id="success" name="success" value="${successUrl?replace("@","%40")?html}"/>
+            <input type="hidden" name="failure" value="<#assign link>${url.context}/page/type/login</#assign>${link?replace("@","%40")?html}?error=true"/>
          </fieldset>
       </form>
 </#if>
       <div style="padding-top:16px; width: 250px;">
          <span class="menu-item">
-            <a href="http://portalen.vgregion.se/web/vgregion/losenord" target="_blank">Om du är en användare som har vgregion e-postadress, kan du behöva klicka här för att aktivera ditt konto innan du kan logga in första gången.</a>
+            <a href="http://www.vgregion.se/alfresco" target="_blank">Problem att logga in?</a>
          </span>
+      </div>
+      <div style="padding-top:12px; width: 400px; color:red; ">
+         Du loggar in till Alfresco med ditt VGR ID och samma lösenord som du använder för att logga in till din dator och nya e-posten Outlook.
       </div>
       <div style="padding-top:12px">
          <span class="login-copyright">

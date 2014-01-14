@@ -1,3 +1,5 @@
+// @overridden projects/slingshot/source/web/components/search/advsearch.js
+
 (function(onBeforeFormRuntimeInit) {
 
    Alfresco.AdvancedSearch.prototype.onBeforeFormRuntimeInit = function(layer, args) {

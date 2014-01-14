@@ -58,7 +58,7 @@
          for (i = 0; i < pairs.length; i++) {
             n = pairs[i].split('=')[1];
 
-            if (n != 'VGR' && n != 'OrgExtended') { // filter these common root nodes out
+            if (n != 'VGR' && n != 'OrgExtended' && n != 'Org') { // filter these common root nodes out
                parents.push(n);
             }
          }

@@ -1,3 +1,5 @@
+// @overridden projects/slingshot/source/web/components/site-members/site-members.js
+
 (function(onReady) {
 
    var self = this;

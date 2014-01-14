@@ -1,3 +1,7 @@
+/*
+ * @overridden projects/slingshot/source/web/components/document-details/document-actions.js
+ */
+
 (function(onActionEditOffline) {
 
    Alfresco.DocumentActions.prototype.onActionEditOffline = function(asset) {

@@ -7,6 +7,7 @@
       <map>
         <entry key="vgr:responsibility_code" value="${ldap.synchronization.vgrResponsibilityCode}" />
         <entry key="vgr:organization_dn" value="${ldap.synchronization.userOrganizationalIdAttributeNameDN}" />
+        <entry key="vgr:thumbnailPhoto" value="${ldap.synchronization.thumbnailPhoto}" />
       </map>
     </property>
   </bean>

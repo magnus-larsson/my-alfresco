@@ -1,3 +1,7 @@
+/*
+ * @overridden projects/slingshot/source/web/components/document-details/document-links.js
+ */
+
 /**
  * TODO write some docs
  */

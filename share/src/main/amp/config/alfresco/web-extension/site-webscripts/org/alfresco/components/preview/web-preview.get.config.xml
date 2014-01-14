@@ -35,8 +35,8 @@
             * testPluginAvailability="true|false" Test if a plugin is available. Use for mime types that need a plugin to display for example application/pdf (default "false")
       -->
       <condition mimeType="application/pdf">
-         <plugin>PdfJs</plugin>
-         <plugin>Embed</plugin>
+         <plugin timeout="10">PdfJs</plugin>
+         <plugin timeout="10">Embed</plugin>
       </condition>
 
       <!--
@@ -46,8 +46,8 @@
           Note, the OpenOffice transformer must be available on the server for this to work.
       -->
       <condition thumbnail="pdf">
-         <plugin src="pdf">PdfJs</plugin>
-         <plugin src="pdf">Embed</plugin>
+         <plugin src="pdf" timeout="10">PdfJs</plugin>
+         <plugin src="pdf" timeout="10">Embed</plugin>
       </condition>
 
       <!--

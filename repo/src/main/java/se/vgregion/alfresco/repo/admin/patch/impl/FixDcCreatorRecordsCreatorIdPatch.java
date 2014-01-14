@@ -46,7 +46,7 @@ public class FixDcCreatorRecordsCreatorIdPatch extends AbstractPatch implements 
   }
 
   private String doApply() {
-    _behaviourFilter.disableAllBehaviours();
+    _behaviourFilter.disableBehaviour();
 
     final ResultSet documents = queryDocuments();
 

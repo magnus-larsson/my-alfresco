@@ -53,7 +53,7 @@ public class FixDcDocumentStatusIdPatch extends AbstractPatch implements Initial
   }
 
   private String doApply() {
-    _behaviourFilter.disableAllBehaviours();
+    _behaviourFilter.disableBehaviour();
 
     final String query = "TYPE:\"vgr:document\" AND (ISUNSET:\"vgr:vgr.status.document.id\" OR ISNULL:\"vgr:vgr.status.document.id\")";
 

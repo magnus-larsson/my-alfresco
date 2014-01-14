@@ -19,7 +19,7 @@
    <#assign currentVersion = "">
 </#if>
 <#-- Permissions -->
-<#if result.permissions?? && !isReadOnly>
+<#if result.permissions??>
    <#assign permissions = result.permissions>
 <#else>
    <#assign permissions = {}>

@@ -17,7 +17,6 @@ function exitUpload(statusCode, statusMsg)
    status.code = statusCode;
    status.message = statusMsg;
    status.redirect = true;
-   formdata.cleanup();
 }
 
 function writeContent(contentData, content, tempFilename) {
@@ -250,6 +249,12 @@ function main()
          updateNode.properties.content.guessMimetype(filename);
          updateNode.properties.content.guessEncoding();
          // check it in again, with supplied version history note
+         
+         // Extract the metadata
+         // (The overwrite policy controls which if any parts of
+         //  the document's properties are updated from this)
+         extractMetadata(updateNode);
+         
          updateNode = updateNode.checkin(description, majorVersion);
          if (aspects.length != 0)
          {
@@ -262,11 +267,6 @@ function main()
             }
          }
 
-         // Extract the metadata
-         // (The overwrite policy controls which if any parts of
-         //  the document's properties are updated from this)
-         extractMetadata(updateNode);
-         
          // Record the file details ready for generating the response
          model.document = updateNode;
       }
@@ -395,7 +395,6 @@ function main()
          // Record the file details ready for generating the response
          model.document = newFile;
       }
-      
       // MNT-8745 fix: Do not clean formdata temp files to allow for retries. Temp files will be deleted later when GC call DiskFileItem#finalize() method or by temp file cleaner.
    }
    catch (e)
@@ -409,10 +408,14 @@ function main()
       {
          e.code = 413;
       }
+      else if (e.message && e.message.indexOf("org.alfresco.repo.content.ContentLimitViolationException") == 0)
+      {
+         e.code = 409;
+      }
       else
       {
          e.code = 500;
-         e.message = "Unexpected error occured during upload of new content.";      
+         e.message = "Unexpected error occurred during upload of new content.";      
       }
       throw e;
    }

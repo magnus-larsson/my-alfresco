@@ -1,3 +1,6 @@
+/*
+ * @overridden projects/slingshot/source/web/modules/delete-site.js
+ */
 (function(_onDeleteClick) {
 
    Alfresco.module.DeleteSite.prototype._onDeleteClick = function(config) {

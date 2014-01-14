@@ -1,3 +1,5 @@
+// @overridden projects/slingshot/source/web/components/folder-details/folder-links.js
+
 /**
  * TODO write some docs
  */

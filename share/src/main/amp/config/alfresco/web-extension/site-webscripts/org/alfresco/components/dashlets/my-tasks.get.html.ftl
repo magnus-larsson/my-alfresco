@@ -46,7 +46,6 @@
             <option value="${filter.type?html}">${msg("filter." + filter.type)}</option>
          </#list>
          </select>
-         <#if (isReadOnly!false)?string == "false">
          <span class="align-right yui-button-align">
             <span class="first-child">
                <#-- until VGR has workflow support, this is commented out
@@ -56,7 +55,6 @@
                -->
             </span>
          </span>
-         </#if>
          <div class="clear"></div>
       </div>
    </div>

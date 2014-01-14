@@ -1,5 +1,5 @@
 /**
- * TODO write some docs
+ * @overridden projects/slingshot/source/web/components/dashlets/docsummary.js
  */
 (function(onReady) {
 

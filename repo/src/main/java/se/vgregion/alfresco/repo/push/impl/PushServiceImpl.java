@@ -254,14 +254,14 @@ public class PushServiceImpl implements PushService, InitializingBean {
     if (publishStatus == null || publishStatus.length() == 0) {
       query.append("AND ISNULL:\"vgr:publish-status\" ");
     } else if (publishStatus.length() > 0 && !"any".equalsIgnoreCase(publishStatus)) {
-      query.append("AND vgr\\:publish\\-status: \"" + publishStatus + "\" ");
+      query.append("AND vgr\\:publish\\-status: \"" + publishStatus.toUpperCase() + "\" ");
     }
 
     if (unpublishStatus == null || unpublishStatus.length() == 0) {
       query.append("AND ISNULL:\"vgr:unpublish-status\" ");
       query.append("AND ISNOTNULL:\"vgr:pushed-for-unpublish\" ");
     } else if (unpublishStatus.length() > 0 && !"any".equalsIgnoreCase(unpublishStatus)) {
-      query.append("AND vgr\\:unpublish\\-status: \"" + unpublishStatus + "\" ");
+      query.append("AND vgr\\:unpublish\\-status: \"" + unpublishStatus.toUpperCase() + "\" ");
     }
 
     if (LOG.isDebugEnabled()) {
