@@ -38,7 +38,7 @@
             <a href="http://www.vgregion.se/alfresco" target="_blank">Problem att logga in?</a>
          </span>
       </div>
-      <div style="padding-top:12px; width: 400px;">
+      <div style="padding-top:12px; width: 400px; color:red; ">
          Du loggar in till Alfresco med ditt VGR ID och samma lösenord som du använder för att logga in till din dator och nya e-posten Outlook.
       </div>
       <div style="padding-top:12px">
