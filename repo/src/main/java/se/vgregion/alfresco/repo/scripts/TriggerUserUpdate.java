@@ -26,7 +26,7 @@ import org.springframework.extensions.webscripts.DeclarativeWebScript;
 import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class TriggerUserUpdate extends DeclarativeWebScript implements InitializingBean {
 
@@ -64,7 +64,7 @@ public class TriggerUserUpdate extends DeclarativeWebScript implements Initializ
           LOG.info("Triggered '" + resultSet.length() + "' user updates for '" + letters + "'");
         }
       } finally {
-        ServiceUtils.closeQuietly(resultSet);
+        ServiceUtilsImpl.closeQuietly(resultSet);
       }
     }
 

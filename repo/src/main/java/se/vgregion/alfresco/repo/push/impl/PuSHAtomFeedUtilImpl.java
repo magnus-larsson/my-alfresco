@@ -2,6 +2,7 @@ package se.vgregion.alfresco.repo.push.impl;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,6 +16,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.descriptor.Descriptor;
 import org.alfresco.service.descriptor.DescriptorService;
 import org.alfresco.service.namespace.QName;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -257,9 +259,9 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
     }
 
     // Special handling language
-    String languagesStr = (String) properties.get(VgrModel.PROP_LANGUAGE);
-    if (languagesStr != null) {
-      String[] languages = languagesStr.split(",");
+    ArrayList<String> languages = (ArrayList<String>) properties.get(VgrModel.PROP_LANGUAGE);
+    
+    if (languages != null && languages.size() > 0) {
       for (String language : languages) {
         String languageCode = serviceUtils.findLanguageCode(language);
         sb.append(createEntryDataTag("DC:language", languageCode, null)); // skip=true
@@ -270,14 +272,13 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
     sb.append(createEntryDataTag("DC:identifier.documentid", nodeRef.toString(), null));
 
     // Special handling of access rights
-    String accessRightsStr = (String) properties.get(VgrModel.PROP_ACCESS_RIGHT);
+    ArrayList<String> accessRights = (ArrayList<String>) properties.get(VgrModel.PROP_ACCESS_RIGHT);
     String theAccessRight = null;
-    if (accessRightsStr == null || accessRightsStr.length() == 0) {
+    if (accessRights == null || accessRights.size() == 0) {
       theAccessRight = "";
     } else {
-      String[] accessRights = accessRightsStr.split(",");
-      if (accessRights.length == 1) {
-        theAccessRight = accessRights[0];
+      if (accessRights.size() == 1) {
+        theAccessRight = accessRights.get(0);
       } else {
         for (String accessRight : accessRights) {
           if ("Internet".equalsIgnoreCase(accessRight)) {
@@ -286,7 +287,7 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
           }
         }
         if (theAccessRight == null) {
-          theAccessRight = accessRights[0];
+          theAccessRight = accessRights.get(0);
         }
       }
     }
@@ -299,9 +300,10 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
     Serializable documentId = properties.get(VgrModel.PROP_SOURCE_DOCUMENTID);
     Map<String, Serializable> linkMap = new HashMap<String, Serializable>();
     if (documentId != null) {
-      String theDownloadUrl = downloadUrl.replaceAll("#documentId#", documentId.toString());
+      String theDownloadUrl = downloadUrl.replaceAll("#documentId#", documentId.toString().replace("://", "/"));
       linkMap.put("href", theDownloadUrl);
     }
+    
     sb.append(createEntryDataTag("link", null, linkMap));
 
     sb.append(mapProperties(nodeRef, properties));
@@ -340,6 +342,8 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
     if (value instanceof Date) {
       Date aDate = (Date) value;
       sb.append(createEntryDataTag(key, toUTCDate(aDate), null));
+    } else if (value instanceof String) {
+      sb.append(createEntryDataTag(key, StringEscapeUtils.escapeXml((String) value), null));
     } else if (value != null) {
       sb.append(createEntryDataTag(key, value, null));
     } else {
