@@ -105,6 +105,7 @@ public class PuSHAtomFeedUtilTest {
     properties.put(VgrModel.PROP_DATE_ISSUED, new Date());
     properties.put(VgrModel.PROP_TITLE_ALTERNATIVE, "Titel 1,Titel 2");
     properties.put(VgrModel.PROP_SOURCE_DOCUMENTID, 1234);
+    properties.put(VgrModel.PROP_IDENTIFIER, "http://localhost:8080/alfresco/service/vgr/storage/node/content/workspace/SpacesStore/a38c5f20-dfe6-4e7d-b51a-3f1c400b02f6?a=false&guest=true");
     context.checking(new Expectations() {
       {
         allowing(nodeService).exists(publishNodeRef);

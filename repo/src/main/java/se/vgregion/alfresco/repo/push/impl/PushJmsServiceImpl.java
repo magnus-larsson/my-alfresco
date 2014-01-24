@@ -9,6 +9,7 @@ import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
+import javax.jms.JMSException;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
@@ -16,6 +17,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
@@ -61,8 +63,9 @@ public class PushJmsServiceImpl implements PushJmsService, InitializingBean {
   public static final se.vgregion.docpublishing.unpublishdocumentevent.v1.ObjectFactory documentUnPublishObjectFactory = new se.vgregion.docpublishing.unpublishdocumentevent.v1.ObjectFactory();
 
   // private BrokerService producerBroker;
-  
-  //To maintain cdata tags use something like this: https://jaxb.java.net/faq/JaxbCDATASample.java
+
+  // To maintain cdata tags use something like this:
+  // https://jaxb.java.net/faq/JaxbCDATASample.java
   private String ObjectToXml(Object object) throws JAXBException {
     JAXBContext context = JAXBContext.newInstance(object.getClass());
 
@@ -104,60 +107,64 @@ public class PushJmsServiceImpl implements PushJmsService, InitializingBean {
       producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
 
       for (NodeRef nodeRef : nodeRefs) {
-        TextMessage message = null;
-        String requestId;
-        if (VgrModel.PROP_PUSHED_FOR_PUBLISH.equals(property)) {
-          // Publish event
-          Date publishDate = (Date) _nodeService.getProperty(nodeRef, VgrModel.PROP_PUSHED_FOR_PUBLISH);
-          requestId = "publish_" + nodeRef.toString() + "_" + publishDate.getTime();
-          PublishDocument createPublishDocument = documentPublishObjectFactory.createPublishDocument();
-          createPublishDocument.setDocumentId(nodeRef.toString());
-          createPublishDocument.setSource((String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_ORIGIN));
-          createPublishDocument.setSourceDocumentId((String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_DOCUMENTID));
-          createPublishDocument.setRequestId(requestId);
-          String feedXml = _pushAtomFeedUtil.createPublishDocumentFeed(nodeRef);
-          feedXml = "<![CDATA[" + feedXml +"]]>";
-          createPublishDocument.setFeed(feedXml);
-          if (LOG.isDebugEnabled()) {
-            LOG.debug("PublishDocument contents: " + ObjectToXml(createPublishDocument));
+        try {
+          TextMessage message = null;
+          String requestId;
+          if (VgrModel.PROP_PUSHED_FOR_PUBLISH.equals(property)) {
+            // Publish event
+            Date publishDate = (Date) _nodeService.getProperty(nodeRef, VgrModel.PROP_PUSHED_FOR_PUBLISH);
+            requestId = "publish_" + nodeRef.toString() + "_" + publishDate.getTime();
+            PublishDocument createPublishDocument = documentPublishObjectFactory.createPublishDocument();
+            createPublishDocument.setDocumentId(nodeRef.toString());
+            createPublishDocument.setSource((String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_ORIGIN));
+            createPublishDocument.setSourceDocumentId((String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_DOCUMENTID));
+            createPublishDocument.setRequestId(requestId);
+            String feedXml = _pushAtomFeedUtil.createPublishDocumentFeed(nodeRef);
+            feedXml = "<![CDATA[" + feedXml + "]]>";
+            createPublishDocument.setFeed(feedXml);
+            if (LOG.isDebugEnabled()) {
+              LOG.debug("PublishDocument contents: " + ObjectToXml(createPublishDocument));
+            }
+            message = session.createTextMessage(ObjectToXml(createPublishDocument));
+            message.setJMSCorrelationID(requestId);
+            message.setStringProperty(VGR_HDR_SENDER_ID, _vgrHdrSenderId);
+            message.setStringProperty(VGR_HDR_RECEIVER_ID, _vgrHdrReceiverId);
+            message.setStringProperty(VGR_HDR_MESSAGE_TYPE, PUBLISH_DOCUMENT_EVENT);
+            if (LOG.isDebugEnabled())
+              LOG.debug("Sending publishEvent: " + message.toString());
+          } else if (VgrModel.PROP_PUSHED_FOR_UNPUBLISH.equals(property)) {
+            // Unpublish event
+            Date unpublishDate = (Date) _nodeService.getProperty(nodeRef, VgrModel.PROP_PUSHED_FOR_UNPUBLISH);
+            requestId = "unpublish_" + nodeRef.toString() + "_" + unpublishDate.getTime();
+            UnpublishDocument createUnpublishDocument = documentUnPublishObjectFactory.createUnpublishDocument();
+            createUnpublishDocument.setDocumentId(nodeRef.toString());
+            createUnpublishDocument.setSource((String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_ORIGIN));
+            createUnpublishDocument.setSourceDocumentId((String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_DOCUMENTID));
+            createUnpublishDocument.setRequestId(requestId);
+            String feedXml = _pushAtomFeedUtil.createUnPublishDocumentFeed(nodeRef);
+            feedXml = "<![CDATA[" + feedXml + "]]>";
+            createUnpublishDocument.setFeed(feedXml);
+            if (LOG.isDebugEnabled()) {
+              LOG.debug("UnpublishDocument contents: " + ObjectToXml(createUnpublishDocument));
+            }
+            message = session.createTextMessage(ObjectToXml(createUnpublishDocument));
+            message.setJMSCorrelationID(requestId);
+            message.setStringProperty(VGR_HDR_SENDER_ID, _vgrHdrSenderId);
+            message.setStringProperty(VGR_HDR_RECEIVER_ID, _vgrHdrReceiverId);
+            message.setStringProperty(VGR_HDR_MESSAGE_TYPE, UNPUBLISH_DOCUMENT_EVENT);
+            if (LOG.isDebugEnabled())
+              LOG.debug("Sending unPublishEvent: " + message.toString());
           }
-          message = session.createTextMessage(ObjectToXml(createPublishDocument));
-          message.setJMSCorrelationID(requestId);
-          message.setStringProperty(VGR_HDR_SENDER_ID, _vgrHdrSenderId);
-          message.setStringProperty(VGR_HDR_RECEIVER_ID, _vgrHdrReceiverId);
-          message.setStringProperty(VGR_HDR_MESSAGE_TYPE, PUBLISH_DOCUMENT_EVENT);
-          if (LOG.isDebugEnabled())
-            LOG.debug("Sending publishEvent: " + message.toString());
-        } else if (VgrModel.PROP_PUSHED_FOR_UNPUBLISH.equals(property)) {
-          // Unpublish event
-          Date unpublishDate = (Date) _nodeService.getProperty(nodeRef, VgrModel.PROP_PUSHED_FOR_UNPUBLISH);
-          requestId = "unpublish_" + nodeRef.toString() + "_" + unpublishDate.getTime();
-          UnpublishDocument createUnpublishDocument = documentUnPublishObjectFactory.createUnpublishDocument();
-          createUnpublishDocument.setDocumentId(nodeRef.toString());
-          createUnpublishDocument.setSource((String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_ORIGIN));
-          createUnpublishDocument.setSourceDocumentId((String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_DOCUMENTID));
-          createUnpublishDocument.setRequestId(requestId);
-          String feedXml = _pushAtomFeedUtil.createUnPublishDocumentFeed(nodeRef);
-          feedXml = "<![CDATA[" + feedXml +"]]>";
-          createUnpublishDocument.setFeed(feedXml);
-          if (LOG.isDebugEnabled()) {
-            LOG.debug("UnpublishDocument contents: " + ObjectToXml(createUnpublishDocument));
-          }
-          message = session.createTextMessage(ObjectToXml(createUnpublishDocument));
-          message.setJMSCorrelationID(requestId);
-          message.setStringProperty(VGR_HDR_SENDER_ID, _vgrHdrSenderId);
-          message.setStringProperty(VGR_HDR_RECEIVER_ID, _vgrHdrReceiverId);
-          message.setStringProperty(VGR_HDR_MESSAGE_TYPE, UNPUBLISH_DOCUMENT_EVENT);
-          if (LOG.isDebugEnabled())
-            LOG.debug("Sending unPublishEvent: " + message.toString());
-        }
-        if (message != null) {
+          if (message != null) {
 
-          producer.send(message);
-          if (LOG.isDebugEnabled())
-            LOG.debug("Sent message");
-        } else {
-          LOG.error("No message to send");
+            producer.send(message);
+            if (LOG.isDebugEnabled())
+              LOG.debug("Sent message");
+          } else {
+            LOG.error("No message to send");
+          }
+        } catch (Exception e) {
+          LOG.error("Could not publish " + nodeRef.toString(), e);
         }
       }
       producer.close();
@@ -171,9 +178,8 @@ public class PushJmsServiceImpl implements PushJmsService, InitializingBean {
         LOG.debug("Closed connection");
 
       return true;
-    } catch (Exception e) {
-      LOG.error("Error when sending JMS message", e);
-      return false;
+    } catch (JMSException e) {
+      throw new AlfrescoRuntimeException("Error when sending JMS message", e);
     }
   }
 

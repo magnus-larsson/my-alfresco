@@ -116,7 +116,7 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
 
       @Override
       public Void doWork() throws Exception {
-        _transactionService.getRetryingTransactionHelper().doInTransaction(executionJms, true, true);
+        _transactionService.getRetryingTransactionHelper().doInTransaction(executionJms, false, true);
         return null;
       }
 
