@@ -186,9 +186,9 @@ public class PushJmsServiceTest {
             String result = textMessage.getText();
             Assert.assertTrue(result.length() > 0);
 
-            if (result.indexOf("<PublishDocument") > 0 && result.indexOf("<feed>&lt;![CDATA[&lt;xmlPub&gt;&lt;/xmlPub&gt;]]&gt;</feed>") > 0) {
+            if (result.indexOf("<PublishDocument") > 0 && result.indexOf("<feed>&lt;xmlPub&gt;&lt;/xmlPub&gt;</feed>") > 0) {
               successPublish = true;
-            } else if (result.indexOf("<UnpublishDocument") > 0 && result.indexOf("<feed>&lt;![CDATA[&lt;xmlUnPub&gt;&lt;/xmlUnPub&gt;]]&gt;</feed>") > 0) {
+            } else if (result.indexOf("<UnpublishDocument") > 0 && result.indexOf("<feed>&lt;xmlUnPub&gt;&lt;/xmlUnPub&gt;</feed>") > 0) {
               successUnpublish = true;
             }
 
