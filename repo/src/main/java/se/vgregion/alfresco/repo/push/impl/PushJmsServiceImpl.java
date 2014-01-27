@@ -120,7 +120,7 @@ public class PushJmsServiceImpl implements PushJmsService, InitializingBean {
             createPublishDocument.setSourceDocumentId((String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_DOCUMENTID));
             createPublishDocument.setRequestId(requestId);
             String feedXml = _pushAtomFeedUtil.createPublishDocumentFeed(nodeRef);
-            feedXml = "<![CDATA[" + feedXml + "]]>";
+            //feedXml = "<![CDATA[" + feedXml + "]]>";
             createPublishDocument.setFeed(feedXml);
             if (LOG.isDebugEnabled()) {
               LOG.debug("PublishDocument contents: " + ObjectToXml(createPublishDocument));
@@ -142,7 +142,7 @@ public class PushJmsServiceImpl implements PushJmsService, InitializingBean {
             createUnpublishDocument.setSourceDocumentId((String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_DOCUMENTID));
             createUnpublishDocument.setRequestId(requestId);
             String feedXml = _pushAtomFeedUtil.createUnPublishDocumentFeed(nodeRef);
-            feedXml = "<![CDATA[" + feedXml + "]]>";
+            //feedXml = "<![CDATA[" + feedXml + "]]>";
             createUnpublishDocument.setFeed(feedXml);
             if (LOG.isDebugEnabled()) {
               LOG.debug("UnpublishDocument contents: " + ObjectToXml(createUnpublishDocument));
