@@ -86,6 +86,14 @@
     <kivurl>http://sokikiv.vgregion.se/sokikiv/visaperson?vgrid={id}</kivurl>
   </config>
 
+  <config evaluator="string-compare" condition="Users" replace="true">
+    <users>
+      <!-- minimum length for username and password -->
+      <username-min-length>2</username-min-length>
+      <password-min-length>6</password-min-length>
+    </users>
+  </config>
+
   <config evaluator="string-compare" condition="WebFramework">
     <web-framework>
       <!-- SpringSurf Autowire Runtime Settings -->

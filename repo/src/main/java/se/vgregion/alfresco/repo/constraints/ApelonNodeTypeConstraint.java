@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.repo.dictionary.constraint.ListOfValuesConstraint;
+import org.alfresco.service.cmr.i18n.MessageLookup;
 
 import se.vgregion.alfresco.repo.utils.ApplicationContextHolder;
 
@@ -55,6 +56,11 @@ public class ApelonNodeTypeConstraint extends ListOfValuesConstraint implements 
   @Override
   protected void evaluateSingleValue(final Object value) {
  // must override to nullify check later on in super class
+  }
+  
+  @Override
+  public String getDisplayLabel(String constraintAllowableValue, MessageLookup messageLookup) {
+    return constraintAllowableValue;
   }
 
 }
