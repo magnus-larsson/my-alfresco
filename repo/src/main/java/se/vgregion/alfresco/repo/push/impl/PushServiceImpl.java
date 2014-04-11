@@ -204,7 +204,7 @@ public class PushServiceImpl implements PushService, InitializingBean {
     query.append("(ISNULL:\"vgr:dc.date.availableto\" OR ISUNSET:\"vgr:dc.date.availableto\" OR vgr:dc\\.date\\.availableto:[\"" + formatDate(now) + "\" TO MAX]) ");
 
     if (count != null) {
-      query.append("AND (vgr\\:pushed\\-count:[MIN TO " + (count - 1) + "] OR ISNULL:\"vgr:pushed-count\" OR ISUNSET:\"vgr:pushed-count\") ");
+      query.append("AND (vgr\\:pushed\\-count:[0 TO " + (count - 1) + "] OR ISNULL:\"vgr:pushed-count\" OR ISUNSET:\"vgr:pushed-count\") ");
     }
 
     if (minimumPushAge != null && minimumPushAge > 0) {

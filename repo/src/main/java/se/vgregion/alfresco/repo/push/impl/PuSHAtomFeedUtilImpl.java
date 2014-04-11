@@ -48,104 +48,104 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
   private static final Map<String, QName> propertyMap = new HashMap<String, QName>();
   static {
     // title custom handled
-    propertyMap.put("DC:title.alternative", VgrModel.PROP_TITLE_ALTERNATIVE); // multiple
-    propertyMap.put("DC:title.filename", VgrModel.PROP_TITLE_FILENAME);
-    propertyMap.put("DC:title.filename.native", VgrModel.PROP_TITLE_FILENAME_NATIVE);
+    propertyMap.put("DC.title.alternative", VgrModel.PROP_TITLE_ALTERNATIVE); // multiple
+    propertyMap.put("DC.title.filename", VgrModel.PROP_TITLE_FILENAME);
+    propertyMap.put("DC.title.filename.native", VgrModel.PROP_TITLE_FILENAME_NATIVE);
 
     // saved custom handled
     propertyMap.put("updated", ContentModel.PROP_MODIFIED); // skip=true
-    propertyMap.put("dcterms:created", ContentModel.PROP_CREATED); // skip=true
-    propertyMap.put("DC:creator", VgrModel.PROP_CREATOR); // multiple
-    propertyMap.put("DC:creator.id", VgrModel.PROP_CREATOR_ID); // multiple
+    propertyMap.put("dcterms.created", ContentModel.PROP_CREATED); // skip=true
+    propertyMap.put("DC.creator", VgrModel.PROP_CREATOR); // multiple
+    propertyMap.put("DC.creator.id", VgrModel.PROP_CREATOR_ID); // multiple
     propertyMap.put("summary", VgrModel.PROP_DESCRIPTION); // skip=true
-    propertyMap.put("DC:description", VgrModel.PROP_DESCRIPTION);
+    propertyMap.put("DC.description", VgrModel.PROP_DESCRIPTION);
     // language codes custom handled
 
-    propertyMap.put("DC:format.extent.mimetype", VgrModel.PROP_FORMAT_EXTENT_MIMETYPE);
-    propertyMap.put("DC:format.extent.mimetype.native", VgrModel.PROP_FORMAT_EXTENT_MIMETYPE_NATIVE);
+    propertyMap.put("DC.format.extent.mimetype", VgrModel.PROP_FORMAT_EXTENT_MIMETYPE);
+    propertyMap.put("DC.format.extent.mimetype.native", VgrModel.PROP_FORMAT_EXTENT_MIMETYPE_NATIVE);
 
-    propertyMap.put("DC:subject.authorkeywords", VgrModel.PROP_SUBJECT_AUTHOR_KEYWORDS); // multiple
-    propertyMap.put("DC:subject.keywords", VgrModel.PROP_SUBJECT_KEYWORDS); // multiple
-    propertyMap.put("DC:subject.keywords.id", VgrModel.PROP_SUBJECT_KEYWORDS_ID); // multiple
+    propertyMap.put("DC.subject.authorkeywords", VgrModel.PROP_SUBJECT_AUTHOR_KEYWORDS); // multiple
+    propertyMap.put("DC.subject.keywords", VgrModel.PROP_SUBJECT_KEYWORDS); // multiple
+    propertyMap.put("DC.subject.keywords.id", VgrModel.PROP_SUBJECT_KEYWORDS_ID); // multiple
 
-    propertyMap.put("DC:creator.freetext", VgrModel.PROP_CREATOR_FREETEXT);
-    propertyMap.put("DC:creator.document", VgrModel.PROP_CREATOR_DOCUMENT); // multiple
-    propertyMap.put("DC:creator.document.id", VgrModel.PROP_CREATOR_DOCUMENT_ID); // multiple
-    propertyMap.put("DC:creator.function", VgrModel.PROP_CREATOR_FUNCTION);
-    propertyMap.put("DC:creator.forunit", VgrModel.PROP_CREATOR_FORUNIT); // multiple
-    propertyMap.put("DC:creator.forunit.id", VgrModel.PROP_CREATOR_FORUNIT_ID); // multiple
-    propertyMap.put("DC:creator.recordscreator", VgrModel.PROP_CREATOR_RECORDSCREATOR); // multiple
-    propertyMap.put("DC:creator.recordscreator.id", VgrModel.PROP_CREATOR_RECORDSCREATOR_ID); // multiple
-    propertyMap.put("DC:creator.project-assignment", VgrModel.PROP_CREATOR_PROJECT_ASSIGNMENT);
+    propertyMap.put("DC.creator.freetext", VgrModel.PROP_CREATOR_FREETEXT);
+    propertyMap.put("DC.creator.document", VgrModel.PROP_CREATOR_DOCUMENT); // multiple
+    propertyMap.put("DC.creator.document.id", VgrModel.PROP_CREATOR_DOCUMENT_ID); // multiple
+    propertyMap.put("DC.creator.function", VgrModel.PROP_CREATOR_FUNCTION);
+    propertyMap.put("DC.creator.forunit", VgrModel.PROP_CREATOR_FORUNIT); // multiple
+    propertyMap.put("DC.creator.forunit.id", VgrModel.PROP_CREATOR_FORUNIT_ID); // multiple
+    propertyMap.put("DC.creator.recordscreator", VgrModel.PROP_CREATOR_RECORDSCREATOR); // multiple
+    propertyMap.put("DC.creator.recordscreator.id", VgrModel.PROP_CREATOR_RECORDSCREATOR_ID); // multiple
+    propertyMap.put("DC.creator.project-assignment", VgrModel.PROP_CREATOR_PROJECT_ASSIGNMENT);
 
-    propertyMap.put("DC:publisher", VgrModel.PROP_PUBLISHER);
-    propertyMap.put("DC:publisher.id", VgrModel.PROP_PUBLISHER_ID);
-    propertyMap.put("DC:publisher.forunit", VgrModel.PROP_PUBLISHER_FORUNIT); // multiple
-    propertyMap.put("DC:publisher.forunit.id", VgrModel.PROP_PUBLISHER_FORUNIT_ID); // multiple
-    propertyMap.put("DC:publisher.project-assignment", VgrModel.PROP_PUBLISHER_PROJECT_ASSIGNMENT); // multiple
+    propertyMap.put("DC.publisher", VgrModel.PROP_PUBLISHER);
+    propertyMap.put("DC.publisher.id", VgrModel.PROP_PUBLISHER_ID);
+    propertyMap.put("DC.publisher.forunit", VgrModel.PROP_PUBLISHER_FORUNIT); // multiple
+    propertyMap.put("DC.publisher.forunit.id", VgrModel.PROP_PUBLISHER_FORUNIT_ID); // multiple
+    propertyMap.put("DC.publisher.project-assignment", VgrModel.PROP_PUBLISHER_PROJECT_ASSIGNMENT); // multiple
 
-    propertyMap.put("DC:date.issued", VgrModel.PROP_DATE_ISSUED); // skip = true
-    propertyMap.put("DC:date.accepted", VgrModel.PROP_DATE_ACCEPTED); // skip=true
-    propertyMap.put("DC:date.controlled", VgrModel.PROP_DATE_CONTROLLED); // skip=true
-    propertyMap.put("DC:date.validfrom", VgrModel.PROP_DATE_VALID_FROM); // skip=true
-    propertyMap.put("DC:date.validto", VgrModel.PROP_DATE_VALID_TO); // skip=true
-    propertyMap.put("DC:date.availablefrom", VgrModel.PROP_DATE_AVAILABLE_FROM); // skip=true
-    propertyMap.put("DC:date.availableto", VgrModel.PROP_DATE_AVAILABLE_TO); // skip=true
+    propertyMap.put("DC.date.issued", VgrModel.PROP_DATE_ISSUED); // skip = true
+    propertyMap.put("DC.date.accepted", VgrModel.PROP_DATE_ACCEPTED); // skip=true
+    propertyMap.put("DC.date.controlled", VgrModel.PROP_DATE_CONTROLLED); // skip=true
+    propertyMap.put("DC.date.validfrom", VgrModel.PROP_DATE_VALID_FROM); // skip=true
+    propertyMap.put("DC.date.validto", VgrModel.PROP_DATE_VALID_TO); // skip=true
+    propertyMap.put("DC.date.availablefrom", VgrModel.PROP_DATE_AVAILABLE_FROM); // skip=true
+    propertyMap.put("DC.date.availableto", VgrModel.PROP_DATE_AVAILABLE_TO); // skip=true
 
     // available from special handled
     // available to special handled
-    propertyMap.put("DC:date.copyrighted", VgrModel.PROP_DATE_COPYRIGHTED); // skip=true
+    propertyMap.put("DC.date.copyrighted", VgrModel.PROP_DATE_COPYRIGHTED); // skip=true
 
-    propertyMap.put("DC:contributor.savedby", VgrModel.PROP_CONTRIBUTOR_SAVEDBY);
-    propertyMap.put("DC:contributor.savedby.id", VgrModel.PROP_CONTRIBUTOR_SAVEDBY_ID);
-    propertyMap.put("DC:contributor.acceptedby", VgrModel.PROP_CONTRIBUTOR_ACCEPTEDBY); // multiple
-    propertyMap.put("DC:contributor.acceptedby.id", VgrModel.PROP_CONTRIBUTOR_ACCEPTEDBY_ID); // multiple
-    propertyMap.put("DC:contributor.acceptedby.freetext", VgrModel.PROP_CONTRIBUTOR_ACCEPTEDBY_FREETEXT);
-    propertyMap.put("DC:contributor.acceptedby.role", VgrModel.PROP_CONTRIBUTOR_ACCEPTEDBY);
-    propertyMap.put("DC:contributor.acceptedby.unit.freetext", VgrModel.PROP_CONTRIBUTOR_ACCEPTEDBY_UNIT_FREETEXT);
-    propertyMap.put("DC:contributor.controlledby", VgrModel.PROP_CONTRIBUTOR_CONTROLLEDBY); // multiple
-    propertyMap.put("DC:contributor.controlledby.id", VgrModel.PROP_CONTRIBUTOR_CONTROLLEDBY_ID); // multiple
-    propertyMap.put("DC:contributor.controlledby.freetext", VgrModel.PROP_CONTRIBUTOR_CONTROLLEDBY_FREETEXT);
-    propertyMap.put("DC:contributor.controlledby.role", VgrModel.PROP_CONTRIBUTOR_ACCEPTEDBY);
-    propertyMap.put("DC:contributor.controlledby.unit.freetext", VgrModel.PROP_CONTRIBUTOR_ACCEPTEDBY_UNIT_FREETEXT);
-    propertyMap.put("DC:contributor.unit", VgrModel.PROP_CONTRIBUTOR_UNIT);
+    propertyMap.put("DC.contributor.savedby", VgrModel.PROP_CONTRIBUTOR_SAVEDBY);
+    propertyMap.put("DC.contributor.savedby.id", VgrModel.PROP_CONTRIBUTOR_SAVEDBY_ID);
+    propertyMap.put("DC.contributor.acceptedby", VgrModel.PROP_CONTRIBUTOR_ACCEPTEDBY); // multiple
+    propertyMap.put("DC.contributor.acceptedby.id", VgrModel.PROP_CONTRIBUTOR_ACCEPTEDBY_ID); // multiple
+    propertyMap.put("DC.contributor.acceptedby.freetext", VgrModel.PROP_CONTRIBUTOR_ACCEPTEDBY_FREETEXT);
+    propertyMap.put("DC.contributor.acceptedby.role", VgrModel.PROP_CONTRIBUTOR_ACCEPTEDBY);
+    propertyMap.put("DC.contributor.acceptedby.unit.freetext", VgrModel.PROP_CONTRIBUTOR_ACCEPTEDBY_UNIT_FREETEXT);
+    propertyMap.put("DC.contributor.controlledby", VgrModel.PROP_CONTRIBUTOR_CONTROLLEDBY); // multiple
+    propertyMap.put("DC.contributor.controlledby.id", VgrModel.PROP_CONTRIBUTOR_CONTROLLEDBY_ID); // multiple
+    propertyMap.put("DC.contributor.controlledby.freetext", VgrModel.PROP_CONTRIBUTOR_CONTROLLEDBY_FREETEXT);
+    propertyMap.put("DC.contributor.controlledby.role", VgrModel.PROP_CONTRIBUTOR_ACCEPTEDBY);
+    propertyMap.put("DC.contributor.controlledby.unit.freetext", VgrModel.PROP_CONTRIBUTOR_ACCEPTEDBY_UNIT_FREETEXT);
+    propertyMap.put("DC.contributor.unit", VgrModel.PROP_CONTRIBUTOR_UNIT);
 
-    propertyMap.put("DC:type.document", VgrModel.PROP_TYPE_DOCUMENT);
-    propertyMap.put("DC:type.document.structure", VgrModel.PROP_DOCUMENT_STRUCTURE);
-    propertyMap.put("DC:type.document.structure.id", VgrModel.PROP_DOCUMENT_STRUCTURE_ID);
-    propertyMap.put("DC:type.templatename", VgrModel.PROP_TYPE_TEMPLATENAME);
-    propertyMap.put("DC:type.record", VgrModel.PROP_TYPE_RECORD);
-    propertyMap.put("DC:type.record.id", VgrModel.PROP_TYPE_RECORD_ID);
-    propertyMap.put("DC:type.process.name", VgrModel.PROP_TYPE_PROCESS_NAME); // multiple
-    propertyMap.put("DC:type.file.process", VgrModel.PROP_TYPE_FILE_PROCESS); // multiple
-    propertyMap.put("DC:type.file", VgrModel.PROP_TYPE_FILE); // multiple
-    propertyMap.put("DC:type.document.serie", VgrModel.PROP_TYPE_DOCUMENT_SERIE);
-    propertyMap.put("DC:type.document.id", VgrModel.PROP_TYPE_DOCUMENT_ID);
+    propertyMap.put("DC.type.document", VgrModel.PROP_TYPE_DOCUMENT);
+    propertyMap.put("DC.type.document.structure", VgrModel.PROP_DOCUMENT_STRUCTURE);
+    propertyMap.put("DC.type.document.structure.id", VgrModel.PROP_DOCUMENT_STRUCTURE_ID);
+    propertyMap.put("DC.type.templatename", VgrModel.PROP_TYPE_TEMPLATENAME);
+    propertyMap.put("DC.type.record", VgrModel.PROP_TYPE_RECORD);
+    propertyMap.put("DC.type.record.id", VgrModel.PROP_TYPE_RECORD_ID);
+    propertyMap.put("DC.type.process.name", VgrModel.PROP_TYPE_PROCESS_NAME); // multiple
+    propertyMap.put("DC.type.file.process", VgrModel.PROP_TYPE_FILE_PROCESS); // multiple
+    propertyMap.put("DC.type.file", VgrModel.PROP_TYPE_FILE); // multiple
+    propertyMap.put("DC.type.document.serie", VgrModel.PROP_TYPE_DOCUMENT_SERIE);
+    propertyMap.put("DC.type.document.id", VgrModel.PROP_TYPE_DOCUMENT_ID);
 
-    propertyMap.put("DC:format.extent", VgrModel.PROP_FORMAT_EXTENT); // multiple
-    propertyMap.put("DC:format.extension", VgrModel.PROP_FORMAT_EXTENT_EXTENSION);
-    propertyMap.put("DC:format.extension.native", VgrModel.PROP_FORMAT_EXTENT_EXTENSION_NATIVE);
+    propertyMap.put("DC.format.extent", VgrModel.PROP_FORMAT_EXTENT); // multiple
+    propertyMap.put("DC.format.extension", VgrModel.PROP_FORMAT_EXTENT_EXTENSION);
+    propertyMap.put("DC.format.extension.native", VgrModel.PROP_FORMAT_EXTENT_EXTENSION_NATIVE);
 
-    propertyMap.put("DC:identifier", VgrModel.PROP_IDENTIFIER);
-    propertyMap.put("DC:identifier.native", VgrModel.PROP_IDENTIFIER_NATIVE);
-    propertyMap.put("DC:identifier.checksum", VgrModel.PROP_IDENTIFIER_CHECKSUM);
-    propertyMap.put("DC:identifier.checksum.native", VgrModel.PROP_IDENTIFIER_CHECKSUM_NATIVE);
+    propertyMap.put("DC.identifier", VgrModel.PROP_IDENTIFIER);
+    propertyMap.put("DC.identifier.native", VgrModel.PROP_IDENTIFIER_NATIVE);
+    propertyMap.put("DC.identifier.checksum", VgrModel.PROP_IDENTIFIER_CHECKSUM);
+    propertyMap.put("DC.identifier.checksum.native", VgrModel.PROP_IDENTIFIER_CHECKSUM_NATIVE);
     // document id is special handled
-    propertyMap.put("DC:identifier.version", VgrModel.PROP_IDENTIFIER_VERSION);
-    propertyMap.put("DC:identifier.diarie.id", VgrModel.PROP_IDENTIFIER_DIARIE_ID);
-    propertyMap.put("DC:identifier.location", VgrModel.PROP_IDENTIFIER_LOCATION);
+    propertyMap.put("DC.identifier.version", VgrModel.PROP_IDENTIFIER_VERSION);
+    propertyMap.put("DC.identifier.diarie.id", VgrModel.PROP_IDENTIFIER_DIARIE_ID);
+    propertyMap.put("DC.identifier.location", VgrModel.PROP_IDENTIFIER_LOCATION);
 
-    propertyMap.put("DC:source", VgrModel.PROP_SOURCE);
-    propertyMap.put("DC:source.documentid", VgrModel.PROP_SOURCE_DOCUMENTID);
-    propertyMap.put("DC:source.origin", VgrModel.PROP_SOURCE_ORIGIN);
-    propertyMap.put("DC:relation.isversionof", VgrModel.PROP_RELATION_ISVERSIONOF);
-    propertyMap.put("DC:relation.replaces", VgrModel.PROP_RELATION_REPLACES); // multiple
-    propertyMap.put("DC:coverage.hsacode", VgrModel.PROP_COVERAGE_HSACODE); // multiple
-    propertyMap.put("DC:coverage.hsacode.id", VgrModel.PROP_COVERAGE_HSACODE_ID); // multiple
-    propertyMap.put("dcterms:audience", VgrModel.PROP_AUDIENCE);
-    propertyMap.put("dcterms:audience.id", VgrModel.PROP_AUDIENCE_ID);
-    propertyMap.put("VGR:status.document", VgrModel.PROP_STATUS_DOCUMENT);
-    propertyMap.put("VGR:status.document", VgrModel.PROP_STATUS_DOCUMENT_ID);
+    propertyMap.put("DC.source", VgrModel.PROP_SOURCE);
+    propertyMap.put("DC.source.documentid", VgrModel.PROP_SOURCE_DOCUMENTID);
+    propertyMap.put("DC.source.origin", VgrModel.PROP_SOURCE_ORIGIN);
+    propertyMap.put("DC.relation.isversionof", VgrModel.PROP_RELATION_ISVERSIONOF);
+    propertyMap.put("DC.relation.replaces", VgrModel.PROP_RELATION_REPLACES); // multiple
+    propertyMap.put("DC.coverage.hsacode", VgrModel.PROP_COVERAGE_HSACODE); // multiple
+    propertyMap.put("DC.coverage.hsacode.id", VgrModel.PROP_COVERAGE_HSACODE_ID); // multiple
+    propertyMap.put("dcterms.audience", VgrModel.PROP_AUDIENCE);
+    propertyMap.put("dcterms.audience.id", VgrModel.PROP_AUDIENCE_ID);
+    propertyMap.put("VGR.status.document", VgrModel.PROP_STATUS_DOCUMENT);
+    propertyMap.put("VGR.status.document", VgrModel.PROP_STATUS_DOCUMENT_ID);
     // access rights is special handled
     // id is special handled
     // download url is special handled
@@ -155,46 +155,46 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
   private static final Set<String> skipSet = new HashSet<String>();
   static {
     skipSet.add("updated");
-    skipSet.add("dcterms:created");
+    skipSet.add("dcterms.created");
     skipSet.add("summary");
-    skipSet.add("DC:date.issued");
-    skipSet.add("DC:date.accepted");
-    skipSet.add("DC:date.controlled");
-    skipSet.add("DC:date.validfrom");
-    skipSet.add("DC:date.validto");
-    skipSet.add("DC:date.availablefrom");
-    skipSet.add("DC:date.availableto");
-    skipSet.add("DC:date.copyrighted");
+    skipSet.add("DC.date.issued");
+    skipSet.add("DC.date.accepted");
+    skipSet.add("DC.date.controlled");
+    skipSet.add("DC.date.validfrom");
+    skipSet.add("DC.date.validto");
+    skipSet.add("DC.date.availablefrom");
+    skipSet.add("DC.date.availableto");
+    skipSet.add("DC.date.copyrighted");
   }
 
   private static final Set<String> multipleSet = new HashSet<String>();
   static {
-    multipleSet.add("DC:title.alternative");
-    multipleSet.add("DC:creator");
-    multipleSet.add("DC:creator.id");
-    multipleSet.add("DC:subject.authorkeywords");
-    multipleSet.add("DC:subject.keywords");
-    multipleSet.add("DC:subject.keywords.id");
-    multipleSet.add("DC:creator.document");
-    multipleSet.add("DC:creator.document.id");
-    multipleSet.add("DC:creator.forunit");
-    multipleSet.add("DC:creator.forunit.id");
-    multipleSet.add("DC:creator.recordscreator");
-    multipleSet.add("DC:creator.recordscreator.id");
-    multipleSet.add("DC:publisher.forunit");
-    multipleSet.add("DC:publisher.forunit.id");
-    multipleSet.add("DC:publisher.project-assignment");
-    multipleSet.add("DC:contributor.acceptedby");
-    multipleSet.add("DC:contributor.acceptedby.id");
-    multipleSet.add("DC:contributor.controlledby");
-    multipleSet.add("DC:contributor.controlledby.id");
-    multipleSet.add("DC:type.process.name");
-    multipleSet.add("DC:type.file.process");
-    multipleSet.add("DC:type.file");
-    multipleSet.add("DC:format.extent");
-    multipleSet.add("DC:relation.replaces");
-    multipleSet.add("DC:coverage.hsacode");
-    multipleSet.add("DC:coverage.hsacode.id");
+    multipleSet.add("DC.title.alternative");
+    multipleSet.add("DC.creator");
+    multipleSet.add("DC.creator.id");
+    multipleSet.add("DC.subject.authorkeywords");
+    multipleSet.add("DC.subject.keywords");
+    multipleSet.add("DC.subject.keywords.id");
+    multipleSet.add("DC.creator.document");
+    multipleSet.add("DC.creator.document.id");
+    multipleSet.add("DC.creator.forunit");
+    multipleSet.add("DC.creator.forunit.id");
+    multipleSet.add("DC.creator.recordscreator");
+    multipleSet.add("DC.creator.recordscreator.id");
+    multipleSet.add("DC.publisher.forunit");
+    multipleSet.add("DC.publisher.forunit.id");
+    multipleSet.add("DC.publisher.project-assignment");
+    multipleSet.add("DC.contributor.acceptedby");
+    multipleSet.add("DC.contributor.acceptedby.id");
+    multipleSet.add("DC.contributor.controlledby");
+    multipleSet.add("DC.contributor.controlledby.id");
+    multipleSet.add("DC.type.process.name");
+    multipleSet.add("DC.type.file.process");
+    multipleSet.add("DC.type.file");
+    multipleSet.add("DC.format.extent");
+    multipleSet.add("DC.relation.replaces");
+    multipleSet.add("DC.coverage.hsacode");
+    multipleSet.add("DC.coverage.hsacode.id");
   }
 
   @Override
@@ -249,29 +249,31 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
       title = (String) properties.get(ContentModel.PROP_NAME);
     }
     sb.append(createEntryDataTag("title", title, null));
-    sb.append(createEntryDataTag("DC:title", title, null));
+    sb.append(createEntryDataTag("DC.title", title, null));
 
     // Special handling saved
     Date saved = (Date) properties.get(VgrModel.PROP_DATE_SAVED);
     if (saved == null) {
       saved = (Date) properties.get(VgrModel.PROP_DATE_CREATED);
-      sb.append(createEntryDataTag("DC:date.saved", toUTCDate(saved), null)); // skip=true
+      sb.append(createEntryDataTag("DC.date.saved", toUTCDate(saved), null)); // skip=true
     }
 
     // Special handling language
+    @SuppressWarnings("unchecked")
     ArrayList<String> languages = (ArrayList<String>) properties.get(VgrModel.PROP_LANGUAGE);
     
     if (languages != null && languages.size() > 0) {
       for (String language : languages) {
         String languageCode = serviceUtils.findLanguageCode(language);
-        sb.append(createEntryDataTag("DC:language", languageCode, null)); // skip=true
+        sb.append(createEntryDataTag("DC.language", languageCode, null)); // skip=true
       }
     }
 
     // Special handling of document id
-    sb.append(createEntryDataTag("DC:identifier.documentid", nodeRef.toString(), null));
+    sb.append(createEntryDataTag("DC.identifier.documentid", nodeRef.toString(), null));
 
     // Special handling of access rights
+    @SuppressWarnings("unchecked")
     ArrayList<String> accessRights = (ArrayList<String>) properties.get(VgrModel.PROP_ACCESS_RIGHT);
     String theAccessRight = null;
     if (accessRights == null || accessRights.size() == 0) {
@@ -291,7 +293,7 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
         }
       }
     }
-    sb.append(createEntryDataTag("DC:rights.accessrights", theAccessRight, null));
+    sb.append(createEntryDataTag("DC.rights.accessrights", theAccessRight, null));
 
     // special handling of id
     sb.append(createEntryDataTag("id", "tag:" + HOST + ",2011-06-30:" + nodeRef.getId(), null));
