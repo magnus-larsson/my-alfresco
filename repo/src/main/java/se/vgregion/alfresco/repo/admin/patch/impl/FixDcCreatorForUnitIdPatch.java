@@ -19,7 +19,7 @@ import org.springframework.extensions.surf.util.I18NUtil;
 import org.springframework.util.Assert;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class FixDcCreatorForUnitIdPatch extends AbstractPatch implements InitializingBean {
 
@@ -92,7 +92,7 @@ public class FixDcCreatorForUnitIdPatch extends AbstractPatch implements Initial
         LOG.debug("Patched vgr:dc.creator.forunit.id for " + document.getNodeRef());
       }
     } finally {
-      ServiceUtils.closeQuietly(documents);
+      ServiceUtilsImpl.closeQuietly(documents);
     }
 
     return I18NUtil.getMessage(MSG_SUCCESS);

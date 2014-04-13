@@ -14,13 +14,13 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 import se.vgregion.alfresco.repo.storage.StorageService;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class ScriptVgrDok extends BaseScopableProcessorExtension implements InitializingBean {
 
   private static final Logger LOG = Logger.getLogger(ScriptVgrDok.class);
 
-  protected ServiceUtils _serviceUtils;
+  protected ServiceUtilsImpl _serviceUtils;
 
   protected SearchService _searchService;
 
@@ -28,7 +28,7 @@ public class ScriptVgrDok extends BaseScopableProcessorExtension implements Init
 
   protected NodeService _nodeService;
 
-  public void setServiceUtils(final ServiceUtils serviceUtils) {
+  public void setServiceUtils(final ServiceUtilsImpl serviceUtils) {
     _serviceUtils = serviceUtils;
   }
 
@@ -68,7 +68,7 @@ public class ScriptVgrDok extends BaseScopableProcessorExtension implements Init
         }
       }
     } finally {
-      ServiceUtils.closeQuietly(result);
+      ServiceUtilsImpl.closeQuietly(result);
     }
 
     return published;

@@ -230,7 +230,7 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
 
       _initialized = true;
     }
-    
+
     _transactionListener = new UpdatePersonInfoTransactionListener();
   }
 
@@ -294,53 +294,40 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
         LOG.debug("Handling person info update for " + _personNodeRef);
       }
 
-      String responsibiltyCode = (String) _nodeService.getProperty(_personNodeRef, VgrModel.PROP_PERSON_RESPONSIBILITY_CODE);
+      try {
+        String username = (String) _nodeService.getProperty(_personNodeRef, ContentModel.PROP_USERNAME);
 
-      String userName = (String) _nodeService.getProperty(_personNodeRef, ContentModel.PROP_USERNAME);
+        String organizationDn = (String) _nodeService.getProperty(_personNodeRef, VgrModel.PROP_PERSON_ORGANIZATION_DN);
 
-      if (StringUtils.isNotBlank(userName)) {
-        if (responsibiltyCode != null && responsibiltyCode.length() > 0) {
-          String organizationDn;
-
+        if (organizationDn != null && organizationDn.length() > 0) {
+          _behaviourFilter.disableBehaviour(_personNodeRef);
           try {
-            organizationDn = _kivWsClient.searchPersonEmployment(userName, responsibiltyCode);
 
-            if (organizationDn != null && organizationDn.length() > 0) {
-              _behaviourFilter.disableBehaviour(_personNodeRef);
-              try {
-                _nodeService.setProperty(_personNodeRef, VgrModel.PROP_PERSON_ORGANIZATION_DN, organizationDn);
+            String[] ous = organizationDn.split(",");
 
-                String[] ous = organizationDn.split(",");
+            ArrayUtils.reverse(ous);
 
-                ArrayUtils.reverse(ous);
+            List<String> result = new ArrayList<String>();
 
-                List<String> result = new ArrayList<String>();
+            for (String ou : ous) {
+              ou = ou.split("=")[1];
 
-                for (String ou : ous) {
-                  ou = ou.split("=")[1];
-
-                  result.add(ou);
-                }
-
-                String organization = StringUtils.join(result, "/");
-
-                _nodeService.setProperty(_personNodeRef, ContentModel.PROP_ORGANIZATION, organization);
-
-                _nodeService.setProperty(_personNodeRef, ContentModel.PROP_ORGID, organization);
-              } finally {
-                _behaviourFilter.enableBehaviour(_personNodeRef);
-              }
-            } else {
-              LOG.warn("User organzationDn is empty for user: " + userName);
+              result.add(ou);
             }
-          } catch (Exception e) {
-            LOG.error("Error while searching for person employment", e);
+
+            String organization = StringUtils.join(result, "/");
+
+            _nodeService.setProperty(_personNodeRef, ContentModel.PROP_ORGANIZATION, organization);
+
+            _nodeService.setProperty(_personNodeRef, ContentModel.PROP_ORGID, organization);
+          } finally {
+            _behaviourFilter.enableBehaviour(_personNodeRef);
           }
         } else {
-          LOG.warn("User responsibility code is not available for user: " + userName);
+          LOG.warn("User organzationDn is empty for user: " + username);
         }
-      } else {
-        LOG.warn("Username could not be found for " + _personNodeRef);
+      } catch (Exception e) {
+        LOG.error("Error while searching for person employment", e);
       }
     }
   }

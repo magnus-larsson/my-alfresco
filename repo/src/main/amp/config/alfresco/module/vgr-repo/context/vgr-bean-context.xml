@@ -174,6 +174,13 @@
     <property name="behaviourFilter" ref="policyBehaviourFilter" />
   </bean>
 
+  <bean id="vgr.pushAtomFeedUtil" class="se.vgregion.alfresco.repo.push.impl.PuSHAtomFeedUtilImpl">
+    <property name="descriptorService" ref="DescriptorService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="serviceUtils" ref="vgr.serviceUtils" />
+    <property name="downloadUrl" value="${vgr.push.downloadUrl}" />
+  </bean>
+
   <bean id="vgr.pushJmsService" class="se.vgregion.alfresco.repo.push.impl.PushJmsServiceImpl">
     <property name="nodeService" ref="NodeService" />
     <property name="queueName" value="${vgr.pushJms.queueName}" />
@@ -182,13 +189,14 @@
     <property name="vgrHdrSenderId" value="${vgr.pushJms.vgrHdrSenderId}" />
     <property name="vgrHdrReceiverId" value="${vgr.pushJms.vgrHdrReceiverId}" />
     <property name="vgrHdrMessageTypeVersion" value="${vgr.pushJms.VgrHdrMessageTypeVersion}" />
+    <property name="pushAtomFeedUtil" ref="vgr.pushAtomFeedUtil" />
   </bean>
 
   <!-- *********************************** -->
   <!-- Service bean for all things related -->
   <!-- *********************************** -->
 
-  <bean id="vgr.serviceUtils" class="se.vgregion.alfresco.repo.utils.ServiceUtils">
+  <bean id="vgr.serviceUtils" class="se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl">
     <property name="transactionService" ref="TransactionService" />
     <property name="nodeService" ref="NodeService" />
     <property name="authenticationService" ref="AuthenticationService" />

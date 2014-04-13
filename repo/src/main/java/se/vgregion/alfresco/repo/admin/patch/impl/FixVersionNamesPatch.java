@@ -22,7 +22,7 @@ import org.apache.log4j.Logger;
 import org.springframework.extensions.surf.util.I18NUtil;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class FixVersionNamesPatch extends AbstractPatch {
 
@@ -92,7 +92,7 @@ public class FixVersionNamesPatch extends AbstractPatch {
         }
       }
     } finally {
-      ServiceUtils.closeQuietly(result);
+      ServiceUtilsImpl.closeQuietly(result);
     }
 
     LOG.debug("Fixed " + countFixedFilenames + " document filenames in history.");

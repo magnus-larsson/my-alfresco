@@ -21,7 +21,7 @@ import org.alfresco.util.VersionNumber;
 import org.apache.log4j.Logger;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPolicy implements BeforeCreateVersionPolicy {
 
@@ -45,7 +45,7 @@ public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPoli
 
   private NodeService _nodeService;
 
-  private ServiceUtils _serviceUtils;
+  private ServiceUtilsImpl _serviceUtils;
 
   private final ThreadLocal<NodeRef> _savedNodeRef = new ThreadLocal<NodeRef>();
 
@@ -60,7 +60,7 @@ public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPoli
   public void setLockService(final LockService lockService) {
   }
 
-  public void setServiceUtils(final ServiceUtils serviceUtils) {
+  public void setServiceUtils(final ServiceUtilsImpl serviceUtils) {
     _serviceUtils = serviceUtils;
   }
 

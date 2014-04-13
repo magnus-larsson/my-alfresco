@@ -53,7 +53,7 @@ import org.springframework.web.context.support.ServletContextResource;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.storage.StorageService;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 /**
  * Content Retrieval Service for the Storage
@@ -72,7 +72,7 @@ public class StorageContentGet extends StreamContent implements ServletContextAw
 
   private CMISRenditionService _cmisRenditionService;
 
-  private ServiceUtils _serviceUtils;
+  private ServiceUtilsImpl _serviceUtils;
 
   private ThumbnailService _thumbnailService;
 
@@ -95,7 +95,7 @@ public class StorageContentGet extends StreamContent implements ServletContextAw
     _cmisRenditionService = cmisRenditionService;
   }
 
-  public void setServiceUtils(final ServiceUtils serviceUtils) {
+  public void setServiceUtils(final ServiceUtilsImpl serviceUtils) {
     _serviceUtils = serviceUtils;
   }
 

@@ -21,7 +21,7 @@ import org.apache.log4j.Logger;
 
 import se.vgregion.alfresco.repo.jobs.ClusteredExecuter;
 import se.vgregion.alfresco.repo.model.VgrModel;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class PushToPubSubHubBubServer extends ClusteredExecuter {
 
@@ -101,39 +101,11 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
       }
     }, AuthenticationUtil.getSystemUserName());
 
-    final RetryingTransactionCallback<Void> executionUpdate = new RetryingTransactionCallback<Void>() {
-      @Override
-      public Void execute() throws Throwable {
-        executeUpdate(publishedDocuments, unpublishedDocuments);
-        return null;
-      }
-    };
-
-    // Push the nodes
-    final RetryingTransactionCallback<Boolean> executionPush = new RetryingTransactionCallback<Boolean>() {
-      @Override
-      public Boolean execute() throws Throwable {
-        if (_test || _pushService.pingPush()) {
-          // We need to commit the updates before we can push the documents so
-          // that we can guarantee that the Push server reads the correct
-          // results from the feed
-          AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>() {
-            @Override
-            public Void doWork() throws Exception {
-              return _transactionService.getRetryingTransactionHelper().doInTransaction(executionUpdate, false, true);
-            }
-          }, AuthenticationUtil.getSystemUserName());
-          return executePush(publishedDocuments, unpublishedDocuments);
-        } else {
-          return false;
-        }
-      }
-    };
-
     // Send to JMS
     final RetryingTransactionCallback<Void> executionJms = new RetryingTransactionCallback<Void>() {
       @Override
       public Void execute() throws Throwable {
+        executeUpdate(publishedDocuments, unpublishedDocuments);
         _pushJmsService.pushToJms(publishedDocuments, VgrModel.PROP_PUSHED_FOR_PUBLISH);
         _pushJmsService.pushToJms(unpublishedDocuments, VgrModel.PROP_PUSHED_FOR_UNPUBLISH);
         return null;
@@ -144,10 +116,7 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
 
       @Override
       public Void doWork() throws Exception {
-        if (_transactionService.getRetryingTransactionHelper().doInTransaction(executionPush, false, true).booleanValue()) {
-          // Only send to JMS if the push action went well
-          _transactionService.getRetryingTransactionHelper().doInTransaction(executionJms, true, true);
-        }
+        _transactionService.getRetryingTransactionHelper().doInTransaction(executionJms, false, true);
         return null;
       }
 
@@ -303,7 +272,7 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
         }
       }
     } finally {
-      ServiceUtils.closeQuietly(result);
+      ServiceUtilsImpl.closeQuietly(result);
     }
 
     return nodeRefs;
@@ -315,7 +284,7 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
     try {
       return result.getNodeRefs();
     } finally {
-      ServiceUtils.closeQuietly(result);
+      ServiceUtilsImpl.closeQuietly(result);
     }
   }
 

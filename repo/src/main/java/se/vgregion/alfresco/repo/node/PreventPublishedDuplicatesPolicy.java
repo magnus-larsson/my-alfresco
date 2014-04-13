@@ -16,7 +16,7 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.QName;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class PreventPublishedDuplicatesPolicy extends AbstractPolicy implements OnUpdatePropertiesPolicy {
 
@@ -102,7 +102,7 @@ public class PreventPublishedDuplicatesPolicy extends AbstractPolicy implements 
     try {
       return result.getNodeRefs().size() > 1;
     } finally {
-      ServiceUtils.closeQuietly(result);
+      ServiceUtilsImpl.closeQuietly(result);
     }
   }
 

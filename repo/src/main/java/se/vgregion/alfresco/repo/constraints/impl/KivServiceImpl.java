@@ -18,15 +18,15 @@ import org.springframework.util.Assert;
 
 import se.vgregion.alfresco.repo.constraints.KivService;
 import se.vgregion.alfresco.repo.model.KivUnit;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class KivServiceImpl implements KivService, InitializingBean {
 
-  private ServiceUtils _serviceUtils;
+  private ServiceUtilsImpl _serviceUtils;
 
   private LdapTemplate _ldapTemplate;
 
-  public void setServiceUtils(final ServiceUtils serviceUtils) {
+  public void setServiceUtils(final ServiceUtilsImpl serviceUtils) {
     _serviceUtils = serviceUtils;
   }
 
