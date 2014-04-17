@@ -57,6 +57,7 @@ import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.net.telnet.TelnetClient;
+import org.apache.log4j.Logger;
 import org.apache.tika.io.IOUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -66,6 +67,8 @@ import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.utils.ServiceUtils;
 
 public class ServiceUtilsImpl implements InitializingBean, ServiceUtils {
+  
+  private static final Logger LOG = Logger.getLogger(ServiceUtilsImpl.class);
 
   private static final int STREAM_BUFFER_LENGTH = 32 * 1024;
 
@@ -995,6 +998,25 @@ public class ServiceUtilsImpl implements InitializingBean, ServiceUtils {
     } catch (Exception ex) {
       // just swallow...
     }
+  }
+
+  @Override
+  public ResultSet query(String query) {
+    SearchParameters searchParameters = new SearchParameters();
+
+    searchParameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
+    searchParameters.setLanguage(SearchService.LANGUAGE_FTS_ALFRESCO);
+    searchParameters.setQuery(query.toString());
+
+    ResultSet result = _searchService.query(searchParameters);
+
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Documents found for query: " + query.toString());
+      LOG.debug("Count: " + result.length());
+      LOG.debug("");
+    }
+
+    return result;
   }
 
 }

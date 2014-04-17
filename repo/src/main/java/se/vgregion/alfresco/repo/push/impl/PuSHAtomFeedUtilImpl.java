@@ -1,5 +1,6 @@
 package se.vgregion.alfresco.repo.push.impl;
 
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,14 +18,18 @@ import org.alfresco.service.descriptor.Descriptor;
 import org.alfresco.service.descriptor.DescriptorService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
+import se.vgregion.alfresco.repo.publish.NodeRefCallbackHandler;
+import se.vgregion.alfresco.repo.publish.PublishingService;
 import se.vgregion.alfresco.repo.push.PuSHAtomFeedUtil;
 import se.vgregion.alfresco.repo.utils.ServiceUtils;
 
 public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil {
+
   public static final String NEWLINE = "\n";
   public static final String TAB = "  ";
   public static final String XML_START = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
@@ -36,14 +41,16 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
   public static final String TAG_NOVALUE_TEMPLATE = "<#name##attributes# />";
 
   private static final String LINK = "https://alfresco.vgregion.se/alfresco/service/vgr/feed/document/published";
-  private static final String TITLE = "VGR Publish/Unpublish document feed for content: ";
+  private static final String TITLE_NODEREF = "VGR Publish/Unpublish document feed for content: ";
+  private static final String TITLE_FROMTO = "VGR published/unpublished documents feed for content modified between ${from} and ${to}";
   private static final String ICON = "https://alfresco.vgregion.se/alfresco/images/logo/AlfrescoLogo16.ico";
   private static final String HOST = "alfresco.vgregion.se";
 
-  private DescriptorService descriptorService;
-  private NodeService nodeService;
-  private ServiceUtils serviceUtils;
-  private String downloadUrl;
+  private DescriptorService _descriptorService;
+  private NodeService _nodeService;
+  private ServiceUtils _serviceUtils;
+  private PublishingService _publishingService;
+  private String _downloadUrl;
 
   private static final Map<String, QName> propertyMap = new HashMap<String, QName>();
   static {
@@ -200,10 +207,11 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
   @Override
   public String createPublishDocumentFeed(NodeRef nodeRef) {
     StringBuffer result = new StringBuffer();
-    if (nodeService.exists(nodeRef)) {
-      Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
 
-      result.append(createHeader(nodeRef, properties));
+    if (_nodeService.exists(nodeRef)) {
+      Map<QName, Serializable> properties = _nodeService.getProperties(nodeRef);
+
+      result.append(createHeader(nodeRef));
 
       result.append(createPublishSpecificData(nodeRef, properties));
 
@@ -211,16 +219,18 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
 
       result.append(createFooter());
     }
+
     return result.toString();
   }
 
   @Override
   public String createUnPublishDocumentFeed(NodeRef nodeRef) {
     StringBuffer result = new StringBuffer();
-    if (nodeService.exists(nodeRef)) {
-      Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
 
-      result.append(createHeader(nodeRef, properties));
+    if (_nodeService.exists(nodeRef)) {
+      Map<QName, Serializable> properties = _nodeService.getProperties(nodeRef);
+
+      result.append(createHeader(nodeRef));
 
       result.append(createUnpublishSpecificData(nodeRef, properties));
 
@@ -228,7 +238,67 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
 
       result.append(createFooter());
     }
+
     return result.toString();
+  }
+
+  @Override
+  public void createDocumentFeed(Date from, Date to, final OutputStream outputStream, boolean excludeAlreadyPushed) {
+    try {
+      Date now = new Date();
+
+      String header = createHeader(from, to);
+
+      outputStream.write(header.getBytes("UTF-8"));
+
+      _publishingService.findPublishedDocuments(now, from, to, new NodeRefCallbackHandler() {
+
+        @Override
+        public void processNodeRef(NodeRef nodeRef) {
+          try {
+            Map<QName, Serializable> properties = _nodeService.getProperties(nodeRef);
+
+            String publishSpecificData = createPublishSpecificData(nodeRef, properties);
+
+            outputStream.write(publishSpecificData.getBytes("UTF-8"));
+
+            String commonData = createCommonData(nodeRef, properties);
+
+            outputStream.write(commonData.getBytes("UTF-8"));
+          } catch (Exception ex) {
+            throw new AlfrescoRuntimeException(ex.getMessage(), ex);
+          }
+        }
+
+      }, excludeAlreadyPushed);
+
+      _publishingService.findUnpublishedDocuments(now, from, to, new NodeRefCallbackHandler() {
+
+        @Override
+        public void processNodeRef(NodeRef nodeRef) {
+          try {
+            Map<QName, Serializable> properties = _nodeService.getProperties(nodeRef);
+
+            String unpublishSpecificData = createUnpublishSpecificData(nodeRef, properties);
+
+            outputStream.write(unpublishSpecificData.getBytes("UTF-8"));
+
+            String commonData = createCommonData(nodeRef, properties);
+
+            outputStream.write(commonData.getBytes("UTF-8"));
+          } catch (Exception ex) {
+            throw new AlfrescoRuntimeException(ex.getMessage(), ex);
+          }
+        }
+
+      }, excludeAlreadyPushed);
+
+      String footer = createFooter();
+
+      outputStream.write(footer.getBytes("UTF-8"));
+    } catch (Exception ex) {
+      throw new AlfrescoRuntimeException(ex.getMessage(), ex);
+    }
   }
 
   /**
@@ -238,7 +308,7 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
    * @param properties
    * @return
    */
-  public String createCommonData(final NodeRef nodeRef, final Map<QName, Serializable> properties) {
+  protected String createCommonData(final NodeRef nodeRef, final Map<QName, Serializable> properties) {
     if (properties == null) {
       throw new AlfrescoRuntimeException("Properties map is null");
     }
@@ -261,10 +331,10 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
     // Special handling language
     @SuppressWarnings("unchecked")
     ArrayList<String> languages = (ArrayList<String>) properties.get(VgrModel.PROP_LANGUAGE);
-    
+
     if (languages != null && languages.size() > 0) {
       for (String language : languages) {
-        String languageCode = serviceUtils.findLanguageCode(language);
+        String languageCode = _serviceUtils.findLanguageCode(language);
         sb.append(createEntryDataTag("DC.language", languageCode, null)); // skip=true
       }
     }
@@ -302,13 +372,15 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
     Serializable documentId = properties.get(VgrModel.PROP_SOURCE_DOCUMENTID);
     Map<String, Serializable> linkMap = new HashMap<String, Serializable>();
     if (documentId != null) {
-      String theDownloadUrl = downloadUrl.replaceAll("#documentId#", documentId.toString().replace("://", "/"));
+      String theDownloadUrl = _downloadUrl.replaceAll("#documentId#", documentId.toString().replace("://", "/"));
       linkMap.put("href", theDownloadUrl);
     }
-    
+
     sb.append(createEntryDataTag("link", null, linkMap));
 
     sb.append(mapProperties(nodeRef, properties));
+
+    sb.append(TAB + ENTRY_END + NEWLINE);
 
     // skip -> tom = skriv inte ut
     // multiple -> flera taggar
@@ -363,14 +435,21 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
    * @param properties
    * @return
    */
-  public String createPublishSpecificData(NodeRef nodeRef, Map<QName, Serializable> properties) {
+  protected String createPublishSpecificData(NodeRef nodeRef, Map<QName, Serializable> properties) {
     if (properties == null) {
       throw new AlfrescoRuntimeException("Properties map is null");
     }
+
     StringBuffer sb = new StringBuffer();
+
+    sb.append(TAB + ENTRY_START + NEWLINE);
+
     sb.append(createEntryDataTag("published", "true", null));
+
     Date publishDate = (Date) properties.get(VgrModel.PROP_PUSHED_FOR_PUBLISH);
+
     sb.append(createEntryDataTag("requestId", "publish_" + nodeRef.toString() + "_" + publishDate.getTime(), null));
+
     return sb.toString();
   }
 
@@ -386,10 +465,28 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
       throw new AlfrescoRuntimeException("Properties map is null");
     }
     StringBuffer sb = new StringBuffer();
+
+    sb.append(TAB + ENTRY_START + NEWLINE);
+
     sb.append(createEntryDataTag("published", "false", null));
+    
     Date unpublishDate = (Date) properties.get(VgrModel.PROP_PUSHED_FOR_UNPUBLISH);
+    
     sb.append(createEntryDataTag("requestId", "unpublish_" + nodeRef.toString() + "_" + unpublishDate.getTime(), null));
+    
     return sb.toString();
+  }
+
+  private String createHeader(Date from, Date to) {
+    String title = StringUtils.replace(TITLE_FROMTO, "${from}", toUTCDate(from));
+
+    title = StringUtils.replace(title, "${to}", toUTCDate(to));
+
+    return createHeader(title);
+  }
+
+  protected String createHeader(NodeRef nodeRef) {
+    return createHeader(TITLE_NODEREF + nodeRef);
   }
 
   /**
@@ -397,11 +494,9 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
    * 
    * @return
    */
-  public String createHeader(NodeRef nodeRef, Map<QName, Serializable> properties) {
-    if (properties == null) {
-      throw new AlfrescoRuntimeException("Properties map is null");
-    }
+  private String createHeader(String title) {
     StringBuffer sb = new StringBuffer();
+
     sb.append(XML_START + NEWLINE);
     sb.append(FEED_START + NEWLINE);
     sb.append(createDataTag("id", LINK, null));
@@ -411,19 +506,19 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
     linkMap.put("rel", "self");
     sb.append(createDataTag("link", null, linkMap));
 
-    Descriptor serverDescriptor = descriptorService.getServerDescriptor();
+    Descriptor serverDescriptor = _descriptorService.getServerDescriptor();
     Map<String, Serializable> generatorMap = new HashMap<String, Serializable>();
     generatorMap.put("version", serverDescriptor.getVersion());
     sb.append(createDataTag("generator", serverDescriptor.getName() + " (" + serverDescriptor.getEdition() + ")", generatorMap));
 
-    sb.append(createDataTag("title", TITLE + nodeRef, null));
+    sb.append(createDataTag("title", title, null));
 
     Date updated = new Date();
 
     sb.append(createDataTag("updated", toUTCDate(updated), null));
     sb.append(createDataTag("icon", ICON, null));
     sb.append(createDataTag("author", NEWLINE + TAB + createDataTag("name", "system", null) + TAB, null));
-    sb.append(TAB + ENTRY_START + NEWLINE);
+
     return sb.toString();
   }
 
@@ -432,10 +527,11 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
    * 
    * @return
    */
-  public String createFooter() {
+  protected String createFooter() {
     StringBuffer sb = new StringBuffer();
-    sb.append(TAB + ENTRY_END + NEWLINE);
+
     sb.append(FEED_END + NEWLINE);
+
     return sb.toString();
   }
 
@@ -452,19 +548,23 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
    */
   public String createDataTag(final String name, final Serializable value, final Map<String, Serializable> attributes) {
     String concatenatedAttributes = "";
+
     if (attributes != null && attributes.size() > 0) {
       Set<String> keySet = attributes.keySet();
+
       for (String key : keySet) {
         concatenatedAttributes = concatenatedAttributes + " " + key + "=\"" + attributes.get(key) + "\"";
       }
     }
 
     StringBuffer sb = new StringBuffer();
+
     if (value == null || value.toString().length() == 0) {
       sb.append(TAB + TAG_NOVALUE_TEMPLATE.replaceAll("#name#", name).replaceAll("#attributes#", concatenatedAttributes) + NEWLINE);
     } else {
       sb.append(TAB + TAG_TEMPLATE.replaceAll("#name#", name).replaceAll("#value#", value.toString()).replaceAll("#attributes#", concatenatedAttributes) + NEWLINE);
     }
+
     return sb.toString();
 
   }
@@ -482,41 +582,49 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
    */
   public String createEntryDataTag(final String name, final Serializable value, final Map<String, Serializable> attributes) {
     StringBuffer sb = new StringBuffer();
+
     sb.append(TAB + createDataTag(name, value, attributes));
+
     return sb.toString();
   }
 
   public void setDescriptorService(DescriptorService descriptorService) {
-    this.descriptorService = descriptorService;
+    _descriptorService = descriptorService;
   }
 
   public void setNodeService(NodeService nodeService) {
-    this.nodeService = nodeService;
+    _nodeService = nodeService;
   }
 
   public void setServiceUtils(ServiceUtils serviceUtils) {
-    this.serviceUtils = serviceUtils;
+    _serviceUtils = serviceUtils;
   }
 
   public void setDownloadUrl(String downloadUrl) {
-    this.downloadUrl = downloadUrl;
+    _downloadUrl = downloadUrl;
+  }
+
+  public void setPublishingService(PublishingService publishingService) {
+    _publishingService = publishingService;
   }
 
   private String toUTCDate(Date date) {
-    if (date != null) {
-      SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz");
-      return sdf.format(date);
-    } else {
+    if (date == null) {
       return null;
     }
+
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz");
+
+    return sdf.format(date);
   }
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    Assert.notNull(descriptorService);
-    Assert.notNull(nodeService);
-    Assert.notNull(serviceUtils);
-    Assert.notNull(downloadUrl);
+    Assert.notNull(_descriptorService);
+    Assert.notNull(_nodeService);
+    Assert.notNull(_serviceUtils);
+    Assert.hasText(_downloadUrl);
+    Assert.notNull(_publishingService);
   }
 
 }

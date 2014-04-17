@@ -2,6 +2,7 @@ package se.vgregion.alfresco.repo.push.impl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -49,6 +50,7 @@ public class PushJmsServiceImpl implements PushJmsService, InitializingBean {
   private String _vgrHdrMessageTypeVersion;
   private NodeService _nodeService;
   private PuSHAtomFeedUtil _pushAtomFeedUtil;
+  private boolean _testMode;
 
   // Public for testing
   public static final String VGR_HDR_SENDER_ID = "vgrHdr_senderId";
@@ -80,30 +82,55 @@ public class PushJmsServiceImpl implements PushJmsService, InitializingBean {
   }
 
   @Override
+  public boolean pushToJms(NodeRef nodeRef, QName property) {
+    List<NodeRef> nodeRefs = new ArrayList<NodeRef>();
+
+    nodeRefs.add(nodeRef);
+
+    return pushToJms(nodeRefs, property);
+  }
+
+  @Override
   public boolean pushToJms(List<NodeRef> nodeRefs, QName property) {
+    if (_testMode) {
+      LOG.debug("Push JMS is set to test mode, exiting...");
+      
+      return true;
+    }
+    
     if (nodeRefs == null || nodeRefs.size() == 0) {
       LOG.debug("No nodes available for sending");
+      
       return false;
     } else if (property == null || !(VgrModel.PROP_PUSHED_FOR_PUBLISH.equals(property) || VgrModel.PROP_PUSHED_FOR_UNPUBLISH.equals(property))) {
       LOG.error("Type of JMS event missing or of unexpected type: " + property);
+      
       return false;
     }
 
     try {
-
-      if (LOG.isDebugEnabled())
+      if (LOG.isDebugEnabled()) {
         LOG.debug("Creating connection to " + _consumerRemoteUrl);
+      }
+
       ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(_consumerRemoteUrl);
+
       Connection connection = connectionFactory.createConnection();
 
-      if (LOG.isDebugEnabled())
+      if (LOG.isDebugEnabled()) {
         LOG.debug("Creating session on queue " + _queueName);
+      }
+
       Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+
       Destination destination = session.createQueue(_queueName);
 
-      if (LOG.isDebugEnabled())
+      if (LOG.isDebugEnabled()) {
         LOG.debug("Starting producer");
+      }
+
       MessageProducer producer = session.createProducer(destination);
+
       producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
 
       for (NodeRef nodeRef : nodeRefs) {
@@ -120,18 +147,22 @@ public class PushJmsServiceImpl implements PushJmsService, InitializingBean {
             createPublishDocument.setSourceDocumentId((String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_DOCUMENTID));
             createPublishDocument.setRequestId(requestId);
             String feedXml = _pushAtomFeedUtil.createPublishDocumentFeed(nodeRef);
-            //feedXml = "<![CDATA[" + feedXml + "]]>";
+            // feedXml = "<![CDATA[" + feedXml + "]]>";
             createPublishDocument.setFeed(feedXml);
+
             if (LOG.isDebugEnabled()) {
               LOG.debug("PublishDocument contents: " + ObjectToXml(createPublishDocument));
             }
+
             message = session.createTextMessage(ObjectToXml(createPublishDocument));
             message.setJMSCorrelationID(requestId);
             message.setStringProperty(VGR_HDR_SENDER_ID, _vgrHdrSenderId);
             message.setStringProperty(VGR_HDR_RECEIVER_ID, _vgrHdrReceiverId);
             message.setStringProperty(VGR_HDR_MESSAGE_TYPE, PUBLISH_DOCUMENT_EVENT);
-            if (LOG.isDebugEnabled())
+
+            if (LOG.isDebugEnabled()) {
               LOG.debug("Sending publishEvent: " + message.toString());
+            }
           } else if (VgrModel.PROP_PUSHED_FOR_UNPUBLISH.equals(property)) {
             // Unpublish event
             Date unpublishDate = (Date) _nodeService.getProperty(nodeRef, VgrModel.PROP_PUSHED_FOR_UNPUBLISH);
@@ -142,24 +173,30 @@ public class PushJmsServiceImpl implements PushJmsService, InitializingBean {
             createUnpublishDocument.setSourceDocumentId((String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_DOCUMENTID));
             createUnpublishDocument.setRequestId(requestId);
             String feedXml = _pushAtomFeedUtil.createUnPublishDocumentFeed(nodeRef);
-            //feedXml = "<![CDATA[" + feedXml + "]]>";
+            // feedXml = "<![CDATA[" + feedXml + "]]>";
             createUnpublishDocument.setFeed(feedXml);
+
             if (LOG.isDebugEnabled()) {
               LOG.debug("UnpublishDocument contents: " + ObjectToXml(createUnpublishDocument));
             }
+
             message = session.createTextMessage(ObjectToXml(createUnpublishDocument));
             message.setJMSCorrelationID(requestId);
             message.setStringProperty(VGR_HDR_SENDER_ID, _vgrHdrSenderId);
             message.setStringProperty(VGR_HDR_RECEIVER_ID, _vgrHdrReceiverId);
             message.setStringProperty(VGR_HDR_MESSAGE_TYPE, UNPUBLISH_DOCUMENT_EVENT);
-            if (LOG.isDebugEnabled())
-              LOG.debug("Sending unPublishEvent: " + message.toString());
-          }
-          if (message != null) {
 
+            if (LOG.isDebugEnabled()) {
+              LOG.debug("Sending unPublishEvent: " + message.toString());
+            }
+          }
+
+          if (message != null) {
             producer.send(message);
-            if (LOG.isDebugEnabled())
+
+            if (LOG.isDebugEnabled()) {
               LOG.debug("Sent message");
+            }
           } else {
             LOG.error("No message to send");
           }
@@ -167,15 +204,24 @@ public class PushJmsServiceImpl implements PushJmsService, InitializingBean {
           LOG.error("Could not publish " + nodeRef.toString(), e);
         }
       }
+
       producer.close();
-      if (LOG.isDebugEnabled())
+
+      if (LOG.isDebugEnabled()) {
         LOG.debug("Closed producer");
+      }
+
       session.close();
-      if (LOG.isDebugEnabled())
+
+      if (LOG.isDebugEnabled()) {
         LOG.debug("Closed session");
+      }
+
       connection.close();
-      if (LOG.isDebugEnabled())
+
+      if (LOG.isDebugEnabled()) {
         LOG.debug("Closed connection");
+      }
 
       return true;
     } catch (JMSException e) {
@@ -183,36 +229,40 @@ public class PushJmsServiceImpl implements PushJmsService, InitializingBean {
     }
   }
 
-  public void setQueueName(String _queueName) {
-    this._queueName = _queueName;
+  public void setQueueName(String queueName) {
+    _queueName = queueName;
   }
 
-  public void setProducerLocalUrl(String _producerLocalUrl) {
-    this._producerLocalUrl = _producerLocalUrl;
+  public void setProducerLocalUrl(String producerLocalUrl) {
+    _producerLocalUrl = producerLocalUrl;
   }
 
-  public void setVgrHdrSenderId(String _vgrHdrSenderId) {
-    this._vgrHdrSenderId = _vgrHdrSenderId;
+  public void setVgrHdrSenderId(String vgrHdrSenderId) {
+    _vgrHdrSenderId = vgrHdrSenderId;
   }
 
-  public void setVgrHdrReceiverId(String _vgrHdrReceiverId) {
-    this._vgrHdrReceiverId = _vgrHdrReceiverId;
+  public void setVgrHdrReceiverId(String vgrHdrReceiverId) {
+    _vgrHdrReceiverId = vgrHdrReceiverId;
   }
 
-  public void setVgrHdrMessageTypeVersion(String _vgrHdrMessageTypeVersion) {
-    this._vgrHdrMessageTypeVersion = _vgrHdrMessageTypeVersion;
+  public void setVgrHdrMessageTypeVersion(String vgrHdrMessageTypeVersion) {
+    _vgrHdrMessageTypeVersion = vgrHdrMessageTypeVersion;
   }
 
   public void setPushAtomFeedUtil(PuSHAtomFeedUtil pushAtomFeedUtil) {
-    this._pushAtomFeedUtil = pushAtomFeedUtil;
+    _pushAtomFeedUtil = pushAtomFeedUtil;
   }
 
-  public void setConsumerRemoteUrl(String _consumerRemoteUrl) {
-    this._consumerRemoteUrl = _consumerRemoteUrl;
+  public void setConsumerRemoteUrl(String consumerRemoteUrl) {
+    _consumerRemoteUrl = consumerRemoteUrl;
   }
 
-  public void setNodeService(NodeService _nodeService) {
-    this._nodeService = _nodeService;
+  public void setNodeService(NodeService nodeService) {
+    _nodeService = nodeService;
+  }
+
+  public void setTestMode(boolean testMode) {
+    _testMode = testMode;
   }
 
   @Override

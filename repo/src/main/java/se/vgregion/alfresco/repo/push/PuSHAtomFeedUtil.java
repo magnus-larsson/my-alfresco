@@ -1,5 +1,8 @@
 package se.vgregion.alfresco.repo.push;
 
+import java.io.OutputStream;
+import java.util.Date;
+
 import org.alfresco.service.cmr.repository.NodeRef;
 
 public interface PuSHAtomFeedUtil {
@@ -11,8 +14,8 @@ public interface PuSHAtomFeedUtil {
    *          nodeRef of the publish document
    * @return
    */
-  public String createPublishDocumentFeed(NodeRef nodeRef);
-  
+  String createPublishDocumentFeed(NodeRef nodeRef);
+
   /**
    * Create an unpublish document atom feed
    * 
@@ -20,5 +23,8 @@ public interface PuSHAtomFeedUtil {
    *          nodeRef of the unpublish document
    * @return
    */
-  public String createUnPublishDocumentFeed(NodeRef nodeRef);
+  String createUnPublishDocumentFeed(NodeRef nodeRef);
+
+  void createDocumentFeed(Date from, Date to, OutputStream outputStream, boolean excludeAlreadyPushed);
+
 }

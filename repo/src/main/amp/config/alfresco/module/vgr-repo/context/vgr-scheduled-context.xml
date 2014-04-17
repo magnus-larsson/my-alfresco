@@ -108,12 +108,10 @@
   <!-- ****************************************************************** -->
 
   <bean id="vgr.pushToPubSubHubBubServer" class="se.vgregion.alfresco.repo.push.PushToPubSubHubBubServer" parent="vgr.clusteredExecuter">
-    <property name="searchService" ref="SearchService" />
     <property name="nodeService" ref="NodeService" />
     <property name="behaviourFilter" ref="policyBehaviourFilter" />
-    <property name="pushService" ref="vgr.pushService" />
-    <property name="test" value="${vgr.pushserver.test}" />
     <property name="pushJmsService" ref="vgr.pushJmsService" />
+    <property name="publishingService" ref="vgr.publishingService" />
   </bean>
 
   <bean id="vgr.pushServerJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">

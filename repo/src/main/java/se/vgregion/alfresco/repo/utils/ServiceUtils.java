@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.site.SiteInfo;
 import org.alfresco.service.namespace.QName;
 
@@ -112,4 +113,7 @@ public interface ServiceUtils {
   public void disableAllBehaviours();
 
   public void disableBehaviour();
+
+  ResultSet query(String query);
+  
 }
