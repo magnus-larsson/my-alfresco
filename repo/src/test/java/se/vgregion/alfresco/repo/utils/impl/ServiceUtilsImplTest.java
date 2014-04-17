@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Properties;
 
-import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.jmock.Expectations;
@@ -15,7 +14,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
-import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class ServiceUtilsImplTest {
 

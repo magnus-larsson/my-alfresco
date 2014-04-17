@@ -203,8 +203,6 @@ public class PushJmsServiceTest {
 
     class ProducerThread extends Thread {
 
-      final Logger LOG = Logger.getLogger(ProducerThread.class);
-
       @Override
       public void run() {
         PushJmsServiceImpl pushJmsService = new PushJmsServiceImpl();

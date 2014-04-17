@@ -3,9 +3,8 @@ package se.vgregion.alfresco.repo.constraints.impl;
 import java.io.IOException;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import keywordservices.wsdl.metaservice_vgr_se.v2.KeywordService;
+
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -13,6 +12,7 @@ import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
+import org.junit.Assert;
 import org.junit.Test;
 
 import se.vgregion.alfresco.repo.model.ApelonNode;

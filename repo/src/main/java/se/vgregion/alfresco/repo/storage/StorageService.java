@@ -3,7 +3,6 @@ package se.vgregion.alfresco.repo.storage;
 import java.util.List;
 
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.search.ResultSetRow;
 
 public interface StorageService {
 

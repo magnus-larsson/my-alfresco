@@ -880,6 +880,8 @@ public class ServiceUtilsImpl implements InitializingBean, ServiceUtils {
               }
             }
             break;
+          default:
+            break;
           }
         }
       }

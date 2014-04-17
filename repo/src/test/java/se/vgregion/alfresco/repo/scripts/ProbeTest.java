@@ -3,11 +3,10 @@ package se.vgregion.alfresco.repo.scripts;
 import java.util.Map;
 import java.util.Properties;
 
-import junit.framework.Assert;
-
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.jmock.lib.legacy.ClassImposteriser;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.extensions.webscripts.Cache;

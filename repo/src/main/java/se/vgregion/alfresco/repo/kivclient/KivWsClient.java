@@ -42,7 +42,6 @@ public class KivWsClient {
   private static final String OU = "ou";
   private static final String RESPONSIBILITY_CODE = "vgransvarsnummer";
   private static final String HSA_IDENTITY = "hsaIdentity";
-  private static final String VGR_MODIFY_TIMESTAMP = "vgrModifyTimestamp";
   private static final int DEFAULT_RETRY_COUNT = 5;
   private static final int DEFAULT_RETRY_WAIT = 5;
 
@@ -73,6 +72,7 @@ public class KivWsClient {
     Unmarshaller m = context.createUnmarshaller();
 
     StringReader is = new StringReader(xml);
+    @SuppressWarnings("rawtypes")
     JAXBElement object = (JAXBElement) m.unmarshal(is);
 
     return type.cast(object.getValue());

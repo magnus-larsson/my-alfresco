@@ -1,13 +1,17 @@
 package se.vgregion.alfresco.repo.admin.patch.impl;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.query.PagingRequest;
 import org.alfresco.repo.admin.patch.AbstractPatch;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.PersonService;
+import org.alfresco.service.cmr.security.PersonService.PersonInfo;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.extensions.surf.util.I18NUtil;
@@ -34,7 +38,14 @@ public class ExtendPersonPatch extends AbstractPatch implements InitializingBean
   @Override
   protected String applyInternal() throws Exception {
     // get all users in the system
-    final Set<NodeRef> people = _personService.getAllPeople();
+
+    List<PersonInfo> personInfos = _personService.getPeople(null, null, null, new PagingRequest(Integer.MAX_VALUE, null)).getPage();
+
+    Set<NodeRef> people = new HashSet<NodeRef>(personInfos.size());
+
+    for (PersonInfo personInfo : personInfos) {
+      people.add(personInfo.getNodeRef());
+    }
 
     // iterate through all the users
     for (final NodeRef person : people) {
