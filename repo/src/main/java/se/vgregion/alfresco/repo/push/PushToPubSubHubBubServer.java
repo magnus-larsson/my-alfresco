@@ -61,7 +61,7 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
   }
 
   private void handleUnpublishedDocuments(final Date now) {
-    _publishingService.findUnpublishedDocuments(now, new NodeRefCallbackHandler() {
+    _publishingService.findUnpublishedDocuments(now, null, null, new NodeRefCallbackHandler() {
 
       @Override
       public void processNodeRef(NodeRef nodeRef) {
@@ -72,11 +72,11 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
         _pushJmsService.pushToJms(nodeRef, VgrModel.PROP_PUSHED_FOR_UNPUBLISH);
       }
 
-    });
+    }, true, null, null);
   }
 
   private void handlePublishedDocuments(final Date now) {
-    _publishingService.findPublishedDocuments(now, new NodeRefCallbackHandler() {
+    _publishingService.findPublishedDocuments(now, null, null, new NodeRefCallbackHandler() {
 
       @Override
       public void processNodeRef(NodeRef nodeRef) {
@@ -87,7 +87,7 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
         _pushJmsService.pushToJms(nodeRef, VgrModel.PROP_PUSHED_FOR_PUBLISH);
       }
 
-    });
+    }, true, null, null);
   }
 
   private void executeUpdate(NodeRef nodeRef, QName property) {

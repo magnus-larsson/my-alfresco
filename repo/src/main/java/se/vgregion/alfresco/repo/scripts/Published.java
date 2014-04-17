@@ -39,15 +39,18 @@ public class Published extends AbstractWebScript implements InitializingBean {
       if (StringUtils.isNotBlank(nodeRef)) {
         streamAtomFeed(outputStream, new NodeRef(nodeRef));
       } else {
-        streamAtomFeed(outputStream, from, to);
+        Integer maxItems = request.getParameter("maxItems") != null ? Integer.parseInt(request.getParameter("maxItems")) : null;
+        Integer skipCount = request.getParameter("skipCount") != null ? Integer.parseInt(request.getParameter("skipCount")) : null;
+        
+        streamAtomFeed(outputStream, from, to, maxItems, skipCount);
       }
     } finally {
       IOUtils.closeQuietly(outputStream);
     }
   }
 
-  private void streamAtomFeed(OutputStream outputStream, Date from, Date to) {
-    _puSHAtomFeedUtil.createDocumentFeed(from, to, outputStream, false);
+  private void streamAtomFeed(OutputStream outputStream, Date from, Date to, Integer maxItems, Integer skipCount) {
+    _puSHAtomFeedUtil.createDocumentFeed(from, to, outputStream, false, maxItems, skipCount);
   }
 
   private void streamAtomFeed(OutputStream outputStream, NodeRef nodeRef) {

@@ -25,6 +25,6 @@ public interface PuSHAtomFeedUtil {
    */
   String createUnPublishDocumentFeed(NodeRef nodeRef);
 
-  void createDocumentFeed(Date from, Date to, OutputStream outputStream, boolean excludeAlreadyPushed);
+  void createDocumentFeed(Date from, Date to, OutputStream outputStream, boolean excludeAlreadyPushed, Integer maxItems, Integer skipCount);
 
 }

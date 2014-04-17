@@ -28,7 +28,7 @@ public class PublishingServiceImpl implements PublishingService, InitializingBea
 
   @Override
   public List<NodeRef> findUnpublishedDocuments(Date availableDate) {
-    ResultSet result = _serviceUtils.query(findUnpublishedDocumentsQuery(availableDate));
+    ResultSet result = _serviceUtils.query(findUnpublishedDocumentsQuery(availableDate), null, null);
 
     List<NodeRef> nodeRefs = new ArrayList<NodeRef>();
 
@@ -52,8 +52,8 @@ public class PublishingServiceImpl implements PublishingService, InitializingBea
   }
 
   @Override
-  public void findUnpublishedDocuments(Date availableDate, Date modifiedFrom, Date modifiedTo, NodeRefCallbackHandler callback, boolean excludeAlreadyPushed) {
-    ResultSet result = _serviceUtils.query(findUnpublishedDocumentsQuery(availableDate, modifiedFrom, modifiedTo, excludeAlreadyPushed));
+  public void findUnpublishedDocuments(Date availableDate, Date modifiedFrom, Date modifiedTo, NodeRefCallbackHandler callback, boolean excludeAlreadyPushed, Integer maxItems, Integer skipCount) {
+    ResultSet result = _serviceUtils.query(findUnpublishedDocumentsQuery(availableDate, modifiedFrom, modifiedTo, excludeAlreadyPushed), maxItems, skipCount);
 
     try {
       for (NodeRef nodeRef : result.getNodeRefs()) {
@@ -70,11 +70,6 @@ public class PublishingServiceImpl implements PublishingService, InitializingBea
     } finally {
       ServiceUtilsImpl.closeQuietly(result);
     }
-  }
-
-  @Override
-  public void findUnpublishedDocuments(Date availableDate, NodeRefCallbackHandler callback) {
-    findUnpublishedDocuments(availableDate, null, null, callback, true);
   }
 
   @Override
@@ -121,7 +116,7 @@ public class PublishingServiceImpl implements PublishingService, InitializingBea
 
   @Override
   public List<NodeRef> findPublishedDocuments(Date availableDate) {
-    ResultSet result = _serviceUtils.query(findPublishedDocumentsQuery(availableDate));
+    ResultSet result = _serviceUtils.query(findPublishedDocumentsQuery(availableDate), null, null);
 
     try {
       return result.getNodeRefs();
@@ -131,13 +126,8 @@ public class PublishingServiceImpl implements PublishingService, InitializingBea
   }
 
   @Override
-  public void findPublishedDocuments(Date availableDate, NodeRefCallbackHandler callback) {
-    findPublishedDocuments(availableDate, null, null, callback, true);
-  }
-
-  @Override
-  public void findPublishedDocuments(Date availableDate, Date modifiedFrom, Date modifiedTo, NodeRefCallbackHandler callback, boolean excludeAlreadyPushed) {
-    ResultSet result = _serviceUtils.query(findPublishedDocumentsQuery(availableDate, modifiedFrom, modifiedTo, excludeAlreadyPushed));
+  public void findPublishedDocuments(Date availableDate, Date modifiedFrom, Date modifiedTo, NodeRefCallbackHandler callback, boolean excludeAlreadyPushed, Integer maxItems, Integer skipCount) {
+    ResultSet result = _serviceUtils.query(findPublishedDocumentsQuery(availableDate, modifiedFrom, modifiedTo, excludeAlreadyPushed), maxItems, skipCount);
 
     try {
       for (NodeRef nodeRef : result.getNodeRefs()) {

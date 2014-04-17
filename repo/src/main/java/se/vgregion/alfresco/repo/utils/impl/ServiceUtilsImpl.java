@@ -67,7 +67,7 @@ import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.utils.ServiceUtils;
 
 public class ServiceUtilsImpl implements InitializingBean, ServiceUtils {
-  
+
   private static final Logger LOG = Logger.getLogger(ServiceUtilsImpl.class);
 
   private static final int STREAM_BUFFER_LENGTH = 32 * 1024;
@@ -1001,12 +1001,20 @@ public class ServiceUtilsImpl implements InitializingBean, ServiceUtils {
   }
 
   @Override
-  public ResultSet query(String query) {
+  public ResultSet query(String query, Integer maxItems, Integer skipCount) {
     SearchParameters searchParameters = new SearchParameters();
 
     searchParameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
     searchParameters.setLanguage(SearchService.LANGUAGE_FTS_ALFRESCO);
     searchParameters.setQuery(query.toString());
+
+    if (maxItems != null && maxItems > 0) {
+      searchParameters.setMaxItems(maxItems);
+    }
+
+    if (skipCount != null && skipCount > 0) {
+      searchParameters.setSkipCount(skipCount);
+    }
 
     ResultSet result = _searchService.query(searchParameters);
 

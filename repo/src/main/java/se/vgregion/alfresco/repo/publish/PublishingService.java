@@ -21,15 +21,11 @@ public interface PublishingService {
 
   List<NodeRef> findPublishedDocuments(Date availableDate);
 
-  void findPublishedDocuments(Date availableDate, NodeRefCallbackHandler callback);
-
-  void findPublishedDocuments(Date availableDate, Date modifiedFrom, Date modifiedTo, NodeRefCallbackHandler callback, boolean excludeAlreadyPushed);
+  void findPublishedDocuments(Date availableDate, Date modifiedFrom, Date modifiedTo, NodeRefCallbackHandler callback, boolean excludeAlreadyPushed, Integer maxItems, Integer skipCount);
 
   List<NodeRef> findUnpublishedDocuments(Date availableDate);
 
-  void findUnpublishedDocuments(Date availableDate, NodeRefCallbackHandler callback);
-
-  void findUnpublishedDocuments(Date availableDate, Date modifiedFrom, Date modifiedTo, NodeRefCallbackHandler callback, boolean excludeAlreadyPushed);
+  void findUnpublishedDocuments(Date availableDate, Date modifiedFrom, Date modifiedTo, NodeRefCallbackHandler callback, boolean excludeAlreadyPushed, Integer maxItems, Integer skipCount);
 
   boolean isPublished(NodeRef nodeRef);
 

@@ -243,7 +243,7 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
   }
 
   @Override
-  public void createDocumentFeed(Date from, Date to, final OutputStream outputStream, boolean excludeAlreadyPushed) {
+  public void createDocumentFeed(Date from, Date to, final OutputStream outputStream, boolean excludeAlreadyPushed, Integer maxItems, Integer skipCount) {
     try {
       Date now = new Date();
 
@@ -270,7 +270,7 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
           }
         }
 
-      }, excludeAlreadyPushed);
+      }, excludeAlreadyPushed, maxItems, skipCount);
 
       _publishingService.findUnpublishedDocuments(now, from, to, new NodeRefCallbackHandler() {
 
@@ -291,7 +291,7 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
           }
         }
 
-      }, excludeAlreadyPushed);
+      }, excludeAlreadyPushed, maxItems, skipCount);
 
       String footer = createFooter();
 
@@ -448,7 +448,9 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
 
     Date publishDate = (Date) properties.get(VgrModel.PROP_PUSHED_FOR_PUBLISH);
 
-    sb.append(createEntryDataTag("requestId", "publish_" + nodeRef.toString() + "_" + publishDate.getTime(), null));
+    if (publishDate != null) {
+      sb.append(createEntryDataTag("requestId", "publish_" + nodeRef.toString() + "_" + publishDate.getTime(), null));
+    }
 
     return sb.toString();
   }
@@ -469,11 +471,13 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
     sb.append(TAB + ENTRY_START + NEWLINE);
 
     sb.append(createEntryDataTag("published", "false", null));
-    
+
     Date unpublishDate = (Date) properties.get(VgrModel.PROP_PUSHED_FOR_UNPUBLISH);
-    
-    sb.append(createEntryDataTag("requestId", "unpublish_" + nodeRef.toString() + "_" + unpublishDate.getTime(), null));
-    
+
+    if (unpublishDate != null) {
+      sb.append(createEntryDataTag("requestId", "unpublish_" + nodeRef.toString() + "_" + unpublishDate.getTime(), null));
+    }
+
     return sb.toString();
   }
 

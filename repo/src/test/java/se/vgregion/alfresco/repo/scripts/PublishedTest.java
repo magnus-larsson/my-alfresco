@@ -70,9 +70,15 @@ public class PublishedTest {
         will(returnValue(sTo));
         allowing(_request).getParameter("nodeRef");
         will(returnValue(null));
+        allowing(_request).getParameter("maxItems");
+        will(returnValue(null));
+        allowing(_request).getParameter("skipCount");
+        will(returnValue(null));
         allowing(_response).getOutputStream();
         will(returnValue(outputStream));
-        allowing(_puSHAtomFeedUtil).createDocumentFeed(from, to, outputStream, true);
+        allowing(_response).setContentEncoding("UTF-8");
+        allowing(_response).setContentType("text/xml");
+        allowing(_puSHAtomFeedUtil).createDocumentFeed(from, to, outputStream, false, null, null);
       }
     });
 
@@ -94,9 +100,15 @@ public class PublishedTest {
         will(returnValue(sTo));
         allowing(_request).getParameter("nodeRef");
         will(returnValue(null));
+        allowing(_request).getParameter("maxItems");
+        will(returnValue("1"));
+        allowing(_request).getParameter("skipCount");
+        will(returnValue("1"));
         allowing(_response).getOutputStream();
         will(returnValue(outputStream));
-        allowing(_puSHAtomFeedUtil).createDocumentFeed(with(any(Date.class)), with(any(Date.class)), with(any(OutputStream.class)), with(any(Boolean.class)));
+        allowing(_response).setContentEncoding("UTF-8");
+        allowing(_response).setContentType("text/xml");
+        allowing(_puSHAtomFeedUtil).createDocumentFeed(with(any(Date.class)), with(any(Date.class)), with(any(OutputStream.class)), with(any(Boolean.class)), with(any(Integer.class)), with(any(Integer.class)));
       }
     });
 
@@ -122,6 +134,8 @@ public class PublishedTest {
         will(returnValue(sNodeRef));
         allowing(_response).getOutputStream();
         will(returnValue(outputStream));
+        allowing(_response).setContentType("text/xml");
+        allowing(_response).setContentEncoding("UTF-8");
         allowing(_publishingService).isPublished(nodeRef);
         will(returnValue(true));
         allowing(_puSHAtomFeedUtil).createPublishDocumentFeed(nodeRef);
@@ -150,6 +164,8 @@ public class PublishedTest {
         will(returnValue(sNodeRef));
         allowing(_response).getOutputStream();
         will(returnValue(outputStream));
+        allowing(_response).setContentType("text/xml");
+        allowing(_response).setContentEncoding("UTF-8");
         allowing(_publishingService).isPublished(nodeRef);
         will(returnValue(false));
         allowing(_puSHAtomFeedUtil).createUnPublishDocumentFeed(nodeRef);

@@ -114,6 +114,6 @@ public interface ServiceUtils {
 
   public void disableBehaviour();
 
-  ResultSet query(String query);
+  ResultSet query(String query, Integer maxItems, Integer skipCount);
   
 }
