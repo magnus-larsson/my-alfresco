@@ -1,25 +1,11 @@
 package se.vgregion.alfresco.repo.scripts;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.springframework.extensions.webscripts.Cache;
-import org.springframework.extensions.webscripts.Status;
-import org.springframework.extensions.webscripts.WebScriptRequest;
 
 public class TriggerUserUpdateTest {
   
-  @Test
-  public void testExecute() {
-    TriggerUserUpdate triggerUserUpdate = new TriggerUserUpdate();
-
-    WebScriptRequest req = null;
-    Status status = null;
-    Cache cache = null;
-    
-    // triggerUserUpdate.executeImpl(req, status, cache);
-  }
-
   @Test
   public void testStartingLetters() {
     TriggerUserUpdate triggerUserUpdate = new TriggerUserUpdate();

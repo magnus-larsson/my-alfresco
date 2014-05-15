@@ -20,13 +20,13 @@ import org.springframework.util.Assert;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.storage.StorageService;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class GetPublishStatus extends DeclarativeWebScript implements InitializingBean {
 
   private NodeService nodeService;
   private StorageService storageService;
-  private ServiceUtils serviceUtils;
+  private ServiceUtilsImpl serviceUtils;
 
   private static final Logger LOG = Logger.getLogger(GetPublishStatus.class);
   private static final String OK = "ok";
@@ -209,7 +209,7 @@ public class GetPublishStatus extends DeclarativeWebScript implements Initializi
     this.storageService = storageService;
   }
 
-  public void setServiceUtils(ServiceUtils serviceUtils) {
+  public void setServiceUtils(ServiceUtilsImpl serviceUtils) {
     this.serviceUtils = serviceUtils;
   }
 

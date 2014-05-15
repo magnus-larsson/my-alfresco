@@ -13,8 +13,9 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.extensions.surf.util.I18NUtil;
 import org.springframework.util.Assert;
+
 import se.vgregion.alfresco.repo.model.VgrModel;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -91,7 +92,7 @@ public class FixDcPublisherForUnitIdPatch extends AbstractPatch implements Initi
         LOG.debug("Patched vgr:dc.publisher.forunit.id for " + document.getNodeRef());
       }
     } finally {
-      ServiceUtils.closeQuietly(documents);
+      ServiceUtilsImpl.closeQuietly(documents);
     }
 
 

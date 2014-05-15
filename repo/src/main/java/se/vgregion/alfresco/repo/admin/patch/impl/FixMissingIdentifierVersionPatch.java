@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
 import org.springframework.extensions.surf.util.I18NUtil;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class FixMissingIdentifierVersionPatch extends AbstractPatch {
 
@@ -72,7 +72,7 @@ public class FixMissingIdentifierVersionPatch extends AbstractPatch {
         count++;
       }
     } finally {
-      ServiceUtils.closeQuietly(documents);
+      ServiceUtilsImpl.closeQuietly(documents);
     }
 
     LOG.info("vgr:dc.identifier.version set for " + count + " nodes.");

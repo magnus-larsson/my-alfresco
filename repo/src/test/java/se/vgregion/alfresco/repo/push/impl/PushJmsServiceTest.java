@@ -31,6 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
+import se.vgregion.alfresco.repo.push.PuSHAtomFeedUtil;
 
 public class PushJmsServiceTest {
 
@@ -58,7 +59,8 @@ public class PushJmsServiceTest {
   Mockery context;
 
   NodeService nodeService;
-
+  PuSHAtomFeedUtil pushAtomFeedUtil;
+  
   private static final String WORKSPACE_AND_STORE = "workspace://SpacesStore/";
   private static final String DUMMY_NODE_ID_PUBLISH = "cafebabe-cafe-babe-cafe-babecafebab1";
   private static final String DUMMY_NODE_ID_UNPUBLISH = "cafebabe-cafe-babe-cafe-babecafebab2";
@@ -78,7 +80,8 @@ public class PushJmsServiceTest {
     };
 
     nodeService = context.mock(NodeService.class);
-
+    pushAtomFeedUtil = context.mock(PuSHAtomFeedUtil.class);
+    
     context.checking(new Expectations() {
       {
         // siteService.getSite
@@ -90,6 +93,10 @@ public class PushJmsServiceTest {
         will(returnValue(new Date()));
         allowing(nodeService).getProperty(with(any(NodeRef.class)), with(equal(VgrModel.PROP_PUSHED_FOR_UNPUBLISH)));
         will(returnValue(new Date()));
+        allowing(pushAtomFeedUtil).createPublishDocumentFeed(new NodeRef(WORKSPACE_AND_STORE + DUMMY_NODE_ID_PUBLISH));
+        will(returnValue("<xmlPub></xmlPub>"));
+        allowing(pushAtomFeedUtil).createUnPublishDocumentFeed(new NodeRef(WORKSPACE_AND_STORE + DUMMY_NODE_ID_UNPUBLISH));
+        will(returnValue("<xmlUnPub></xmlUnPub>"));
       }
     });
     this.logger.info("Starting consumer broker");
@@ -179,9 +186,9 @@ public class PushJmsServiceTest {
             String result = textMessage.getText();
             Assert.assertTrue(result.length() > 0);
 
-            if (result.indexOf("<PublishDocument") > 0) {
+            if (result.indexOf("<PublishDocument") > 0 && result.indexOf("<feed>&lt;xmlPub&gt;&lt;/xmlPub&gt;</feed>") > 0) {
               successPublish = true;
-            } else if (result.indexOf("<UnpublishDocument") > 0) {
+            } else if (result.indexOf("<UnpublishDocument") > 0 && result.indexOf("<feed>&lt;xmlUnPub&gt;&lt;/xmlUnPub&gt;</feed>") > 0) {
               successUnpublish = true;
             }
 
@@ -196,8 +203,6 @@ public class PushJmsServiceTest {
 
     class ProducerThread extends Thread {
 
-      final Logger LOG = Logger.getLogger(ProducerThread.class);
-
       @Override
       public void run() {
         PushJmsServiceImpl pushJmsService = new PushJmsServiceImpl();
@@ -208,7 +213,7 @@ public class PushJmsServiceTest {
         pushJmsService.setConsumerRemoteUrl("failover:(" + CONSUMER_REMOTE_URL + ")");
         pushJmsService.setNodeService(nodeService);
         pushJmsService.setVgrHdrMessageTypeVersion(MESSAGE_TYPE_VERSION);
-
+        pushJmsService.setPushAtomFeedUtil(pushAtomFeedUtil);
         try {
           pushJmsService.afterPropertiesSet();
         } catch (Exception e) {

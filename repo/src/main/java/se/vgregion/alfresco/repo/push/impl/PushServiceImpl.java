@@ -24,7 +24,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 import se.vgregion.alfresco.repo.push.PushService;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class PushServiceImpl implements PushService, InitializingBean {
 
@@ -36,7 +36,7 @@ public class PushServiceImpl implements PushService, InitializingBean {
 
   private String _feedUrl;
 
-  private ServiceUtils _serviceUtils;
+  private ServiceUtilsImpl _serviceUtils;
 
   private SearchService _searchService;
 
@@ -52,7 +52,7 @@ public class PushServiceImpl implements PushService, InitializingBean {
     _feedUrl = feedUrl;
   }
 
-  public void setServiceUtils(final ServiceUtils serviceUtils) {
+  public void setServiceUtils(final ServiceUtilsImpl serviceUtils) {
     _serviceUtils = serviceUtils;
   }
 
@@ -159,7 +159,7 @@ public class PushServiceImpl implements PushService, InitializingBean {
     try {
       return result.getNodeRefs();
     } finally {
-      ServiceUtils.closeQuietly(result);
+      ServiceUtilsImpl.closeQuietly(result);
     }
   }
 
@@ -179,7 +179,7 @@ public class PushServiceImpl implements PushService, InitializingBean {
     try {
       return result.getNodeRefs();
     } finally {
-      ServiceUtils.closeQuietly(result);
+      ServiceUtilsImpl.closeQuietly(result);
     }
   }
 
@@ -204,7 +204,7 @@ public class PushServiceImpl implements PushService, InitializingBean {
     query.append("(ISNULL:\"vgr:dc.date.availableto\" OR ISUNSET:\"vgr:dc.date.availableto\" OR vgr:dc\\.date\\.availableto:[\"" + formatDate(now) + "\" TO MAX]) ");
 
     if (count != null) {
-      query.append("AND (vgr\\:pushed\\-count:[MIN TO " + (count - 1) + "] OR ISNULL:\"vgr:pushed-count\" OR ISUNSET:\"vgr:pushed-count\") ");
+      query.append("AND (vgr\\:pushed\\-count:[0 TO " + (count - 1) + "] OR ISNULL:\"vgr:pushed-count\" OR ISUNSET:\"vgr:pushed-count\") ");
     }
 
     if (minimumPushAge != null && minimumPushAge > 0) {

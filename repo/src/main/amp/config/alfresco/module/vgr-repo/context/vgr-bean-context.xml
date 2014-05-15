@@ -57,12 +57,12 @@
 
   <!-- Controller for the web script Published -->
   <bean id="webscript.feed.document.published.get" class="se.vgregion.alfresco.repo.scripts.Published" parent="webscript">
-    <property name="globalProperties" ref="global-properties" />
+    <property name="pushAtomFeedUtil" ref="vgr.pushAtomFeedUtil" />
+    <property name="publishingService" ref="vgr.publishingService" />
   </bean>
 
   <!-- Controller for the web script Published -->
   <bean id="webscript.probe.probe.get" class="com.redpill.alfresco.clusterprobe.repo.ProbeScript" parent="webscript.com.redpill.alfresco.clusterprobe.probe.get" />
-
 
   <!-- Need to override the "registerContentWithVersionService" to replace the version label calculation done for cm:content alternatively create a new bean for all custom content types. -->
 
@@ -174,6 +174,14 @@
     <property name="behaviourFilter" ref="policyBehaviourFilter" />
   </bean>
 
+  <bean id="vgr.pushAtomFeedUtil" class="se.vgregion.alfresco.repo.push.impl.PuSHAtomFeedUtilImpl">
+    <property name="descriptorService" ref="DescriptorService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="serviceUtils" ref="vgr.serviceUtils" />
+    <property name="downloadUrl" value="${vgr.push.downloadUrl}" />
+    <property name="publishingService" ref="vgr.publishingService" />
+  </bean>
+
   <bean id="vgr.pushJmsService" class="se.vgregion.alfresco.repo.push.impl.PushJmsServiceImpl">
     <property name="nodeService" ref="NodeService" />
     <property name="queueName" value="${vgr.pushJms.queueName}" />
@@ -182,13 +190,20 @@
     <property name="vgrHdrSenderId" value="${vgr.pushJms.vgrHdrSenderId}" />
     <property name="vgrHdrReceiverId" value="${vgr.pushJms.vgrHdrReceiverId}" />
     <property name="vgrHdrMessageTypeVersion" value="${vgr.pushJms.VgrHdrMessageTypeVersion}" />
+    <property name="pushAtomFeedUtil" ref="vgr.pushAtomFeedUtil" />
+    <property name="testMode" value="${vgr.pushserver.test}" />
+  </bean>
+  
+  <bean id="vgr.publishingService" class="se.vgregion.alfresco.repo.publish.impl.PublishingServiceImpl">
+    <property name="nodeService" ref="NodeService" />
+    <property name="serviceUtils" ref="vgr.serviceUtils" />
   </bean>
 
   <!-- *********************************** -->
   <!-- Service bean for all things related -->
   <!-- *********************************** -->
 
-  <bean id="vgr.serviceUtils" class="se.vgregion.alfresco.repo.utils.ServiceUtils">
+  <bean id="vgr.serviceUtils" class="se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl">
     <property name="transactionService" ref="TransactionService" />
     <property name="nodeService" ref="NodeService" />
     <property name="authenticationService" ref="AuthenticationService" />

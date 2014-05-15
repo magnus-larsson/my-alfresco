@@ -43,7 +43,7 @@
       </div>
       <div style="padding-top:12px">
          <span class="login-copyright">
-            &copy; 2005-2013 Alfresco Software Inc. All rights reserved.
+            &copy; 2005-2014 Alfresco Software Inc. All rights reserved.
          </span>
       </div>
    </div>

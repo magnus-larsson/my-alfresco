@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Properties;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.version.VersionModel;
@@ -20,7 +21,7 @@ import org.alfresco.util.VersionNumber;
 import org.apache.log4j.Logger;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPolicy implements BeforeCreateVersionPolicy {
 
@@ -44,7 +45,7 @@ public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPoli
 
   private NodeService _nodeService;
 
-  private ServiceUtils _serviceUtils;
+  private ServiceUtilsImpl _serviceUtils;
 
   private final ThreadLocal<NodeRef> _savedNodeRef = new ThreadLocal<NodeRef>();
 
@@ -59,7 +60,7 @@ public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPoli
   public void setLockService(final LockService lockService) {
   }
 
-  public void setServiceUtils(final ServiceUtils serviceUtils) {
+  public void setServiceUtils(final ServiceUtilsImpl serviceUtils) {
     _serviceUtils = serviceUtils;
   }
 
@@ -90,6 +91,11 @@ public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPoli
   @Override
   public String calculateVersionLabel(final QName classRef, final Version preceedingVersion, final int versionNumber,
       final Map<String, Serializable> versionProperties) {
+    // if the nodeRef is not saved, then this is not a VGR Document and calculation should be handled as usual
+    if (_savedNodeRef == null) {
+      super.calculateVersionLabel(classRef, preceedingVersion, versionNumber, versionProperties);
+    }
+    
     SerialVersionLabel serialVersionNumber = null;
 
     if (preceedingVersion != null) {
@@ -139,13 +145,18 @@ public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPoli
 
   @Override
   public void beforeCreateVersion(final NodeRef nodeRef) {
+    // if it's not a VGR Document, don't save nodeRef for later use, i.e. calculate version 
+    if (!_nodeService.getType(nodeRef).isMatch(VgrModel.TYPE_VGR_DOCUMENT)) {
+      return;
+    }
+    
     // This is a horribly nasty hack, but until ETHREEOH-3183 is fixed there's
     // no real way around it.
     _savedNodeRef.set(nodeRef);
   }
 
   public void init() {
-    _policyComponent.bindClassBehaviour(POLICY_BEFORE_CREATE_VERSION, VgrModel.TYPE_VGR_DOCUMENT, new JavaBehaviour(this, "beforeCreateVersion"));
+    _policyComponent.bindClassBehaviour(POLICY_BEFORE_CREATE_VERSION, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "beforeCreateVersion"));
   }
 
   private class SerialVersionLabel {

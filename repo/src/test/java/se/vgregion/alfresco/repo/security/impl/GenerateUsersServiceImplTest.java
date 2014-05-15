@@ -2,19 +2,13 @@ package se.vgregion.alfresco.repo.security.impl;
 
 import java.util.Map;
 
-import junit.framework.Assert;
-
-import org.alfresco.model.ContentModel;
-import org.alfresco.service.cmr.search.SearchParameters;
-import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.jmock.lib.legacy.ClassImposteriser;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-
-import se.vgregion.alfresco.repo.model.VgrModel;
 
 public class GenerateUsersServiceImplTest {
 
@@ -25,6 +19,7 @@ public class GenerateUsersServiceImplTest {
     }
   };
   
+  @SuppressWarnings("unchecked")
   @Test
   public void testGenerateUsers() {
     

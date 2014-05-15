@@ -7,7 +7,7 @@
 "documents": [
     <#list documents as document>
     {
-    "title": <#if document.title??>"${document.title?js_string}"<#else>""</#if>,
+    "title": <#if document.title??>"${document.title?js_string?replace("\\'", "'")}"<#else>""</#if>,
     "id": <#if document.id??>"${document.id?js_string}"<#else>""</#if>,
     "version": <#if document.version??>"${document.version?js_string}"<#else>""</#if>,
     "sourceId": <#if document.sourceId??>"${document.sourceId?js_string}"<#else>""</#if>,

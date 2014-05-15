@@ -27,13 +27,13 @@ import org.springframework.extensions.webscripts.WebScriptResponse;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.storage.StorageService;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class WebDok extends ContentGet {
 
   private SearchService _searchService;
 
-  private ServiceUtils _serviceUtils;
+  private ServiceUtilsImpl _serviceUtils;
 
   private ThumbnailService _thumbnailService;
 
@@ -43,7 +43,7 @@ public class WebDok extends ContentGet {
     _searchService = searchService;
   }
 
-  public void setServiceUtils(final ServiceUtils serviceUtils) {
+  public void setServiceUtils(final ServiceUtilsImpl serviceUtils) {
     _serviceUtils = serviceUtils;
   }
 
@@ -103,7 +103,7 @@ public class WebDok extends ContentGet {
 
       return document;
     } finally {
-      ServiceUtils.closeQuietly(documents);
+      ServiceUtilsImpl.closeQuietly(documents);
     }
   }
 

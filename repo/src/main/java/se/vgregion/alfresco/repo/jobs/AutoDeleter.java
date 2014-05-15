@@ -24,7 +24,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class AutoDeleter extends ClusteredExecuter {
 
@@ -98,7 +98,7 @@ public class AutoDeleter extends ClusteredExecuter {
         autoDeleteSite(site);
       }
     } finally {
-      ServiceUtils.closeQuietly(sites);
+      ServiceUtilsImpl.closeQuietly(sites);
     }
   }
 

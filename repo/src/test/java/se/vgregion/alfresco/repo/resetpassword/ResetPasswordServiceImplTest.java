@@ -30,18 +30,11 @@ import org.junit.Test;
 import org.springframework.extensions.surf.util.I18NUtil;
 
 import se.vgregion.alfresco.repo.mail.SendMailService;
-import se.vgregion.alfresco.repo.resetpassword.ResetPasswordService;
 import se.vgregion.alfresco.repo.resetpassword.impl.ResetPasswordServiceImpl;
 
 public class ResetPasswordServiceImplTest {
 	public class TestSiteInfo implements SiteInfo {
 		
-		private String name;
-		
-		public TestSiteInfo(String name) {
-			this.name = name;
-		}
-
 		@Override
 		public NodeRef getNodeRef() {
 			// TODO Auto-generated method stub
@@ -132,8 +125,8 @@ public class ResetPasswordServiceImplTest {
 	SendMailService sendMailService;
 	NodeService nodeService;
 	MutableAuthenticationService authenticationService;
-	SiteInfo siteInfo = new TestSiteInfo("site");
-	SiteInfo siteInfoOther = new TestSiteInfo("othersite");
+	SiteInfo siteInfo = new TestSiteInfo();
+	SiteInfo siteInfoOther = new TestSiteInfo();
 	Set<String> internalUserZones = new HashSet<String>();
 	Set<String> externalUserZones = new HashSet<String>();
 	

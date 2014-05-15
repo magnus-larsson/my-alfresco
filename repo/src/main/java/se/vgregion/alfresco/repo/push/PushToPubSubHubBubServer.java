@@ -1,10 +1,6 @@
 package se.vgregion.alfresco.repo.push;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.BehaviourFilter;
@@ -12,24 +8,17 @@ import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.search.ResultSet;
-import org.alfresco.service.cmr.search.SearchParameters;
-import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.QName;
 import org.apache.log4j.Logger;
 
 import se.vgregion.alfresco.repo.jobs.ClusteredExecuter;
 import se.vgregion.alfresco.repo.model.VgrModel;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.publish.NodeRefCallbackHandler;
+import se.vgregion.alfresco.repo.publish.PublishingService;
 
 public class PushToPubSubHubBubServer extends ClusteredExecuter {
 
-  private static Logger LOG = Logger.getLogger(PushToPubSubHubBubServer.class);
-
-  private SearchService _searchService;
-
-  private PushService _pushService;
+  private static final Logger LOG = Logger.getLogger(PushToPubSubHubBubServer.class);
 
   private NodeService _nodeService;
 
@@ -37,10 +26,122 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
 
   private PushJmsService _pushJmsService;
 
-  private boolean _test = false;
+  private PublishingService _publishingService;
 
-  public void setPushService(PushService pushService) {
-    _pushService = pushService;
+  @Override
+  protected String getJobName() {
+    return "Push to pubsubhubbub server";
+  }
+
+  @Override
+  protected void executeInternal() {
+    final Date now = new Date();
+
+    // Send to JMS
+    final RetryingTransactionCallback<Void> executionJms = new RetryingTransactionCallback<Void>() {
+
+      @Override
+      public Void execute() throws Throwable {
+        handlePublishedDocuments(now);
+
+        handleUnpublishedDocuments(now);
+
+        return null;
+      }
+    };
+
+    AuthenticationUtil.runAsSystem(new AuthenticationUtil.RunAsWork<Void>() {
+
+      @Override
+      public Void doWork() throws Exception {
+        return _transactionService.getRetryingTransactionHelper().doInTransaction(executionJms, false, true);
+      }
+
+    });
+  }
+
+  private void handleUnpublishedDocuments(final Date now) {
+    _publishingService.findUnpublishedDocuments(now, null, null, new NodeRefCallbackHandler() {
+
+      @Override
+      public void processNodeRef(NodeRef nodeRef) {
+        refreshLock();
+
+        executeUpdate(nodeRef, VgrModel.PROP_PUSHED_FOR_UNPUBLISH);
+
+        _pushJmsService.pushToJms(nodeRef, VgrModel.PROP_PUSHED_FOR_UNPUBLISH);
+      }
+
+    }, true, null, null);
+  }
+
+  private void handlePublishedDocuments(final Date now) {
+    _publishingService.findPublishedDocuments(now, null, null, new NodeRefCallbackHandler() {
+
+      @Override
+      public void processNodeRef(NodeRef nodeRef) {
+        refreshLock();
+
+        executeUpdate(nodeRef, VgrModel.PROP_PUSHED_FOR_PUBLISH);
+
+        _pushJmsService.pushToJms(nodeRef, VgrModel.PROP_PUSHED_FOR_PUBLISH);
+      }
+
+    }, true, null, null);
+  }
+
+  private void executeUpdate(NodeRef nodeRef, QName property) {
+    // disable all behaviours, we can't have the modified date updated for
+    // this...
+    _behaviourFilter.disableBehaviour();
+
+    try {
+      setUpdatedProperty(nodeRef);
+
+      setPublishStatusProperties(nodeRef, property);
+
+      increasePushedCount(nodeRef);
+    } finally {
+      _behaviourFilter.enableBehaviour();
+    }
+  }
+
+  protected void increasePushedCount(NodeRef nodeRef) {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Increasing pushed count for '" + nodeRef + "'");
+    }
+
+    Integer pushedCount = (Integer) _nodeService.getProperty(nodeRef, VgrModel.PROP_PUSHED_COUNT);
+
+    if (pushedCount == null) {
+      pushedCount = 0;
+    }
+
+    pushedCount++;
+
+    _nodeService.setProperty(nodeRef, VgrModel.PROP_PUSHED_COUNT, pushedCount);
+  }
+
+  protected void setPublishStatusProperties(NodeRef nodeRef, QName property) {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Setting published status properties for nodeRef '" + nodeRef + "' and property '" + property + "'");
+    }
+
+    _nodeService.setProperty(nodeRef, property, new Date());
+
+    if (VgrModel.PROP_PUSHED_FOR_PUBLISH.equals(property)) {
+      _nodeService.setProperty(nodeRef, VgrModel.PROP_PUBLISH_STATUS, null);
+    } else {
+      _nodeService.setProperty(nodeRef, VgrModel.PROP_UNPUBLISH_STATUS, null);
+    }
+  }
+
+  protected void setUpdatedProperty(NodeRef nodeRef) {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Setting cm:modified to now for '" + nodeRef + "'");
+    }
+
+    _nodeService.setProperty(nodeRef, ContentModel.PROP_MODIFIED, new Date());
   }
 
   public void setNodeService(NodeService nodeService) {
@@ -51,323 +152,12 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
     _behaviourFilter = behaviourFilter;
   }
 
-  public void setSearchService(SearchService searchService) {
-    _searchService = searchService;
+  public void setPushJmsService(PushJmsService pushJmsService) {
+    _pushJmsService = pushJmsService;
   }
 
-  public void setTest(boolean test) {
-    _test = test;
-  }
-
-  public void setPushJmsService(PushJmsService _pushJmsService) {
-    this._pushJmsService = _pushJmsService;
-  }
-
-  @Override
-  protected String getJobName() {
-    return "Push to pubsubhubbub server";
-  }
-
-  @Override
-  protected void executeInternal() {
-    final String now = formatNow();
-
-    // Get the actual nodes we want to push
-    final RetryingTransactionCallback<List<NodeRef>> executionSelectPublished = new RetryingTransactionCallback<List<NodeRef>>() {
-      @Override
-      public List<NodeRef> execute() throws Throwable {
-        return findPublishedDocuments(now);
-      }
-    };
-
-    final RetryingTransactionCallback<List<NodeRef>> executionSelectUnpublished = new RetryingTransactionCallback<List<NodeRef>>() {
-      @Override
-      public List<NodeRef> execute() throws Throwable {
-        return findUnpublishedDocuments(now);
-      }
-    };
-
-    final List<NodeRef> publishedDocuments = AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<List<NodeRef>>() {
-      @Override
-      public List<NodeRef> doWork() throws Exception {
-        return _transactionService.getRetryingTransactionHelper().doInTransaction(executionSelectPublished, true, false);
-      }
-    }, AuthenticationUtil.getSystemUserName());
-
-    final List<NodeRef> unpublishedDocuments = AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<List<NodeRef>>() {
-      @Override
-      public List<NodeRef> doWork() throws Exception {
-        return _transactionService.getRetryingTransactionHelper().doInTransaction(executionSelectUnpublished, true, false);
-      }
-    }, AuthenticationUtil.getSystemUserName());
-
-    final RetryingTransactionCallback<Void> executionUpdate = new RetryingTransactionCallback<Void>() {
-      @Override
-      public Void execute() throws Throwable {
-        executeUpdate(publishedDocuments, unpublishedDocuments);
-        return null;
-      }
-    };
-
-    // Push the nodes
-    final RetryingTransactionCallback<Boolean> executionPush = new RetryingTransactionCallback<Boolean>() {
-      @Override
-      public Boolean execute() throws Throwable {
-        if (_test || _pushService.pingPush()) {
-          // We need to commit the updates before we can push the documents so
-          // that we can guarantee that the Push server reads the correct
-          // results from the feed
-          AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>() {
-            @Override
-            public Void doWork() throws Exception {
-              return _transactionService.getRetryingTransactionHelper().doInTransaction(executionUpdate, false, true);
-            }
-          }, AuthenticationUtil.getSystemUserName());
-          return executePush(publishedDocuments, unpublishedDocuments);
-        } else {
-          return false;
-        }
-      }
-    };
-
-    // Send to JMS
-    final RetryingTransactionCallback<Void> executionJms = new RetryingTransactionCallback<Void>() {
-      @Override
-      public Void execute() throws Throwable {
-        _pushJmsService.pushToJms(publishedDocuments, VgrModel.PROP_PUSHED_FOR_PUBLISH);
-        _pushJmsService.pushToJms(unpublishedDocuments, VgrModel.PROP_PUSHED_FOR_UNPUBLISH);
-        return null;
-      }
-    };
-
-    AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>() {
-
-      @Override
-      public Void doWork() throws Exception {
-        if (_transactionService.getRetryingTransactionHelper().doInTransaction(executionPush, false, true).booleanValue()) {
-          // Only send to JMS if the push action went well
-          _transactionService.getRetryingTransactionHelper().doInTransaction(executionJms, true, true);
-        }
-        return null;
-      }
-
-    }, AuthenticationUtil.getSystemUserName());
-  }
-
-  private void executeUpdate(List<NodeRef> publishedDocuments, List<NodeRef> unpublishedDocuments) {
-    // disable all behaviours, we can't have the modified date updated for
-    // this...
-    _behaviourFilter.disableBehaviour();
-
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Setting cm:modified property for all published documents");
-    }
-    setUpdatedProperty(publishedDocuments);
-
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Setting cm:modified property for all unpublished documents");
-    }
-    setUpdatedProperty(unpublishedDocuments);
-
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Setting pushed properties for all published documents");
-    }
-    setPublishStatusProperties(publishedDocuments, VgrModel.PROP_PUSHED_FOR_PUBLISH);
-
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Setting pushed properties for all unpublished documents");
-    }
-    setPublishStatusProperties(unpublishedDocuments, VgrModel.PROP_PUSHED_FOR_UNPUBLISH);
-
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Increasing vgr:pushed-count with 1 for all published documents");
-    }
-    increasePushedCount(publishedDocuments);
-
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Increasing vgr:pushed-count with 1 for all unpublished documents");
-    }
-    increasePushedCount(unpublishedDocuments);
-
-    _behaviourFilter.enableBehaviour();
-  }
-
-  protected void increasePushedCount(List<NodeRef> nodeRefs) {
-    for (NodeRef nodeRef : nodeRefs) {
-      refreshLock();
-
-      Integer pushedCount = (Integer) _nodeService.getProperty(nodeRef, VgrModel.PROP_PUSHED_COUNT);
-
-      if (pushedCount == null) {
-        pushedCount = 0;
-      }
-
-      pushedCount++;
-
-      _nodeService.setProperty(nodeRef, VgrModel.PROP_PUSHED_COUNT, pushedCount);
-    }
-  }
-
-  protected void setPublishStatusProperties(List<NodeRef> nodeRefs, QName property) {
-    for (NodeRef nodeRef : nodeRefs) {
-      refreshLock();
-      _nodeService.setProperty(nodeRef, property, new Date());
-      if (VgrModel.PROP_PUSHED_FOR_PUBLISH.equals(property)) {
-        _nodeService.setProperty(nodeRef, VgrModel.PROP_PUBLISH_STATUS, null);
-      } else {
-        _nodeService.setProperty(nodeRef, VgrModel.PROP_UNPUBLISH_STATUS, null);
-      }
-    }
-  }
-
-  private Boolean executePush(List<NodeRef> publishedDocuments, List<NodeRef> unpublishedDocuments) {
-    // disable all behaviours, we can't have the modified date updated for
-    // this...
-    _behaviourFilter.disableBehaviour();
-
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Sending published and unpublished documents to PuSH server");
-    }
-
-    List<NodeRef> concatenatedList = new ArrayList<NodeRef>();
-    concatenatedList.addAll(publishedDocuments);
-    concatenatedList.addAll(unpublishedDocuments);
-
-    boolean pushed = _pushService.pushFiles(concatenatedList) || _test;
-
-    if (!pushed) {
-      if (LOG.isDebugEnabled()) {
-        for (NodeRef nodeRef : concatenatedList) {
-          LOG.debug("For some reason the node ref '" + nodeRef + "' could not be pushed.");
-        }
-      }
-    } else {
-      for (NodeRef nodeRef : publishedDocuments) {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("Pushed NodeRef " + nodeRef + " to property " + VgrModel.PROP_PUSHED_FOR_PUBLISH);
-        }
-      }
-      for (NodeRef nodeRef : unpublishedDocuments) {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("Pushed NodeRef " + nodeRef + " to property " + VgrModel.PROP_PUSHED_FOR_UNPUBLISH);
-        }
-      }
-    }
-
-    _behaviourFilter.enableBehaviour();
-    return pushed;
-  }
-
-  private String formatNow() {
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-
-    return sdf.format(new Date());
-  }
-
-  private Date parseNow(String now) {
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-
-    try {
-      return sdf.parse(now);
-    } catch (ParseException ex) {
-      throw new RuntimeException(ex);
-    }
-  }
-
-  protected void setUpdatedProperty(List<NodeRef> nodeRefs) {
-    for (NodeRef nodeRef : nodeRefs) {
-      refreshLock();
-      _nodeService.setProperty(nodeRef, ContentModel.PROP_MODIFIED, new Date());
-    }
-  }
-
-  protected List<NodeRef> findUnpublishedDocuments(String now) {
-    ResultSet result = findDocuments(findUnpublishedDocumentsQuery(now));
-
-    Date nw = parseNow(now);
-
-    List<NodeRef> nodeRefs = new ArrayList<NodeRef>();
-
-    try {
-      for (NodeRef nodeRef : result.getNodeRefs()) {
-        refreshLock();
-
-        Date availableto = (Date) _nodeService.getProperty(nodeRef, VgrModel.PROP_DATE_AVAILABLE_TO);
-
-        if (availableto == null) {
-          continue;
-        }
-
-        if (nw.getTime() >= availableto.getTime()) {
-          nodeRefs.add(nodeRef);
-        }
-      }
-    } finally {
-      ServiceUtils.closeQuietly(result);
-    }
-
-    return nodeRefs;
-  }
-
-  protected List<NodeRef> findPublishedDocuments(String now) {
-    ResultSet result = findDocuments(findPublishedDocumentsQuery(now));
-
-    try {
-      return result.getNodeRefs();
-    } finally {
-      ServiceUtils.closeQuietly(result);
-    }
-  }
-
-  private StringBuffer findPublishedDocumentsQuery(String now) {
-    StringBuffer query = new StringBuffer();
-
-    query.append("TYPE:\"vgr:document\" AND ");
-    query.append("ASPECT:\"vgr:published\" AND ");
-    query.append("vgr:dc\\.date\\.availablefrom:[MIN TO \"" + now + "\"] AND ");
-    query.append("(ISNULL:\"vgr:dc.date.availableto\" OR vgr:dc\\.date\\.availableto:[\"" + now + "\" TO MAX]) AND ");
-    query.append("ISNULL:\"vgr:pushed-for-publish\"");
-
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Query for finding unpushed published documents: " + query.toString());
-    }
-
-    return query;
-  }
-
-  private StringBuffer findUnpublishedDocumentsQuery(String now) {
-    StringBuffer query = new StringBuffer();
-
-    query.append("TYPE:\"vgr:document\" AND ");
-    query.append("ASPECT:\"vgr:published\" AND ");
-    query.append("ISNOTNULL:\"vgr:dc.date.availableto\" AND ");
-    query.append("vgr:dc\\.date\\.availableto:[MIN TO \"" + now + "\"] AND ");
-    query.append("ISNOTNULL:\"vgr:pushed-for-publish\" AND ");
-    query.append("ISNULL:\"vgr:pushed-for-unpublish\"");
-
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Query for finding unpushed unpublished documents: " + query.toString());
-    }
-
-    return query;
-  }
-
-  private ResultSet findDocuments(StringBuffer query) {
-    SearchParameters searchParameters = new SearchParameters();
-
-    searchParameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
-    searchParameters.setLanguage(SearchService.LANGUAGE_FTS_ALFRESCO);
-    searchParameters.setQuery(query.toString());
-
-    ResultSet result = _searchService.query(searchParameters);
-
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Documents found for query: " + query.toString());
-      LOG.debug("Count: " + result.length());
-      LOG.debug("");
-    }
-
-    return result;
+  public void setPublishingService(PublishingService publishingService) {
+    _publishingService = publishingService;
   }
 
 }

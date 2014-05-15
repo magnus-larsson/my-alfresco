@@ -1,10 +1,5 @@
 package se.vgregion.alfresco.repo.storage;
 
-import static org.junit.Assert.fail;
-
-import java.util.Calendar;
-
-import org.apache.commons.lang.StringUtils;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.jmock.lib.legacy.ClassImposteriser;
@@ -140,53 +135,6 @@ public class StorageServiceTest {
     });
 
     storageService.publishToStorage(sourceNodeRef);
-  }
-/*
-  @Test
-  public void testPublishToStorageNodeRef() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  public void testUnpublishFromStorage() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  public void testMoveToStorage() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  public void testGetPublishedNodeRef() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  public void testCreatePdfRendition() {
-    fail("Not yet implemented");
-  }
-*/
-  private String getYear() {
-    final Calendar calendar = Calendar.getInstance();
-
-    return String.valueOf(calendar.get(Calendar.YEAR));
-  }
-
-  private String getMonth() {
-    final Calendar calendar = Calendar.getInstance();
-
-    final String month = StringUtils.leftPad(String.valueOf(calendar.get(Calendar.MONTH) + 1), 2, "0");
-
-    return month;
-  }
-
-  private String getDay() {
-    final Calendar calendar = Calendar.getInstance();
-
-    final String day = StringUtils.leftPad(String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)), 2, "0");
-
-    return day;
   }
 
 }

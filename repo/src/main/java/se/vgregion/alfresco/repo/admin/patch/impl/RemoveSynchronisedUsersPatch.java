@@ -1,13 +1,16 @@
 package se.vgregion.alfresco.repo.admin.patch.impl;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.query.PagingRequest;
 import org.alfresco.repo.admin.patch.AbstractPatch;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.PersonService;
+import org.alfresco.service.cmr.security.PersonService.PersonInfo;
 import org.alfresco.service.cmr.site.SiteInfo;
 import org.alfresco.service.cmr.site.SiteService;
 import org.apache.log4j.Logger;
@@ -36,7 +39,13 @@ public class RemoveSynchronisedUsersPatch extends AbstractPatch implements Initi
   @Override
   protected String applyInternal() throws Exception {
     // get all users in the system
-    final Set<NodeRef> people = _personService.getAllPeople();
+    List<PersonInfo> personInfos = _personService.getPeople(null, null, null, new PagingRequest(Integer.MAX_VALUE, null)).getPage();
+
+    Set<NodeRef> people = new HashSet<NodeRef>(personInfos.size());
+
+    for (PersonInfo personInfo : personInfos) {
+      people.add(personInfo.getNodeRef());
+    }
 
     int count = 0;
 

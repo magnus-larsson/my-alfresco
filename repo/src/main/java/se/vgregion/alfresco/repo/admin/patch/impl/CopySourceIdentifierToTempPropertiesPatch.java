@@ -13,7 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.extensions.surf.util.I18NUtil;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class CopySourceIdentifierToTempPropertiesPatch extends AbstractPatch {
 
@@ -71,7 +71,7 @@ public class CopySourceIdentifierToTempPropertiesPatch extends AbstractPatch {
         }
       }
     } finally {
-      ServiceUtils.closeQuietly(documents);
+      ServiceUtilsImpl.closeQuietly(documents);
     }
 
 

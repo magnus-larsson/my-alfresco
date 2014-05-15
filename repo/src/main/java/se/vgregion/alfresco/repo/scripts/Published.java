@@ -1,31 +1,116 @@
 package se.vgregion.alfresco.repo.scripts;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-import org.springframework.extensions.webscripts.Cache;
-import org.springframework.extensions.webscripts.DeclarativeWebScript;
-import org.springframework.extensions.webscripts.Status;
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.util.ParameterCheck;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.extensions.webscripts.AbstractWebScript;
 import org.springframework.extensions.webscripts.WebScriptRequest;
+import org.springframework.extensions.webscripts.WebScriptResponse;
 
-public class Published extends DeclarativeWebScript {
+import se.vgregion.alfresco.repo.publish.PublishingService;
+import se.vgregion.alfresco.repo.push.PuSHAtomFeedUtil;
 
-  private Properties _globalProperties;
+public class Published extends AbstractWebScript implements InitializingBean {
 
-  public void setGlobalProperties(final Properties globalProperties) {
-    _globalProperties = globalProperties;
+  private PuSHAtomFeedUtil _puSHAtomFeedUtil;
+
+  private PublishingService _publishingService;
+
+  @Override
+  public void execute(WebScriptRequest request, WebScriptResponse response) throws IOException {
+    Date from = parseFromDate(request.getParameter("from"));
+    Date to = parseToDate(request.getParameter("to"));
+    String nodeRef = request.getParameter("nodeRef");
+
+    response.setContentEncoding("UTF-8");
+    response.setContentType("text/xml");
+    OutputStream outputStream = response.getOutputStream();
+
+    try {
+      if (StringUtils.isNotBlank(nodeRef)) {
+        streamAtomFeed(outputStream, new NodeRef(nodeRef));
+      } else {
+        Integer maxItems = request.getParameter("maxItems") != null ? Integer.parseInt(request.getParameter("maxItems")) : null;
+        Integer skipCount = request.getParameter("skipCount") != null ? Integer.parseInt(request.getParameter("skipCount")) : null;
+        
+        streamAtomFeed(outputStream, from, to, maxItems, skipCount);
+      }
+    } finally {
+      IOUtils.closeQuietly(outputStream);
+    }
+  }
+
+  private void streamAtomFeed(OutputStream outputStream, Date from, Date to, Integer maxItems, Integer skipCount) {
+    _puSHAtomFeedUtil.createDocumentFeed(from, to, outputStream, false, maxItems, skipCount);
+  }
+
+  private void streamAtomFeed(OutputStream outputStream, NodeRef nodeRef) {
+    String feed;
+
+    if (_publishingService.isPublished(nodeRef)) {
+      feed = _puSHAtomFeedUtil.createPublishDocumentFeed(nodeRef);
+    } else {
+      feed = _puSHAtomFeedUtil.createUnPublishDocumentFeed(nodeRef);
+    }
+
+    try {
+      IOUtils.write(feed, outputStream);
+    } catch (IOException ex) {
+      throw new AlfrescoRuntimeException(ex.getMessage(), ex);
+    }
+  }
+
+  private Date parseFromDate(String from) {
+    Date date = parseDate(from);
+
+    if (date == null) {
+      date = DateTime.now().minusMinutes(30).toDate();
+    }
+
+    return date;
+  }
+
+  private Date parseToDate(String to) {
+    Date date = parseDate(to);
+
+    if (date == null) {
+      date = new Date();
+    }
+
+    return date;
+  }
+
+  private Date parseDate(String date) {
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+    try {
+      return sdf.parse(date);
+    } catch (Exception ex) {
+      return null;
+    }
+  }
+
+  public void setPushAtomFeedUtil(PuSHAtomFeedUtil puSHAtomFeedUtil) {
+    _puSHAtomFeedUtil = puSHAtomFeedUtil;
+  }
+
+  public void setPublishingService(PublishingService publishingService) {
+    _publishingService = publishingService;
   }
 
   @Override
-  protected Map<String, Object> executeImpl(final WebScriptRequest req, final Status status, final Cache cache) {
-    final Map<String, Object> model = new HashMap<String, Object>();
-
-    model.put("host", _globalProperties.getProperty("alfresco.host", "localhost"));
-    model.put("port", _globalProperties.getProperty("alfresco.port", "8080"));
-    model.put("context", _globalProperties.getProperty("alfresco.context", "alfresco"));
-
-    return model;
+  public void afterPropertiesSet() throws Exception {
+    ParameterCheck.mandatory("puSHAtomFeedUtil", _puSHAtomFeedUtil);
+    ParameterCheck.mandatory("publishingService", _publishingService);
   }
 
 }

@@ -1,11 +1,10 @@
-package se.vgregion.alfresco.repo.utils;
+package se.vgregion.alfresco.repo.utils.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Properties;
 
-import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.jmock.Expectations;
@@ -16,7 +15,7 @@ import org.junit.Test;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
 
-public class ServiceUtilsTest {
+public class ServiceUtilsImplTest {
 
   @Rule
   public JUnitRuleMockery context = new JUnitRuleMockery() {
@@ -29,7 +28,7 @@ public class ServiceUtilsTest {
   public void testGetBaseLink() {
     final Properties properties = new Properties();
 
-    final ServiceUtils utils = new ServiceUtils();
+    final ServiceUtilsImpl utils = new ServiceUtilsImpl();
     utils.setGlobalProperties(properties);
 
     String link = utils.getBaseLink("holger");
@@ -59,7 +58,7 @@ public class ServiceUtilsTest {
     properties.put("alfresco.port", "443");
     properties.put("alfresco.context", "repo");
 
-    final ServiceUtils utils = new ServiceUtils();
+    final ServiceUtilsImpl utils = new ServiceUtilsImpl();
     utils.setGlobalProperties(properties);
 
     final NodeService nodeService = context.mock(NodeService.class);
@@ -86,7 +85,7 @@ public class ServiceUtilsTest {
   public void testGetSourceFail() throws Exception {
     final Properties properties = new Properties();
 
-    final ServiceUtils utils = new ServiceUtils();
+    final ServiceUtilsImpl utils = new ServiceUtilsImpl();
     utils.setGlobalProperties(properties);
 
     final NodeService nodeService = context.mock(NodeService.class);

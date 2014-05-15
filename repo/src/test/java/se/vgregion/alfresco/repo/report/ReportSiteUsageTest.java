@@ -202,8 +202,6 @@ public class ReportSiteUsageTest {
 
     final NodeRef siteNodeRef1 = new NodeRef(WORKSPACE_AND_STORE + DUMMY_NODE_ID_1);
     final NodeRef siteNodeRef2 = new NodeRef(WORKSPACE_AND_STORE + DUMMY_NODE_ID_2);
-    final String shortname1 = "site1";
-    final String shortname2 = "site2";
 
     rsu.setActivityService(activityService);
     rsu.setFileFolderService(fileFolderService);

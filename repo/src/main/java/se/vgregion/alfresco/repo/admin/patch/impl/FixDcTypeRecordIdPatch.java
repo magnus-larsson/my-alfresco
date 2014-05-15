@@ -19,7 +19,7 @@ import org.springframework.util.Assert;
 
 import se.vgregion.alfresco.repo.constraints.ApelonService;
 import se.vgregion.alfresco.repo.model.VgrModel;
-import se.vgregion.alfresco.repo.utils.ServiceUtils;
+import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class FixDcTypeRecordIdPatch extends AbstractPatch implements InitializingBean {
 
@@ -106,7 +106,7 @@ public class FixDcTypeRecordIdPatch extends AbstractPatch implements Initializin
         LOG.debug("Patched vgr:dc.type.record.id for " + document.getNodeRef());
       }
     } finally {
-      ServiceUtils.closeQuietly(documents);
+      ServiceUtilsImpl.closeQuietly(documents);
     }
 
     return I18NUtil.getMessage(MSG_SUCCESS);
