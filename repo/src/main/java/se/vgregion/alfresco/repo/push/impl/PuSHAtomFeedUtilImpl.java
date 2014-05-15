@@ -2,11 +2,13 @@ package se.vgregion.alfresco.repo.push.impl;
 
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -312,17 +314,22 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
     if (properties == null) {
       throw new AlfrescoRuntimeException("Properties map is null");
     }
+    
     StringBuffer sb = new StringBuffer();
+    
     // Special handling of title if missing
     String title = (String) properties.get(VgrModel.PROP_TITLE);
+    
     if (title == null) {
       title = (String) properties.get(ContentModel.PROP_NAME);
     }
-    sb.append(createEntryDataTag("title", title, null));
-    sb.append(createEntryDataTag("DC.title", title, null));
+    
+    sb.append(createEntryDataTag("title", StringEscapeUtils.escapeXml(title), null));
+    sb.append(createEntryDataTag("DC.title", StringEscapeUtils.escapeXml(title), null));
 
     // Special handling saved
     Date saved = (Date) properties.get(VgrModel.PROP_DATE_SAVED);
+    
     if (saved == null) {
       saved = (Date) properties.get(VgrModel.PROP_DATE_CREATED);
       sb.append(createEntryDataTag("DC.date.saved", toUTCDate(saved), null)); // skip=true
@@ -403,7 +410,14 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
         for (String split : splits) {
           sb.append(writeProperty(key, split));
         }
-      } else {
+      } else if (value != null && value instanceof List && multipleSet.contains(key)) {
+        @SuppressWarnings("unchecked")
+        List<String> list = (List<String>) value;
+        
+        for (String entry : list) {
+          sb.append(writeProperty(key, entry));
+        }
+      }else {
         sb.append(writeProperty(key, value));
       }
 
@@ -417,9 +431,27 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
       Date aDate = (Date) value;
       sb.append(createEntryDataTag(key, toUTCDate(aDate), null));
     } else if (value instanceof String) {
-      sb.append(createEntryDataTag(key, StringEscapeUtils.escapeXml((String) value), null));
+      String sValue;
+
+      try {
+        sValue = new String((value.toString()).getBytes("UTF-8"));
+      } catch (UnsupportedEncodingException ex) {
+        throw new RuntimeException(ex);
+      }
+      
+      if (sValue.indexOf("&amp;") >= 0) {
+        sValue = StringUtils.replace(sValue, "&amp;", "&");
+      }
+
+      sb.append(createEntryDataTag(key, StringEscapeUtils.escapeXml(sValue), null));
     } else if (value != null) {
-      sb.append(createEntryDataTag(key, value, null));
+      Serializable result = value;
+
+      if (value.toString().indexOf("&") >= 0) {
+        result = StringEscapeUtils.escapeXml(value.toString());
+      }
+
+      sb.append(createEntryDataTag(key, result, null));
     } else {
       if (!skipSet.contains(key)) {
         sb.append(createEntryDataTag(key, null, null));
@@ -617,7 +649,7 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
       return null;
     }
 
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz");
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     return sdf.format(date);
   }
