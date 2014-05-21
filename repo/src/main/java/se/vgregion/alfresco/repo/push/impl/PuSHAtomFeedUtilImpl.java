@@ -117,7 +117,6 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
     propertyMap.put("DC.contributor.controlledby.freetext", VgrModel.PROP_CONTRIBUTOR_CONTROLLEDBY_FREETEXT);
     propertyMap.put("DC.contributor.controlledby.role", VgrModel.PROP_CONTRIBUTOR_ACCEPTEDBY);
     propertyMap.put("DC.contributor.controlledby.unit.freetext", VgrModel.PROP_CONTRIBUTOR_ACCEPTEDBY_UNIT_FREETEXT);
-    propertyMap.put("DC.contributor.unit", VgrModel.PROP_CONTRIBUTOR_UNIT);
 
     propertyMap.put("DC.type.document", VgrModel.PROP_TYPE_DOCUMENT);
     propertyMap.put("DC.type.document.structure", VgrModel.PROP_DOCUMENT_STRUCTURE);
