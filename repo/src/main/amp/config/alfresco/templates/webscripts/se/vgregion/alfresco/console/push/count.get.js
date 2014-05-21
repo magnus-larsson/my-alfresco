@@ -1,5 +1,5 @@
-<import resource="classpath:alfresco/templates/webscripts/feed/document/date.format.js">
-<import resource="classpath:alfresco/templates/webscripts/feed/document/underscore.string.js">
+<import resource="classpath:alfresco/templates/webscripts/se/vgregion/alfresco/console/push/date.format.js">
+<import resource="classpath:alfresco/templates/webscripts/se/vgregion/alfresco/console/push/underscore.string.js">
 
 function main() {
    var fromDate = args.fromDate;

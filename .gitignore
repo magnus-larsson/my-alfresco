@@ -14,3 +14,6 @@ sharepoint/
 .idea
 *.launch
 .springBeans
+/share/src/main/java/rebel.xml
+
+rebel.xml

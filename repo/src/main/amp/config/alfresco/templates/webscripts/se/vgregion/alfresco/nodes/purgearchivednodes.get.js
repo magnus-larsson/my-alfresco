@@ -1,4 +1,4 @@
-<import resource="classpath:alfresco/templates/webscripts/feed/document/date.format.js">
+<import resource="classpath:alfresco/templates/webscripts/se/vgregion/alfresco/console/push/date.format.js">
 
 function subtractFromDate(date, days, hours, minutes) {
    var m_secs = date.getTime();

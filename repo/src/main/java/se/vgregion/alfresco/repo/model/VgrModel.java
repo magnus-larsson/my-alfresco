@@ -54,7 +54,6 @@ public interface VgrModel {
   public static final QName PROP_SUBJECT_AUTHOR_KEYWORDS = QName.createQName(VGR_URI, "dc.subject.authorkeywords");
   public static final QName PROP_SUBJECT_KEYWORDS = QName.createQName(VGR_URI, "dc.subject.keywords");
   public static final QName PROP_SUBJECT_KEYWORDS_ID = QName.createQName(VGR_URI, "dc.subject.keywords.id");
-             
 
   public static final QName PROP_CONTRIBUTOR_SAVEDBY = QName.createQName(VGR_URI, "dc.contributor.savedby");
   public static final QName PROP_CONTRIBUTOR_SAVEDBY_ID = QName.createQName(VGR_URI, "dc.contributor.savedby.id");
@@ -113,9 +112,6 @@ public interface VgrModel {
   public static final QName PROP_TYPE_PROCESS_NAME = QName.createQName(VGR_URI, "dc.type.process.name");
   public static final QName PROP_TYPE_FILE_PROCESS = QName.createQName(VGR_URI, "dc.type.file.process");
   public static final QName PROP_TYPE_FILE = QName.createQName(VGR_URI, "dc.type.file");
-
-  
-  
   
   public static final QName PROP_CONTRIBUTOR_ACCEPTEDBY = QName.createQName(VGR_URI, "dc.contributor.acceptedby");
   public static final QName PROP_CONTRIBUTOR_ACCEPTEDBY_ROLE = QName.createQName(VGR_URI, "dc.contributor.acceptedby.role");
@@ -127,13 +123,9 @@ public interface VgrModel {
   public static final QName PROP_CONTRIBUTOR_CONTROLLEDBY_UNIT_FREETEXT = QName.createQName(VGR_URI, "dc.contributor.controlledby.unit.freetext");
   public static final QName PROP_CONTRIBUTOR_CONTROLLEDBY_ID = QName.createQName(VGR_URI, "dc.contributor.controlledby.id");
   public static final QName PROP_CONTRIBUTOR_CONTROLLEDBY_FREETEXT = QName.createQName(VGR_URI, "dc.contributor.controlledby.freetext");
-  public static final QName PROP_CONTRIBUTOR_UNIT = QName.createQName(VGR_URI, "dc.dc.contributor.unit");
-  public static final QName PROP_DOCUMENT_STRUCTURE = QName.createQName(VGR_URI, "dc.dc.type.document.structure");
-  public static final QName PROP_DOCUMENT_STRUCTURE_ID = QName.createQName(VGR_URI, "dc.dc.type.document.structure.id");
-  public static final QName PROP_TYPE_TEMPLATENAME = QName.createQName(VGR_URI, "dc.dc.type.templatename");
-  
-
-  
+  public static final QName PROP_DOCUMENT_STRUCTURE = QName.createQName(VGR_URI, "dc.type.document.structure");
+  public static final QName PROP_DOCUMENT_STRUCTURE_ID = QName.createQName(VGR_URI, "dc.type.document.structure.id");
+  public static final QName PROP_TYPE_TEMPLATENAME = QName.createQName(VGR_URI, "dc.type.templatename");
   
   // properties specific for the VGR Dok aspect
   public static final QName PROP_VGR_DOK_DOCUMENT_ID = QName.createQName(VGR_URI, "vgr_dok_document_id");
@@ -187,6 +179,5 @@ public interface VgrModel {
   
   public static final QName ASPECT_THUMBNAIL_PHOTO = QName.createQName(VGR_URI, "thumbnail-photo-aspect");
   public static final QName PROP_THUMBNAIL_PHOTO = QName.createQName(VGR_URI, "thumbnailPhoto");
- 
   
 }
