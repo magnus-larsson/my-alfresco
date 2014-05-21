@@ -123,7 +123,6 @@ public interface VgrModel {
   public static final QName PROP_CONTRIBUTOR_CONTROLLEDBY_UNIT_FREETEXT = QName.createQName(VGR_URI, "dc.contributor.controlledby.unit.freetext");
   public static final QName PROP_CONTRIBUTOR_CONTROLLEDBY_ID = QName.createQName(VGR_URI, "dc.contributor.controlledby.id");
   public static final QName PROP_CONTRIBUTOR_CONTROLLEDBY_FREETEXT = QName.createQName(VGR_URI, "dc.contributor.controlledby.freetext");
-  public static final QName PROP_CONTRIBUTOR_UNIT = QName.createQName(VGR_URI, "dc.contributor.unit");
   public static final QName PROP_DOCUMENT_STRUCTURE = QName.createQName(VGR_URI, "dc.type.document.structure");
   public static final QName PROP_DOCUMENT_STRUCTURE_ID = QName.createQName(VGR_URI, "dc.type.document.structure.id");
   public static final QName PROP_TYPE_TEMPLATENAME = QName.createQName(VGR_URI, "dc.type.templatename");
