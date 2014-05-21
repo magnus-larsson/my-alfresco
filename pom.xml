@@ -15,7 +15,7 @@
   <name>VGR Alfresco Base Project</name>
 
   <properties>
-    <alfresco.version>4.1.7</alfresco.version>
+    <alfresco.version>4.1.8</alfresco.version>
   </properties>
 
   <modules>
