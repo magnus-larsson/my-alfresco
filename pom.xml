@@ -16,6 +16,7 @@
 
   <properties>
     <alfresco.version>4.1.8</alfresco.version>
+    <alfresco-cluster-probe.version>1.0.4</alfresco-cluster-probe.version>
   </properties>
 
   <modules>

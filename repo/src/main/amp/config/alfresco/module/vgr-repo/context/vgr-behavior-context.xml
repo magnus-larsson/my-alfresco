@@ -77,7 +77,7 @@
 	<bean id="vgr.configurableSerialVersionLabelPolicy"
 		class="se.vgregion.alfresco.repo.node.version.common.versionlabel.ConfigurableSerialVersionLabelPolicy"
 		init-method="init" p:serviceUtils-ref="vgr.serviceUtils"
-		p:lockService-ref="LockService" p:policyComponent-ref="policyComponent"
+		p:policyComponent-ref="policyComponent"
 		p:nodeService-ref="NodeService">
 		<constructor-arg>
 			<props>

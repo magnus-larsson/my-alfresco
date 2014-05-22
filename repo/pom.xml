@@ -167,9 +167,9 @@
       </dependency>
 
       <dependency>
-         <groupId>com.redpill-linpro.alfresco</groupId>
+         <groupId>org.redpill-linpro.alfresco</groupId>
          <artifactId>alfresco-cluster-probe</artifactId>
-         <version>1.0.1</version>
+         <version>${alfresco-cluster-probe.version}</version>
          <exclusions>
             <exclusion>
                <artifactId>spring-surf</artifactId>
