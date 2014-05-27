@@ -395,7 +395,7 @@ public class ServiceUtilsImpl implements InitializingBean, ServiceUtils {
           }
         }
       } finally {
-        results.close();
+        closeQuietly(results);
       }
     }
 
@@ -624,7 +624,7 @@ public class ServiceUtilsImpl implements InitializingBean, ServiceUtils {
 
       return null;
     } finally {
-      ServiceUtilsImpl.closeQuietly(result);
+      closeQuietly(result);
     }
   }
 
@@ -731,7 +731,7 @@ public class ServiceUtilsImpl implements InitializingBean, ServiceUtils {
             }
           }
         } finally {
-          ServiceUtilsImpl.closeQuietly(nodes);
+          closeQuietly(nodes);
         }
 
         return code;
