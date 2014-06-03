@@ -48,13 +48,7 @@
   </bean>
 
   <!-- Controller for the web script Clear Cache -->
-  <bean id="webscript.clearcache.clearcache.get" class="se.vgregion.alfresco.repo.scripts.ClearCache" parent="webscript">
-    <property name="cacheManagers">
-      <list>
-        <ref bean="internalEHCacheManager" />
-      </list>
-    </property>
-  </bean>
+  <bean id="webscript.clearcache.clearcache.get" class="se.vgregion.alfresco.repo.scripts.ClearCache" parent="webscript" />
 
   <!-- Controller for the web script Published -->
   <bean id="webscript.feed.document.published.get" class="se.vgregion.alfresco.repo.scripts.Published" parent="webscript">

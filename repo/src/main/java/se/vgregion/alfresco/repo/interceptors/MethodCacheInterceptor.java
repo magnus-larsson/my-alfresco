@@ -2,9 +2,7 @@ package se.vgregion.alfresco.repo.interceptors;
 
 import java.io.Serializable;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.Element;
-
+import org.alfresco.repo.cache.SimpleCache;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.log4j.Logger;
@@ -15,9 +13,9 @@ public class MethodCacheInterceptor implements MethodInterceptor, InitializingBe
 
   private static final Logger LOG = Logger.getLogger(MethodCacheInterceptor.class);
 
-  private Cache _cache;
+  private SimpleCache<Serializable, Object> _cache;
 
-  public void setCache(Cache cache) {
+  public void setCache(SimpleCache<Serializable, Object> cache) {
     _cache = cache;
   }
 
@@ -26,25 +24,22 @@ public class MethodCacheInterceptor implements MethodInterceptor, InitializingBe
     String methodName = invocation.getMethod().getName();
     Object[] arguments = invocation.getArguments();
 
-    Object result;
-
     String cacheKey = getCacheKey(targetName, methodName, arguments);
-    Element element = _cache.get(cacheKey);
+    Object result = _cache.get(cacheKey);
 
     LOG.debug("About the check if " + cacheKey + " is in the cache.");
 
-    if (element == null) {
+    if (result == null) {
       // call target/sub-interceptor
       result = invocation.proceed();
-      element = new Element(cacheKey, (Serializable) result);
-      _cache.put(element);
+      _cache.put(cacheKey, result);
 
       LOG.debug(cacheKey + " was not in the cache, but should be now");
     } else {
       LOG.debug(cacheKey + " was in the cache");
     }
 
-    return element.getValue();
+    return result;
   }
 
   private String getCacheKey(String targetName, String methodName, Object[] arguments) {

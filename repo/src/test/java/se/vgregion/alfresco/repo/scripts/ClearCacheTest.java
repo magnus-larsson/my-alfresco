@@ -1,10 +1,5 @@
 package se.vgregion.alfresco.repo.scripts;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.sf.ehcache.CacheManager;
-
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.jmock.lib.legacy.ClassImposteriser;
@@ -31,16 +26,11 @@ public class ClearCacheTest {
 
     final Cache cache = context.mock(Cache.class);
 
-    final List<CacheManager> cacheManagers = new ArrayList<CacheManager>();
-    final CacheManager cacheManager = context.mock(CacheManager.class);
-    cacheManagers.add(cacheManager);
-
     final ClearCache clearCache = new ClearCache();
-    clearCache.setCacheManagers(cacheManagers);
 
     context.checking(new Expectations() {
       {
-        oneOf(cacheManager).clearAll();
+        
       }
     });
 
