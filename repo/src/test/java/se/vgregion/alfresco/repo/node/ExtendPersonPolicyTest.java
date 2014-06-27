@@ -22,18 +22,16 @@ import se.vgregion.alfresco.repo.node.ExtendPersonPolicy.PersonInfoUpdater;
 
 public class ExtendPersonPolicyTest {
 
-  private static final String RESPONSIBILITY_CODE = "Bemanningsservice Poolmedarbetare";
-  
   private static final String USERNAME = "kallekula";
-  
+
   private static final String ORGANIZATION_DN = "ou=Bemanningsservice Poolmedarbetare,ou=Verksamhet Bemanningsservice,ou=Område 2,ou=Sahlgrenska Universitetssjukhuset,ou=Org,o=VGR";
 
   Mockery _context;
 
   NodeService _nodeService;
-  
+
   KivWsClient _kivWsClient;
-  
+
   BehaviourFilter _behaviourFilter;
 
   @Before
@@ -53,18 +51,14 @@ public class ExtendPersonPolicyTest {
   @Test
   public void test() throws IOException, JAXBException {
     final String expectedOrganisation = "VGR/Org/Sahlgrenska Universitetssjukhuset/Område 2/Verksamhet Bemanningsservice/Bemanningsservice Poolmedarbetare";
-    
+
     _context.checking(new Expectations() {
       {
-        // siteService.getSite
-        allowing(_nodeService).getProperty(with(any(NodeRef.class)), with(equal(VgrModel.PROP_PERSON_RESPONSIBILITY_CODE)));
-        will(returnValue(RESPONSIBILITY_CODE));
         allowing(_nodeService).getProperty(with(any(NodeRef.class)), with(equal(ContentModel.PROP_USERNAME)));
         will(returnValue(USERNAME));
-        allowing(_kivWsClient).searchPersonEmployment(with(equal(USERNAME)), with(equal(RESPONSIBILITY_CODE)));
+        allowing(_nodeService).getProperty(with(any(NodeRef.class)), with(equal(VgrModel.PROP_PERSON_ORGANIZATION_DN)));
         will(returnValue(ORGANIZATION_DN));
         allowing(_behaviourFilter).disableBehaviour(with(any(NodeRef.class)));
-        allowing(_nodeService).setProperty(with(any(NodeRef.class)), with(equal(VgrModel.PROP_PERSON_ORGANIZATION_DN)), with(equal(ORGANIZATION_DN)));
         allowing(_nodeService).setProperty(with(any(NodeRef.class)), with(equal(ContentModel.PROP_ORGANIZATION)), with(equal(expectedOrganisation)));
         allowing(_nodeService).setProperty(with(any(NodeRef.class)), with(equal(ContentModel.PROP_ORGID)), with(equal(expectedOrganisation)));
         allowing(_behaviourFilter).enableBehaviour(with(any(NodeRef.class)));
