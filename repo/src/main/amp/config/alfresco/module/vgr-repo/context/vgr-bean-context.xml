@@ -2,13 +2,13 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
                            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
-                           http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd 
+                           http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd
                            http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd">
 
   <!-- activate the load time weaver for weaving aspects into classes and also accessing private mehtods -->
-  <context:load-time-weaver />
+  <context:load-time-weaver weaver-class="org.springframework.instrument.classloading.ReflectiveLoadTimeWeaver" aspectj-weaving="on" />
 
   <!-- This is a helper bean for getting hold of the current application context and making it available with a static method -->
   <bean id="vgr.applicationContextHolder" class="se.vgregion.alfresco.repo.utils.ApplicationContextHolder" />
@@ -193,7 +193,7 @@
     <property name="pushAtomFeedUtil" ref="vgr.pushAtomFeedUtil" />
     <property name="testMode" value="${vgr.pushserver.test}" />
   </bean>
-  
+
   <bean id="vgr.publishingService" class="se.vgregion.alfresco.repo.publish.impl.PublishingServiceImpl">
     <property name="nodeService" ref="NodeService" />
     <property name="serviceUtils" ref="vgr.serviceUtils" />
@@ -587,7 +587,7 @@
     <property name="nodeService" ref="NodeService" />
     <property name="behaviourFilter" ref="policyBehaviourFilter" />
   </bean>
-  
+
   <!-- ***************************************************************************************************** -->
   <!-- Trigger User Update web scripts -->
   <!-- ***************************************************************************************************** -->
