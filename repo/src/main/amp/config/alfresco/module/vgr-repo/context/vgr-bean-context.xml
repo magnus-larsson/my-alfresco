@@ -319,17 +319,17 @@
   <!-- ***************************** -->
 
   <bean id="vgr.metadata-writer.service" class="org.redpill.alfresco.module.metadatawriter.services.impl.MetadataServiceImpl" init-method="register" parent="metadata-writer.abstract.service">
-    <constructor-arg type="java.lang.String" value="vgr.metadata-writer.service" />
-    <constructor-arg type="java.util.List">
+    <property name="serviceName" value="vgr.metadata-writer.service" />
+    <property name="converters">
       <list></list>
-    </constructor-arg>
-    <constructor-arg type="java.util.Properties">
+    </property>
+    <property name="mappings">
       <props>
         <prop key="Title">vgr:dc.title</prop>
         <prop key="DC:identifier.documentid">vgr:dc.identifier.documentid</prop>
         <prop key="nodeRef">sys:node-uuid</prop>
       </props>
-    </constructor-arg>
+    </property>
   </bean>
 
   <!-- ********************************************* -->
