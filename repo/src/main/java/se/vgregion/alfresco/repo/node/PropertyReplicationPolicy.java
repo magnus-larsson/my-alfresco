@@ -30,7 +30,8 @@ public class PropertyReplicationPolicy extends AbstractPolicy implements OnUpdat
     // Run as system user to prevent certain access restriction errors which may
     // appear when property updates are made by alfresco when new renditions are
     // created
-    AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>() {
+    AuthenticationUtil.runAsSystem(new AuthenticationUtil.RunAsWork<Void>() {
+      
       @Override
       public Void doWork() throws Exception {
         _behaviourFilter.disableBehaviour();
@@ -42,7 +43,7 @@ public class PropertyReplicationPolicy extends AbstractPolicy implements OnUpdat
         return null;
       }
 
-    }, AuthenticationUtil.getSystemUserName());
+    });
   }
 
   private void updateProperties(final NodeRef nodeRef) {

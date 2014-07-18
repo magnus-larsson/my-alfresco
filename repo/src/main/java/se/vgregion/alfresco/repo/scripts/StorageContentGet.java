@@ -19,23 +19,14 @@
 package se.vgregion.alfresco.repo.scripts;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.cmis.CMISFilterNotValidException;
-import org.alfresco.cmis.CMISRendition;
-import org.alfresco.cmis.CMISRenditionService;
-import org.alfresco.model.ApplicationModel;
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.content.MimetypeMap;
-import org.alfresco.repo.web.scripts.FileTypeImageUtils;
-import org.alfresco.repo.web.scripts.content.StreamContent;
-import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.repository.FileTypeImageSize;
+import org.alfresco.repo.web.scripts.content.ContentGet;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.thumbnail.ThumbnailService;
 import org.alfresco.service.namespace.NamespaceService;
@@ -47,9 +38,7 @@ import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.WebScriptException;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
-import org.springframework.util.FileCopyUtils;
-import org.springframework.web.context.ServletContextAware;
-import org.springframework.web.context.support.ServletContextResource;
+import org.springframework.util.ReflectionUtils;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.storage.StorageService;
@@ -62,15 +51,9 @@ import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
  * 
  * @author Niklas Ekman
  */
-public class StorageContentGet extends StreamContent implements ServletContextAware {
-
-  private ServletContext _servletContext;
-
-  private DictionaryService _dictionaryService;
+public class StorageContentGet extends ContentGet {
 
   private NamespaceService _namespaceService;
-
-  private CMISRenditionService _cmisRenditionService;
 
   private ServiceUtilsImpl _serviceUtils;
 
@@ -78,21 +61,8 @@ public class StorageContentGet extends StreamContent implements ServletContextAw
 
   private StorageService _storageService;
 
-  @Override
-  public void setServletContext(final ServletContext servletContext) {
-    _servletContext = servletContext;
-  }
-
-  public void setDictionaryService(final DictionaryService dictionaryService) {
-    _dictionaryService = dictionaryService;
-  }
-
   public void setNamespaceService(final NamespaceService namespaceService) {
     _namespaceService = namespaceService;
-  }
-
-  public void setCMISRenditionService(final CMISRenditionService cmisRenditionService) {
-    _cmisRenditionService = cmisRenditionService;
   }
 
   public void setServiceUtils(final ServiceUtilsImpl serviceUtils) {
@@ -188,7 +158,19 @@ public class StorageContentGet extends StreamContent implements ServletContextAw
       final String filename = extractFilename(filenameNodeRef, nodeRef);
 
       // Stream the content
+      streamContentLocal(req, res, nodeRef, attach, propertyQName, filename);
+    }
+  }
+
+  private void streamContentLocal(WebScriptRequest req, WebScriptResponse res, NodeRef nodeRef, boolean attach, QName propertyQName, String filename) throws IOException {
+    String userAgent = req.getHeader("User-Agent");
+
+    boolean rfc5987Supported = (null != userAgent) && (userAgent.contains("MSIE") || userAgent.contains(" Chrome/") || userAgent.contains(" FireFox/"));
+
+    if (attach && rfc5987Supported) {
       streamContent(req, res, nodeRef, propertyQName, attach, filename);
+    } else {
+      streamContent(req, res, nodeRef, propertyQName, attach);
     }
   }
 
@@ -214,97 +196,16 @@ public class StorageContentGet extends StreamContent implements ServletContextAw
     return "\"" + filename + extension + "\"";
   }
 
-  /**
-   * Stream content rendition
-   * 
-   * @param req
-   * @param res
-   * @param nodeRef
-   * @param streamId
-   * @param attach
-   * @throws IOException
-   */
-  private void streamRendition(final WebScriptRequest req, final WebScriptResponse res, final NodeRef nodeRef, final String streamId, final boolean attach) throws IOException {
+  private void streamRendition(WebScriptRequest req, WebScriptResponse res, NodeRef nodeRef, String streamId, boolean attach) throws IOException {
     try {
-      // find rendition
-      CMISRendition rendition = null;
+      final Method method = ReflectionUtils.findMethod(ContentGet.class, "streamRendition", WebScriptRequest.class, WebScriptResponse.class, NodeRef.class, String.class, Boolean.class);
 
-      final List<CMISRendition> renditions = _cmisRenditionService.getRenditions(nodeRef, "*");
+      ReflectionUtils.makeAccessible(method);
 
-      for (final CMISRendition candidateRendition : renditions) {
-        if (candidateRendition.getStreamId().equals(streamId)) {
-          rendition = candidateRendition;
-          break;
-        }
-      }
-
-      if (rendition == null) {
-        throw new WebScriptException(HttpServletResponse.SC_NOT_FOUND, "Unable to find rendition " + streamId + " for " + nodeRef.toString());
-      }
-
-      // determine if special case for icons
-      if (streamId.startsWith("alf:icon")) {
-        streamIcon(res, nodeRef, streamId, attach);
-      } else {
-        streamContent(req, res, rendition.getNodeRef(), ContentModel.PROP_CONTENT, attach);
-      }
-    } catch (final CMISFilterNotValidException e) {
-      throw new WebScriptException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Invalid Rendition Filter");
+      ReflectionUtils.invokeMethod(method, req, res, nodeRef, streamId, attach);
+    } catch (final Exception ex) {
+      throw new RuntimeException(ex);
     }
-  }
-
-  /**
-   * Stream Icon
-   * 
-   * @param res
-   * @param nodeRef
-   * @param streamId
-   * @param attach
-   * @throws IOException
-   */
-  private void streamIcon(final WebScriptResponse res, final NodeRef nodeRef, final String streamId, final boolean attach) throws IOException {
-    // convert stream id to icon size
-    final FileTypeImageSize imageSize = streamId.equals("alf:icon16") ? FileTypeImageSize.Small : FileTypeImageSize.Medium;
-
-    final String iconSize = streamId.equals("alf:icon16") ? "-16" : "";
-
-    // calculate icon file name and path
-    String iconPath = null;
-
-    if (_dictionaryService.isSubClass(nodeService.getType(nodeRef), ContentModel.TYPE_CONTENT)) {
-      final String name = (String) nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
-
-      iconPath = FileTypeImageUtils.getFileTypeImage(_servletContext, name, imageSize);
-    } else {
-      final String icon = (String) nodeService.getProperty(nodeRef, ApplicationModel.PROP_ICON);
-
-      if (icon != null) {
-        iconPath = "/images/icons/" + icon + iconSize + ".gif";
-      } else {
-        iconPath = "/images/icons/space-icon-default" + iconSize + ".gif";
-      }
-    }
-
-    // set mimetype
-    String mimetype = MimetypeMap.MIMETYPE_BINARY;
-
-    final int extIndex = iconPath.lastIndexOf('.');
-
-    if (extIndex != -1) {
-      final String ext = iconPath.substring(extIndex + 1);
-
-      mimetype = mimetypeService.getMimetype(ext);
-    }
-    res.setContentType(mimetype);
-
-    // stream icon
-    final ServletContextResource resource = new ServletContextResource(_servletContext, iconPath);
-
-    if (!resource.exists()) {
-      throw new WebScriptException(HttpServletResponse.SC_NOT_FOUND, "Unable to find rendition " + streamId + " for " + nodeRef.toString());
-    }
-
-    FileCopyUtils.copy(resource.getInputStream(), res.getOutputStream());
   }
 
   /**
@@ -333,17 +234,6 @@ public class StorageContentGet extends StreamContent implements ServletContextAw
     final Map<String, Object> templateModel = createTemplateParameters(req, res, model);
 
     sendStatus(req, res, status, cache, format, templateModel);
-  }
-
-  @Override
-  protected void setAttachment(final WebScriptRequest req, final WebScriptResponse res, final boolean attach, final String attachFileName) {
-    String headerValue = attach ? "attachment" : "inline";
-
-    if (StringUtils.isNotBlank(attachFileName)) {
-      headerValue += "; filename=" + attachFileName;
-    }
-
-    res.setHeader("Content-Disposition", headerValue);
   }
 
 }

@@ -110,12 +110,12 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
     propertyMap.put("DC.contributor.acceptedby", VgrModel.PROP_CONTRIBUTOR_ACCEPTEDBY); // multiple
     propertyMap.put("DC.contributor.acceptedby.id", VgrModel.PROP_CONTRIBUTOR_ACCEPTEDBY_ID); // multiple
     propertyMap.put("DC.contributor.acceptedby.freetext", VgrModel.PROP_CONTRIBUTOR_ACCEPTEDBY_FREETEXT);
-    propertyMap.put("DC.contributor.acceptedby.role", VgrModel.PROP_CONTRIBUTOR_ACCEPTEDBY);
+    propertyMap.put("DC.contributor.acceptedby.role", VgrModel.PROP_CONTRIBUTOR_ACCEPTEDBY_ROLE);
     propertyMap.put("DC.contributor.acceptedby.unit.freetext", VgrModel.PROP_CONTRIBUTOR_ACCEPTEDBY_UNIT_FREETEXT);
     propertyMap.put("DC.contributor.controlledby", VgrModel.PROP_CONTRIBUTOR_CONTROLLEDBY); // multiple
     propertyMap.put("DC.contributor.controlledby.id", VgrModel.PROP_CONTRIBUTOR_CONTROLLEDBY_ID); // multiple
     propertyMap.put("DC.contributor.controlledby.freetext", VgrModel.PROP_CONTRIBUTOR_CONTROLLEDBY_FREETEXT);
-    propertyMap.put("DC.contributor.controlledby.role", VgrModel.PROP_CONTRIBUTOR_ACCEPTEDBY);
+    propertyMap.put("DC.contributor.controlledby.role", VgrModel.PROP_CONTRIBUTOR_CONTROLLEDBY_ROLE);
     propertyMap.put("DC.contributor.controlledby.unit.freetext", VgrModel.PROP_CONTRIBUTOR_ACCEPTEDBY_UNIT_FREETEXT);
 
     propertyMap.put("DC.type.document", VgrModel.PROP_TYPE_DOCUMENT);

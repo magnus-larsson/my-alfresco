@@ -741,7 +741,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
             }
           }
         } finally {
-          documents.close();
+          ServiceUtilsImpl.closeQuietly(documents);
         }
 
         return count;

@@ -57,9 +57,6 @@ public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPoli
     _nodeService = nodeService;
   }
 
-  public void setLockService(final LockService lockService) {
-  }
-
   public void setServiceUtils(final ServiceUtilsImpl serviceUtils) {
     _serviceUtils = serviceUtils;
   }
@@ -70,8 +67,7 @@ public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPoli
     startMinor = properties.getProperty(START_MINOR_KEY) != null ? Integer.parseInt(properties.getProperty(START_MINOR_KEY)) : DEFAULT_START_MINOR;
 
     if (LOG.isDebugEnabled()) {
-      LOG.debug("Initialized ConfigurableSerialVersionLabelPolicy with delimiter = " + delimiter + ", major start = " + startMajor
-          + ", minor start =  " + startMinor);
+      LOG.debug("Initialized ConfigurableSerialVersionLabelPolicy with delimiter = " + delimiter + ", major start = " + startMajor + ", minor start =  " + startMinor);
     }
   }
 
@@ -89,13 +85,16 @@ public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPoli
    * @Override
    */
   @Override
-  public String calculateVersionLabel(final QName classRef, final Version preceedingVersion, final int versionNumber,
-      final Map<String, Serializable> versionProperties) {
+  public String calculateVersionLabel(final QName classRef, final Version preceedingVersion, final int versionNumber, final Map<String, Serializable> versionProperties) {
     // if the nodeRef is not saved, then this is not a VGR Document and calculation should be handled as usual
-    if (_savedNodeRef == null) {
+    if (_savedNodeRef == null && _savedNodeRef.get() == null) {
       super.calculateVersionLabel(classRef, preceedingVersion, versionNumber, versionProperties);
+
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Saved node ref is empty, so document is NOT a VGR document and calulcation proceeds as normal.");
+      }
     }
-    
+
     SerialVersionLabel serialVersionNumber = null;
 
     if (preceedingVersion != null) {
@@ -145,11 +144,17 @@ public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPoli
 
   @Override
   public void beforeCreateVersion(final NodeRef nodeRef) {
-    // if it's not a VGR Document, don't save nodeRef for later use, i.e. calculate version 
-    if (!_nodeService.getType(nodeRef).isMatch(VgrModel.TYPE_VGR_DOCUMENT)) {
+    // if it's not a VGR Document, don't save nodeRef for later use, i.e. calculate version
+    QName nodeType = _nodeService.getType(nodeRef);
+
+    if (!nodeType.isMatch(VgrModel.TYPE_VGR_DOCUMENT)) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Node is not a vgr:document but rather a '" + nodeType + "'");
+      }
+
       return;
     }
-    
+
     // This is a horribly nasty hack, but until ETHREEOH-3183 is fixed there's
     // no real way around it.
     _savedNodeRef.set(nodeRef);
@@ -164,7 +169,7 @@ public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPoli
     /**
      * The major revision number
      */
-    private int majorRevisionNumber;
+    private int _majorRevisionNumber;
 
     /**
      * The minor revision number
@@ -180,15 +185,15 @@ public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPoli
     public SerialVersionLabel(final String versionLabel) {
       if (versionLabel != null && versionLabel.length() != 0) {
         final VersionNumber versionNumber = new VersionNumber(versionLabel);
-        majorRevisionNumber = versionNumber.getPart(0);
+        _majorRevisionNumber = versionNumber.getPart(0);
         minorRevisionNumber = versionNumber.getPart(1);
       } else {
-        majorRevisionNumber = startMajor;
+        _majorRevisionNumber = startMajor;
         minorRevisionNumber = startMinor;
       }
 
       if (LOG.isDebugEnabled()) {
-        LOG.debug("Extracted major = " + majorRevisionNumber + " and minor = " + minorRevisionNumber + " from " + versionLabel);
+        LOG.debug("Extracted major = " + _majorRevisionNumber + " and minor = " + minorRevisionNumber + " from " + versionLabel);
       }
     }
 
@@ -196,7 +201,7 @@ public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPoli
      * Increments the major revision number and sets the minor to zero.
      */
     public void majorIncrement() {
-      this.majorRevisionNumber += 1;
+      this._majorRevisionNumber += 1;
       this.minorRevisionNumber = 0;
     }
 
@@ -212,7 +217,7 @@ public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPoli
      */
     @Override
     public String toString() {
-      return this.majorRevisionNumber + delimiter + this.minorRevisionNumber;
+      return this._majorRevisionNumber + delimiter + this.minorRevisionNumber;
     }
   }
 

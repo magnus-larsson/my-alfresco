@@ -2,13 +2,13 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
                            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
-                           http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd 
+                           http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd
                            http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd">
 
   <!-- activate the load time weaver for weaving aspects into classes and also accessing private mehtods -->
-  <context:load-time-weaver />
+  <context:load-time-weaver weaver-class="org.springframework.instrument.classloading.ReflectiveLoadTimeWeaver" aspectj-weaving="on" />
 
   <!-- This is a helper bean for getting hold of the current application context and making it available with a static method -->
   <bean id="vgr.applicationContextHolder" class="se.vgregion.alfresco.repo.utils.ApplicationContextHolder" />
@@ -62,7 +62,7 @@
   </bean>
 
   <!-- Controller for the web script Published -->
-  <bean id="webscript.probe.probe.get" class="com.redpill.alfresco.clusterprobe.repo.ProbeScript" parent="webscript.com.redpill.alfresco.clusterprobe.probe.get" />
+  <bean id="webscript.probe.probe.get" class="org.redpill.alfresco.clusterprobe.repo.ProbeScript" parent="webscript.org.redpill.alfresco.clusterprobe.probe.get" />
 
   <!-- Need to override the "registerContentWithVersionService" to replace the version label calculation done for cm:content alternatively create a new bean for all custom content types. -->
 
@@ -193,7 +193,7 @@
     <property name="pushAtomFeedUtil" ref="vgr.pushAtomFeedUtil" />
     <property name="testMode" value="${vgr.pushserver.test}" />
   </bean>
-  
+
   <bean id="vgr.publishingService" class="se.vgregion.alfresco.repo.publish.impl.PublishingServiceImpl">
     <property name="nodeService" ref="NodeService" />
     <property name="serviceUtils" ref="vgr.serviceUtils" />
@@ -319,31 +319,25 @@
   <!-- ***************************** -->
 
   <bean id="vgr.metadata-writer.service" class="org.redpill.alfresco.module.metadatawriter.services.impl.MetadataServiceImpl" init-method="register" parent="metadata-writer.abstract.service">
-    <constructor-arg type="java.lang.String" value="vgr.metadata-writer.service" />
-    <constructor-arg type="java.util.List">
+    <property name="serviceName" value="vgr.metadata-writer.service" />
+    <property name="converters">
       <list></list>
-    </constructor-arg>
-    <constructor-arg type="java.util.Properties">
+    </property>
+    <property name="mappings">
       <props>
         <prop key="Title">vgr:dc.title</prop>
         <prop key="DC:identifier.documentid">vgr:dc.identifier.documentid</prop>
         <prop key="nodeRef">sys:node-uuid</prop>
       </props>
-    </constructor-arg>
+    </property>
   </bean>
 
   <!-- ********************************************* -->
   <!-- Bean for the VGR specific content.get service -->
   <!-- ********************************************* -->
 
-  <bean id="webscript.se.vgregion.storage.content.get" class="se.vgregion.alfresco.repo.scripts.StorageContentGet" parent="webscript">
+  <bean id="webscript.se.vgregion.storage.content.get" class="se.vgregion.alfresco.repo.scripts.StorageContentGet" parent="webscript.org.alfresco.cmis.content.get">
     <property name="namespaceService" ref="NamespaceService" />
-    <property name="permissionService" ref="PermissionService" />
-    <property name="nodeService" ref="NodeService" />
-    <property name="contentService" ref="ContentService" />
-    <property name="dictionaryService" ref="DictionaryService" />
-    <property name="mimetypeService" ref="MimetypeService" />
-    <property name="CMISRenditionService" ref="CMISRenditionService" />
     <property name="serviceUtils" ref="vgr.serviceUtils" />
     <property name="thumbnailService" ref="ThumbnailService" />
     <property name="storageService" ref="vgr.storageService" />
@@ -593,7 +587,7 @@
     <property name="nodeService" ref="NodeService" />
     <property name="behaviourFilter" ref="policyBehaviourFilter" />
   </bean>
-  
+
   <!-- ***************************************************************************************************** -->
   <!-- Trigger User Update web scripts -->
   <!-- ***************************************************************************************************** -->
