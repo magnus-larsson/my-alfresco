@@ -53,7 +53,9 @@ import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
  * <p/>
  * It's purpose is to create an external user when that kind of invitation is initiated.
  * <p/>
- * Niklas Ekman
+ * 
+ * @author Niklas Ekman (niklas.ekman@redpill-linpro.com)
+ * @deprecated This feature is not used any longer
  */
 public class ExternalUsersInvitationServiceImpl implements InitializingBean, ExternalUsersInvitationService {
 

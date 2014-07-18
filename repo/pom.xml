@@ -273,6 +273,7 @@
       <groupId>${alfresco.groupId}</groupId>
       <artifactId>alfresco-web-client</artifactId>
       <scope>provided</scope>
+      <version>${alfresco.version}</version>
       <exclusions>
         <exclusion>
           <groupId>axis2</groupId>

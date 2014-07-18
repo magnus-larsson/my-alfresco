@@ -10,7 +10,7 @@
 
   <groupId>se.vgregion.alfresco</groupId>
   <artifactId>alfresco-vgr</artifactId>
-  <version>2.1.7</version>
+  <version>2.1.7-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>VGR Alfresco Base Project</name>
 
@@ -26,67 +26,4 @@
     <!-- <module>toolkit</module> -->
   </modules>
 
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>com.sourcesense.maven</groupId>
-                    <artifactId>maven-nosnapshot-plugin</artifactId>
-                    <versionRange>[0.0.7-SNAPSHOT,)</versionRange>
-                    <goals>
-                      <goal>strip</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <execute />
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <versionRange>[2.4,)</versionRange>
-                    <goals>
-                      <goal>copy-dependencies</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>net.alchim31.maven</groupId>
-                    <artifactId>yuicompressor-maven-plugin</artifactId>
-                    <versionRange>[1.1,)</versionRange>
-                    <goals>
-                      <goal>compress</goal>
-                      <goal>jslint</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
-  <repositories>
-    <repository>
-      <id>alfresco-hotfix-releases</id>
-      <url>https://artifacts.alfresco.com/nexus/content/repositories/hotfix-releases</url>
-    </repository>
-  </repositories>
 </project>

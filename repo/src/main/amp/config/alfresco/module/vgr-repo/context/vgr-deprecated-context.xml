@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+  <!-- **************************************************************** -->
+  <!-- Overridden bean for implementing external users specific for VGR -->
+  <!-- **************************************************************** -->
+
+  <!-- 
+  <bean id="vgr.externalUsersInvitationService" class="org.alfresco.repo.invitation.ExternalUsersInvitationServiceImpl" p:authenticationService-ref="AuthenticationService"
+    p:externalUsersService-ref="vgr.externalUsers" p:namespaceService-ref="NamespaceService" p:invitationService-ref="invitationService" p:workflowService-ref="WorkflowService" p:personService-ref="PersonService"
+    p:permissionService-ref="PermissionService" p:siteService-ref="SiteService" p:nodeService-ref="NodeService" p:userSynchronizer-ref="vgr.userSynchronizer" p:userRegistrySynchronizer-ref="userRegistrySynchronizer"
+    p:serviceUtils-ref="vgr.serviceUtils" />
+
+  <bean id="vgr.invitationServiceInterceptor" class="se.vgregion.alfresco.repo.invitation.InvitationServiceInterceptor" p:externalActivation="${vgr.external.activation}"
+    p:externalUsersInvitationService-ref="vgr.externalUsersInvitationService" />
+
+  <bean id="InvitationService" class="org.springframework.aop.framework.ProxyFactoryBean" p:targetName="invitationService">
+    <property name="proxyInterfaces">
+      <list>
+        <value>org.alfresco.service.cmr.invitation.InvitationService</value>
+      </list>
+    </property>
+    <property name="interceptorNames">
+      <list>
+        <idref bean="InvitationService_transaction" />
+        <idref bean="AuditMethodInterceptor" />
+        <idref bean="exceptionTranslator" />
+        <idref bean="InvitationService_security" />
+        <idref local="vgr.invitationServiceInterceptor" />
+      </list>
+    </property>
+  </bean>
+
+  <bean id="vgr.userSynchronizer" class="se.vgregion.alfresco.repo.security.UserSynchronizer" p:applicationContextManager-ref="Authentication" p:authorityService-ref="authorityService"
+    p:personService-ref="personService" p:ruleService-ref="ruleService" p:transactionService-ref="transactionService" p:zone="${vgr.external.users.zone}" />
+  -->
+
+</beans>
