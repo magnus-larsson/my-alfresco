@@ -170,9 +170,9 @@ public class StorageContentGet extends ContentGet {
     boolean rfc5987Supported = (null != userAgent) && (userAgent.contains("msie") || userAgent.contains(" chrome/") || userAgent.contains(" firefox/"));
 
     if (attach && rfc5987Supported) {
-      streamContent(req, res, nodeRef, propertyQName, attach, filename, null);
+      streamContent(req, res, nodeRef, propertyQName, attach, filename);
     } else {
-      streamContent(req, res, nodeRef, propertyQName, attach, null, null);
+      streamContent(req, res, nodeRef, propertyQName, attach);
     }
   }
 
