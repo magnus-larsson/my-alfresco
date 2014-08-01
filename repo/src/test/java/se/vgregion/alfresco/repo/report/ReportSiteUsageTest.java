@@ -320,7 +320,7 @@ public class ReportSiteUsageTest {
         will(returnValue("site1"));
 
         List<String> activityFeed = new ArrayList<String>();
-        allowing(activityService).getSiteFeedEntries("site1", "json");
+        allowing(activityService).getSiteFeedEntries("site1");
         will(returnValue(activityFeed));
       }
     });
@@ -344,7 +344,7 @@ public class ReportSiteUsageTest {
 
         List<String> activityFeed = new ArrayList<String>();
         activityFeed.add("{\"postDate\": \"" + ISO8601DateFormat.format(testDate) + "\" }");
-        allowing(activityService).getSiteFeedEntries("site2", "json");
+        allowing(activityService).getSiteFeedEntries("site2");
         will(returnValue(activityFeed));
       }
     });

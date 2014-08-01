@@ -232,6 +232,7 @@
     <actions>
 
       <action id="action-header-edit" type="header">
+        <param name="foobar">{foobar}</param>
         <permissions>
           <permission allow="true">Write</permission>
         </permissions>
@@ -239,6 +240,7 @@
       </action>
 
       <action id="action-header-publish" type="header">
+        <param name="foobar">{foobar}</param>
         <permissions>
           <permission allow="true">Write</permission>
         </permissions>
@@ -248,9 +250,12 @@
         <evaluator negate="true">evaluator.doclib.metadata.isLocked</evaluator>
       </action>
 
-      <action id="action-header-manage" type="header" />
+      <action id="action-header-manage" type="header">
+        <param name="foobar">{foobar}</param>
+      </action>
 
       <action id="action-header-origin" type="header">
+        <param name="foobar">{foobar}</param>
         <evaluator>evaluator.doclib.action.isWorkingCopy</evaluator>
       </action>
 

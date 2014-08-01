@@ -762,7 +762,7 @@ function resolveRootNode(reference)
    {
       if (reference == "alfresco://company/home")
       {
-         node = null;
+         node = "";
       }
       else if (reference == "alfresco://user/home")
       {
@@ -771,6 +771,10 @@ function resolveRootNode(reference)
       else if (reference == "alfresco://sites/home")
       {
          node = companyhome.childrenByXPath("st:sites")[0];
+      }
+      else if (reference == "alfresco://shared")
+      {
+         node = companyhome.childrenByXPath("app:shared")[0];
       }
       else if (reference.indexOf("://") > 0)
       {
@@ -798,7 +802,7 @@ function resolveRootNode(reference)
    {
       node = null;
    }
-   return node;
+   return node !== "" ? node : null;
 }
 
 /**
@@ -816,7 +820,7 @@ function getSearchResults(params)
       term = params.term,
       tag = params.tag,
       formData = params.query,
-      rootNode = resolveRootNode(params.rootNode);
+      rootNode = params.rootNode ? resolveRootNode(params.rootNode) : null;
    
    // Simple keyword search and tag specific search
    if (term !== null && term.length !== 0)
@@ -1110,7 +1114,7 @@ function getSearchResults(params)
       nodes = [];
    }
    
-   return processResults(nodes, params.pageSize, params.startIndex, rootNode);
+   return processResults(nodes, params.pageSize < params.maxResults ? params.pageSize : params.maxResults, params.startIndex, rootNode);
 }
 
 /**

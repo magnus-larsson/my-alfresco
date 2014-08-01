@@ -6,7 +6,8 @@
     http://www.springframework.org/schema/context
     http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-  <import resource="classpath*:alfresco/module/vgr-repo/context/*-context.xml" />
+  <import resource="classpath*:alfresco/module/*/context/*-context.xml" />
+  <import resource="classpath*:alfresco/module/*/module-webscripts-context.xml" />
 
   <bean id="vgr.configBootstrap" class="org.alfresco.web.config.WebClientConfigBootstrap" init-method="init">
     <property name="configs">

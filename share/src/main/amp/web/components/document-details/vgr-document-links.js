@@ -6,6 +6,8 @@
  * TODO write some docs
  */
 (function(onReady) {
+   
+   var Dom = YAHOO.util.Dom;
 
    Alfresco.DocumentLinks.prototype.onReady = function() {
       onReady.call(this);

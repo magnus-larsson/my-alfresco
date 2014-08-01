@@ -123,7 +123,7 @@ public class ReportSiteUsage implements InitializingBean {
    * @throws Exception
    */
   public Date getLastActivityOnSite(SiteInfo siteInfo) throws Exception {
-    List<String> siteFeedEntries = _activityService.getSiteFeedEntries(siteInfo.getShortName(), "json");
+    List<String> siteFeedEntries = _activityService.getSiteFeedEntries(siteInfo.getShortName());
 
     JSONParser p = new JSONParser();
 

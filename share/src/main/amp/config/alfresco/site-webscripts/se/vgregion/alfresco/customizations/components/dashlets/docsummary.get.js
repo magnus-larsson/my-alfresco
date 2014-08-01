@@ -1,29 +1,12 @@
-function main() {
-   var filters = [];
-
-   // first remove the actions which should not be there
-   for each (filter in model.filters) {
-      if (filter.type === 'synced') {
-         continue;
-      }
-      
-      if (filter.type === 'syncedErrors') {
-         continue;
-      }
-      
-      filters.push(filter);
-   }
-   
+function vgr_main() {
    // then add another filter for viewing what others are editing
-   filters.splice(2, 0, {
+   model.filters.splice(2, 0, {
       type: "editingOthers",
       parameters: ""
    });
-
-   model.filters = filters;
 }
 
-main();
+vgr_main();
 
 function getContentTypes() {
    return contentTypes = [ {

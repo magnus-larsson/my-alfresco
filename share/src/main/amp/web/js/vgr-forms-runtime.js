@@ -5,8 +5,8 @@
  */
 (function(_runValidations) {
 
-   Alfresco.forms.Form.prototype._runValidations = function(silent) {
-      var valid = _runValidations.call(this, silent);
+   Alfresco.forms.Form.prototype._runValidations = function(event, fieldId, notificationLevel) {
+      var valid = _runValidations.call(this, event, fieldId, notificationLevel);
       
       var warningText = Dom.get(this.formId + "-warningtext");
 

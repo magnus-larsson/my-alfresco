@@ -6,7 +6,7 @@
  * @returns
  */
 
-function main() {
+function vgr_main() {
    var aspects = model.item.node.aspects;
    
    var status = [];
@@ -28,10 +28,10 @@ function main() {
          if (all) {
             status.push('auto-publish-all-versions');
          }
-
-         model.item.status = status.join(',');
       }
    }
+   
+   model.widgets[0].options.status = status.join(',');
 }
 
-main();
+vgr_main();

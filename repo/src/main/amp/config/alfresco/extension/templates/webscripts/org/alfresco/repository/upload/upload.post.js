@@ -71,10 +71,14 @@ function main()
       {
          switch (String(field.name).toLowerCase())
          {
+            case "filename":
+               filename = fnFieldValue(field);
+               break;
+            
             case "filedata":
                if (field.isFile)
                {
-                  filename = field.filename;
+                  filename = filename ? filename : field.filename;
                   content = field.content;
                   mimetype = field.mimetype;
                }
@@ -139,13 +143,16 @@ function main()
             case "tempfilename":
                tempFilename = field.value;
                break;
-               
-            case "filename":
-               filename = field.value;
-               break;
          }
       }
 
+      //MNT-7213 When alf_data runs out of disk space, Share uploads result in a success message, but the files do not appear
+      if (formdata.fields.length == 0)
+      {
+         exitUpload(404, " No disk space available");
+         return;
+      }
+	  
       // Ensure mandatory file attributes have been located. Need either destination, or site + container or updateNodeRef
       if ((filename === null || (content === null && tempFilename === null)) || (destination === null && (siteId === null || containerId === null) && updateNodeRef === null))
       {
@@ -351,11 +358,11 @@ function main()
          var newFile;
          if (contentType !== null)
          {
-         newFile = destNode.createFile(filename, contentType);
+            newFile = destNode.createFile(filename, contentType);
          }
          else
          {
-          newFile = destNode.createFile(filename);
+            newFile = destNode.createFile(filename);
          }
          writeContent(newFile.properties.content, content, tempFilename);
 
@@ -363,22 +370,13 @@ function main()
          newFile.properties.content.guessMimetype(filename);
          newFile.properties.content.guessEncoding();
          newFile.save();
+         
+         // TODO (THOR-175) - review
+         // Ensure the file is versionable (autoVersion = true, autoVersionProps = false)
+         newFile.ensureVersioningEnabled(true, false);
 
-         // Create thumbnail?
-         if (thumbnailNames != null)
-         {
-            var thumbnails = thumbnailNames.split(","),
-               thumbnailName = "";
-
-            for (i = 0; i < thumbnails.length; i++)
-            {
-               thumbnailName = thumbnails[i];
-               if (thumbnailName != "" && thumbnailService.isThumbnailNameRegistered(thumbnailName))
-               {
-                  newFile.createThumbnail(thumbnailName, true);
-               }
-            }
-         }
+         // NOTE: Removal of first request for thumbnails to improve upload performance
+         //       Thumbnails are still requested by Share on first render of the doclist image.
 
          // Additional aspects?
          if (aspects.length > 0)
@@ -404,7 +402,11 @@ function main()
       //       file cleanup.
       
       // capture exception, annotate it accordingly and re-throw
-      if (e.message && e.message.indexOf("org.alfresco.service.cmr.usage.ContentQuotaException") == 0)
+      if (e.message && e.message.indexOf("AccessDeniedException") != -1)
+      {
+         e.code = 403;
+      }
+      else if (e.message && e.message.indexOf("org.alfresco.service.cmr.usage.ContentQuotaException") == 0)
       {
          e.code = 413;
       }

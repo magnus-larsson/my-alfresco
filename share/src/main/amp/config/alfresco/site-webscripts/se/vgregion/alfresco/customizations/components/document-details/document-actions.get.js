@@ -10,4 +10,4 @@ if (result.status == 200) {
    containerType = data.container.type;
 }
 
-model.containerType = containerType;
+model.widgets[0].options.containerType = containerType

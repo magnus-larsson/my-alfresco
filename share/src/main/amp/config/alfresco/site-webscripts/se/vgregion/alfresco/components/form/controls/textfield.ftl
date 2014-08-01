@@ -98,7 +98,7 @@
        <#if field.control.params.style??>style="${field.control.params.style}"</#if>
        value="${value}"
        <#if field.description??>title="${field.description?html}"</#if>
-       <#if field.control.params.maxLength??>maxlength="${field.control.params.maxLength}"</#if> 
+       <#if field.control.params.maxLength??>maxlength="${field.control.params.maxLength}"<#else>maxlength="1024"</#if> 
        <#if field.control.params.size??>size="${field.control.params.size}"</#if> 
        <#if field.disabled && !(field.control.params.forceEditable?? && field.control.params.forceEditable == "true")>disabled="disabled"</#if> />
 </#macro>

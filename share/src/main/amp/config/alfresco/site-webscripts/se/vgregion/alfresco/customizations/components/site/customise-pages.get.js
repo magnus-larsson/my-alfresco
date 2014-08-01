@@ -1,4 +1,4 @@
-function main() {
+function vgr_main() {
    var sitePages = sitedata.getPage("site/" + model.siteId + "/dashboard").properties.sitePages;
    sitePages = eval('(' + sitePages + ')');
 
@@ -36,4 +36,4 @@ function main() {
    model.themes = themes;
 }
 
-main();
+vgr_main();
