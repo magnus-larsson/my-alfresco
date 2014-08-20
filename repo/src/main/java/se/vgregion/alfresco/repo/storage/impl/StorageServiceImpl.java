@@ -269,9 +269,11 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
           _nodeService.setProperty(newNode, VgrModel.PROP_SOURCE_DOCUMENTID, nodeRef.toString());
           _nodeService.setProperty(nodeRef, VgrModel.PROP_SOURCE_DOCUMENTID, nodeRef.toString());
 
-          // set the field "DC.identifier" when publishing
-          final String identifier = _serviceUtils.getDocumentIdentifier(newNode);
+          // set the field "DC.identifier" & "DC.identifier.native" when publishing
+          String identifier = _serviceUtils.getDocumentIdentifier(newNode);
+          String nativeIdentifier = _serviceUtils.getDocumentIdentifier(newNode, true);
           _nodeService.setProperty(newNode, VgrModel.PROP_IDENTIFIER, identifier);
+          _nodeService.setProperty(newNode, VgrModel.PROP_IDENTIFIER_NATIVE, nativeIdentifier);
           _nodeService.setProperty(nodeRef, VgrModel.PROP_IDENTIFIER, identifier);
 
           // set the field "DC.source" when publishing on the source

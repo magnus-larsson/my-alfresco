@@ -599,4 +599,16 @@
     <property name="transactionService" ref="TransactionService" />
   </bean>
 
+  <!-- ***************************************************** -->
+  <!-- Script for getting nodes with missing PDF/A rendition -->
+  <!-- ***************************************************** -->
+  
+  <bean id="webscript.se.vgregion.alfresco.console.pdfa.missing.get" class="se.vgregion.alfresco.repo.scripts.MissingGet" parent="webscript">
+  	<property name="nodeService" ref="NodeService" />
+  	<property name="permissionService" ref="PermissionService" />
+  	<property name="renditionService" ref="RenditionService" />
+  	<property name="searchService" ref="SearchService" />
+  	<property name="storageService" ref="vgr.storageService" />
+  </bean>
+  
 </beans>
