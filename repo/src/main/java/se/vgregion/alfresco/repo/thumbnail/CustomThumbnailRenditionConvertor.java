@@ -29,6 +29,7 @@ public class CustomThumbnailRenditionConvertor extends ThumbnailRenditionConvert
 
       parameters.put(PdfaPilotRenderingEngine.PARAM_LEVEL, pdfaPilotTransformationOptions.getLevel());
       parameters.put(PdfaPilotRenderingEngine.PARAM_OPTIMIZE, pdfaPilotTransformationOptions.isOptimize());
+      parameters.put(PdfaPilotRenderingEngine.PARAM_FAIL_SILENTLY, pdfaPilotTransformationOptions.isFailSilently());
     }
 
     return parameters;

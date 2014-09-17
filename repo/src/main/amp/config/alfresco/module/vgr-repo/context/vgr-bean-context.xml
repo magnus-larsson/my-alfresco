@@ -446,6 +446,7 @@
     <property name="optimize" value="true" />
     <property name="level" value="" />
     <property name="timeoutMs" value="300000" />
+    <property name="failSilently" value="false" />
   </bean>
 
   <bean id="thumbnail.register.pdf" class="org.alfresco.repo.thumbnail.ThumbnailDefinitionSpringRegisterer">
@@ -475,6 +476,7 @@
     <property name="optimize" value="false" />
     <property name="level" value="1b" />
     <property name="timeoutMs" value="300000" />
+    <property name="failSilently" value="true" />
   </bean>
 
   <bean id="thumbnail.register.pdfa" class="org.alfresco.repo.thumbnail.ThumbnailDefinitionSpringRegisterer">
