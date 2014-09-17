@@ -165,6 +165,7 @@ public interface VgrModel {
   public static final String ACCESS_RIGHT_INTERNET = "Internet";
 
   public static final QName RD_PDF = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "pdf");
+  public static final QName RD_PDFA = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "pdfa");
 
   public static final QName PROP_AUTO_PUBLISH_MAJOR_VERSION = QName.createQName(VGR_URI, "auto_publish_major_version");
   public static final QName PROP_AUTO_PUBLISH_ALL_VERSIONS = QName.createQName(VGR_URI, "auto_publish_all_versions");

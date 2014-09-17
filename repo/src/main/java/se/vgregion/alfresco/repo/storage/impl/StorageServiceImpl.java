@@ -188,7 +188,8 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     final String oldName = (String) _nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
     final String newName = getUniqueName(finalFolder, oldName);
 
-    // disable the auditable aspect in order to prevent the last updated user to be "system"
+    // disable the auditable aspect in order to prevent the last updated user to
+    // be "system"
     _behaviourFilter.disableBehaviour(ContentModel.ASPECT_AUDITABLE);
 
     // we don't want to up the version, so we disable the versionalbe aspect
@@ -269,9 +270,12 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
           _nodeService.setProperty(newNode, VgrModel.PROP_SOURCE_DOCUMENTID, nodeRef.toString());
           _nodeService.setProperty(nodeRef, VgrModel.PROP_SOURCE_DOCUMENTID, nodeRef.toString());
 
-          // set the field "DC.identifier" when publishing
-          final String identifier = _serviceUtils.getDocumentIdentifier(newNode);
+          // set the field "DC.identifier" & "DC.identifier.native" when
+          // publishing
+          String identifier = _serviceUtils.getDocumentIdentifier(newNode);
+          String nativeIdentifier = _serviceUtils.getDocumentIdentifier(newNode, true);
           _nodeService.setProperty(newNode, VgrModel.PROP_IDENTIFIER, identifier);
+          _nodeService.setProperty(newNode, VgrModel.PROP_IDENTIFIER_NATIVE, nativeIdentifier);
           _nodeService.setProperty(nodeRef, VgrModel.PROP_IDENTIFIER, identifier);
 
           // set the field "DC.source" when publishing on the source
@@ -614,7 +618,8 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
   @Override
   public boolean createPdfRendition(final NodeRef nodeRef, final boolean async) {
-    // must first check whether the nodeRef can be transformed into a PDF/A or not...
+    // must first check whether the nodeRef can be transformed into a PDF/A or
+    // not...
     if (!pdfaRendable(nodeRef)) {
       return false;
     }
@@ -629,7 +634,8 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
       throw new RuntimeException("The thumbnail name pdfa is not registered");
     }
 
-    // If there's nothing currently registered to generate thumbnails for the specified mimetype, then log a message and
+    // If there's nothing currently registered to generate thumbnails for the
+    // specified mimetype, then log a message and
     // bail out
     String mimeType = _serviceUtils.getMimetype(nodeRef);
 
@@ -652,11 +658,17 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     // Have the thumbnail created
     if (!async) {
       // Create the thumbnail
-      _thumbnailService.createThumbnail(nodeRef, ContentModel.PROP_CONTENT, details.getMimetype(), details.getTransformationOptions(), details.getName());
+      try {
+        _thumbnailService.createThumbnail(nodeRef, ContentModel.PROP_CONTENT, details.getMimetype(), details.getTransformationOptions(), details.getName());
+      } catch (Exception ex) {
+        // do the mail sending here...
+        return false;
+      }
     } else {
       Action action = ThumbnailHelper.createCreateThumbnailAction(details, _serviceRegistry);
 
       // Queue async creation of thumbnail
+      action.setExecuteAsynchronously(true);
       _actionService.executeAction(action, nodeRef, true, true);
     }
 
@@ -664,7 +676,8 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   }
 
   private void assertPublishable(final NodeRef nodeRef) {
-    // must get the nodeRef to see if the user has create permission in that folder
+    // must get the nodeRef to see if the user has create permission in that
+    // folder
     NodeRef parentNodeRef = _nodeService.getPrimaryParent(nodeRef).getParentRef();
 
     if (_permissionService.hasPermission(parentNodeRef, PermissionService.CREATE_CHILDREN) != AccessStatus.ALLOWED) {

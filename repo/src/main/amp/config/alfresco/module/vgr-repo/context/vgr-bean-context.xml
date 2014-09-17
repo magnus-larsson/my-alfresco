@@ -446,6 +446,7 @@
     <property name="optimize" value="true" />
     <property name="level" value="" />
     <property name="timeoutMs" value="300000" />
+    <property name="failSilently" value="false" />
   </bean>
 
   <bean id="thumbnail.register.pdf" class="org.alfresco.repo.thumbnail.ThumbnailDefinitionSpringRegisterer">
@@ -475,6 +476,7 @@
     <property name="optimize" value="false" />
     <property name="level" value="1b" />
     <property name="timeoutMs" value="300000" />
+    <property name="failSilently" value="true" />
   </bean>
 
   <bean id="thumbnail.register.pdfa" class="org.alfresco.repo.thumbnail.ThumbnailDefinitionSpringRegisterer">
@@ -599,4 +601,16 @@
     <property name="transactionService" ref="TransactionService" />
   </bean>
 
+  <!-- ***************************************************** -->
+  <!-- Script for getting nodes with missing PDF/A rendition -->
+  <!-- ***************************************************** -->
+  
+  <bean id="webscript.se.vgregion.alfresco.console.pdfa.missing.get" class="se.vgregion.alfresco.repo.scripts.MissingGet" parent="webscript">
+  	<property name="nodeService" ref="NodeService" />
+  	<property name="permissionService" ref="PermissionService" />
+  	<property name="renditionService" ref="RenditionService" />
+  	<property name="searchService" ref="SearchService" />
+  	<property name="storageService" ref="vgr.storageService" />
+  </bean>
+  
 </beans>

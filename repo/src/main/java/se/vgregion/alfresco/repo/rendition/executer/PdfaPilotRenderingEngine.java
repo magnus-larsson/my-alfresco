@@ -21,6 +21,8 @@ public class PdfaPilotRenderingEngine extends AbstractTransformationRenderingEng
   public static final String PARAM_LEVEL = "level";
 
   public static final String PARAM_OPTIMIZE = "optimize";
+  
+  public static final String PARAM_FAIL_SILENTLY = "failSilently";
 
   private BehaviourFilter _behaviourFilter;
   
@@ -56,6 +58,12 @@ public class PdfaPilotRenderingEngine extends AbstractTransformationRenderingEng
 
     if (optimize != null) {
       transformationOptions.setOptimize(optimize);
+    }
+    
+    Boolean failSilently = context.getCheckedParam(PARAM_FAIL_SILENTLY, Boolean.class);
+
+    if (failSilently != null) {
+      transformationOptions.setFailSilently(failSilently);
     }
 
     return super.getTransformOptionsImpl(options, context);

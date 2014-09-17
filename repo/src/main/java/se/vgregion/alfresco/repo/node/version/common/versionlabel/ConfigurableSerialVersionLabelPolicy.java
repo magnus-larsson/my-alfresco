@@ -10,7 +10,6 @@ import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.version.VersionModel;
 import org.alfresco.repo.version.VersionServicePolicies.BeforeCreateVersionPolicy;
 import org.alfresco.repo.version.common.versionlabel.SerialVersionLabelPolicy;
-import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.version.Version;
@@ -19,11 +18,12 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.VersionNumber;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.InitializingBean;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
-public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPolicy implements BeforeCreateVersionPolicy {
+public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPolicy implements BeforeCreateVersionPolicy, InitializingBean {
 
   private final static Logger LOG = Logger.getLogger(ConfigurableSerialVersionLabelPolicy.class);
 
@@ -40,6 +40,8 @@ public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPoli
   private final String delimiter;
   private final int startMinor;
   private final int startMajor;
+
+  private static boolean _initilized = false;
 
   private PolicyComponent _policyComponent;
 
@@ -86,7 +88,8 @@ public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPoli
    */
   @Override
   public String calculateVersionLabel(final QName classRef, final Version preceedingVersion, final int versionNumber, final Map<String, Serializable> versionProperties) {
-    // if the nodeRef is not saved, then this is not a VGR Document and calculation should be handled as usual
+    // if the nodeRef is not saved, then this is not a VGR Document and
+    // calculation should be handled as usual
     if (_savedNodeRef == null && _savedNodeRef.get() == null) {
       super.calculateVersionLabel(classRef, preceedingVersion, versionNumber, versionProperties);
 
@@ -144,7 +147,8 @@ public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPoli
 
   @Override
   public void beforeCreateVersion(final NodeRef nodeRef) {
-    // if it's not a VGR Document, don't save nodeRef for later use, i.e. calculate version
+    // if it's not a VGR Document, don't save nodeRef for later use, i.e.
+    // calculate version
     QName nodeType = _nodeService.getType(nodeRef);
 
     if (!nodeType.isMatch(VgrModel.TYPE_VGR_DOCUMENT)) {
@@ -160,8 +164,12 @@ public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPoli
     _savedNodeRef.set(nodeRef);
   }
 
-  public void init() {
-    _policyComponent.bindClassBehaviour(POLICY_BEFORE_CREATE_VERSION, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "beforeCreateVersion"));
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    if (!_initilized) {
+      _policyComponent.bindClassBehaviour(POLICY_BEFORE_CREATE_VERSION, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "beforeCreateVersion"));
+      _initilized = true;
+    }
   }
 
   private class SerialVersionLabel {
