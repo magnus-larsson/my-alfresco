@@ -6,26 +6,28 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.policy.BehaviourFilter;
+import org.alfresco.repo.rendition.executer.AbstractRenderingEngine;
+import org.alfresco.repo.rendition.executer.AbstractTransformationRenderingEngine;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
-import org.alfresco.repo.thumbnail.ThumbnailDefinition;
-import org.alfresco.repo.thumbnail.ThumbnailHelper;
-import org.alfresco.repo.thumbnail.ThumbnailRegistry;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileFolderServiceType;
 import org.alfresco.service.cmr.model.FileInfo;
+import org.alfresco.service.cmr.rendition.RenderCallback;
+import org.alfresco.service.cmr.rendition.RenditionDefinition;
 import org.alfresco.service.cmr.rendition.RenditionService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
@@ -42,15 +44,16 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.OwnableService;
 import org.alfresco.service.cmr.security.PermissionService;
-import org.alfresco.service.cmr.thumbnail.ThumbnailService;
 import org.alfresco.util.VersionNumber;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.redpill.alfresco.repo.content.transform.PdfaPilotTransformationOptions;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.extensions.surf.util.I18NUtil;
 import org.springframework.util.Assert;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
+import se.vgregion.alfresco.repo.rendition.executer.PdfaPilotRenderingEngine;
 import se.vgregion.alfresco.repo.storage.CreationCallback;
 import se.vgregion.alfresco.repo.storage.StorageService;
 import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
@@ -86,8 +89,6 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   private DictionaryService _dictionaryService;
 
   private RetryingTransactionHelper _retryingTransactionHelper;
-
-  private ThumbnailService _thumbnailService;
 
   private ActionService _actionService;
 
@@ -149,10 +150,6 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     _retryingTransactionHelper = retryingTransactionHelper;
   }
 
-  public void setThumbnailService(ThumbnailService thumbnailService) {
-    _thumbnailService = thumbnailService;
-  }
-
   public void setActionService(ActionService actionService) {
     _actionService = actionService;
   }
@@ -162,7 +159,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   }
 
   @Override
-  public void publishToStorage(final NodeRef nodeRef) {
+  public NodeRef publishToStorage(final NodeRef nodeRef) {
     // first check so that each and every condition is met before publishing
     assertPublishable(nodeRef);
 
@@ -170,7 +167,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
       // create the folder structure <year>/<month>/<day>
       final NodeRef finalFolder = createFolderStructure();
 
-      publishFileToStorage(nodeRef, finalFolder);
+      return publishFileToStorage(nodeRef, finalFolder);
     } catch (final Exception ex) {
       LOG.error(ex.getMessage(), ex);
       throw new RuntimeException(ex);
@@ -178,13 +175,13 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   }
 
   @Override
-  public void publishToStorage(final String sourceNodeRef) {
+  public NodeRef publishToStorage(final String sourceNodeRef) {
     final NodeRef nodeRef = new NodeRef(sourceNodeRef);
 
-    publishToStorage(nodeRef);
+    return publishToStorage(nodeRef);
   }
 
-  private void publishFileToStorage(final NodeRef nodeRef, final NodeRef finalFolder) {
+  private NodeRef publishFileToStorage(final NodeRef nodeRef, final NodeRef finalFolder) {
     final String oldName = (String) _nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
     final String newName = getUniqueName(finalFolder, oldName);
 
@@ -214,15 +211,14 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     _nodeService.setProperty(nodeRef, VgrModel.PROP_PUBLISHER, _serviceUtils.getRepresentation(username));
     _nodeService.setProperty(nodeRef, VgrModel.PROP_PUBLISHER_ID, username);
 
-    // check if this file has been published before, i.e. we've published
-    // it,
-    // then revoked it, and are now publishing again
-    final NodeRef publishedNodeRef = getPublishedNodeRef(nodeRef);
-
-    AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>() {
+    return AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<NodeRef>() {
 
       @Override
-      public Void doWork() throws Exception {
+      public NodeRef doWork() throws Exception {
+        // check if this file has been published before, i.e. we've published
+        // it, then revoked it, and are now publishing again
+        NodeRef publishedNodeRef = getPublishedNodeRef(nodeRef);
+
         if (publishedNodeRef != null) {
           // then we need to update the copy's properties as well
           _nodeService.setProperty(publishedNodeRef, VgrModel.PROP_DATE_ISSUED, now);
@@ -289,9 +285,11 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
           // create a PDF/A rendition of the nodeRef
           createPdfRendition(newNode);
+
+          publishedNodeRef = newNode;
         }
 
-        return null;
+        return publishedNodeRef;
       }
     }, AuthenticationUtil.getSystemUserName());
   }
@@ -496,7 +494,6 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     Assert.hasText(_storageNodeRef);
     Assert.notNull(_dictionaryService);
     Assert.notNull(_retryingTransactionHelper);
-    Assert.notNull(_thumbnailService);
     Assert.notNull(_actionService);
   }
 
@@ -612,6 +609,13 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   }
 
   @Override
+  public NodeRef getPdfaRendition(NodeRef nodeRef) {
+    ChildAssociationRef rendition = _renditionService.getRenditionByName(nodeRef, VgrModel.RD_PDFA);
+
+    return rendition != null ? rendition.getChildRef() : null;
+  }
+
+  @Override
   public boolean createPdfRendition(final NodeRef nodeRef) {
     return createPdfRendition(nodeRef, true);
   }
@@ -624,55 +628,63 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
       return false;
     }
 
-    // Use the thumbnail registy to get the details of the thumbail
-    ThumbnailRegistry registry = _thumbnailService.getThumbnailRegistry();
-
-    ThumbnailDefinition details = registry.getThumbnailDefinition("pdfa");
-
-    if (details == null) {
-      // Throw exception
-      throw new RuntimeException("The thumbnail name pdfa is not registered");
-    }
-
-    // If there's nothing currently registered to generate thumbnails for the
-    // specified mimetype, then log a message and
-    // bail out
-    String mimeType = _serviceUtils.getMimetype(nodeRef);
-
     Serializable value = _nodeService.getProperty(nodeRef, ContentModel.PROP_CONTENT);
 
     ContentData contentData = DefaultTypeConverter.INSTANCE.convert(ContentData.class, value);
 
     if (contentData == null) {
-      LOG.info("Unable to create thumbnail '" + details.getName() + "' as there is no content");
+      LOG.info("Unable to create PDF/A rendition from '" + nodeRef + "' as there is no content");
 
       return false;
     }
 
-    if (!registry.isThumbnailDefinitionAvailable(contentData.getContentUrl(), mimeType, contentData.getSize(), nodeRef, details)) {
-      LOG.info("Unable to create thumbnail '" + details.getName() + "' for " + mimeType + " as no transformer is currently available");
+    RenditionDefinition renditionDefinition = createRenditionDefinition();
 
-      return false;
-    }
+    if (async) {
+      _renditionService.render(nodeRef, renditionDefinition, new RenderCallback() {
 
-    // Have the thumbnail created
-    if (!async) {
-      // Create the thumbnail
-      try {
-        _thumbnailService.createThumbnail(nodeRef, ContentModel.PROP_CONTENT, details.getMimetype(), details.getTransformationOptions(), details.getName());
-      } catch (Exception ex) {
-        // do the mail sending here...
-        return false;
-      }
+        @Override
+        public void handleSuccessfulRendition(ChildAssociationRef primaryParentOfNewRendition) {
+        }
+
+        @Override
+        public void handleFailedRendition(Throwable t) {
+        }
+
+      });
     } else {
-      Action action = ThumbnailHelper.createCreateThumbnailAction(details, _serviceRegistry);
-
-      // Queue async creation of thumbnail
-      action.setExecuteAsynchronously(true);
-      _actionService.executeAction(action, nodeRef, true, true);
+      _renditionService.render(nodeRef, renditionDefinition);
     }
 
     return true;
+  }
+
+  private RenditionDefinition createRenditionDefinition() {
+    RenditionDefinition definition = _renditionService.createRenditionDefinition(VgrModel.RD_PDFA, PdfaPilotRenderingEngine.NAME);
+
+    definition.setTrackStatus(true);
+
+    Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+
+    parameters.put(RenditionService.PARAM_RENDITION_NODETYPE, ContentModel.TYPE_CONTENT);
+    
+    parameters.put(AbstractRenderingEngine.PARAM_SOURCE_CONTENT_PROPERTY, ContentModel.PROP_CONTENT);
+    parameters.put(AbstractRenderingEngine.PARAM_MIME_TYPE, "application/pdf");
+    
+    parameters.put(PdfaPilotRenderingEngine.PARAM_LEVEL, PdfaPilotTransformationOptions.PDFA_LEVEL_1B);
+    parameters.put(PdfaPilotRenderingEngine.PARAM_OPTIMIZE, false);
+    parameters.put(PdfaPilotRenderingEngine.PARAM_FAIL_SILENTLY, true);
+
+    parameters.put(AbstractTransformationRenderingEngine.PARAM_TIMEOUT_MS, 300000L);
+    parameters.put(AbstractTransformationRenderingEngine.PARAM_READ_LIMIT_TIME_MS, -1L);
+    parameters.put(AbstractTransformationRenderingEngine.PARAM_MAX_SOURCE_SIZE_K_BYTES, -1L);
+    parameters.put(AbstractTransformationRenderingEngine.PARAM_READ_LIMIT_K_BYTES, -1L);
+    parameters.put(AbstractTransformationRenderingEngine.PARAM_MAX_PAGES, -1);
+    parameters.put(AbstractTransformationRenderingEngine.PARAM_PAGE_LIMIT, -1);
+
+    definition.addParameterValues(parameters);
+
+    return definition;
   }
 
   private void assertPublishable(final NodeRef nodeRef) {
@@ -791,7 +803,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
           return false;
         }
 
-        NodeRef pdfaRendition = _thumbnailService.getThumbnailByName(nodeRef, ContentModel.PROP_CONTENT, "pdfa");
+        NodeRef pdfaRendition = getPdfaRendition(nodeRef);
 
         // if the rendition is already there, just exit
         if (pdfaRendition != null) {
@@ -913,4 +925,5 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
     return result;
   }
+
 }

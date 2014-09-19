@@ -29,7 +29,6 @@
     <property name="searchService" ref="SearchService" />
     <property name="dictionaryService" ref="DictionaryService" />
     <property name="retryingTransactionHelper" ref="retryingTransactionHelper" />
-    <property name="thumbnailService" ref="ThumbnailService" />
     <property name="actionService" ref="ActionService" />
     <property name="ownableService" ref="OwnableService" />
     <property name="renditionService" ref="RenditionService" />
@@ -235,7 +234,6 @@
   <bean id="webscript.webdok.webdok.get" class="se.vgregion.alfresco.repo.scripts.WebDok" parent="webscript.org.alfresco.cmis.content.get">
     <property name="searchService" ref="SearchService" />
     <property name="serviceUtils" ref="vgr.serviceUtils" />
-    <property name="thumbnailService" ref="ThumbnailService" />
     <property name="storageService" ref="vgr.storageService" />
   </bean>
 
@@ -339,7 +337,6 @@
   <bean id="webscript.se.vgregion.storage.content.get" class="se.vgregion.alfresco.repo.scripts.StorageContentGet" parent="webscript.org.alfresco.cmis.content.get">
     <property name="namespaceService" ref="NamespaceService" />
     <property name="serviceUtils" ref="vgr.serviceUtils" />
-    <property name="thumbnailService" ref="ThumbnailService" />
     <property name="storageService" ref="vgr.storageService" />
   </bean>
 
@@ -474,7 +471,7 @@
     <property name="maxPages" value="-1" />
     <property name="includeEmbedded" value="true" />
     <property name="optimize" value="false" />
-    <property name="level" value="1b" />
+    <property name="level" value="2b" />
     <property name="timeoutMs" value="300000" />
     <property name="failSilently" value="true" />
   </bean>

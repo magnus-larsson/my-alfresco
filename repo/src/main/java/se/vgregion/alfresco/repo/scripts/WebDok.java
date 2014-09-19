@@ -15,7 +15,6 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.ResultSetRow;
 import org.alfresco.service.cmr.search.SearchService;
-import org.alfresco.service.cmr.thumbnail.ThumbnailService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -26,6 +25,7 @@ import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
+import se.vgregion.alfresco.repo.rendition.executer.PdfaPilotRenderingEngine;
 import se.vgregion.alfresco.repo.storage.StorageService;
 import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
@@ -35,8 +35,6 @@ public class WebDok extends ContentGet {
 
   private ServiceUtilsImpl _serviceUtils;
 
-  private ThumbnailService _thumbnailService;
-
   private StorageService _storageService;
 
   public void setSearchService(final SearchService searchService) {
@@ -45,10 +43,6 @@ public class WebDok extends ContentGet {
 
   public void setServiceUtils(final ServiceUtilsImpl serviceUtils) {
     _serviceUtils = serviceUtils;
-  }
-
-  public void setThumbnailService(ThumbnailService thumbnailService) {
-    _thumbnailService = thumbnailService;
   }
 
   public void setStorageService(StorageService storageService) {
@@ -121,12 +115,16 @@ public class WebDok extends ContentGet {
     final QName propertyQName = ContentModel.PROP_CONTENT;
 
     // get the PDF/A rendition if it exists
-    NodeRef pdfRendition = _thumbnailService.getThumbnailByName(nodeRef, ContentModel.PROP_CONTENT, "pdfa");
+    NodeRef pdfRendition = _storageService.getPdfaRendition(nodeRef);
 
     if (pdfRendition == null) {
-      _storageService.createPdfRendition(nodeRef, false);
+      try {
+        _storageService.createPdfRendition(nodeRef, false);
 
-      pdfRendition = _thumbnailService.getThumbnailByName(nodeRef, ContentModel.PROP_CONTENT, "pdfa");
+        pdfRendition = _storageService.getPdfaRendition(nodeRef);
+      } catch (Exception ex) {
+        pdfRendition = null;
+      }
     }
 
     // use the PDF/A rendition if it exists, otherwise use the nodeRef

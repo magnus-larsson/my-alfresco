@@ -21,11 +21,11 @@ public class PdfaPilotRenderingEngine extends AbstractTransformationRenderingEng
   public static final String PARAM_LEVEL = "level";
 
   public static final String PARAM_OPTIMIZE = "optimize";
-  
+
   public static final String PARAM_FAIL_SILENTLY = "failSilently";
 
   private BehaviourFilter _behaviourFilter;
-  
+
   @Override
   protected TransformationOptions getTransformOptions(RenderingContext context) {
     return getTransformOptionsImpl(new PdfaPilotTransformationOptions(), context);
@@ -33,13 +33,14 @@ public class PdfaPilotRenderingEngine extends AbstractTransformationRenderingEng
 
   @Override
   protected TransformationOptions getTransformOptionsImpl(TransformationOptions options, RenderingContext context) {
-    try {    
-      _behaviourFilter.disableBehaviour(ContentModel.ASPECT_VERSIONABLE);
+    _behaviourFilter.disableBehaviour(ContentModel.ASPECT_VERSIONABLE);
+
+    try {
       options.setSourceNodeRef(context.getSourceNode());
-      options.setTargetNodeRef(context.getDestinationNode());
     } finally {
       _behaviourFilter.enableBehaviour(ContentModel.ASPECT_VERSIONABLE);
     }
+
     PdfaPilotTransformationOptions transformationOptions = (PdfaPilotTransformationOptions) options;
 
     String level = context.getCheckedParam(PARAM_LEVEL, String.class);
@@ -59,7 +60,7 @@ public class PdfaPilotRenderingEngine extends AbstractTransformationRenderingEng
     if (optimize != null) {
       transformationOptions.setOptimize(optimize);
     }
-    
+
     Boolean failSilently = context.getCheckedParam(PARAM_FAIL_SILENTLY, Boolean.class);
 
     if (failSilently != null) {
