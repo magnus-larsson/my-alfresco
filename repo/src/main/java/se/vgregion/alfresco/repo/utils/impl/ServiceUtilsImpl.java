@@ -456,6 +456,10 @@ public class ServiceUtilsImpl implements InitializingBean, ServiceUtils {
     return _authorityService.isAdminAuthority(username);
   }
 
+  public boolean isAdmin(String username) {
+    return _authorityService.isAdminAuthority(username);
+  }
+
   public String getFileExtension(final Serializable content) {
     return getFileExtension(content, true);
   }
