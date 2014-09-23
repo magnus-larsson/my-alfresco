@@ -53,7 +53,7 @@ public class CTFootnoesAspect {
     System.out.println("List after limit is " + result.size());
     
     for (StackTraceElement stackTraceElement : Thread.currentThread().getStackTrace()) {
-      LOG.error(stackTraceElement.toString());
+      LOG.warn(stackTraceElement.toString());
     }
 
     return result;
@@ -76,7 +76,7 @@ public class CTFootnoesAspect {
     LOG.warn("List after limit is " + getLimit());
     
     for (StackTraceElement stackTraceElement : Thread.currentThread().getStackTrace()) {
-      LOG.error(stackTraceElement.toString());
+      LOG.warn(stackTraceElement.toString());
     }
 
     return getLimit();
