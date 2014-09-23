@@ -150,8 +150,8 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
     propertyMap.put("DC.relation.replaces", VgrModel.PROP_RELATION_REPLACES); // multiple
     propertyMap.put("DC.coverage.hsacode", VgrModel.PROP_COVERAGE_HSACODE); // multiple
     propertyMap.put("DC.coverage.hsacode.id", VgrModel.PROP_COVERAGE_HSACODE_ID); // multiple
-    propertyMap.put("dcterms.audience", VgrModel.PROP_AUDIENCE);
-    propertyMap.put("dcterms.audience.id", VgrModel.PROP_AUDIENCE_ID);
+    propertyMap.put("dcterms.audience", VgrModel.PROP_AUDIENCE); // multiple
+    propertyMap.put("dcterms.audience.id", VgrModel.PROP_AUDIENCE_ID); // multiple
     propertyMap.put("VGR.status.document", VgrModel.PROP_STATUS_DOCUMENT);
     propertyMap.put("VGR.status.document", VgrModel.PROP_STATUS_DOCUMENT_ID);
     // access rights is special handled
@@ -203,6 +203,8 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
     multipleSet.add("DC.relation.replaces");
     multipleSet.add("DC.coverage.hsacode");
     multipleSet.add("DC.coverage.hsacode.id");
+    multipleSet.add("dcterms.audience");
+    multipleSet.add("dcterms.audience.id");
   }
 
   @Override
