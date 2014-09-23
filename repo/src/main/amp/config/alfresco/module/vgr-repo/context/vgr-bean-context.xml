@@ -32,6 +32,8 @@
     <property name="actionService" ref="ActionService" />
     <property name="ownableService" ref="OwnableService" />
     <property name="renditionService" ref="RenditionService" />
+    <property name="personService" ref="PersonService" />
+    <property name="namespaceService" ref="NamespaceService" />
   </bean>
 
   <bean id="vgr.kivWsClient" class="se.vgregion.alfresco.repo.kivclient.KivWsClient">
@@ -601,13 +603,33 @@
   <!-- ***************************************************** -->
   <!-- Script for getting nodes with missing PDF/A rendition -->
   <!-- ***************************************************** -->
-  
+
   <bean id="webscript.se.vgregion.alfresco.console.pdfa.missing.get" class="se.vgregion.alfresco.repo.scripts.MissingGet" parent="webscript">
-  	<property name="nodeService" ref="NodeService" />
-  	<property name="permissionService" ref="PermissionService" />
-  	<property name="renditionService" ref="RenditionService" />
-  	<property name="searchService" ref="SearchService" />
-  	<property name="storageService" ref="vgr.storageService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="permissionService" ref="PermissionService" />
+    <property name="renditionService" ref="RenditionService" />
+    <property name="searchService" ref="SearchService" />
+    <property name="storageService" ref="vgr.storageService" />
   </bean>
-  
+
+  <bean id="add-failed-rendition" class="se.vgregion.alfresco.repo.rendition.executer.AddFailedRenditionActionExecuter" parent="action-executer">
+    <property name="publicAction" value="false" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="behaviourFilter" ref="policyBehaviourFilter" />
+    <property name="renditionService" ref="RenditionService" />
+  </bean>
+
+  <bean id="node-eligible-for-rerendering-evaluator" class="se.vgregion.alfresco.repo.rendition.executer.NodeEligibleForRerenderingEvaluator" parent="action-condition-evaluator">
+    <property name="publicCondition" value="false" />
+    <property name="nodeService" ref="nodeService" />
+    <property name="renditionService" ref="RenditionService" />
+    <property name="storageService" ref="vgr.storageService" />
+  </bean>
+
+  <bean id="vgr.failedPdfaRenditionEmailTemplateLocation" class="org.alfresco.repo.dictionary.RepositoryLocation">
+    <property name="path">
+      <value>/app:company_home/app:dictionary/app:email_templates/cm:failedPdfaRenditionEmailTemplate/cm:failed-pdfa-rendition-email.ftl</value>
+    </property>
+  </bean>
+
 </beans>

@@ -83,7 +83,7 @@ public class WatchedDocumentUpdatePolicy extends AbstractPolicy implements Initi
 
     // if we've come this far, it's a document being updated and it's from a
     // configured origin, so create a PDF rendition
-    _storageService.createPdfRendition(nodeRef);
+    _storageService.createPdfaRendition(nodeRef);
   }
 
 }

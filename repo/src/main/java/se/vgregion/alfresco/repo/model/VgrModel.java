@@ -77,7 +77,7 @@ public interface VgrModel {
   public static final QName PROP_DATE_AVAILABLE_TO = QName.createQName(VGR_URI, "dc.date.availableto");
   public static final QName PROP_DATE_AVAILABLE_FROM = QName.createQName(VGR_URI, "dc.date.availablefrom");
   public static final QName PROP_DATE_COPYRIGHTED = QName.createQName(VGR_URI, "dc.date.copyrighted");
-  
+
   public static final QName PROP_SOURCE = QName.createQName(VGR_URI, "dc.source");
   public static final QName PROP_SOURCE_TEMP = QName.createQName(VGR_URI, "dc.source.temp");
   public static final QName PROP_SOURCE_DOCUMENTID = QName.createQName(VGR_URI, "dc.source.documentid");
@@ -86,7 +86,7 @@ public interface VgrModel {
   public static final QName PROP_RELATION_REPLACES = QName.createQName(VGR_URI, "dc.relation.replaces");
   public static final QName PROP_AUDIENCE = QName.createQName(VGR_URI, "dc.audience");
   public static final QName PROP_AUDIENCE_ID = QName.createQName(VGR_URI, "dc.audience.id");
-  
+
   public static final QName PROP_DESCRIPTION = QName.createQName(VGR_URI, "dc.description");
   public static final QName PROP_CREATOR = QName.createQName(VGR_URI, "dc.creator");
   public static final QName PROP_CREATOR_ID = QName.createQName(VGR_URI, "dc.creator.id");
@@ -112,7 +112,7 @@ public interface VgrModel {
   public static final QName PROP_TYPE_PROCESS_NAME = QName.createQName(VGR_URI, "dc.type.process.name");
   public static final QName PROP_TYPE_FILE_PROCESS = QName.createQName(VGR_URI, "dc.type.file.process");
   public static final QName PROP_TYPE_FILE = QName.createQName(VGR_URI, "dc.type.file");
-  
+
   public static final QName PROP_CONTRIBUTOR_ACCEPTEDBY = QName.createQName(VGR_URI, "dc.contributor.acceptedby");
   public static final QName PROP_CONTRIBUTOR_ACCEPTEDBY_ROLE = QName.createQName(VGR_URI, "dc.contributor.acceptedby.role");
   public static final QName PROP_CONTRIBUTOR_ACCEPTEDBY_UNIT_FREETEXT = QName.createQName(VGR_URI, "dc.contributor.acceptedby.unit.freetext");
@@ -127,7 +127,7 @@ public interface VgrModel {
   public static final QName PROP_DOCUMENT_STRUCTURE = QName.createQName(VGR_URI, "dc.type.document.structure");
   public static final QName PROP_DOCUMENT_STRUCTURE_ID = QName.createQName(VGR_URI, "dc.type.document.structure.id");
   public static final QName PROP_TYPE_TEMPLATENAME = QName.createQName(VGR_URI, "dc.type.templatename");
-  
+
   // properties specific for the VGR Dok aspect
   public static final QName PROP_VGR_DOK_DOCUMENT_ID = QName.createQName(VGR_URI, "vgr_dok_document_id");
   public static final QName PROP_VGR_DOK_VERSION = QName.createQName(VGR_URI, "vgr_dok_version");
@@ -166,6 +166,10 @@ public interface VgrModel {
 
   public static final QName RD_PDF = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "pdf");
   public static final QName RD_PDFA = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "pdfa");
+  public static final QName ASPECT_FAILED_RENDITION_SOURCE = QName.createQName(VGR_URI, "failedRenditionSource");
+  public static final QName ASSOC_FAILED_RENDITION = QName.createQName(VGR_URI, "failedRendition");
+  public static final QName PROP_FAILED_RENDITION_TIME = QName.createQName(VGR_URI, "failedRenditionTime");
+  public static final QName TYPE_FAILED_RENDITION = QName.createQName(VGR_URI, "failedRendition");
 
   public static final QName PROP_AUTO_PUBLISH_MAJOR_VERSION = QName.createQName(VGR_URI, "auto_publish_major_version");
   public static final QName PROP_AUTO_PUBLISH_ALL_VERSIONS = QName.createQName(VGR_URI, "auto_publish_all_versions");
@@ -175,11 +179,11 @@ public interface VgrModel {
   public static final QName PROP_AUTO_DELETABLE_MIMETYPES = QName.createQName(VGR_URI, "mimetypes");
 
   public static final QName PROP_SENT_EMAILS = QName.createQName(VGR_URI, "sent-emails");
-  
+
   public static final QName PROP_PERSON_RESPONSIBILITY_CODE = QName.createQName(VGR_URI, "responsibility_code");
   public static final QName PROP_PERSON_ORGANIZATION_DN = QName.createQName(VGR_URI, "organization_dn");
-  
+
   public static final QName ASPECT_THUMBNAIL_PHOTO = QName.createQName(VGR_URI, "thumbnail-photo-aspect");
   public static final QName PROP_THUMBNAIL_PHOTO = QName.createQName(VGR_URI, "thumbnailPhoto");
-  
+
 }

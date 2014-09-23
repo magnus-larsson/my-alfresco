@@ -111,21 +111,8 @@ public class StorageContentGet extends ContentGet {
     final String streamId = req.getParameter("streamId");
 
     if (!nativ) {
-      // get the PDF/A rendition if it exists
-      NodeRef pdfRendition = _storageService.getPdfaRendition(nodeRef);
-
-      if (pdfRendition == null) {
-        try {
-          _storageService.createPdfRendition(nodeRef, false);
-
-          pdfRendition = _storageService.getPdfaRendition(nodeRef);
-        } catch (Exception ex) {
-          pdfRendition = null;
-        }
-      }
-
       // use the PDF/A rendition if it exists, otherwise use the nodeRef
-      nodeRef = pdfRendition != null ? pdfRendition : nodeRef;
+      nodeRef = _storageService.getOrCreatePdfaRendition(nodeRef);
     }
 
     // determine attachment

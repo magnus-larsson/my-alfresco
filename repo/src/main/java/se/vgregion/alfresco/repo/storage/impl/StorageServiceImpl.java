@@ -14,13 +14,18 @@ import java.util.Properties;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.action.executer.MailActionExecuter;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.dictionary.RepositoryLocation;
 import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.rendition.executer.AbstractRenderingEngine;
 import org.alfresco.repo.rendition.executer.AbstractTransformationRenderingEngine;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.action.Action;
+import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.model.FileFolderService;
@@ -44,8 +49,13 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.OwnableService;
 import org.alfresco.service.cmr.security.PermissionService;
+import org.alfresco.service.cmr.security.PersonService;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.util.VersionNumber;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.redpill.alfresco.repo.content.transform.PdfaPilotTransformationOptions;
 import org.springframework.beans.factory.InitializingBean;
@@ -53,9 +63,13 @@ import org.springframework.extensions.surf.util.I18NUtil;
 import org.springframework.util.Assert;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
+import se.vgregion.alfresco.repo.rendition.executer.AddFailedRenditionActionExecuter;
+import se.vgregion.alfresco.repo.rendition.executer.NodeEligibleForRerenderingEvaluator;
 import se.vgregion.alfresco.repo.rendition.executer.PdfaPilotRenderingEngine;
 import se.vgregion.alfresco.repo.storage.CreationCallback;
+import se.vgregion.alfresco.repo.storage.FailedRenditionInfo;
 import se.vgregion.alfresco.repo.storage.StorageService;
+import se.vgregion.alfresco.repo.utils.ApplicationContextHolder;
 import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class StorageServiceImpl implements StorageService, InitializingBean {
@@ -93,6 +107,10 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   private ActionService _actionService;
 
   private OwnableService _ownableService;
+
+  private PersonService _personService;
+
+  private NamespaceService _namespaceService;
 
   public void setNodeService(final NodeService nodeService) {
     _nodeService = nodeService;
@@ -156,6 +174,14 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
   public void setOwnableService(OwnableService ownableService) {
     _ownableService = ownableService;
+  }
+
+  public void setPersonService(PersonService personService) {
+    _personService = personService;
+  }
+
+  public void setNamespaceService(NamespaceService namespaceService) {
+    _namespaceService = namespaceService;
   }
 
   @Override
@@ -284,7 +310,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
           deleteRenditions(newNode);
 
           // create a PDF/A rendition of the nodeRef
-          createPdfRendition(newNode);
+          createPdfaRendition(newNode);
 
           publishedNodeRef = newNode;
         }
@@ -598,7 +624,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
       _ownableService.setOwner(nodeRef, AuthenticationUtil.getSystemUserName());
 
       // create a PDF/A rendition
-      createPdfRendition(nodeRef);
+      createPdfaRendition(nodeRef);
 
       if (LOG.isDebugEnabled()) {
         LOG.debug("File '" + nodeRef + "' moved to Lagret.");
@@ -616,12 +642,12 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   }
 
   @Override
-  public boolean createPdfRendition(final NodeRef nodeRef) {
-    return createPdfRendition(nodeRef, true);
+  public boolean createPdfaRendition(final NodeRef nodeRef) {
+    return createPdfaRendition(nodeRef, true);
   }
 
   @Override
-  public boolean createPdfRendition(final NodeRef nodeRef, final boolean async) {
+  public boolean createPdfaRendition(final NodeRef nodeRef, final boolean async) {
     // must first check whether the nodeRef can be transformed into a PDF/A or
     // not...
     if (!pdfaRendable(nodeRef)) {
@@ -649,14 +675,83 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
         @Override
         public void handleFailedRendition(Throwable t) {
+          // handleFailedPdfaRendition(nodeRef, t);
         }
 
       });
     } else {
-      _renditionService.render(nodeRef, renditionDefinition);
+      try {
+        _renditionService.render(nodeRef, renditionDefinition);
+      } catch (Throwable ex) {
+        // handleFailedPdfaRendition(nodeRef, ex);
+
+        throw new RuntimeException(ex);
+      }
     }
 
     return true;
+  }
+
+  protected void handleFailedPdfaRendition(final NodeRef nodeRef, final Throwable t) {
+    AuthenticationUtil.runAsSystem(new RunAsWork<Void>() {
+
+      @Override
+      public Void doWork() throws Exception {
+        Map<String, Object> model = new HashMap<String, Object>();
+        
+        String username = (String) _nodeService.getProperty(nodeRef, VgrModel.PROP_PUBLISHER_ID);
+
+        NodeRef user = _personService.getPerson(username);
+
+        model.put("nodeRef", nodeRef);
+        model.put("name", _nodeService.getProperty(nodeRef, ContentModel.PROP_NAME));
+        model.put("source", _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE));
+        model.put("origin", _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_ORIGIN));
+        model.put("stacktrace", _serviceUtils.isAdmin(username) ? ExceptionUtils.getStackTrace(t) : "");
+
+        Action mailAction = _actionService.createAction(MailActionExecuter.NAME);
+        mailAction.setExecuteAsynchronously(false);
+
+
+        String to = (String) _nodeService.getProperty(user, ContentModel.PROP_EMAIL);
+        // String subject = I18NUtil.getMessage("failed.pdfa.email.subject",
+        // "failed.pdfa.email.subject");
+        String subject = "Foobar";
+
+        mailAction.setParameterValue(MailActionExecuter.PARAM_TO, to);
+        mailAction.setParameterValue(MailActionExecuter.PARAM_SUBJECT, subject);
+        mailAction.setParameterValue(MailActionExecuter.PARAM_TEMPLATE, getFailedPdfaRenditionEmailTemplateRef());
+        mailAction.setParameterValue(MailActionExecuter.PARAM_TEMPLATE_MODEL, (Serializable) model);
+
+        _actionService.executeAction(mailAction, null);
+
+        return null;
+      }
+
+    });
+  }
+
+  private NodeRef getFailedPdfaRenditionEmailTemplateRef() {
+    RepositoryLocation failedPdfaRenditionEmailTemplateLocation = (RepositoryLocation) ApplicationContextHolder.getApplicationContext().getBean("vgr.failedPdfaRenditionEmailTemplateLocation");
+
+    StoreRef store = failedPdfaRenditionEmailTemplateLocation.getStoreRef();
+    String xpath = failedPdfaRenditionEmailTemplateLocation.getPath();
+
+    if (!failedPdfaRenditionEmailTemplateLocation.getQueryLanguage().equals(SearchService.LANGUAGE_XPATH)) {
+      LOG.warn("Cannot find the failed PDF/A rendition email template - repository location query language is not 'xpath': " + failedPdfaRenditionEmailTemplateLocation.getQueryLanguage());
+
+      return null;
+    }
+
+    List<NodeRef> nodeRefs = _searchService.selectNodes(_nodeService.getRootNode(store), xpath, null, _namespaceService, false);
+
+    if (nodeRefs.size() != 1) {
+      LOG.warn("Cannot find the failed PDF/A rendition email template: " + xpath);
+
+      return null;
+    }
+
+    return _fileFolderService.getLocalizedSibling(nodeRefs.get(0));
   }
 
   private RenditionDefinition createRenditionDefinition() {
@@ -667,13 +762,13 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     Map<String, Serializable> parameters = new HashMap<String, Serializable>();
 
     parameters.put(RenditionService.PARAM_RENDITION_NODETYPE, ContentModel.TYPE_CONTENT);
-    
+
     parameters.put(AbstractRenderingEngine.PARAM_SOURCE_CONTENT_PROPERTY, ContentModel.PROP_CONTENT);
     parameters.put(AbstractRenderingEngine.PARAM_MIME_TYPE, "application/pdf");
-    
-    parameters.put(PdfaPilotRenderingEngine.PARAM_LEVEL, PdfaPilotTransformationOptions.PDFA_LEVEL_1B);
+
+    parameters.put(PdfaPilotRenderingEngine.PARAM_LEVEL, PdfaPilotTransformationOptions.PDFA_LEVEL_2B);
     parameters.put(PdfaPilotRenderingEngine.PARAM_OPTIMIZE, false);
-    parameters.put(PdfaPilotRenderingEngine.PARAM_FAIL_SILENTLY, true);
+    parameters.put(PdfaPilotRenderingEngine.PARAM_FAIL_SILENTLY, false);
 
     parameters.put(AbstractTransformationRenderingEngine.PARAM_TIMEOUT_MS, 300000L);
     parameters.put(AbstractTransformationRenderingEngine.PARAM_READ_LIMIT_TIME_MS, -1L);
@@ -683,6 +778,25 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     parameters.put(AbstractTransformationRenderingEngine.PARAM_PAGE_LIMIT, -1);
 
     definition.addParameterValues(parameters);
+
+    // The thumbnail/action should only be run if it is eligible.
+    Map<String, Serializable> failedRenditionConditionParams = new HashMap<String, Serializable>();
+    failedRenditionConditionParams.put(NodeEligibleForRerenderingEvaluator.PARAM_RENDITION_NAME, "pdfa");
+    failedRenditionConditionParams.put(NodeEligibleForRerenderingEvaluator.PARAM_RETRY_PERIOD, 0L);
+    failedRenditionConditionParams.put(NodeEligibleForRerenderingEvaluator.PARAM_RETRY_COUNT, 10);
+    failedRenditionConditionParams.put(NodeEligibleForRerenderingEvaluator.PARAM_QUIET_PERIOD, 0L);
+    failedRenditionConditionParams.put(NodeEligibleForRerenderingEvaluator.PARAM_QUIET_PERIOD_RETRIES_ENABLED, true);
+
+    ActionCondition renditionCondition = _actionService.createActionCondition(NodeEligibleForRerenderingEvaluator.NAME, failedRenditionConditionParams);
+
+    // If it is run and if it fails, then we want a compensating action to run
+    // which will mark the source node as having failed to produce a rendition
+    Action applyBrokenRendition = _actionService.createAction(AddFailedRenditionActionExecuter.NAME);
+    applyBrokenRendition.setParameterValue(AddFailedRenditionActionExecuter.PARAM_RENDITION_NAME, "pdfa");
+    applyBrokenRendition.setParameterValue(AddFailedRenditionActionExecuter.PARAM_FAILURE_DATETIME, new Date());
+
+    definition.setCompensatingAction(applyBrokenRendition);
+    definition.addActionCondition(renditionCondition);
 
     return definition;
   }
@@ -811,7 +925,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
         }
 
         // create the PDF rendition
-        final boolean result = createPdfRendition(nodeRef, false);
+        final boolean result = createPdfaRendition(nodeRef, false);
 
         if (!result) {
           return false;
@@ -924,6 +1038,87 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     }
 
     return result;
+  }
+
+  @Override
+  public Map<String, FailedRenditionInfo> getFailedRenditions(NodeRef sourceNode) {
+    if (!_nodeService.hasAspect(sourceNode, VgrModel.ASPECT_FAILED_RENDITION_SOURCE)) {
+      return Collections.emptyMap();
+    }
+
+    List<ChildAssociationRef> failedRenditionChildren = _nodeService.getChildAssocs(sourceNode, VgrModel.ASSOC_FAILED_RENDITION, RegexQNamePattern.MATCH_ALL);
+
+    Map<String, FailedRenditionInfo> result = new HashMap<String, FailedRenditionInfo>();
+
+    for (ChildAssociationRef chAssRef : failedRenditionChildren) {
+      QName failedRenditionName = chAssRef.getQName();
+
+      NodeRef failedRenditionNode = chAssRef.getChildRef();
+
+      Map<QName, Serializable> props = _nodeService.getProperties(failedRenditionNode);
+
+      Date failureDateTime = (Date) props.get(VgrModel.PROP_FAILED_RENDITION_TIME);
+
+      int failureCount = (Integer) props.get(ContentModel.PROP_FAILURE_COUNT);
+
+      final FailedRenditionInfo failedRenditionInfo = new FailedRenditionInfo(failedRenditionName.getLocalName(), failureDateTime, failureCount, failedRenditionNode);
+
+      result.put(failedRenditionName.getLocalName(), failedRenditionInfo);
+    }
+
+    return result;
+  }
+
+  @Override
+  public NodeRef getOrCreatePdfaRendition(NodeRef nodeRef) {
+    // get the PDF/A rendition if it exists
+    NodeRef pdfRendition = getPdfaRendition(nodeRef);
+
+    // if it exists all is well and good and the rendition should be returned
+    if (pdfRendition != null) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("PDF/A rendition exists, returning it: " + pdfRendition);
+      }
+
+      return pdfRendition;
+    }
+
+    // if no PDF/A rendition exists, try to get the failed ones
+    // get the failed PDF/A renditions
+    Map<String, FailedRenditionInfo> failedRenditions = getFailedRenditions(nodeRef);
+
+    // if there's failed renditions, return the native file
+    if (failedRenditions.size() > 0) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("There are failed renditions for node '" + nodeRef + "', returning native document.");
+      }
+
+      return nodeRef;
+    }
+
+    // if no failed ones exist, try to create a new PDF/A rendition
+    try {
+      createPdfaRendition(nodeRef, false);
+
+      // get the newly created one
+      pdfRendition = getPdfaRendition(nodeRef);
+
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("PDF/A rendition exists (didn't before), returning it: " + pdfRendition);
+      }
+    } catch (Exception ex) {
+      LOG.error(ex.getMessage(), ex);
+
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Didn't manage to create new PDF/A rendition, therefore returns native document for '" + nodeRef + "'");
+      }
+
+      // if this fails here, something is fishy and the original node should
+      // be returned.
+      pdfRendition = null;
+    }
+
+    return pdfRendition != null ? pdfRendition : nodeRef;
   }
 
 }

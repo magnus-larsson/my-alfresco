@@ -25,7 +25,6 @@ import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
-import se.vgregion.alfresco.repo.rendition.executer.PdfaPilotRenderingEngine;
 import se.vgregion.alfresco.repo.storage.StorageService;
 import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
@@ -110,25 +109,10 @@ public class WebDok extends ContentGet {
    * @throws IOException
    */
   private void streamDocument(final WebScriptRequest req, final WebScriptResponse res, final NodeRef document) throws IOException {
-    NodeRef nodeRef = document;
-
     final QName propertyQName = ContentModel.PROP_CONTENT;
 
     // get the PDF/A rendition if it exists
-    NodeRef pdfRendition = _storageService.getPdfaRendition(nodeRef);
-
-    if (pdfRendition == null) {
-      try {
-        _storageService.createPdfRendition(nodeRef, false);
-
-        pdfRendition = _storageService.getPdfaRendition(nodeRef);
-      } catch (Exception ex) {
-        pdfRendition = null;
-      }
-    }
-
-    // use the PDF/A rendition if it exists, otherwise use the nodeRef
-    nodeRef = pdfRendition != null ? pdfRendition : document;
+    NodeRef nodeRef = _storageService.getOrCreatePdfaRendition(document);
 
     final boolean attach = Boolean.valueOf(req.getParameter("a"));
 

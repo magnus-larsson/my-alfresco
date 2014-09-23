@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<view:view xmlns:view="http://www.alfresco.org/view/repository/1.0" xmlns:app="http://www.alfresco.org/model/application/1.0" xmlns:sys="http://www.alfresco.org/model/system/1.0" xmlns:cm="http://www.alfresco.org/model/content/1.0">
+  <cm:folder view:childName="${spaces.templates.email.failed-pdfa-rendition.childname}">
+    <view:aspects>
+      <app:uifacets></app:uifacets>
+    </view:aspects>
+    <view:properties>
+      <cm:description>${spaces.templates.email.failed-pdfa-rendition.description}</cm:description>
+      <app:icon>space-icon-default</app:icon>
+      <cm:title>${spaces.templates.email.failed-pdfa-rendition.name}</cm:title>
+      <cm:name>${spaces.templates.email.failed-pdfa-rendition.name}</cm:name>
+    </view:properties>
+    <view:associations>
+      <cm:contains>
+        <cm:content view:childName="cm:failed-pdfa-rendition-email.ftl">
+          <view:aspects>
+            <cm:titled></cm:titled>
+            <cm:author></cm:author>
+            <app:inlineeditable></app:inlineeditable>
+            <sys:referenceable></sys:referenceable>
+          </view:aspects>
+          <view:properties>
+            <app:editInline>true</app:editInline>
+            <cm:content>contentUrl=classpath:alfresco/templates/email-templates/failed-pdfa-rendition-email.ftl|mimetype=text/plain|size=4603|encoding=UTF-8</cm:content>
+            <cm:author></cm:author>
+            <cm:name>failed-pdfa-rendition-email.ftl</cm:name>
+            <cm:title>failed-pdfa-rendition-email.ftl</cm:title>
+            <cm:description>${spaces.templates.email.failed-pdfa-rendition.description} - ${version.default}</cm:description>
+          </view:properties>
+          <view:associations></view:associations>
+        </cm:content>
+      </cm:contains>
+    </view:associations>
+  </cm:folder>
+</view:view>

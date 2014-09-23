@@ -138,4 +138,12 @@
 		<property name="searchService" ref="SearchService" />
 	</bean>
 
+   <bean id="vgr.failedRenditionAspect" class="se.vgregion.alfresco.repo.rendition.executer.FailedRenditionSourceAspect">
+       <property name="nodeService" ref="NodeService"/>
+       <property name="lockService" ref="LockService"/>
+       <property name="storageService" ref="vgr.storageService"/>
+       <property name="policyComponent" ref="policyComponent"/>
+       <property name="behaviourFilter" ref="policyBehaviourFilter"/>
+   </bean>
+
 </beans>
