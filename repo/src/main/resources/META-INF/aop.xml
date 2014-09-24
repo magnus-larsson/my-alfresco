@@ -2,18 +2,8 @@
 
 <aspectj>
 
-  <!-- <weaver options="-verbose -showWeaveInfo -Xreweavable"> -->
   <weaver options="-verbose -showWeaveInfo">
-
     <exclude within="org.apache.felix.framework.*" />
-
-    <!-- <include within="org.alfresco.repo.thumbnail.ThumbnailServiceImpl" /> -->
-
-    <!-- <include within="se.vgregion.alfresco.repo.scripts.StorageContentGet" /> -->
-    <!-- <include within="se.vgregion.alfresco.repo.web.scripts.content.ContentGet" /> -->
-    <!-- <include within="org.alfresco.repo.web.scripts.content.ContentGet" /> -->
-
-    <!-- <include within="se.vgregion.alfresco.repo.thumbnail.ThumbnailServiceAspect" /> -->
   </weaver>
 
   <aspects>

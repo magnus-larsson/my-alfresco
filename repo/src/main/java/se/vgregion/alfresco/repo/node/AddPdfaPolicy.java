@@ -1,6 +1,7 @@
 package se.vgregion.alfresco.repo.node;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.model.RenditionModel;
 import org.alfresco.repo.policy.Behaviour;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -11,6 +12,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.redpill.alfresco.module.metadatawriter.model.MetadataWriterModel;
 import org.springframework.util.Assert;
+
 import se.vgregion.alfresco.repo.model.VgrModel;
 
 import java.io.InputStream;
@@ -24,6 +26,8 @@ public class AddPdfaPolicy extends AbstractPolicy implements OnContentUpdatePoli
 
   private final static Logger LOG = Logger.getLogger(AddPdfaPolicy.class);
 
+  private static boolean _initialized = false;
+
   private ContentService _contentService;
 
   private Behaviour _behaviour;
@@ -33,7 +37,8 @@ public class AddPdfaPolicy extends AbstractPolicy implements OnContentUpdatePoli
   }
 
   public void onContentUpdate(final NodeRef nodeRef, final boolean newContent) {
-    // have to disable this particular behaviour, otherwise a endless loop is created
+    // have to disable this particular behaviour, otherwise a endless loop is
+    // created
     _behaviour.disable();
 
     runSafe(new DefaultRunSafe(nodeRef) {
@@ -54,10 +59,24 @@ public class AddPdfaPolicy extends AbstractPolicy implements OnContentUpdatePoli
       return;
     }
 
+    // if the node does not have the aspect 'rn:hiddenRendition' it's not a
+    // PDF/A rendition
+    if (!_nodeService.hasAspect(nodeRef, RenditionModel.ASPECT_HIDDEN_RENDITION)) {
+      return;
+    }
+
+    String name = (String) _nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
+
+    // if the name is not pdfa then it's not a PDF/A rendition
+    if (!"pdfa".equals(name)) {
+      return;
+    }
+
     final NodeRef pdfNodeRef = nodeRef;
     final NodeRef parentNodeRef = _nodeService.getPrimaryParent(pdfNodeRef).getParentRef();
 
-    // this policy should only work for PDF/A parents that is published documents
+    // this policy should only work for PDF/A parents that is published
+    // documents
     if (!_nodeService.hasAspect(parentNodeRef, VgrModel.ASPECT_PUBLISHED)) {
       return;
     }
@@ -143,8 +162,12 @@ public class AddPdfaPolicy extends AbstractPolicy implements OnContentUpdatePoli
 
     Assert.notNull(_contentService);
 
-    _behaviour = new JavaBehaviour(this, "onContentUpdate", Behaviour.NotificationFrequency.TRANSACTION_COMMIT);
+    if (!_initialized) {
+      _behaviour = new JavaBehaviour(this, "onContentUpdate", Behaviour.NotificationFrequency.TRANSACTION_COMMIT);
 
-    _policyComponent.bindClassBehaviour(OnContentUpdatePolicy.QNAME, ContentModel.TYPE_THUMBNAIL, _behaviour);
+      _policyComponent.bindClassBehaviour(OnContentUpdatePolicy.QNAME, ContentModel.TYPE_CONTENT, _behaviour);
+
+      _initialized = true;
+    }
   }
 }

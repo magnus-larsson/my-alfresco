@@ -33,6 +33,8 @@ public class EnableMetadataWriterPolicy extends AbstractPolicy implements OnChec
 
   private MetadataContentFactory _metadataContentFactory;
 
+  private static boolean _initialized = false;
+
   public void setMetadataContentFactory(final MetadataContentFactory metadataContentFactory) {
     _metadataContentFactory = metadataContentFactory;
   }
@@ -123,6 +125,13 @@ public class EnableMetadataWriterPolicy extends AbstractPolicy implements OnChec
     // metadata to be written to the file...
 
     _nodeService.addAspect(nodeRef, MetadataWriterModel.ASPECT_METADATA_WRITEABLE, properties);
+
+    if (LOG.isDebugEnabled()) {
+      QName type = _nodeService.getType(nodeRef);
+      String name = (String) _nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
+
+      LOG.debug("Adding mdw:metadatawriteable to node '" + nodeRef.toString() + "' with name '" + name + "' and of type '" + type.toString() + "'...");
+    }
   }
 
   @Override
@@ -131,10 +140,16 @@ public class EnableMetadataWriterPolicy extends AbstractPolicy implements OnChec
 
     Assert.notNull(_metadataContentFactory);
 
-    _policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onCreateNode",
-        NotificationFrequency.TRANSACTION_COMMIT));
+    if (!_initialized) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Initializing EnableMetadataWriterPolicy...");
+      }
 
-    _policyComponent.bindClassBehaviour(OnCheckOut.QNAME, VgrModel.TYPE_VGR_DOCUMENT, new JavaBehaviour(this, "onCheckOut",
-        NotificationFrequency.TRANSACTION_COMMIT));
+      _policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onCreateNode", NotificationFrequency.TRANSACTION_COMMIT));
+
+      _policyComponent.bindClassBehaviour(OnCheckOut.QNAME, VgrModel.TYPE_VGR_DOCUMENT, new JavaBehaviour(this, "onCheckOut", NotificationFrequency.TRANSACTION_COMMIT));
+
+      _initialized = true;
+    }
   }
 }

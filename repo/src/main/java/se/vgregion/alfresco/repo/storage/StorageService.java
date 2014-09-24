@@ -1,14 +1,15 @@
 package se.vgregion.alfresco.repo.storage;
 
 import java.util.List;
+import java.util.Map;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 
 public interface StorageService {
 
-  void publishToStorage(String nodeRef);
+  NodeRef publishToStorage(String nodeRef);
 
-  void publishToStorage(NodeRef nodeRef);
+  NodeRef publishToStorage(NodeRef nodeRef);
 
   void unpublishFromStorage(String nodeRef);
 
@@ -16,9 +17,11 @@ public interface StorageService {
 
   NodeRef getPublishedNodeRef(final NodeRef nodeRef);
 
-  boolean createPdfRendition(NodeRef nodeRef);
+  boolean createPdfaRendition(NodeRef nodeRef);
 
-  boolean createPdfRendition(NodeRef nodeRef, boolean async);
+  boolean createPdfaRendition(NodeRef nodeRef, boolean async);
+  
+  NodeRef getPdfaRendition(NodeRef nodeRef);
 
   int createMissingPdfRenditions();
 
@@ -62,5 +65,9 @@ public interface StorageService {
    * @return
    */
   public List<NodeRef> getStorageVersions(final String nodeRef);
+
+  Map<String, FailedRenditionInfo> getFailedRenditions(NodeRef nodeRef);
+
+  NodeRef getOrCreatePdfaRendition(NodeRef nodeRef);
 
 }

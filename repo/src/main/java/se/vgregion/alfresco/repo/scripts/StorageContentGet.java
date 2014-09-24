@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.web.scripts.content.ContentGet;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.thumbnail.ThumbnailService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.io.FilenameUtils;
@@ -57,8 +56,6 @@ public class StorageContentGet extends ContentGet {
 
   private ServiceUtilsImpl _serviceUtils;
 
-  private ThumbnailService _thumbnailService;
-
   private StorageService _storageService;
 
   public void setNamespaceService(final NamespaceService namespaceService) {
@@ -67,10 +64,6 @@ public class StorageContentGet extends ContentGet {
 
   public void setServiceUtils(final ServiceUtilsImpl serviceUtils) {
     _serviceUtils = serviceUtils;
-  }
-
-  public void setThumbnailService(ThumbnailService thumbnailService) {
-    _thumbnailService = thumbnailService;
   }
 
   public void setStorageService(StorageService storageService) {
@@ -118,17 +111,8 @@ public class StorageContentGet extends ContentGet {
     final String streamId = req.getParameter("streamId");
 
     if (!nativ) {
-      // get the PDF/A rendition if it exists
-      NodeRef pdfRendition = _thumbnailService.getThumbnailByName(nodeRef, ContentModel.PROP_CONTENT, "pdfa");
-
-      if (pdfRendition == null) {
-        _storageService.createPdfRendition(nodeRef, false);
-
-        pdfRendition = _thumbnailService.getThumbnailByName(nodeRef, ContentModel.PROP_CONTENT, "pdfa");
-      }
-
       // use the PDF/A rendition if it exists, otherwise use the nodeRef
-      nodeRef = pdfRendition != null ? pdfRendition : nodeRef;
+      nodeRef = _storageService.getOrCreatePdfaRendition(nodeRef);
     }
 
     // determine attachment

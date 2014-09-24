@@ -15,7 +15,6 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.ResultSetRow;
 import org.alfresco.service.cmr.search.SearchService;
-import org.alfresco.service.cmr.thumbnail.ThumbnailService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -35,8 +34,6 @@ public class WebDok extends ContentGet {
 
   private ServiceUtilsImpl _serviceUtils;
 
-  private ThumbnailService _thumbnailService;
-
   private StorageService _storageService;
 
   public void setSearchService(final SearchService searchService) {
@@ -45,10 +42,6 @@ public class WebDok extends ContentGet {
 
   public void setServiceUtils(final ServiceUtilsImpl serviceUtils) {
     _serviceUtils = serviceUtils;
-  }
-
-  public void setThumbnailService(ThumbnailService thumbnailService) {
-    _thumbnailService = thumbnailService;
   }
 
   public void setStorageService(StorageService storageService) {
@@ -116,21 +109,10 @@ public class WebDok extends ContentGet {
    * @throws IOException
    */
   private void streamDocument(final WebScriptRequest req, final WebScriptResponse res, final NodeRef document) throws IOException {
-    NodeRef nodeRef = document;
-
     final QName propertyQName = ContentModel.PROP_CONTENT;
 
     // get the PDF/A rendition if it exists
-    NodeRef pdfRendition = _thumbnailService.getThumbnailByName(nodeRef, ContentModel.PROP_CONTENT, "pdfa");
-
-    if (pdfRendition == null) {
-      _storageService.createPdfRendition(nodeRef, false);
-
-      pdfRendition = _thumbnailService.getThumbnailByName(nodeRef, ContentModel.PROP_CONTENT, "pdfa");
-    }
-
-    // use the PDF/A rendition if it exists, otherwise use the nodeRef
-    nodeRef = pdfRendition != null ? pdfRendition : document;
+    NodeRef nodeRef = _storageService.getOrCreatePdfaRendition(document);
 
     final boolean attach = Boolean.valueOf(req.getParameter("a"));
 

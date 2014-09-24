@@ -279,6 +279,20 @@
       <title>Förhindra nedladdning</title>
       <parent>cm:folder</parent>
     </type>
+
+    <!-- Failed PDF/A rendition content type -->
+    <type name="vgr:failedRendition">
+      <title>Failed rendition</title>
+      <parent>cm:cmobject</parent>
+      <archive>false</archive>
+      <includedInSuperTypeQuery>false</includedInSuperTypeQuery>
+      <properties>
+        <property name="vgr:failedRenditionTime">
+          <title>Failed rendition time</title>
+          <type>d:datetime</type>
+        </property>
+      </properties>
+    </type>
   </types>
 
   <aspects>
@@ -1006,9 +1020,9 @@
         </property>
       </properties>
     </aspect>
-    
+
     <!-- ######################################################################### -->
-    <!-- Temporary aspect for storing thumbnail photo                              -->
+    <!-- Temporary aspect for storing thumbnail photo -->
     <!-- ######################################################################### -->
 
     <aspect name="vgr:thumbnail-photo-aspect">
@@ -1019,6 +1033,24 @@
         </property>
       </properties>
     </aspect>
+
+    <aspect name="vgr:failedRenditionSource">
+      <title>Failed rendition source</title>
+      <associations>
+        <child-association name="vgr:failedRendition">
+          <source>
+            <mandatory>false</mandatory>
+            <many>false</many>
+          </source>
+          <target>
+            <class>vgr:failedRendition</class>
+            <mandatory>false</mandatory>
+            <many>true</many>
+          </target>
+        </child-association>
+      </associations>
+    </aspect>
+
   </aspects>
 
 </model>

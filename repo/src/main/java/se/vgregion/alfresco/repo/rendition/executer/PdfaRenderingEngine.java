@@ -14,9 +14,7 @@ public class PdfaRenderingEngine extends AbstractTransformationRenderingEngine {
   protected TransformationOptions getTransformOptions(final RenderingContext context) {
     final NodeRef sourceNode = context.getSourceNode();
 
-    final NodeRef destinationNode = context.getDestinationNode();
-
-    final OpenOfficeTransformationOptions transformationOptions = new OpenOfficeTransformationOptions(sourceNode, null, destinationNode, null);
+    final OpenOfficeTransformationOptions transformationOptions = new OpenOfficeTransformationOptions(sourceNode, null, null, null);
 
     transformationOptions.setPdfVersion(1);
 

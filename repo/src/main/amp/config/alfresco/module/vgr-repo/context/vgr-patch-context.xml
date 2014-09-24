@@ -225,4 +225,37 @@
         p:id="vgr.patch.fixVgrDocumentComments"
         p:description="vgr.patch.fixVgrDocumentComments.description" />
  -->
+ 
+  <bean id="vgr.patch.failedPdfaRenditionEmailTemplate" class="org.alfresco.repo.admin.patch.impl.GenericBootstrapPatch" parent="basePatch">
+    <property name="id">
+      <value>patch.failedPdfaRenditionEmailTemplate</value>
+    </property>
+    <property name="description">
+      <value>patch.failedPdfaRenditionEmailTemplate.description</value>
+    </property>
+    <property name="fixesFromSchema">
+      <value>0</value>
+    </property>
+    <property name="fixesToSchema">
+      <value>0</value>
+    </property>
+    <property name="targetSchema">
+      <value>1</value>
+    </property>
+    <property name="force" value="true" />
+    <property name="importerBootstrap">
+      <ref bean="spacesBootstrap" />
+    </property>
+    <property name="checkPath">
+      <value>/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.templates.email.childname}/${spaces.templates.email.failed-pdfa-rendition.childname}</value>
+    </property>
+    <property name="bootstrapView">
+      <props>
+        <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.templates.email.childname}</prop>
+        <prop key="location">alfresco/templates/failed-pdfa-rendition-template.xml</prop>
+        <prop key="messages">alfresco/module/vgr-repo/context/messages/vgr-patches</prop>
+      </props>
+    </property>
+  </bean>
+ 
 </beans>

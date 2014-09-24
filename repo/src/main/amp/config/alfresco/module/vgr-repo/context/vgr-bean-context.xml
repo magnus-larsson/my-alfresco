@@ -29,10 +29,11 @@
     <property name="searchService" ref="SearchService" />
     <property name="dictionaryService" ref="DictionaryService" />
     <property name="retryingTransactionHelper" ref="retryingTransactionHelper" />
-    <property name="thumbnailService" ref="ThumbnailService" />
     <property name="actionService" ref="ActionService" />
     <property name="ownableService" ref="OwnableService" />
     <property name="renditionService" ref="RenditionService" />
+    <property name="personService" ref="PersonService" />
+    <property name="namespaceService" ref="NamespaceService" />
   </bean>
 
   <bean id="vgr.kivWsClient" class="se.vgregion.alfresco.repo.kivclient.KivWsClient">
@@ -235,7 +236,6 @@
   <bean id="webscript.webdok.webdok.get" class="se.vgregion.alfresco.repo.scripts.WebDok" parent="webscript.org.alfresco.cmis.content.get">
     <property name="searchService" ref="SearchService" />
     <property name="serviceUtils" ref="vgr.serviceUtils" />
-    <property name="thumbnailService" ref="ThumbnailService" />
     <property name="storageService" ref="vgr.storageService" />
   </bean>
 
@@ -339,7 +339,6 @@
   <bean id="webscript.se.vgregion.storage.content.get" class="se.vgregion.alfresco.repo.scripts.StorageContentGet" parent="webscript.org.alfresco.cmis.content.get">
     <property name="namespaceService" ref="NamespaceService" />
     <property name="serviceUtils" ref="vgr.serviceUtils" />
-    <property name="thumbnailService" ref="ThumbnailService" />
     <property name="storageService" ref="vgr.storageService" />
   </bean>
 
@@ -474,7 +473,7 @@
     <property name="maxPages" value="-1" />
     <property name="includeEmbedded" value="true" />
     <property name="optimize" value="false" />
-    <property name="level" value="1b" />
+    <property name="level" value="2b" />
     <property name="timeoutMs" value="300000" />
     <property name="failSilently" value="true" />
   </bean>
@@ -604,13 +603,33 @@
   <!-- ***************************************************** -->
   <!-- Script for getting nodes with missing PDF/A rendition -->
   <!-- ***************************************************** -->
-  
+
   <bean id="webscript.se.vgregion.alfresco.console.pdfa.missing.get" class="se.vgregion.alfresco.repo.scripts.MissingGet" parent="webscript">
-  	<property name="nodeService" ref="NodeService" />
-  	<property name="permissionService" ref="PermissionService" />
-  	<property name="renditionService" ref="RenditionService" />
-  	<property name="searchService" ref="SearchService" />
-  	<property name="storageService" ref="vgr.storageService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="permissionService" ref="PermissionService" />
+    <property name="renditionService" ref="RenditionService" />
+    <property name="searchService" ref="SearchService" />
+    <property name="storageService" ref="vgr.storageService" />
   </bean>
-  
+
+  <bean id="add-failed-rendition" class="se.vgregion.alfresco.repo.rendition.executer.AddFailedRenditionActionExecuter" parent="action-executer">
+    <property name="publicAction" value="false" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="behaviourFilter" ref="policyBehaviourFilter" />
+    <property name="renditionService" ref="RenditionService" />
+  </bean>
+
+  <bean id="node-eligible-for-rerendering-evaluator" class="se.vgregion.alfresco.repo.rendition.executer.NodeEligibleForRerenderingEvaluator" parent="action-condition-evaluator">
+    <property name="publicCondition" value="false" />
+    <property name="nodeService" ref="nodeService" />
+    <property name="renditionService" ref="RenditionService" />
+    <property name="storageService" ref="vgr.storageService" />
+  </bean>
+
+  <bean id="vgr.failedPdfaRenditionEmailTemplateLocation" class="org.alfresco.repo.dictionary.RepositoryLocation">
+    <property name="path">
+      <value>/app:company_home/app:dictionary/app:email_templates/cm:failedPdfaRenditionEmailTemplate/cm:failed-pdfa-rendition-email.ftl</value>
+    </property>
+  </bean>
+
 </beans>
