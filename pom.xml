@@ -23,6 +23,7 @@
   <modules>
     <module>repo</module>
     <module>share</module>
+    <module>pdfarenditions</module>
   </modules>
 
   <build>
