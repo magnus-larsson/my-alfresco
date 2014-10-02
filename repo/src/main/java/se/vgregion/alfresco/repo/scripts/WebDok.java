@@ -118,6 +118,21 @@ public class WebDok extends ContentGet {
 
     final String attachFilename = getFilename(nodeRef);
 
+    // if the targetFilename is blank and we're not going to attach the file,
+    // then we redirect to the same URL but with the filename as parameter
+    if (StringUtils.isBlank(attachFilename) && !attach) {
+      String serverPath = req.getServerPath();
+      String servicePath = req.getServicePath();
+      String queryString = req.getQueryString();
+
+      String url = serverPath + servicePath + "/" + attachFilename + "?" + queryString;
+
+      res.setHeader(WebScriptResponse.HEADER_LOCATION, url);
+      res.setStatus(Status.STATUS_MOVED_TEMPORARILY);
+
+      return;
+    }
+    
     streamContent(req, res, nodeRef, propertyQName, attach, attachFilename);
   }
 
