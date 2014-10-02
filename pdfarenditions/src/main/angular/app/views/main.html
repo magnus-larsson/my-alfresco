@@ -6,9 +6,15 @@
 	</div>
 </div>
 
-<div class="row" ng-hide="$data.length === 0" ng-cloak>
-	<div class="col-md-12">
+<div class="row rerenderall" ng-hide="$data.length === 0" ng-cloak>
+	<div class="col-md-6 pull-left">
 		<p>Total failed PDF/A renditions: <strong>{{ tableParams.total() }}</strong></p>
+	</div>
+	<div class="col-md-6">
+		<form class="form-inline pull-right" role="form">
+			<label for="timeout">Timeout (seconds)</label>
+			<input name="timeout" class="form-control" type="text" value="300" ng-model="timeout" />
+		</form>
 	</div>
 </div>
 

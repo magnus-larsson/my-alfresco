@@ -129,10 +129,10 @@ module.exports = function(grunt) {
       },
       proxies: [{
         context: '/alfresco',
-        // host: 'localhost',
-        // port: 8080
-        host: 'alfresco-lager1.vgregion.se',
+        host: 'localhost',
         port: 8080
+          // host: 'alfresco-lager1.vgregion.se',
+          // port: 8080
       }]
     },
 

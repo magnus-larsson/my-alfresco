@@ -108,11 +108,19 @@ public class Index {
     boolean result;
 
     try {
+      Long timeout = request.getParameter("timeout") != null ? Long.parseLong(request.getParameter("timeout")) : null;
+
       json = new JSONObject(request.getContent().getContent());
 
       NodeRef nodeRef = new NodeRef(json.getString("nodeRef"));
 
-      result = _storageService.createPdfaRendition(nodeRef, false);
+      // the try catch is because of backwards compatibility, can be removed
+      // after the next installation from the current date (2014-10-02)
+      try {
+        result = _storageService.createPdfaRendition(nodeRef, timeout);
+      } catch (Exception ex) {
+        result = _storageService.createPdfaRendition(nodeRef, false);
+      }
     } catch (Exception ex) {
       String error = ExceptionUtils.getStackTrace(ex);
 

@@ -21,6 +21,8 @@ public interface StorageService {
 
   boolean createPdfaRendition(NodeRef nodeRef, boolean async);
   
+  boolean createPdfaRendition(NodeRef nodeRef, Long timeout);
+  
   NodeRef getPdfaRendition(NodeRef nodeRef);
 
   int createMissingPdfRenditions();

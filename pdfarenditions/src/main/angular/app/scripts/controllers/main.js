@@ -2,6 +2,10 @@
 
 var MainCtrl = function($scope, Restangular, ngTableParams, toaster, $timeout, usSpinnerService, splash, $q, $sce) {
 
+  if (!$scope.timeout) {
+    $scope.timeout = 300;
+  }
+
   function syncLoop(iterations, process, exit) {
     var index = 0;
     var done = false;
@@ -170,7 +174,9 @@ var MainCtrl = function($scope, Restangular, ngTableParams, toaster, $timeout, u
 
     usSpinnerService.spin('spinner-1');
 
-    node.put().then(function(response) {
+    node.put({
+      timeout: $scope.timeout ? $scope.timeout : 300
+    }).then(function(response) {
       usSpinnerService.stop('spinner-1');
       var end = new Date().getTime();
       var time = (end - start) / 1000;
