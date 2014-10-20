@@ -1,5 +1,6 @@
 package se.vgregion.alfresco.repo.thumbnail;
 
+import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -10,8 +11,9 @@ import se.vgregion.alfresco.repo.content.transform.OpenOfficeTransformationOptio
 import se.vgregion.alfresco.repo.rendition.executer.PdfaPilotRenderingEngine;
 import se.vgregion.alfresco.repo.rendition.executer.PdfaRenderingEngine;
 
-@Aspect
-public class ThumbnailServiceAspect {
+public @Aspect class ThumbnailServiceAspect {
+  
+  private static final Logger LOG = Logger.getLogger(ThumbnailServiceAspect.class);
 
   @Pointcut("execution(* org.alfresco.repo.thumbnail.ThumbnailServiceImpl.getRenderingEngineNameFor(..))")
   private void hook() {
@@ -19,6 +21,10 @@ public class ThumbnailServiceAspect {
 
   @Around("hook()")
   public Object around(ProceedingJoinPoint pjp) throws Throwable {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Entering around()...");
+    }
+    
     String method = pjp.getSignature().getName();
 
     if (!method.equalsIgnoreCase("getRenderingEngineNameFor")) {
