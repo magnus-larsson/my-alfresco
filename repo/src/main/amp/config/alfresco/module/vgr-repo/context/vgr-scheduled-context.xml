@@ -127,7 +127,6 @@
     <property name="jobDetail" ref="vgr.pushServerJobDetail" />
     <property name="scheduler" ref="schedulerFactory" />
     <!-- cron expression is set to fire every minute -->
-    <!-- <property name="cronExpression" value="0 0/1 * 1/1 * ? *" /> -->
     <property name="cronExpression" value="0 0/1 * 1/1 * ? *" />
   </bean>
 
