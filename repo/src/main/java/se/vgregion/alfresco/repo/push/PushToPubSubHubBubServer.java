@@ -15,6 +15,7 @@ import se.vgregion.alfresco.repo.jobs.ClusteredExecuter;
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.publish.NodeRefCallbackHandler;
 import se.vgregion.alfresco.repo.publish.PublishingService;
+import se.vgregion.alfresco.repo.push.impl.PushLogger;
 
 public class PushToPubSubHubBubServer extends ClusteredExecuter {
 
@@ -67,7 +68,11 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
       public void processNodeRef(NodeRef nodeRef) {
         refreshLock();
 
+        PushLogger.logBeforePush(nodeRef, now, _nodeService);
+        
         executeUpdate(nodeRef, VgrModel.PROP_PUSHED_FOR_UNPUBLISH);
+        
+        PushLogger.logAfterPush(nodeRef, _nodeService);
 
         _pushJmsService.pushToJms(nodeRef, VgrModel.PROP_PUSHED_FOR_UNPUBLISH);
       }
@@ -82,9 +87,14 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
       public void processNodeRef(NodeRef nodeRef) {
         refreshLock();
 
+        PushLogger.logBeforePush(nodeRef, now, _nodeService);
+        
         executeUpdate(nodeRef, VgrModel.PROP_PUSHED_FOR_PUBLISH);
+        
+        PushLogger.logAfterPush(nodeRef, _nodeService);
 
         _pushJmsService.pushToJms(nodeRef, VgrModel.PROP_PUSHED_FOR_PUBLISH);
+
       }
 
     }, true, null, null);
@@ -95,12 +105,15 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
     // this...
     _behaviourFilter.disableBehaviour();
 
+    
     try {
+      	
       setUpdatedProperty(nodeRef);
 
       setPublishStatusProperties(nodeRef, property);
 
       increasePushedCount(nodeRef);
+      
     } finally {
       _behaviourFilter.enableBehaviour();
     }
