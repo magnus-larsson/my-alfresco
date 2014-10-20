@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 
 import se.vgregion.alfresco.repo.jobs.ClusteredExecuter;
 import se.vgregion.alfresco.repo.model.VgrModel;
+import se.vgregion.alfresco.repo.push.impl.PushLogger;
 
 public class RepushToPubSubHubBubServer extends ClusteredExecuter {
 
@@ -75,6 +76,8 @@ public class RepushToPubSubHubBubServer extends ClusteredExecuter {
         LOG.debug("Adding '" + nodeRef + "' to be re-pushed...");
       }
 
+      PushLogger.logNodeForRepush(nodeRef, _nodeService);
+      
       _behaviourFilter.disableBehaviour();
       try {
         // null the pushed for publish/unpublish properties to force a re-push
@@ -84,6 +87,7 @@ public class RepushToPubSubHubBubServer extends ClusteredExecuter {
       } finally {
         _behaviourFilter.enableBehaviour();
       }
+      
     }
   }
 
