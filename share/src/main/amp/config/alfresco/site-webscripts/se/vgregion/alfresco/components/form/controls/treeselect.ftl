@@ -36,6 +36,12 @@
     <#assign dflt="">
 </#if>
 
+<#if field.control.params.alwaysShowDflt??>
+    <#assign alwaysShowDflt=field.control.params.alwaysShowDflt>
+<#else>
+    <#assign alwaysShowDflt="false">
+</#if>
+
 <#if field.control.params.onlySelectLeaf??>
     <#assign onlySelectLeaf=field.control.params.onlySelectLeaf>
 <#else>
@@ -78,6 +84,7 @@
         viewmode: <#if form.mode == "view">true<#else>false</#if>,
         values: "${field.value?html}",
         dflt: "${dflt}",
+        alwaysShowDflt: <#if field.control.params.alwaysShowDflt??>true<#else>false</#if>,
         version: version,
         onlySelectLeaf: ${onlySelectLeaf?string},
         nodeRef: nodeRef
