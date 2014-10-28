@@ -23,13 +23,16 @@ public class ChecksumUpdatePolicy extends AbstractPolicy implements OnContentPro
 
       @Override
       public void execute() {
-        doContentPropertyUpdate(nodeRef, propertyQName);
+        // they're equal if the value exists and is the same
+        boolean equal = beforeValue != null && afterValue != null ? beforeValue.equals(afterValue) : false;
+        
+        doContentPropertyUpdate(nodeRef, propertyQName, equal);
       }
 
     });
   }
 
-  private void doContentPropertyUpdate(final NodeRef nodeRef, final QName propertyQName) {
+  private void doContentPropertyUpdate(final NodeRef nodeRef, final QName propertyQName, boolean equal) {
     // if it's not the content property, exit
     if (!propertyQName.isMatch(ContentModel.PROP_CONTENT)) {
       return;
@@ -54,6 +57,11 @@ public class ChecksumUpdatePolicy extends AbstractPolicy implements OnContentPro
     if (!StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.equals(nodeRef.getStoreRef())) {
       return;
     }
+    
+    // if the checksum is already saved and it's equal to the old value, then just exit
+    if (_nodeService.getProperty(nodeRef, VgrModel.PROP_CHECKSUM) != null && equal) {
+      return;
+    }
 
     _serviceUtils.addChecksum(nodeRef);
 
@@ -66,8 +74,7 @@ public class ChecksumUpdatePolicy extends AbstractPolicy implements OnContentPro
   public void afterPropertiesSet() throws Exception {
     super.afterPropertiesSet();
 
-    _policyComponent.bindClassBehaviour(OnContentPropertyUpdatePolicy.QNAME, VgrModel.TYPE_VGR_DOCUMENT, new JavaBehaviour(this,
-        "onContentPropertyUpdate", NotificationFrequency.TRANSACTION_COMMIT));
+    _policyComponent.bindClassBehaviour(OnContentPropertyUpdatePolicy.QNAME, VgrModel.TYPE_VGR_DOCUMENT, new JavaBehaviour(this, "onContentPropertyUpdate", NotificationFrequency.EVERY_EVENT));
   }
 
 }

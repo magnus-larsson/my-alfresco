@@ -4,9 +4,9 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
-import org.alfresco.repo.policy.Behaviour;
+import org.alfresco.repo.node.NodeServicePolicies.OnMoveNodePolicy;
+import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -25,7 +25,7 @@ import se.vgregion.alfresco.repo.model.VgrModel;
  * @author Niklas Ekman (niklas.ekman@redpill-linpro.com)
  * @version $Id$
  */
-public class CreateSiteDocumentPolicy extends AbstractPolicy implements OnCreateNodePolicy {
+public class CreateSiteDocumentPolicy extends AbstractPolicy implements OnCreateNodePolicy, OnMoveNodePolicy {
 
   private static final Logger LOG = Logger.getLogger(CreateSiteDocumentPolicy.class);
 
@@ -37,47 +37,62 @@ public class CreateSiteDocumentPolicy extends AbstractPolicy implements OnCreate
 
   @Override
   public void onCreateNode(final ChildAssociationRef childAssocRef) {
-    final NodeRef fileNodeRef = childAssocRef.getChildRef();
-    final NodeRef folderNodeRef = childAssocRef.getParentRef();
+    final NodeRef file = childAssocRef.getChildRef();
+    final NodeRef folder = childAssocRef.getParentRef();
 
-    runSafe(new DefaultRunSafe(fileNodeRef, _serviceUtils.getCurrentUserName()) {
+    runSafe(new DefaultRunSafe(file, _serviceUtils.getCurrentUserName()) {
 
       @Override
       public void execute() {
-        doCreateNode(fileNodeRef, folderNodeRef);
+        doUpdateNode(file, folder);
       }
 
     });
   }
 
-  private void doCreateNode(NodeRef fileNodeRef, NodeRef folderNodeRef) {
-    if (!_nodeService.exists(fileNodeRef)) {
+  @Override
+  public void onMoveNode(ChildAssociationRef oldChildAssocRef, ChildAssociationRef newChildAssocRef) {
+    final NodeRef file = newChildAssocRef.getChildRef();
+    final NodeRef folder = newChildAssocRef.getParentRef();
+
+    runSafe(new DefaultRunSafe(file, _serviceUtils.getCurrentUserName()) {
+
+      @Override
+      public void execute() {
+        doUpdateNode(file, folder);
+      }
+
+    });
+  }
+
+  private void doUpdateNode(NodeRef file, NodeRef folder) {
+    if (!_nodeService.exists(file)) {
       return;
     }
 
-    if (!_nodeService.exists(folderNodeRef)) {
+    if (!_nodeService.exists(folder)) {
       return;
     }
 
-    if (!_nodeService.getType(fileNodeRef).isMatch(VgrModel.TYPE_VGR_DOCUMENT)) {
+    if (!_nodeService.getType(file).isMatch(VgrModel.TYPE_VGR_DOCUMENT)) {
       return;
     }
 
-    if (!_nodeService.hasAspect(fileNodeRef, VgrModel.ASPECT_STANDARD)) {
+    if (!_nodeService.hasAspect(file, VgrModel.ASPECT_STANDARD)) {
       return;
     }
 
-    if (!_nodeService.hasAspect(folderNodeRef, VgrModel.ASPECT_METADATA)) {
+    if (!_nodeService.hasAspect(folder, VgrModel.ASPECT_METADATA)) {
       return;
     }
 
-    if (_nodeService.hasAspect(fileNodeRef, VgrModel.ASPECT_DONOTTOUCH)) {
-      //this node should not have it's properties copied, it's probably a copy action
+    if (_nodeService.hasAspect(file, VgrModel.ASPECT_DONOTTOUCH)) {
+      // this node should not have it's properties copied, it's probably a copy
+      // action
       return;
     }
 
-
-    final Map<QName, Serializable> folderProperties = _nodeService.getProperties(folderNodeRef);
+    final Map<QName, Serializable> folderProperties = _nodeService.getProperties(folder);
 
     for (final Entry<QName, Serializable> folderProperty : folderProperties.entrySet()) {
       final QName key = folderProperty.getKey();
@@ -98,7 +113,7 @@ public class CreateSiteDocumentPolicy extends AbstractPolicy implements OnCreate
         continue;
       }
 
-      _nodeService.setProperty(fileNodeRef, key, value);
+      _nodeService.setProperty(file, key, value);
     }
 
     if (LOG.isDebugEnabled()) {
@@ -110,8 +125,8 @@ public class CreateSiteDocumentPolicy extends AbstractPolicy implements OnCreate
   public void afterPropertiesSet() throws Exception {
     super.afterPropertiesSet();
 
-    _policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onCreateNode",
-        Behaviour.NotificationFrequency.TRANSACTION_COMMIT));
+    _policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, VgrModel.TYPE_VGR_DOCUMENT, new JavaBehaviour(this, "onCreateNode", NotificationFrequency.EVERY_EVENT));
+    _policyComponent.bindClassBehaviour(OnMoveNodePolicy.QNAME, VgrModel.TYPE_VGR_DOCUMENT, new JavaBehaviour(this, "onMoveNode", NotificationFrequency.EVERY_EVENT));
   }
 
 }

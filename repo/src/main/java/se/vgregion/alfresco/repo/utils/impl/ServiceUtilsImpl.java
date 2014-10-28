@@ -281,7 +281,7 @@ public class ServiceUtilsImpl implements InitializingBean, ServiceUtils {
     Assert.notNull(_globalProperties);
   }
 
-  public void replicateVersion(final NodeRef nodeRef, final String version) {
+  public void replicateVersion(NodeRef nodeRef, String version) {
     if (!_nodeService.exists(nodeRef)) {
       return;
     }
@@ -299,7 +299,7 @@ public class ServiceUtilsImpl implements InitializingBean, ServiceUtils {
     if (!StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.equals(nodeRef.getStoreRef())) {
       return;
     }
-
+    
     _nodeService.setProperty(nodeRef, VgrModel.PROP_IDENTIFIER_VERSION, version);
   }
 

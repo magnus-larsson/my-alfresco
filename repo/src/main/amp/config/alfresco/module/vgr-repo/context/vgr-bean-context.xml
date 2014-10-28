@@ -7,8 +7,8 @@
                            http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd
                            http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd">
 
-  <!-- activate the load time weaver for weaving aspects into classes and also accessing private mehtods -->
-  <context:load-time-weaver weaver-class="org.springframework.instrument.classloading.ReflectiveLoadTimeWeaver" aspectj-weaving="on" />
+  <!-- activate the load time weaver for weaving aspects into classes and also accessing private methods -->
+  <context:load-time-weaver aspectj-weaving="on" />
 
   <!-- This is a helper bean for getting hold of the current application context and making it available with a static method -->
   <bean id="vgr.applicationContextHolder" class="se.vgregion.alfresco.repo.utils.ApplicationContextHolder" />

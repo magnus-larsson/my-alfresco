@@ -859,7 +859,6 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
       Assert.isTrue(publisherForunit.size() > 0 || publisherProjectAssignment.size() > 0, "Either 'dc.publisher.forunit' or 'dc.publisher.project-assignment' must be set.");
     } catch (Exception ex) {
-      ex.printStackTrace();
       throw new AlfrescoRuntimeException(ex.getMessage(), ex);
     }
   }
