@@ -125,6 +125,13 @@
           * @default null
           */
          version : null,
+         
+         /**
+          * @property alwaysShowDflt
+          * @type boolean
+          * @default false
+          */
+         alwaysShowDflt : false,
 
          /**
           * @property onlySelectLeaf
@@ -200,7 +207,7 @@
             emptyValues = emptyValues || hiddenSelectedIdsInput.value === "";
          }
 
-         if (emptyValues && this.options.dflt != "" && (!this.options.viewmode) && this.options.version === 0.1) {
+         if (emptyValues && this.options.dflt != "" && (!this.options.viewmode) && (this.options.version === 0.1 || this.options.alwaysShowDflt)) {
             var defaults = this.options.dflt.split("|");
 
             if (hiddenSelectedIdsInput) {
