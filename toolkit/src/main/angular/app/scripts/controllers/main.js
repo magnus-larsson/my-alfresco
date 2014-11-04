@@ -1,6 +1,7 @@
 'use strict';
 
-var MainController = function($scope, Restangular, ngTableParams, toaster, $timeout, usSpinnerService, splash, $q, $sce) {
+var MainController = function($scope, Restangular, ngTableParams, toaster,
+  $timeout, usSpinnerService, splash, $q, $sce) {
 
   if (!$scope.timeout) {
     $scope.timeout = 300;
@@ -55,12 +56,17 @@ var MainController = function($scope, Restangular, ngTableParams, toaster, $time
 
   $scope.tableParams = new ngTableParams({
     page: 1,
-    count: 5
+    count: 5,
+    sorting: {
+      last: 'asc'
+    }
   }, {
     counts: [],
     total: 1,
     getData: function($defer, params) {
-      Restangular.all('failed').getList().then(function(result) {
+      Restangular.all('failed').getList({
+        sort: params.sorting().last
+      }).then(function(result) {
         params.total(result.total);
         $defer.resolve(result);
       }, function(error) {
@@ -74,7 +80,8 @@ var MainController = function($scope, Restangular, ngTableParams, toaster, $time
 
     switch (exitCode) {
       case 100:
-        message = 'Not serialized (no valid serialization found or keycode expired)';
+        message =
+          'Not serialized (no valid serialization found or keycode expired)';
         break;
       case 101:
         message = 'Command line parameter error';
@@ -184,10 +191,12 @@ var MainController = function($scope, Restangular, ngTableParams, toaster, $time
       node.working = false;
 
       if (response.success) {
-        toaster.pop('success', 'PDF/A render', 'PDF/A rendering successfull (' + time + ' seconds)');
+        toaster.pop('success', 'PDF/A render',
+          'PDF/A rendering successfull (' + time + ' seconds)');
         node.success = true;
       } else {
-        toaster.pop('error', 'PDF/A render', 'PDF/A rendering failed (' + time + ' seconds)');
+        toaster.pop('error', 'PDF/A render', 'PDF/A rendering failed (' +
+          time + ' seconds)');
       }
 
       deferred.resolve();
@@ -205,7 +214,8 @@ var MainController = function($scope, Restangular, ngTableParams, toaster, $time
       var errorCode = error.data.match(/(Error\s+)(\d+)/);
 
       if (exitCode && exitCode.length >= 2) {
-        node.error = getExitCodeMessage(parseInt(exitCode[2])) + ' (exit code: ' + exitCode[2] + ')';
+        node.error = getExitCodeMessage(parseInt(exitCode[2])) +
+          ' (exit code: ' + exitCode[2] + ')';
       }
 
       if (errorCode && errorCode.length >= 2) {
@@ -213,7 +223,8 @@ var MainController = function($scope, Restangular, ngTableParams, toaster, $time
           node.error += '<br/>';
         }
 
-        node.error += getErrorCodeMessage(parseInt(errorCode[2])) + ' (error code: ' + errorCode[2] + ')';
+        node.error += getErrorCodeMessage(parseInt(errorCode[2])) +
+          ' (error code: ' + errorCode[2] + ')';
       }
 
       node.error = $sce.trustAsHtml(node.error);
@@ -221,7 +232,8 @@ var MainController = function($scope, Restangular, ngTableParams, toaster, $time
       // remove the document from the list if the error message is no permission...
       // node.success = error.data.indexOf('No permission to edit document') >= 0;
 
-      toaster.pop('error', 'PDF/A render', 'PDF/A rendering failed (' + $scope.time + ' seconds)');
+      toaster.pop('error', 'PDF/A render', 'PDF/A rendering failed (' +
+        $scope.time + ' seconds)');
 
       deferred.reject();
     });
@@ -257,7 +269,9 @@ var MainController = function($scope, Restangular, ngTableParams, toaster, $time
 
 };
 
-MainController.$inject = ['$scope', 'Restangular', 'ngTableParams', 'toaster', '$timeout', 'usSpinnerService', 'splash', '$q', '$sce'];
+MainController.$inject = ['$scope', 'Restangular', 'ngTableParams', 'toaster',
+  '$timeout', 'usSpinnerService', 'splash', '$q', '$sce'
+];
 
 angular.module('toolkitApp')
 

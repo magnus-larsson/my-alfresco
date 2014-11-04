@@ -28,7 +28,7 @@
 				</td>
 				<td data-title="'Name'">{{node.name}}</td>
 				<td data-title="'Path'">{{node.path}}</td>
-      	<td data-title="'Last failure'">{{node.last}}</td>
+      	<td data-title="'Last failure'" sortable="'last'">{{node.last}}</td>
         <td data-title="'Count'">{{node.count}}</td>
 				<td data-title="'Actions'">
 					<button type="button" class="btn btn-default ladda-button" data-style="zoom-in" ng-click="rerender(node)" ng-disabled="working" data-ui-ladda="node.working" data-spinner-color="#000">
