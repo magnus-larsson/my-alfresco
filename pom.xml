@@ -15,7 +15,7 @@
   <name>VGR Alfresco Base Project</name>
 
   <properties>
-    <alfresco.version>4.1.9</alfresco.version>
+    <alfresco.version>4.1.9.4</alfresco.version>
     <alfresco.groupId>org.alfresco.enterprise</alfresco.groupId>
     <alfresco-cluster-probe.version>1.0.4</alfresco-cluster-probe.version>
   </properties>
