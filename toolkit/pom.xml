@@ -8,6 +8,7 @@
   </parent>
 
   <artifactId>alfresco-vgr-toolkit</artifactId>
+  <name>Alfresco VGR Toolkit</name>
   <packaging>bundle</packaging>
 
   <dependencies>
