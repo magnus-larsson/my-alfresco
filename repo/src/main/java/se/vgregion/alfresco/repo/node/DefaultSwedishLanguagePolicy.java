@@ -36,7 +36,7 @@ public class DefaultSwedishLanguagePolicy extends AbstractPolicy implements OnCr
     if (!newType.isMatch(_nodeService.getType(nodeRef))) {
       return;
     }
-    
+
     addDefaults(nodeRef);
   }
 
@@ -49,19 +49,28 @@ public class DefaultSwedishLanguagePolicy extends AbstractPolicy implements OnCr
           return;
         }
 
-        setDefaultLanguage(file);
+        boolean languageWritten = setDefaultLanguage(file);
 
-        setDefaultAccessRight(file);
+        boolean accessRightWritten = setDefaultAccessRight(file);
+
+        if (LOG.isDebugEnabled()) {
+          if (languageWritten) {
+            LOG.debug("Default language written...");
+          }
+          
+          if (accessRightWritten) {
+            LOG.debug("Default access right written...");
+          }
+        }
       }
 
     });
 
-    if (LOG.isDebugEnabled()) {
-      LOG.debug(this.getClass().getName());
-    }
   }
 
-  private void setDefaultLanguage(final NodeRef file) {
+  private boolean setDefaultLanguage(final NodeRef file) {
+    boolean result = false;
+
     final Serializable language = _nodeService.getProperty(file, VgrModel.PROP_LANGUAGE);
 
     if (language == null) {
@@ -69,10 +78,16 @@ public class DefaultSwedishLanguagePolicy extends AbstractPolicy implements OnCr
       languages.add(VgrModel.DEFAULT_LANGUAGE);
 
       _nodeService.setProperty(file, VgrModel.PROP_LANGUAGE, (Serializable) languages);
+
+      result = true;
     }
+
+    return result;
   }
 
-  private void setDefaultAccessRight(final NodeRef file) {
+  private boolean setDefaultAccessRight(final NodeRef file) {
+    boolean result = false;
+
     final Serializable accessRight = _nodeService.getProperty(file, VgrModel.PROP_ACCESS_RIGHT);
 
     if (accessRight == null) {
@@ -80,7 +95,11 @@ public class DefaultSwedishLanguagePolicy extends AbstractPolicy implements OnCr
       accessRights.add(VgrModel.DEFAULT_ACCESS_RIGHT);
 
       _nodeService.setProperty(file, VgrModel.PROP_ACCESS_RIGHT, (Serializable) accessRights);
+
+      result = true;
     }
+
+    return result;
   }
 
   @Override
