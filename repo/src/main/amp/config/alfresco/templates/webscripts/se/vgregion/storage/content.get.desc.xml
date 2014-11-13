@@ -9,6 +9,7 @@
   <!-- alfresco style -->
   <url>/vgr/storage/node/content{property}/{store_type}/{store_id}/{id}/{filename}?a={attach?}&amp;streamId={streamId?}&amp;version={version?}&amp;native={native?}</url>
   <url>/vgr/storage/node/content{property}/{store_type}/{store_id}/{id}?a={attach?}&amp;streamId={streamId?}&amp;version={version?}&amp;native={native?}</url>
+  <url>/vgr/storage/node/content{property}/{id}/{filename}?a={attach?}&amp;streamId={streamId?}&amp;version={version?}&amp;native={native?}</url>
   <url>/vgr/storage/node/content{property}/{id}?a={attach?}&amp;streamId={streamId?}&amp;version={version?}&amp;native={native?}</url>
 
   <args>
