@@ -7,10 +7,16 @@
   </description>
 
   <!-- alfresco style -->
+  <url>/vgr/storage/node/content{property}/{store_type}/{store_id}/{id}/{filename}?a={attach?}&amp;streamId={streamId?}&amp;version={version?}&amp;native={native?}</url>
   <url>/vgr/storage/node/content{property}/{store_type}/{store_id}/{id}?a={attach?}&amp;streamId={streamId?}&amp;version={version?}&amp;native={native?}</url>
+  <url>/vgr/storage/node/content{property}/{id}/{filename}?a={attach?}&amp;streamId={streamId?}&amp;version={version?}&amp;native={native?}</url>
   <url>/vgr/storage/node/content{property}/{id}?a={attach?}&amp;streamId={streamId?}&amp;version={version?}&amp;native={native?}</url>
 
   <args>
+    <arg>
+      <shortname>filename</shortname>
+      <description>the filename that the file will have</description>
+    </arg>
     <arg>
       <shortname>store_type</shortname>
       <description>the store type (workspace)</description>

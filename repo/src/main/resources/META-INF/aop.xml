@@ -11,6 +11,7 @@
     <aspect name="se.vgregion.alfresco.repo.interceptors.RestrictAccessAspect" />
     <aspect name="se.vgregion.alfresco.repo.interceptors.LDAPUserRegistryAspect" />
     <aspect name="se.vgregion.alfresco.repo.interceptors.CTFootnoesAspect" />
+    <aspect name="se.vgregion.alfresco.repo.interceptors.NodeServiceLoggerAspect" />
   </aspects>
 
 </aspectj>

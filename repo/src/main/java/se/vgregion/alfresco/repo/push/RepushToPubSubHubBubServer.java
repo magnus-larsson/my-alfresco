@@ -28,6 +28,8 @@ public class RepushToPubSubHubBubServer extends ClusteredExecuter {
   private BehaviourFilter _behaviourFilter;
 
   private int _maxRepushCount = 10;
+  
+  private boolean _enabled = true;
 
   /**
    * The minimum time (in minutes) that must have passed for a document before a re-push is tried. Default time is set to 20 minutes.
@@ -41,6 +43,12 @@ public class RepushToPubSubHubBubServer extends ClusteredExecuter {
 
   @Override
   protected void executeInternal() {
+    if (!_enabled) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("RepushToPubSubHubBubServer is not enabled, exiting...");
+      }
+    }
+    
     RetryingTransactionCallback<Void> callback = new RetryingTransactionCallback<Void>() {
 
       @Override
@@ -109,6 +117,10 @@ public class RepushToPubSubHubBubServer extends ClusteredExecuter {
 
   public void setMinimumPushAge(int minimumPushAge) {
     _minimumPushAge = minimumPushAge;
+  }
+  
+  public void setEnabled(boolean enabled) {
+    _enabled = enabled;
   }
 
   @Override

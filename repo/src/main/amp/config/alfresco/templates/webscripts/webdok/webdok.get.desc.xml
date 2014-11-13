@@ -2,8 +2,13 @@
   <shortname>WebDok URL rewriting stuff</shortname>
   <description>Rewrites an old WebDok URL to the corresponding file in Alfresco</description>
   <url>/vgr/webdok?id={id}&amp;version={version?}&amp;a={attach?}</url>
+  <url>/vgr/webdok/{filename}?id={id}&amp;version={version?}&amp;a={attach?}</url>
   
   <args>
+    <arg>
+      <shortname>filename</shortname>
+      <description>the filename that the file will have</description>
+    </arg>
     <arg>
       <shortname>id</shortname>
       <description>the node id of the object</description>

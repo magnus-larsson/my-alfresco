@@ -88,6 +88,8 @@ public class StorageContentGet extends ContentGet {
 
     final String id = parseId(templateVars);
 
+    String targetFilename = templateVars.get("filename");
+
     final boolean nativ = StringUtils.isNotBlank(req.getParameter("native")) ? req.getParameter("native").equalsIgnoreCase("true") : false;
 
     NodeRef nodeRef;
@@ -139,7 +141,22 @@ public class StorageContentGet extends ContentGet {
         }
       }
 
-      final String filename = extractFilename(filenameNodeRef, nodeRef);
+      final String filename = extractFilename(filenameNodeRef, nodeRef, true);
+
+      // if the targetFilename is blank and we're not going to attach the file,
+      // then we redirect to the same URL but with the filename as parameter
+      if (StringUtils.isBlank(targetFilename) && !attach) {
+        String serverPath = req.getServerPath();
+        String servicePath = req.getServicePath();
+        String queryString = req.getQueryString();
+
+        String url = serverPath + servicePath + "/" + extractFilename(filenameNodeRef, nodeRef, false) + "?" + queryString;
+
+        res.setHeader(WebScriptResponse.HEADER_LOCATION, url);
+        res.setStatus(Status.STATUS_MOVED_TEMPORARILY);
+
+        return;
+      }
 
       // Stream the content
       streamContentLocal(req, res, nodeRef, attach, propertyQName, filename);
@@ -147,9 +164,9 @@ public class StorageContentGet extends ContentGet {
   }
 
   private void streamContentLocal(WebScriptRequest req, WebScriptResponse res, NodeRef nodeRef, boolean attach, QName propertyQName, String filename) throws IOException {
-    String userAgent = req.getHeader("User-Agent");
+    String userAgent = req.getHeader("User-Agent") != null ? req.getHeader("User-Agent").toLowerCase() : null;
 
-    boolean rfc5987Supported = (null != userAgent) && (userAgent.contains("MSIE") || userAgent.contains(" Chrome/") || userAgent.contains(" FireFox/"));
+    boolean rfc5987Supported = (null != userAgent) && (userAgent.contains("msie") || userAgent.contains(" chrome/") || userAgent.contains(" firefox/"));
 
     if (attach && rfc5987Supported) {
       streamContent(req, res, nodeRef, propertyQName, attach, filename);
@@ -170,14 +187,18 @@ public class StorageContentGet extends ContentGet {
     return id;
   }
 
-  private String extractFilename(NodeRef filenameNodeRef, NodeRef fileExtensionNodeRef) {
+  private String extractFilename(NodeRef filenameNodeRef, NodeRef fileExtensionNodeRef, boolean quote) {
     final String extension = _serviceUtils.getFileExtension(fileExtensionNodeRef);
 
     String filename = (String) nodeService.getProperty(filenameNodeRef, VgrModel.PROP_TITLE_FILENAME);
 
-    filename = FilenameUtils.getBaseName(filename);
+    filename = FilenameUtils.getBaseName(filename) + extension;
+    
+    if (quote) {
+      filename = "\"" + filename + extension + "\"";
+    }
 
-    return "\"" + filename + extension + "\"";
+    return filename;
   }
 
   private void streamRendition(WebScriptRequest req, WebScriptResponse res, NodeRef nodeRef, String streamId, boolean attach) throws IOException {

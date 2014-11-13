@@ -1,17 +1,15 @@
 package se.vgregion.alfresco.repo.node;
 
+import java.io.Serializable;
+
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnUpdateNodePolicy;
-import org.alfresco.repo.policy.Behaviour;
+import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
-import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
-import org.alfresco.repo.transaction.RetryingTransactionHelper;
-import org.alfresco.repo.transaction.TransactionListener;
-import org.alfresco.repo.transaction.TransactionListenerAdapter;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -27,16 +25,9 @@ public class AutoPublishPolicy extends AbstractPolicy implements OnCreateNodePol
 
   private static final Logger LOG = Logger.getLogger(AutoPublishPolicy.class);
 
-  private static final String FILE_NODE_REF = AutoPublishPolicy.class.getName() + "_FILE_NODE_REF";
-  private static final String FOLDER_NODE_REF = AutoPublishPolicy.class.getName() + "_FOLDER_NODE_REF";
-
   private FileFolderService _fileFolderService;
 
   private StorageService _storageService;
-
-  private TransactionService _transactionService;
-
-  private TransactionListener _transactionListener;
 
   public void setStorageService(StorageService storageService) {
     _storageService = storageService;
@@ -47,24 +38,21 @@ public class AutoPublishPolicy extends AbstractPolicy implements OnCreateNodePol
   }
 
   public void setTransactionService(TransactionService transactionService) {
-    _transactionService = transactionService;
   }
 
   @Override
   public void afterPropertiesSet() throws Exception {
     super.afterPropertiesSet();
 
-    _transactionListener = new AutoPublishTransactionListener();
-
-    _policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onCreateNode", Behaviour.NotificationFrequency.TRANSACTION_COMMIT));
-    _policyComponent.bindClassBehaviour(OnUpdateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onUpdateNode", Behaviour.NotificationFrequency.TRANSACTION_COMMIT));
+    _policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onCreateNode", NotificationFrequency.TRANSACTION_COMMIT));
+    _policyComponent.bindClassBehaviour(OnUpdateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onUpdateNode", NotificationFrequency.TRANSACTION_COMMIT));
   }
 
   @Override
   public void onCreateNode(ChildAssociationRef childAssocRef) {
-    NodeRef folderNodeRef = childAssocRef.getParentRef();
+    NodeRef folderNode = childAssocRef.getParentRef();
 
-    FileInfo folder = getFileInfo(folderNodeRef);
+    FileInfo folder = getFileInfo(folderNode);
 
     if (folder == null) {
       return;
@@ -78,28 +66,28 @@ public class AutoPublishPolicy extends AbstractPolicy implements OnCreateNodePol
       return;
     }
 
-    doPublish(folderNodeRef, childAssocRef.getChildRef());
+    doPublish(folderNode, childAssocRef.getChildRef());
   }
 
-  private FileInfo getFileInfo(final NodeRef folderNodeRef) {
+  private FileInfo getFileInfo(final NodeRef folderNode) {
     return AuthenticationUtil.runAsSystem(new RunAsWork<FileInfo>() {
 
       @Override
       public FileInfo doWork() throws Exception {
-        return _fileFolderService.getFileInfo(folderNodeRef);
+        return _fileFolderService.getFileInfo(folderNode);
       }
     });
   }
 
   @Override
-  public void onUpdateNode(NodeRef fileNodeRef) {
-    if (!_nodeService.exists(fileNodeRef)) {
+  public void onUpdateNode(NodeRef fileNode) {
+    if (!_nodeService.exists(fileNode)) {
       return;
     }
 
-    NodeRef folderNodeRef = _nodeService.getPrimaryParent(fileNodeRef).getParentRef();
+    NodeRef folderNode = _nodeService.getPrimaryParent(fileNode).getParentRef();
 
-    FileInfo folder = getFileInfo(folderNodeRef);
+    FileInfo folder = getFileInfo(folderNode);
 
     if (folder == null) {
       return;
@@ -109,50 +97,48 @@ public class AutoPublishPolicy extends AbstractPolicy implements OnCreateNodePol
       return;
     }
 
-    doPublish(folderNodeRef, fileNodeRef);
+    
+    doPublish(folderNode, fileNode);
   }
-
-  private void doPublish(NodeRef folderNodeRef, NodeRef fileNodeRef) {
-    AlfrescoTransactionSupport.bindResource(FILE_NODE_REF, fileNodeRef);
-    AlfrescoTransactionSupport.bindResource(FOLDER_NODE_REF, folderNodeRef);
-
-    AlfrescoTransactionSupport.bindListener(_transactionListener);
-  }
-
-  private class AutoPublishTransactionListener extends TransactionListenerAdapter {
-
-    @Override
-    public void afterCommit() {
-      final NodeRef fileNodeRef = AlfrescoTransactionSupport.getResource(FILE_NODE_REF);
-      final NodeRef folderNodeRef = AlfrescoTransactionSupport.getResource(FOLDER_NODE_REF);
-
-      _transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>() {
-
-        @Override
-        public Object execute() throws Throwable {
-          doInTransaction(fileNodeRef, folderNodeRef);
-
-          return null;
-        }
-
-      }, false, true);
+  
+  private void doPublish(NodeRef folderNode, NodeRef fileNode) {
+    if (!_nodeService.exists(fileNode)) {
+      return;
     }
 
-  }
+    if (!_nodeService.exists(folderNode)) {
+      return;
+    }
 
-  private void doInTransaction(NodeRef fileNodeRef, NodeRef folderNodeRef) {
-    if (!_serviceUtils.isDocumentLibrary(fileNodeRef)) {
+    if (!_serviceUtils.isDocumentLibrary(fileNode)) {
       return;
     }
 
     // first check if the folder has the correct aspect
-    if (!_nodeService.hasAspect(folderNodeRef, VgrModel.ASPECT_AUTO_PUBLISH)) {
+    if (!_nodeService.hasAspect(folderNode, VgrModel.ASPECT_AUTO_PUBLISH)) {
       return;
     }
 
+    NodeRef publishedNode = _storageService.getLatestPublishedStorageVersion(fileNode.toString());
+    
+    if (_nodeService.getProperty(fileNode, VgrModel.PROP_IDENTIFIER_VERSION) == null) {
+      return;
+    }
+
+    float currentVersion = getNodeVersion(fileNode);
+
+    if (publishedNode != null) {
+      float publishedVersion = getNodeVersion(publishedNode);
+
+      // this version is already published
+      if (currentVersion == publishedVersion) {
+        return;
+      }
+    }
+
     // then check if the document fulfills the criteria stored on the folder
-    Boolean autoPublishMajorVersion = (Boolean) _nodeService.getProperty(folderNodeRef, VgrModel.PROP_AUTO_PUBLISH_MAJOR_VERSION);
-    Boolean autoPublishAllVersions = (Boolean) _nodeService.getProperty(folderNodeRef, VgrModel.PROP_AUTO_PUBLISH_ALL_VERSIONS);
+    Boolean autoPublishMajorVersion = (Boolean) _nodeService.getProperty(folderNode, VgrModel.PROP_AUTO_PUBLISH_MAJOR_VERSION);
+    Boolean autoPublishAllVersions = (Boolean) _nodeService.getProperty(folderNode, VgrModel.PROP_AUTO_PUBLISH_ALL_VERSIONS);
 
     autoPublishMajorVersion = autoPublishMajorVersion != null ? autoPublishMajorVersion : false;
     autoPublishAllVersions = autoPublishAllVersions != null ? autoPublishAllVersions : false;
@@ -160,7 +146,7 @@ public class AutoPublishPolicy extends AbstractPolicy implements OnCreateNodePol
     boolean autoPublish = false;
 
     if (autoPublishMajorVersion) {
-      String version = (String) _nodeService.getProperty(fileNodeRef, ContentModel.PROP_VERSION_LABEL);
+      String version = (String) _nodeService.getProperty(fileNode, ContentModel.PROP_VERSION_LABEL);
 
       autoPublish = StringUtils.isBlank(version) ? false : version.endsWith(".0");
     }
@@ -173,15 +159,25 @@ public class AutoPublishPolicy extends AbstractPolicy implements OnCreateNodePol
       return;
     }
 
+    _behaviourFilter.disableBehaviour(fileNode);
+    
     try {
-      _behaviourFilter.disableBehaviour();
-
-      _storageService.publishToStorage(fileNodeRef);
-
-      _behaviourFilter.enableBehaviour();
+      _storageService.publishToStorage(fileNode);
     } catch (AlfrescoRuntimeException ex) {
       LOG.debug("Publish to storage failed cause document misses some properties.");
+    } finally {
+      _behaviourFilter.enableBehaviour(fileNode);
     }
+  }
+
+  private Float getNodeVersion(NodeRef fileNode) {
+    Serializable version = _nodeService.getProperty(fileNode, VgrModel.PROP_IDENTIFIER_VERSION);
+    
+    if (version == null) {
+      return null;
+    }
+    
+    return Float.parseFloat(version.toString());
   }
 
 }

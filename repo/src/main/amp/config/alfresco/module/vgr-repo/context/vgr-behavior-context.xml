@@ -101,9 +101,6 @@
 
 	<bean id="vgr.extendPersonPolicy" class="se.vgregion.alfresco.repo.node.ExtendPersonPolicy"
 		parent="vgr.abstractPolicy" depends-on="vgr.dictionaryBootstrap">
-		<property name="threadPoolExecutor" ref="vgr.extendPersonThreadPoolExecutor" />
-		<property name="transactionService" ref="TransactionService" />
-		<property name="kivWsClient" ref="vgr.kivWsClient" />
     <property name="contentService" ref="ContentService" />
 	</bean>
 

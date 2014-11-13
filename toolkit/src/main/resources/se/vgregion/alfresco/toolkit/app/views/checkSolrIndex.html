@@ -1,0 +1,17 @@
+<div class="row" ng-hide="$data.length === 0" ng-cloak>
+	<div class="col-md-12">
+		<table ng-table="alfrescoPublishedTableParameters" class="table table-striped table-bordered">
+			<tr ng-repeat="node in $data">
+				<td data-title="'NodeRef'">
+					{{ node.nodeRef }}
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>
+
+<div class="row" ng-hide="$data.length !== 0" ng-cloak>
+	<div class="col-md-12">
+		No data found!
+	</div>
+</div>

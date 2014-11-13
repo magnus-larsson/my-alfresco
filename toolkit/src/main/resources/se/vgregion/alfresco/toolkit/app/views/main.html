@@ -1,0 +1,47 @@
+<div class="row rerenderall" ng-hide="$data.length === 0" ng-cloak>
+	<div class="col-md-12">
+		<button type="button" class="btn btn-default ladda-button pull-right" data-style="zoom-in" ng-click="rerenderAll()" ng-disabled="working" data-ui-ladda="working" data-spinner-color="#000">
+			<span class="ladda-label">Rerender all</span>
+		</button>
+	</div>
+</div>
+
+<div class="row rerenderall" ng-hide="$data.length === 0" ng-cloak>
+	<div class="col-md-6 pull-left">
+		<p>Total failed PDF/A renditions: <strong>{{ tableParams.total() }}</strong></p>
+	</div>
+	<div class="col-md-6">
+		<form class="form-inline pull-right" role="form">
+			<label for="timeout">Timeout (seconds)</label>
+			<input name="timeout" class="form-control" type="text" value="300" ng-model="timeout" />
+		</form>
+	</div>
+</div>
+
+<div class="row" ng-hide="$data.length === 0" ng-cloak>
+	<div class="col-md-12">
+		<table ng-table="tableParams" class="table table-striped table-bordered failed">
+			<tr ng-repeat="node in $data" ng-class="node.stacktrace ? 'error' : ''" ng-hide="node.success">
+				<td data-title="'NodeRef'">
+					<p><span ng-click="showError(node.stacktrace)" class="glyphicon glyphicon-warning-sign warning" ng-show="node.stacktrace"></span>{{ node.nodeRef }}</p>
+					<p ng-bind-html="node.error" ng-show="node.error"></p>
+				</td>
+				<td data-title="'Name'">{{node.name}}</td>
+				<td data-title="'Path'">{{node.path}}</td>
+      	<td data-title="'Last failure'" sortable="'last'">{{node.last}}</td>
+        <td data-title="'Count'">{{node.count}}</td>
+				<td data-title="'Actions'">
+					<button type="button" class="btn btn-default ladda-button" data-style="zoom-in" ng-click="rerender(node)" ng-disabled="working" data-ui-ladda="node.working" data-spinner-color="#000">
+						<span class="ladda-label">Rerender</span>
+					</button>
+				</td>
+      </tr>
+		</table>
+	</div>
+</div>
+
+<div class="row" ng-hide="$data.length !== 0" ng-cloak>
+	<div class="col-md-12">
+		No failed PDF/A nodes found!
+	</div>
+</div>

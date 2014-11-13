@@ -34,6 +34,7 @@ import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.rendition.RenderCallback;
 import org.alfresco.service.cmr.rendition.RenditionDefinition;
 import org.alfresco.service.cmr.rendition.RenditionService;
+import org.alfresco.service.cmr.rendition.RenditionServiceException;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -647,7 +648,16 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   }
 
   @Override
+  public boolean createPdfaRendition(NodeRef nodeRef, Long timeout) {
+    return createPdfaRendition(nodeRef, false, timeout);
+  }
+
+  @Override
   public boolean createPdfaRendition(final NodeRef nodeRef, final boolean async) {
+    return createPdfaRendition(nodeRef, async, null);
+  }
+
+  protected boolean createPdfaRendition(final NodeRef nodeRef, final boolean async, Long timeout) {
     // must first check whether the nodeRef can be transformed into a PDF/A or
     // not...
     if (!pdfaRendable(nodeRef)) {
@@ -681,9 +691,23 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
       });
     } else {
       try {
+        if (timeout != null) {
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("Setting render timeout to '" + timeout + "'");
+          }
+
+          renditionDefinition.setParameterValue(AbstractTransformationRenderingEngine.PARAM_TIMEOUT_MS, timeout);
+        }
+
         _renditionService.render(nodeRef, renditionDefinition);
-      } catch (Throwable ex) {
+      } catch (RenditionServiceException ex) {
         // handleFailedPdfaRendition(nodeRef, ex);
+
+        System.out.println(ex.getRenditionDefinition());
+
+        throw new RuntimeException(ex);
+      } catch (Throwable ex) {
+        System.out.println(ex.getClass());
 
         throw new RuntimeException(ex);
       }
@@ -698,7 +722,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
       @Override
       public Void doWork() throws Exception {
         Map<String, Object> model = new HashMap<String, Object>();
-        
+
         String username = (String) _nodeService.getProperty(nodeRef, VgrModel.PROP_PUBLISHER_ID);
 
         NodeRef user = _personService.getPerson(username);
@@ -711,7 +735,6 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
         Action mailAction = _actionService.createAction(MailActionExecuter.NAME);
         mailAction.setExecuteAsynchronously(false);
-
 
         String to = (String) _nodeService.getProperty(user, ContentModel.PROP_EMAIL);
         // String subject = I18NUtil.getMessage("failed.pdfa.email.subject",
@@ -836,7 +859,6 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
       Assert.isTrue(publisherForunit.size() > 0 || publisherProjectAssignment.size() > 0, "Either 'dc.publisher.forunit' or 'dc.publisher.project-assignment' must be set.");
     } catch (Exception ex) {
-      ex.printStackTrace();
       throw new AlfrescoRuntimeException(ex.getMessage(), ex);
     }
   }

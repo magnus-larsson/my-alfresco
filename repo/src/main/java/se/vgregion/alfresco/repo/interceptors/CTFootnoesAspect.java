@@ -12,8 +12,7 @@ import org.aspectj.lang.annotation.Pointcut;
 
 import se.vgregion.alfresco.repo.utils.ApplicationContextHolder;
 
-@Aspect
-public class CTFootnoesAspect {
+public @Aspect class CTFootnoesAspect {
 
   private final static Logger LOG = Logger.getLogger(CTFootnoesAspect.class);
 
@@ -36,7 +35,7 @@ public class CTFootnoesAspect {
       if (LOG.isDebugEnabled()) {
         LOG.debug("List size is less than or equal to limit.");
       }
-      
+
       return list;
     }
 
@@ -51,7 +50,7 @@ public class CTFootnoesAspect {
 
     LOG.warn("List after limit is " + result.size());
     System.out.println("List after limit is " + result.size());
-    
+
     for (StackTraceElement stackTraceElement : Thread.currentThread().getStackTrace()) {
       LOG.warn(stackTraceElement.toString());
     }
@@ -67,14 +66,14 @@ public class CTFootnoesAspect {
       if (LOG.isDebugEnabled()) {
         LOG.debug("List size is less than or equal to limit.");
       }
-      
+
       return size;
     }
 
     LOG.warn("List before limit is " + size);
 
     LOG.warn("List after limit is " + getLimit());
-    
+
     for (StackTraceElement stackTraceElement : Thread.currentThread().getStackTrace()) {
       LOG.warn(stackTraceElement.toString());
     }
@@ -88,6 +87,10 @@ public class CTFootnoesAspect {
     String limit = properties.getProperty("ctfootnotes.footnoteslist.limit", String.valueOf(DEFAULT_LIMIT));
 
     return Long.valueOf(limit);
+  }
+
+  public static CTFootnoesAspect aspectOf() {
+    return new CTFootnoesAspect();
   }
 
 }

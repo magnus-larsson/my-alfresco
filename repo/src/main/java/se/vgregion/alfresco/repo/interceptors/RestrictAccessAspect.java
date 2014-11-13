@@ -25,8 +25,7 @@ import org.springframework.extensions.webscripts.servlet.WebScriptServletRespons
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.utils.ApplicationContextHolder;
 
-@Aspect
-public class RestrictAccessAspect {
+public @Aspect class RestrictAccessAspect {
 
   private static final Logger LOG = Logger.getLogger(RestrictAccessAspect.class);
 
@@ -97,7 +96,9 @@ public class RestrictAccessAspect {
   }
 
   /**
-   * Extracts the IP adress of the caller. If there's an "x-forwarded-for" header set, that one is used cause that is set by proxies, load balancers and the like.
+   * Extracts the IP adress of the caller. If there's an "x-forwarded-for"
+   * header set, that one is used cause that is set by proxies, load balancers
+   * and the like.
    * 
    * @param request
    *          the http servlet request
