@@ -428,13 +428,20 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
       NodeRef storage = _fileFolderService.searchSimple(companyHome, "Lagret");
 
       if (storage == null) {
-        storage = _fileFolderService.create(companyHome, "Lagret", ContentModel.TYPE_FOLDER).getNodeRef();
+        storage = AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<NodeRef>() {
+          @Override
+          public NodeRef doWork() throws Exception {
+            NodeRef nodeRef = _fileFolderService.create(companyHome, "Lagret", ContentModel.TYPE_FOLDER).getNodeRef();
 
-        _permissionService.setInheritParentPermissions(storage, false);
-        _permissionService.setPermission(storage, PermissionService.ALL_AUTHORITIES, PermissionService.CONSUMER, true);
-        _permissionService.setPermission(storage, "guest", PermissionService.CONSUMER, true);
+            _permissionService.setInheritParentPermissions(nodeRef, false);
+            _permissionService.setPermission(nodeRef, PermissionService.ALL_AUTHORITIES, PermissionService.CONSUMER, true);
+            _permissionService.setPermission(nodeRef, "guest", PermissionService.CONSUMER, true);
+
+            return nodeRef;
+          }
+
+        }, AuthenticationUtil.getSystemUserName());
       }
-
       return storage;
     } finally {
       ServiceUtilsImpl.closeQuietly(nodes);

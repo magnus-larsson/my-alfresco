@@ -66,27 +66,36 @@ public class CreateSiteDocumentPolicy extends AbstractPolicy implements OnCreate
   }
 
   private void doUpdateNode(NodeRef file, NodeRef folder) {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug(this.getClass().getName() + " begin");
+    }
     if (!_nodeService.exists(file)) {
+      LOG.debug("File did not exist");
       return;
     }
 
     if (!_nodeService.exists(folder)) {
+      LOG.debug("Folder did not exist");
       return;
     }
 
     if (!_nodeService.getType(file).isMatch(VgrModel.TYPE_VGR_DOCUMENT)) {
+      LOG.debug("Is not VGR document");
       return;
     }
 
     if (!_nodeService.hasAspect(file, VgrModel.ASPECT_STANDARD)) {
+      LOG.debug("Does not have standard aspect");
       return;
     }
 
     if (!_nodeService.hasAspect(folder, VgrModel.ASPECT_METADATA)) {
+      LOG.debug("Does not have metadata aspect");
       return;
     }
 
     if (_nodeService.hasAspect(file, VgrModel.ASPECT_DONOTTOUCH)) {
+      LOG.debug("Does have do not touch aspect");
       // this node should not have it's properties copied, it's probably a copy
       // action
       return;
@@ -117,7 +126,7 @@ public class CreateSiteDocumentPolicy extends AbstractPolicy implements OnCreate
     }
 
     if (LOG.isDebugEnabled()) {
-      LOG.debug(this.getClass().getName());
+      LOG.debug(this.getClass().getName() + " ran successfully");
     }
   }
 
