@@ -137,7 +137,7 @@ public class AddPdfaPolicy extends AbstractPolicy implements OnContentUpdatePoli
         _nodeService.setProperty(nodeRef, VgrModel.PROP_FORMAT_EXTENT_EXTENSION_NATIVE, nativeExtension);
 
         final ContentReader pdfContentReader = _contentService.getReader(pdfNodeRef, ContentModel.PROP_CONTENT);
-        
+
         final InputStream pdfInputStream = pdfContentReader.getContentInputStream();
 
         final Serializable pdfChecksum = _serviceUtils.getChecksum(pdfInputStream);
@@ -163,7 +163,7 @@ public class AddPdfaPolicy extends AbstractPolicy implements OnContentUpdatePoli
     Assert.notNull(_contentService);
 
     if (!_initialized) {
-      _behaviour = new JavaBehaviour(this, "onContentUpdate", Behaviour.NotificationFrequency.EVERY_EVENT);
+      _behaviour = new JavaBehaviour(this, "onContentUpdate", Behaviour.NotificationFrequency.TRANSACTION_COMMIT);
 
       _policyComponent.bindClassBehaviour(OnContentUpdatePolicy.QNAME, ContentModel.TYPE_CONTENT, _behaviour);
 
