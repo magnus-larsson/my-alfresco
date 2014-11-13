@@ -4,7 +4,7 @@ import java.net.MalformedURLException;
 
 import org.junit.Test;
 
-public class KivServiceImplTest {
+public class KivServiceImplTest_Deprecated {
 
   @Test
   public void testFindOrganisationalUnits() throws MalformedURLException {

@@ -22,7 +22,7 @@ public class CreateSiteDocumentPolicyIntegrationTest extends AbstractVgrRepoInte
   private static final String DEFAULT_USERNAME = "testuser";
 
   @Test
-  public void test() {
+  public void testInSiteSimple() {
     try {
       createUser(DEFAULT_USERNAME);
 
@@ -30,32 +30,73 @@ public class CreateSiteDocumentPolicyIntegrationTest extends AbstractVgrRepoInte
 
         @Override
         public Void doWork() throws Exception {
-          testAsUser();
+          SiteInfo site = createSite();
+
+          try {
+            _testInSiteSimple(site);
+          } finally {
+            deleteSite(site);
+          }
 
           return null;
         }
+      }, DEFAULT_USERNAME);
+    } finally {
+      deleteUser(DEFAULT_USERNAME);
+    }
+  }
+  
+  @Test
+  public void testInSiteWithMove() {
+    try {
+      createUser(DEFAULT_USERNAME);
 
+      AuthenticationUtil.runAs(new RunAsWork<Void>() {
+
+        @Override
+        public Void doWork() throws Exception {
+          SiteInfo site = createSite();
+
+          try {
+            _testInSiteWithMove(site);
+          } finally {
+            deleteSite(site);
+          }
+
+          return null;
+        }
+      }, DEFAULT_USERNAME);
+    } finally {
+      deleteUser(DEFAULT_USERNAME);
+    }
+  }
+  
+  @Test
+  public void testInSiteWithCopy() {
+    try {
+      createUser(DEFAULT_USERNAME);
+
+      AuthenticationUtil.runAs(new RunAsWork<Void>() {
+
+        @Override
+        public Void doWork() throws Exception {
+          SiteInfo site = createSite();
+
+          try {
+            _testInSiteWithCopy(site);
+          } finally {
+            deleteSite(site);
+          }
+
+          return null;
+        }
       }, DEFAULT_USERNAME);
     } finally {
       deleteUser(DEFAULT_USERNAME);
     }
   }
 
-  protected void testAsUser() {
-    SiteInfo site = createSite();
-
-    try {
-      testInSiteSimple(site);
-
-      testInSiteWithMove(site);
-
-      testInSiteWithCopy(site);
-    } finally {
-      deleteSite(site);
-    }
-  }
-
-  private void testInSiteSimple(SiteInfo site) {
+  private void _testInSiteSimple(SiteInfo site) {
     NodeRef documentLibrary = _siteService.getContainer(site.getShortName(), SiteService.DOCUMENT_LIBRARY);
 
     NodeRef folder = _fileFolderService.create(documentLibrary, "testfolder", ContentModel.TYPE_FOLDER).getNodeRef();
@@ -65,10 +106,11 @@ public class CreateSiteDocumentPolicyIntegrationTest extends AbstractVgrRepoInte
 
     String template = (String) _nodeService.getProperty(document, VgrModel.PROP_TYPE_TEMPLATENAME);
 
+    assertType(document, VgrModel.TYPE_VGR_DOCUMENT);
     assertEquals("very nice template", template);
   }
 
-  private void testInSiteWithMove(SiteInfo site) {
+  private void _testInSiteWithMove(SiteInfo site) {
     NodeRef documentLibrary = _siteService.getContainer(site.getShortName(), SiteService.DOCUMENT_LIBRARY);
 
     NodeRef folder = _fileFolderService.create(documentLibrary, "testfolder2", ContentModel.TYPE_FOLDER).getNodeRef();
@@ -107,7 +149,7 @@ public class CreateSiteDocumentPolicyIntegrationTest extends AbstractVgrRepoInte
     assertEquals("very nice template", template);
   }
 
-  private void testInSiteWithCopy(SiteInfo site) {
+  private void _testInSiteWithCopy(SiteInfo site) {
     NodeRef documentLibrary = _siteService.getContainer(site.getShortName(), SiteService.DOCUMENT_LIBRARY);
 
     NodeRef folder = _fileFolderService.create(documentLibrary, "testfolder3", ContentModel.TYPE_FOLDER).getNodeRef();

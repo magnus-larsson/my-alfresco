@@ -18,7 +18,7 @@ import org.junit.Test;
 import se.vgregion.alfresco.repo.model.ApelonNode;
 import vocabularyservices.wsdl.metaservice_vgr_se.v2.VocabularyService;
 
-public class ApelonServiceImplIntegrationTest {
+public class ApelonServiceImplIntegrationTest_Deprecated {
 
   @Test
   public void testDocumentType() {
