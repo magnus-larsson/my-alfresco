@@ -34,7 +34,7 @@ import org.apache.chemistry.opencmis.commons.spi.CmisBinding;
 public class CreateDocument {
 
   public static void main(final String[] args) throws FileNotFoundException {
-    final File file = new File("/Users/niklas/Desktop Dump/test.docx");
+    final File file = new File("/Users/niklas/Downloads/testar.docx");
     final String mimetype = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
     final String username = "admin";
