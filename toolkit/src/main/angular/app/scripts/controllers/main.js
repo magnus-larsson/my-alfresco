@@ -182,7 +182,7 @@ var MainController = function($scope, Restangular, ngTableParams, toaster,
     usSpinnerService.spin('spinner-1');
 
     node.put({
-      timeout: $scope.timeout ? $scope.timeout : 300
+      timeout: $scope.timeout ? ($scope.timeout * 1000) : 300000
     }).then(function(response) {
       usSpinnerService.stop('spinner-1');
       var end = new Date().getTime();

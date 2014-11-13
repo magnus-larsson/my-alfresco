@@ -98,29 +98,9 @@ var CheckSolrIndexController = function($scope, Restangular, ngTableParams,
 
         callback();
       });
-    }, function(error) {
+    }, function(callback) {
       defer.resolve(result);
     });
-
-    /*
-    while ($scope.more) {
-      getAlfrescoNodes(batch, start).then(function(nodes) {
-        start += nodes.total;
-
-        result = result.concat(nodes.data);
-
-        console.log('Result: ' + result.length);
-
-        $scope.more = false;
-
-        if (nodes.total === 0) {
-          $scope.more = false;
-
-          defer.resolve(result);
-        }
-      });
-    }
-    */
 
     return defer.promise;
   }
