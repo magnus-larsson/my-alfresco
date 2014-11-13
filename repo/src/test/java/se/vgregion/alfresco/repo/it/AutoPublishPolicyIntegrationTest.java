@@ -22,16 +22,16 @@ import se.vgregion.alfresco.repo.storage.StorageService;
 public class AutoPublishPolicyIntegrationTest extends AbstractVgrRepoIntegrationTest {
 
   private static final Logger LOG = Logger.getLogger(AutoPublishPolicyIntegrationTest.class);
-  
+
   private static final String DEFAULT_USERNAME = "testuser";
-  
+
   @Autowired
   private StorageService _storageService;
 
   @Test
   public void test() {
     LOG.debug("Starting test...");
-    
+
     try {
       createUser(DEFAULT_USERNAME);
 
@@ -48,7 +48,7 @@ public class AutoPublishPolicyIntegrationTest extends AbstractVgrRepoIntegration
     } finally {
       deleteUser(DEFAULT_USERNAME);
     }
-    
+
     LOG.debug("Ending test...");
   }
 
@@ -66,7 +66,7 @@ public class AutoPublishPolicyIntegrationTest extends AbstractVgrRepoIntegration
     final NodeRef documentLibrary = _siteService.getContainer(site.getShortName(), SiteService.DOCUMENT_LIBRARY);
 
     NodeRef folder = _fileFolderService.create(documentLibrary, "testfolder", ContentModel.TYPE_FOLDER).getNodeRef();
-    
+
     List<String> projects = new ArrayList<String>();
     projects.add("Project");
 
@@ -77,9 +77,9 @@ public class AutoPublishPolicyIntegrationTest extends AbstractVgrRepoIntegration
     _nodeService.setProperty(document, VgrModel.PROP_TYPE_RECORD, "type record");
     _nodeService.setProperty(document, VgrModel.PROP_TYPE_RECORD_ID, "123456");
     _nodeService.setProperty(document, VgrModel.PROP_PUBLISHER_PROJECT_ASSIGNMENT, (Serializable) projects);
-    
+
     NodeRef publishedNode = _storageService.getPublishedNodeRef(document);
-    
+
     assertTrue(_nodeService.hasAspect(publishedNode, VgrModel.ASPECT_PUBLISHED));
   }
 

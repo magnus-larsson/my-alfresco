@@ -17,7 +17,7 @@ import se.vgregion.alfresco.repo.model.VgrModel;
 /**
  * @author Niklas Ekman (niklas.ekman@redpill-linpro.com)
  */
-public class CreateSiteDocumentPolicyIntegrationTest extends AbstractVgrRepoIntegrationTest {
+public class CreateSiteDocumentPolicyIntegrationTest_Disabled extends AbstractVgrRepoIntegrationTest {
 
   private static final String DEFAULT_USERNAME = "testuser";
 
