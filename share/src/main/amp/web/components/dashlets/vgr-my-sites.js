@@ -35,7 +35,7 @@
 
       var anchor = YAHOO.util.Selector.query("h3 a", elCell)[0];
       
-      if (anchor.href.endsWith("dashboard")) {
+      if (anchor != null && anchor.href.endsWith("dashboard")) {
          anchor.href = anchor.href.replace("dashboard", "default-redirect");
       }
    };

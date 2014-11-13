@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 //This class requires soapio endpoint service to be running
-public class KivWsClientIntegrationTest {
+public class KivWsClientIntegrationTest_Deprecated {
   private KivWsClient wsClient;
 
   @Before
