@@ -129,7 +129,7 @@ public class CreateDocument {
     properties.put("vgr:dc.type.record", "Ospecificerat");
     properties.put("vgr:dc.source", "http://bariumtest.vgregion.se/barium/link.asp?content=2528");
     properties.put("vgr:dc.source.documentid", BigInteger.valueOf(2528));
-    properties.put("vgr:dc.identifier.version", "7");
+    properties.put("vgr:dc.identifier.version", "9");
     properties.put("vgr:dc.source.origin", "Barium");
     properties.put("vgr:dc.publisher.project-assignment", "Foobar");
 

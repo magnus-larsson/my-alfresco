@@ -12,8 +12,7 @@ import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.storage.StorageService;
 
 /**
- * Moves a document to the storage that is placed in a folder with the
- * vgr:watched aspect.
+ * Moves a document to the storage that is placed in a folder with the vgr:watched aspect.
  */
 public class MoveWatchedDocumentsPolicy extends AbstractPolicy implements OnCreateNodePolicy {
 
@@ -21,37 +20,41 @@ public class MoveWatchedDocumentsPolicy extends AbstractPolicy implements OnCrea
 
   private StorageService _storageService;
 
+  public void setStorageService(final StorageService storageService) {
+    _storageService = storageService;
+  }
+
   @Override
   public void onCreateNode(final ChildAssociationRef childAssocRef) {
-    final NodeRef file = childAssocRef.getChildRef();
-    final NodeRef folder = childAssocRef.getParentRef();
+    final NodeRef fileNodeRef = childAssocRef.getChildRef();
+    final NodeRef folderNodeRef = childAssocRef.getParentRef();
 
-    runSafe(new DefaultRunSafe(file) {
+    runSafe(new DefaultRunSafe(fileNodeRef) {
 
       @Override
       public void execute() {
         // if the node does not exist, don't do anything...
-        if (!_nodeService.exists(file)) {
+        if (!_nodeService.exists(fileNodeRef)) {
           return;
         }
 
         // if the node is not of type "vgr:document", exit
-        if (!_nodeService.getType(file).isMatch(VgrModel.TYPE_VGR_DOCUMENT)) {
+        if (!_nodeService.getType(fileNodeRef).isMatch(VgrModel.TYPE_VGR_DOCUMENT)) {
           return;
         }
 
         // if the node does not have the required aspect "vgr:standard", exit
-        if (!_nodeService.hasAspect(file, VgrModel.ASPECT_STANDARD)) {
+        if (!_nodeService.hasAspect(fileNodeRef, VgrModel.ASPECT_STANDARD)) {
           return;
         }
 
         // if the nodes folder does not have the required aspect "watched", exit
-        if (!_nodeService.hasAspect(folder, VgrModel.ASPECT_WATCHED)) {
+        if (!_nodeService.hasAspect(folderNodeRef, VgrModel.ASPECT_WATCHED)) {
           return;
         }
 
         // if we reach this point, all is well and good so let's move the file
-        _storageService.moveToStorage(file);
+        _storageService.moveToStorage(fileNodeRef);
 
         if (LOG.isDebugEnabled()) {
           LOG.debug(this.getClass().getName());
@@ -61,15 +64,12 @@ public class MoveWatchedDocumentsPolicy extends AbstractPolicy implements OnCrea
     });
   }
 
-  public void setStorageService(final StorageService storageService) {
-    _storageService = storageService;
-  }
-
   @Override
   public void afterPropertiesSet() throws Exception {
     super.afterPropertiesSet();
 
-    _policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onCreateNode", NotificationFrequency.TRANSACTION_COMMIT));
+    _policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onCreateNode",
+        NotificationFrequency.TRANSACTION_COMMIT));
   }
 
 }

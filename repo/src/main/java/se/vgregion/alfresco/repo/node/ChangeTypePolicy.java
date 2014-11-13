@@ -2,14 +2,13 @@ package se.vgregion.alfresco.repo.node;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
-import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
+import org.alfresco.repo.policy.Behaviour;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.service.cmr.lock.LockStatus;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.apache.log4j.Logger;
-
 import se.vgregion.alfresco.repo.model.VgrModel;
 
 /**
@@ -92,6 +91,7 @@ public class ChangeTypePolicy extends AbstractPolicy implements OnCreateNodePoli
   public void afterPropertiesSet() throws Exception {
     super.afterPropertiesSet();
 
-    _policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onCreateNode", NotificationFrequency.EVERY_EVENT));
+    _policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this,
+            "onCreateNode", Behaviour.NotificationFrequency.TRANSACTION_COMMIT));
   }
 }
