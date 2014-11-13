@@ -69,7 +69,7 @@ public class MoveWatchedDocumentsPolicy extends AbstractPolicy implements OnCrea
   public void afterPropertiesSet() throws Exception {
     super.afterPropertiesSet();
 
-    _policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onCreateNode", NotificationFrequency.EVERY_EVENT));
+    _policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onCreateNode", NotificationFrequency.TRANSACTION_COMMIT));
   }
 
 }
