@@ -20,9 +20,12 @@ import se.vgregion.alfresco.repo.model.VgrModel;
 public class ChangeTypePolicy extends AbstractPolicy implements OnCreateNodePolicy {
 
   private static final Logger LOG = Logger.getLogger(ChangeTypePolicy.class);
-
+  private static boolean _initialized = false;
   @Override
   public void onCreateNode(final ChildAssociationRef childAssocRef) {
+    if (LOG.isTraceEnabled()) {
+      LOG.trace(this.getClass().getName() + " - onCreateNode begin");
+    }
     final NodeRef nodeRef = childAssocRef.getChildRef();
 
     runSafe(new DefaultRunSafe(nodeRef) {
@@ -33,6 +36,9 @@ public class ChangeTypePolicy extends AbstractPolicy implements OnCreateNodePoli
       }
 
     });
+    if (LOG.isTraceEnabled()) {
+      LOG.trace(this.getClass().getName() + " - onCreateNode end");
+    }
   }
 
   private void doCreateNode(NodeRef nodeRef) {
@@ -90,8 +96,9 @@ public class ChangeTypePolicy extends AbstractPolicy implements OnCreateNodePoli
   @Override
   public void afterPropertiesSet() throws Exception {
     super.afterPropertiesSet();
-
-    _policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this,
-            "onCreateNode", Behaviour.NotificationFrequency.TRANSACTION_COMMIT));
+    if (!_initialized) {
+      LOG.info("Initialized " + this.getClass().getName());
+      _policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onCreateNode", Behaviour.NotificationFrequency.EVERY_EVENT));
+    }
   }
 }

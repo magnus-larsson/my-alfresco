@@ -11,52 +11,41 @@ import org.junit.Test;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
 
-public class ChecksumUpdatePolicyIntegrationTest_disabled extends AbstractVgrRepoIntegrationTest {
-  
+public class ChecksumUpdatePolicyIntegrationTest extends AbstractVgrRepoIntegrationTest {
+
   private static final Logger LOG = Logger.getLogger(ChangeTypePolicyIntegrationTest.class);
 
   private static final String DEFAULT_USERNAME = "testuser";
-  
+
+  private SiteInfo site;
+
+  @Override
+  public void beforeClassSetup() {
+    super.beforeClassSetup();
+    createUser(DEFAULT_USERNAME);
+    _authenticationComponent.setCurrentUser(DEFAULT_USERNAME);
+    site = createSite();
+  }
+
+  @Override
+  public void afterClassSetup() {
+    deleteSite(site);
+    _authenticationComponent.setCurrentUser(_authenticationComponent.getSystemUserName());
+    deleteUser(DEFAULT_USERNAME);
+    _authenticationComponent.clearCurrentSecurityContext();
+  }
+
   @Test
   public void test() {
     LOG.debug("Starting test...");
-    
-    try {
-      createUser(DEFAULT_USERNAME);
-
-      AuthenticationUtil.runAs(new RunAsWork<Void>() {
-
-        @Override
-        public Void doWork() throws Exception {
-          testAsUser();
-
-          return null;
-        }
-
-      }, DEFAULT_USERNAME);
-    } finally {
-      deleteUser(DEFAULT_USERNAME);
-    }
-    
-    LOG.debug("Ending test...");
-  }
-
-  protected void testAsUser() {
-    SiteInfo site = createSite();
-
-    try {
-      testInSite(site);
-    } finally {
-      deleteSite(site);
-    }
-  }
-
-  private void testInSite(SiteInfo site) {
+    setRequiresNew(true);
     NodeRef document = uploadDocument(site, "test.doc").getNodeRef();
-    
+
     String checksum = (String) _nodeService.getProperty(document, VgrModel.PROP_CHECKSUM);
-    
+    LOG.debug("Checksum: " + checksum);
     assertEquals("73422f4acd791700eb64b0e909224bf0", checksum);
+
+    LOG.debug("Ending test...");
   }
 
 }
