@@ -32,6 +32,7 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.extensions.surf.util.URLEncoder;
 import org.springframework.extensions.webscripts.Cache;
 import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.WebScriptException;
@@ -145,20 +146,18 @@ public class StorageContentGet extends ContentGet {
 
       // if the targetFilename is blank and we're not going to attach the file,
       // then we redirect to the same URL but with the filename as parameter
-      /*
       if (StringUtils.isBlank(targetFilename) && !attach) {
         String serverPath = req.getServerPath();
         String servicePath = req.getServicePath();
         String queryString = req.getQueryString();
 
-        String url = serverPath + servicePath + "/" + extractFilename(filenameNodeRef, nodeRef, false) + "?" + queryString;
+        String url = serverPath + servicePath + "/" + URLEncoder.encode(extractFilename(filenameNodeRef, nodeRef, false)) + "?" + queryString;
 
         res.setHeader(WebScriptResponse.HEADER_LOCATION, url);
         res.setStatus(Status.STATUS_MOVED_TEMPORARILY);
 
         return;
       }
-      */
 
       // Stream the content
       streamContentLocal(req, res, nodeRef, attach, propertyQName, filename);
@@ -195,7 +194,7 @@ public class StorageContentGet extends ContentGet {
     String filename = (String) nodeService.getProperty(filenameNodeRef, VgrModel.PROP_TITLE_FILENAME);
 
     filename = FilenameUtils.getBaseName(filename) + extension;
-    
+
     if (quote) {
       filename = "\"" + filename + extension + "\"";
     }
