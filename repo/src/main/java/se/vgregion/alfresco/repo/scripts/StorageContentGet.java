@@ -145,6 +145,7 @@ public class StorageContentGet extends ContentGet {
 
       // if the targetFilename is blank and we're not going to attach the file,
       // then we redirect to the same URL but with the filename as parameter
+      /*
       if (StringUtils.isBlank(targetFilename) && !attach) {
         String serverPath = req.getServerPath();
         String servicePath = req.getServicePath();
@@ -157,6 +158,7 @@ public class StorageContentGet extends ContentGet {
 
         return;
       }
+      */
 
       // Stream the content
       streamContentLocal(req, res, nodeRef, attach, propertyQName, filename);
