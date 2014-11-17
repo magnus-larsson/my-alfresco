@@ -57,7 +57,7 @@ public class CreateSiteDocumentPolicyIntegrationTest extends AbstractVgrRepoInte
 
     assertEquals("very nice template", template);
   }
-/*
+
   @Test
   public void testInSiteWithMove() {
     NodeRef documentLibrary = _siteService.getContainer(site.getShortName(), SiteService.DOCUMENT_LIBRARY);
@@ -99,7 +99,7 @@ public class CreateSiteDocumentPolicyIntegrationTest extends AbstractVgrRepoInte
 
     assertEquals("very nice template", template);
   }
-*/
+
   @Test
   public void testInSiteWithCopy() {
     NodeRef documentLibrary = _siteService.getContainer(site.getShortName(), SiteService.DOCUMENT_LIBRARY);
