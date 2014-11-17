@@ -17,7 +17,7 @@ import org.alfresco.service.namespace.QName;
 import org.apache.log4j.Logger;
 import org.redpill.alfresco.module.metadatawriter.factories.MetadataContentFactory;
 import org.redpill.alfresco.module.metadatawriter.model.MetadataWriterModel;
-import org.springframework.util.Assert;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
 
@@ -31,13 +31,10 @@ public class EnableMetadataWriterPolicy extends AbstractPolicy implements OnChec
 
   private static final Logger LOG = Logger.getLogger(EnableMetadataWriterPolicy.class);
 
-  private MetadataContentFactory _metadataContentFactory;
+  @Autowired
+  protected MetadataContentFactory _metadataContentFactory;
 
   private static boolean _initialized = false;
-
-  public void setMetadataContentFactory(final MetadataContentFactory metadataContentFactory) {
-    _metadataContentFactory = metadataContentFactory;
-  }
 
   @Override
   public void onCreateNode(final ChildAssociationRef childAssocRef) {
@@ -138,14 +135,10 @@ public class EnableMetadataWriterPolicy extends AbstractPolicy implements OnChec
   public void afterPropertiesSet() throws Exception {
     super.afterPropertiesSet();
 
-    Assert.notNull(_metadataContentFactory);
-
     if (!_initialized) {
       if (LOG.isDebugEnabled()) {
         LOG.debug("Initializing EnableMetadataWriterPolicy...");
       }
-
-      _policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onCreateNode", NotificationFrequency.TRANSACTION_COMMIT));
 
       _policyComponent.bindClassBehaviour(OnCheckOut.QNAME, VgrModel.TYPE_VGR_DOCUMENT, new JavaBehaviour(this, "onCheckOut", NotificationFrequency.TRANSACTION_COMMIT));
 

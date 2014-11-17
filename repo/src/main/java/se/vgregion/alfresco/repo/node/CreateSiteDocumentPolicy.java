@@ -4,10 +4,9 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.alfresco.model.ContentModel;
+import javax.annotation.Resource;
+
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
-import org.alfresco.repo.policy.Behaviour;
-import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -29,11 +28,8 @@ public class CreateSiteDocumentPolicy extends AbstractPolicy implements OnCreate
 
   private static final Logger LOG = Logger.getLogger(CreateSiteDocumentPolicy.class);
 
-  private DictionaryService _dictionaryService;
-
-  public void setDictionaryService(final DictionaryService dictionaryService) {
-    _dictionaryService = dictionaryService;
-  }
+  @Resource(name = "DictionaryService")
+  protected DictionaryService _dictionaryService;
 
   @Override
   public void onCreateNode(final ChildAssociationRef childAssocRef) {
@@ -72,10 +68,10 @@ public class CreateSiteDocumentPolicy extends AbstractPolicy implements OnCreate
     }
 
     if (_nodeService.hasAspect(fileNodeRef, VgrModel.ASPECT_DONOTTOUCH)) {
-      //this node should not have it's properties copied, it's probably a copy action
+      // this node should not have it's properties copied, it's probably a copy
+      // action
       return;
     }
-
 
     final Map<QName, Serializable> folderProperties = _nodeService.getProperties(folderNodeRef);
 
@@ -104,14 +100,6 @@ public class CreateSiteDocumentPolicy extends AbstractPolicy implements OnCreate
     if (LOG.isDebugEnabled()) {
       LOG.debug(this.getClass().getName());
     }
-  }
-
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    super.afterPropertiesSet();
-
-    _policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onCreateNode",
-        Behaviour.NotificationFrequency.TRANSACTION_COMMIT));
   }
 
 }

@@ -1,19 +1,19 @@
 package se.vgregion.alfresco.repo.it;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.security.authentication.AuthenticationUtil;
-import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.site.SiteInfo;
 import org.apache.log4j.Logger;
 import org.junit.Test;
-import org.redpill.alfresco.test.AbstractRepoIntegrationTest;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
 
@@ -88,7 +88,7 @@ public class ExtendPersonPolicyIntegrationTest extends AbstractVgrRepoIntegratio
         return null;
       }
     }, false, true);
-    Thread.currentThread().sleep(2000); //We need to sleep here since the properties are updated in an transaction listener
+    Thread.sleep(2000); //We need to sleep here since the properties are updated in an transaction listener
     organization = (String) _nodeService.getProperty(user, ContentModel.PROP_ORGANIZATION);
     assertEquals(expectedOrganisation, organization);
 

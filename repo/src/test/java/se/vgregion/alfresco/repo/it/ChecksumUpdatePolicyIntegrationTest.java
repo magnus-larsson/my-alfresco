@@ -2,8 +2,6 @@ package se.vgregion.alfresco.repo.it;
 
 import static org.junit.Assert.assertEquals;
 
-import org.alfresco.repo.security.authentication.AuthenticationUtil;
-import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.site.SiteInfo;
 import org.apache.log4j.Logger;
@@ -13,7 +11,7 @@ import se.vgregion.alfresco.repo.model.VgrModel;
 
 public class ChecksumUpdatePolicyIntegrationTest extends AbstractVgrRepoIntegrationTest {
 
-  private static final Logger LOG = Logger.getLogger(ChangeTypePolicyIntegrationTest.class);
+  private static final Logger LOG = Logger.getLogger(ChecksumUpdatePolicyIntegrationTest.class);
 
   private static final String DEFAULT_USERNAME = "testuser";
 
@@ -38,7 +36,7 @@ public class ChecksumUpdatePolicyIntegrationTest extends AbstractVgrRepoIntegrat
   @Test
   public void test() {
     LOG.debug("Starting test...");
-    setRequiresNew(true);
+
     NodeRef document = uploadDocument(site, "test.doc").getNodeRef();
 
     String checksum = (String) _nodeService.getProperty(document, VgrModel.PROP_CHECKSUM);

@@ -1,12 +1,10 @@
 package se.vgregion.alfresco.repo.node;
 
-import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
-import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
-import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.storage.StorageService;
@@ -18,11 +16,8 @@ public class MoveWatchedDocumentsPolicy extends AbstractPolicy implements OnCrea
 
   private final static Logger LOG = Logger.getLogger(MoveWatchedDocumentsPolicy.class);
 
-  private StorageService _storageService;
-
-  public void setStorageService(final StorageService storageService) {
-    _storageService = storageService;
-  }
+  @Autowired
+  protected StorageService _storageService;
 
   @Override
   public void onCreateNode(final ChildAssociationRef childAssocRef) {
@@ -62,14 +57,6 @@ public class MoveWatchedDocumentsPolicy extends AbstractPolicy implements OnCrea
       }
 
     });
-  }
-
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    super.afterPropertiesSet();
-
-    _policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onCreateNode",
-        NotificationFrequency.TRANSACTION_COMMIT));
   }
 
 }

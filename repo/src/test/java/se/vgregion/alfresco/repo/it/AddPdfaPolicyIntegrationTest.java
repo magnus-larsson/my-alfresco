@@ -61,7 +61,7 @@ public class AddPdfaPolicyIntegrationTest extends AbstractVgrRepoIntegrationTest
   }
 
   private void testInSite(SiteInfo site) {
-    FileInfo fileInfo = uploadDocument(site, "apelonserviceimpl_testgetkeywords.pdf");
+    FileInfo fileInfo = uploadDocument(null, "apelonserviceimpl_testgetkeywords.pdf");
 
     NodeRef parentNode = fileInfo.getNodeRef();
 
@@ -83,12 +83,14 @@ public class AddPdfaPolicyIntegrationTest extends AbstractVgrRepoIntegrationTest
 
     ChildAssociationRef pdfNode = _nodeService.createNode(parentNode, assocType, renditionName, nodeType, nodeProps);
 
-    _nodeService.addAspect(pdfNode.getChildRef(), RenditionModel.ASPECT_HIDDEN_RENDITION, null);
+    _nodeService.addAspect(pdfNode.getChildRef(), RenditionModel.ASPECT_HIDDEN_RENDITION, nodeProps);
 
     ContentWriter writer = _contentService.getWriter(pdfNode.getChildRef(), ContentModel.PROP_CONTENT, true);
 
     writer.putContent(Thread.currentThread().getContextClassLoader().getResourceAsStream("apelonserviceimpl_testgetkeywords.pdf"));
-
+    writer.guessMimetype("apelonserviceimpl_testgetkeywords.pdf");
+    writer.guessEncoding();
+    
     Serializable checksum = _nodeService.getProperty(parentNode, VgrModel.PROP_CHECKSUM_NATIVE);
     Serializable filename = _nodeService.getProperty(parentNode, VgrModel.PROP_TITLE_FILENAME_NATIVE);
     Serializable identifier = _nodeService.getProperty(parentNode, VgrModel.PROP_IDENTIFIER_NATIVE);
