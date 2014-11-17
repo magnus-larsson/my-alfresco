@@ -20,9 +20,9 @@ import org.junit.Test;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
 
-public class AddPdfaPolicyIntegrationTest_disabled extends AbstractVgrRepoIntegrationTest {
+public class AddPdfaPolicyIntegrationTest extends AbstractVgrRepoIntegrationTest {
 
-  private static final Logger LOG = Logger.getLogger(AddPdfaPolicyIntegrationTest_disabled.class);
+  private static final Logger LOG = Logger.getLogger(AddPdfaPolicyIntegrationTest.class);
 
   private static final String DEFAULT_USERNAME = "testuser";
 

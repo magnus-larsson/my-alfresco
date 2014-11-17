@@ -6,8 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Date;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.security.authentication.AuthenticationUtil;
-import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
+import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.site.SiteInfo;
 import org.junit.Test;
@@ -22,73 +21,110 @@ import se.vgregion.alfresco.repo.model.VgrModel;
 public class PropertyReplicationPolicyIntegrationTest_disabled extends AbstractVgrRepoIntegrationTest {
 
   private static final String DEFAULT_USERNAME = "testuser_" + System.currentTimeMillis();
+  private SiteInfo site;
+
+  @Override
+  public void beforeClassSetup() {
+    super.beforeClassSetup();
+    createUser(DEFAULT_USERNAME);
+    _authenticationComponent.setCurrentUser(DEFAULT_USERNAME);
+    site = createSite();
+  }
+
+  @Override
+  public void afterClassSetup() {
+    deleteSite(site);
+    _authenticationComponent.setCurrentUser(_authenticationComponent.getSystemUserName());
+    deleteUser(DEFAULT_USERNAME);
+    _authenticationComponent.clearCurrentSecurityContext();
+  }
 
   @Test
-  public void test() {
-    try {
-      createUser(DEFAULT_USERNAME);
+  public void testPropertyReplication() throws InterruptedException {
+    final NodeRef document = uploadDocument(site, "test.doc", null, null, "test.doc").getNodeRef();
 
-      AuthenticationUtil.runAs(new RunAsWork<Void>() {
+    
 
-        @Override
-        public Void doWork() throws Exception {
-          testAsUser();
+    _transactionHelper.doInTransaction(new RetryingTransactionCallback<Void>() {
+      @Override
+      public Void execute() throws Throwable {
+        _nodeService.setProperty(document, VgrModel.PROP_TITLE, "testar");
+        
+        _nodeService.setProperty(document, ContentModel.PROP_NAME, "testar.doc");
 
-          return null;
-        }
+        return null;
+      }
+    }, false, true);
+    
+    assertEquals("testar.doc", _nodeService.getProperty(document, ContentModel.PROP_NAME));
+    assertEquals("testar.doc", _nodeService.getProperty(document, VgrModel.PROP_TITLE_FILENAME));
 
-      }, DEFAULT_USERNAME);
-    } finally {
-      deleteUser(DEFAULT_USERNAME);
-    }
-  }
+    final String title = "title - " + System.currentTimeMillis();
+    final String description = "description - " + System.currentTimeMillis();
 
-  protected void testAsUser() {
-    SiteInfo site = createSite();
+    _transactionHelper.doInTransaction(new RetryingTransactionCallback<Void>() {
+      @Override
+      public Void execute() throws Throwable {
 
-    try {
-      testInSite(site);
-    } finally {
-      deleteSite(site);
-    }
-  }
+        _nodeService.setProperty(document, VgrModel.PROP_TITLE, title);
 
-  private void testInSite(SiteInfo site) {
-    NodeRef document = uploadDocument(site, "test.doc", null, null, "test.doc").getNodeRef();
+        _nodeService.setProperty(document, VgrModel.PROP_DESCRIPTION, description);
 
-    String title = "title - " + System.currentTimeMillis();
-    _nodeService.setProperty(document, VgrModel.PROP_TITLE, title);
+        _nodeService.setProperty(document, ContentModel.PROP_NAME, "testar.doc");
+
+        return null;
+      }
+    }, false, true);
+
     assertEquals(title, _nodeService.getProperty(document, ContentModel.PROP_TITLE));
-    
-    String description = "description - " + System.currentTimeMillis();
-    _nodeService.setProperty(document, VgrModel.PROP_DESCRIPTION, description);
     assertEquals(description, _nodeService.getProperty(document, ContentModel.PROP_DESCRIPTION));
-    
     Date modified1 = (Date) _nodeService.getProperty(document, ContentModel.PROP_MODIFIED);
     Date modified2 = (Date) _nodeService.getProperty(document, VgrModel.PROP_DATE_SAVED);
     assertTrue(modified1.equals(modified2));
-    
-    _nodeService.setProperty(document, ContentModel.PROP_NAME, "testar.doc");
-    assertEquals("testar.doc", _nodeService.getProperty(document, VgrModel.PROP_TITLE_FILENAME));
-    
-    _nodeService.setProperty(document, ContentModel.PROP_NAME, "testar");
+
+    _transactionHelper.doInTransaction(new RetryingTransactionCallback<Void>() {
+      @Override
+      public Void execute() throws Throwable {
+        _nodeService.setProperty(document, ContentModel.PROP_NAME, "testar");
+        return null;
+      }
+    }, false, true);
+
     assertEquals("doc", _nodeService.getProperty(document, VgrModel.PROP_FORMAT_EXTENT_EXTENSION));
-    _nodeService.setProperty(document, ContentModel.PROP_NAME, "testar.pdf");
+
+    _transactionHelper.doInTransaction(new RetryingTransactionCallback<Void>() {
+      @Override
+      public Void execute() throws Throwable {
+        _nodeService.setProperty(document, ContentModel.PROP_NAME, "testar.pdf");
+
+        // the extension is a calculated property and can't be set
+        _nodeService.setProperty(document, VgrModel.PROP_TITLE, "simple_title");
+        return null;
+      }
+    }, false, true);
+
     assertEquals("pdf", _nodeService.getProperty(document, VgrModel.PROP_FORMAT_EXTENT_EXTENSION));
-    
+
     assertEquals("application/msword", _nodeService.getProperty(document, VgrModel.PROP_FORMAT_EXTENT_MIMETYPE));
-    
-    assertEquals(DEFAULT_USERNAME + " Test ("+DEFAULT_USERNAME+")", _nodeService.getProperty(document, VgrModel.PROP_CONTRIBUTOR_SAVEDBY));
+
+    assertEquals(DEFAULT_USERNAME + " Test (" + DEFAULT_USERNAME + ")", _nodeService.getProperty(document, VgrModel.PROP_CONTRIBUTOR_SAVEDBY));
     assertEquals(DEFAULT_USERNAME, _nodeService.getProperty(document, VgrModel.PROP_CONTRIBUTOR_SAVEDBY_ID));
-    
+
     String version1 = (String) _nodeService.getProperty(document, ContentModel.PROP_VERSION_LABEL);
     String version2 = (String) _nodeService.getProperty(document, VgrModel.PROP_IDENTIFIER_VERSION);
     assertTrue(version1.equals(version2));
+
+    assertEquals("simple_title.pdf", _nodeService.getProperty(document, ContentModel.PROP_NAME));
     
-    // the extension is a calculated property and can't be set
-    _nodeService.setProperty(document, VgrModel.PROP_TITLE, "simple_title");
+    _transactionHelper.doInTransaction(new RetryingTransactionCallback<Void>() {
+      @Override
+      public Void execute() throws Throwable {
+        _nodeService.setProperty(document, VgrModel.PROP_FORMAT_EXTENT_EXTENSION, "doc");
+        return null;
+      }
+    }, false, true);
+    
     assertEquals("simple_title.pdf", _nodeService.getProperty(document, ContentModel.PROP_NAME));
-    _nodeService.setProperty(document, VgrModel.PROP_FORMAT_EXTENT_EXTENSION, "doc");
-    assertEquals("simple_title.pdf", _nodeService.getProperty(document, ContentModel.PROP_NAME));
+
   }
 }
