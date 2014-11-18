@@ -6,7 +6,11 @@ import java.util.Map.Entry;
 
 import javax.annotation.Resource;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
+import org.alfresco.repo.node.NodeServicePolicies.OnMoveNodePolicy;
+import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
+import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -24,15 +28,20 @@ import se.vgregion.alfresco.repo.model.VgrModel;
  * @author Niklas Ekman (niklas.ekman@redpill-linpro.com)
  * @version $Id$
  */
-public class CreateSiteDocumentPolicy extends AbstractPolicy implements OnCreateNodePolicy {
+public class CreateSiteDocumentPolicy extends AbstractPolicy implements OnCreateNodePolicy, OnMoveNodePolicy {
 
   private static final Logger LOG = Logger.getLogger(CreateSiteDocumentPolicy.class);
+
+  private static boolean _initialized = false;
 
   @Resource(name = "DictionaryService")
   protected DictionaryService _dictionaryService;
 
   @Override
   public void onCreateNode(final ChildAssociationRef childAssocRef) {
+    if (LOG.isTraceEnabled()) {
+      LOG.trace(this.getClass().getName() + " - onCreateNode begin");
+    }
     final NodeRef fileNodeRef = childAssocRef.getChildRef();
     final NodeRef folderNodeRef = childAssocRef.getParentRef();
 
@@ -40,13 +49,37 @@ public class CreateSiteDocumentPolicy extends AbstractPolicy implements OnCreate
 
       @Override
       public void execute() {
-        doCreateNode(fileNodeRef, folderNodeRef);
+        doCreateOrMoveNode(fileNodeRef, folderNodeRef);
       }
 
     });
+    if (LOG.isTraceEnabled()) {
+      LOG.trace(this.getClass().getName() + " - onCreateNode end");
+    }
   }
 
-  private void doCreateNode(NodeRef fileNodeRef, NodeRef folderNodeRef) {
+  @Override
+  public void onMoveNode(ChildAssociationRef oldChildAssocRef, ChildAssociationRef newChildAssocRef) {
+    if (LOG.isTraceEnabled()) {
+      LOG.trace(this.getClass().getName() + " - onMoveNode begin");
+    }
+    final NodeRef fileNodeRef = newChildAssocRef.getChildRef();
+    final NodeRef folderNodeRef = newChildAssocRef.getParentRef();
+
+    runSafe(new DefaultRunSafe(fileNodeRef, _serviceUtils.getCurrentUserName()) {
+
+      @Override
+      public void execute() {
+        doCreateOrMoveNode(fileNodeRef, folderNodeRef);
+      }
+
+    });
+    if (LOG.isTraceEnabled()) {
+      LOG.trace(this.getClass().getName() + " - onMoveNode end");
+    }
+  }
+
+  private void doCreateOrMoveNode(NodeRef fileNodeRef, NodeRef folderNodeRef) {
     if (!_nodeService.exists(fileNodeRef)) {
       return;
     }
@@ -97,8 +130,15 @@ public class CreateSiteDocumentPolicy extends AbstractPolicy implements OnCreate
       _nodeService.setProperty(fileNodeRef, key, value);
     }
 
-    if (LOG.isDebugEnabled()) {
-      LOG.debug(this.getClass().getName());
+  }
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    super.afterPropertiesSet();
+    if (!_initialized) {
+      LOG.info("Initialized " + this.getClass().getName() + ".onMoveNode");
+      LOG.info(this.getClass().getName() + ".onCreateNode " + " is handled by delegate class");
+      _policyComponent.bindClassBehaviour(OnMoveNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onMoveNode", NotificationFrequency.TRANSACTION_COMMIT));
     }
   }
 
