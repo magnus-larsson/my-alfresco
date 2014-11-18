@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Date;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.site.SiteInfo;
 import org.junit.Test;
@@ -29,7 +28,6 @@ public class PropertyReplicationPolicyIntegrationTest extends AbstractVgrRepoInt
     _authenticationComponent.setCurrentUser(DEFAULT_USERNAME);
     site = createSite();
   }
-  
 
   @Override
   public void afterClassSetup() {
@@ -48,114 +46,49 @@ public class PropertyReplicationPolicyIntegrationTest extends AbstractVgrRepoInt
     assertEquals("test.doc", _nodeService.getProperty(document, VgrModel.PROP_TITLE_FILENAME));
     assertEquals("doc", _nodeService.getProperty(document, VgrModel.PROP_FORMAT_EXTENT_EXTENSION));
 
-    //Verify that when title is updated, name is also updated
+    // Verify that when title is updated, name is also updated
     _nodeService.setProperty(document, VgrModel.PROP_TITLE, "test2");
     assertEquals("test2", _nodeService.getProperty(document, ContentModel.PROP_TITLE));
     assertEquals("test2.doc", _nodeService.getProperty(document, ContentModel.PROP_NAME));
-    
-    //Do not allow changing prop_name
+
+    // Do not allow changing prop_name
     _nodeService.setProperty(document, ContentModel.PROP_NAME, "test3.doc");
     assertEquals("test2", _nodeService.getProperty(document, ContentModel.PROP_TITLE));
     assertEquals("test2.doc", _nodeService.getProperty(document, ContentModel.PROP_NAME));
-    
-    //Test that description is replicated
+
+    // Test that description is replicated
     _nodeService.setProperty(document, VgrModel.PROP_DESCRIPTION, "desc");
     assertEquals("desc", _nodeService.getProperty(document, ContentModel.PROP_DESCRIPTION));
-    
-    //Verify that modified date is replicated
+
+    // Verify that modified date is replicated
     Date modified1 = (Date) _nodeService.getProperty(document, ContentModel.PROP_MODIFIED);
     Date modified2 = (Date) _nodeService.getProperty(document, VgrModel.PROP_DATE_SAVED);
     assertTrue(modified1.equals(modified2));
-  
-    //Assert that mimetype was replicated
+
+    // Assert that mimetype was replicated
     assertEquals("application/msword", _nodeService.getProperty(document, VgrModel.PROP_FORMAT_EXTENT_MIMETYPE));
 
-    //Assert that user name and username was replicated
+    // Assert that user name and username was replicated
     assertEquals(DEFAULT_USERNAME + " Test (" + DEFAULT_USERNAME + ")", _nodeService.getProperty(document, VgrModel.PROP_CONTRIBUTOR_SAVEDBY));
     assertEquals(DEFAULT_USERNAME, _nodeService.getProperty(document, VgrModel.PROP_CONTRIBUTOR_SAVEDBY_ID));
 
-    //Assert that versions were replicated
+    // Assert that versions were replicated
     String version1 = (String) _nodeService.getProperty(document, ContentModel.PROP_VERSION_LABEL);
     String version2 = (String) _nodeService.getProperty(document, VgrModel.PROP_IDENTIFIER_VERSION);
     assertTrue(version1.equals(version2));
-    
-    //Test that changing the file name with a new extensino does not give a new a new extension   
+
+    // Test that changing the file name with a new extensino does not give a new
+    // a new extension
     _nodeService.setProperty(document, VgrModel.PROP_TITLE, "test4");
     _nodeService.setProperty(document, ContentModel.PROP_NAME, "test5.pdf");
     assertEquals("doc", _nodeService.getProperty(document, VgrModel.PROP_FORMAT_EXTENT_EXTENSION));
     assertEquals("application/msword", _nodeService.getProperty(document, VgrModel.PROP_FORMAT_EXTENT_MIMETYPE));
     assertEquals("test4.doc", _nodeService.getProperty(document, ContentModel.PROP_NAME));
-    
-    //Test that extension is not replicated to name if changed (extension is calculated from name)
+
+    // Test that extension is not replicated to name if changed (extension is
+    // calculated from name)
     _nodeService.setProperty(document, VgrModel.PROP_FORMAT_EXTENT_EXTENSION, "pdf");
     assertEquals("test4.pdf", _nodeService.getProperty(document, ContentModel.PROP_NAME));
-/*
-    final String title = "title - " + System.currentTimeMillis();
-    final String description = "description - " + System.currentTimeMillis();
 
-    _transactionHelper.doInTransaction(new RetryingTransactionCallback<Void>() {
-      @Override
-      public Void execute() throws Throwable {
-
-        _nodeService.setProperty(document, VgrModel.PROP_TITLE, title);
-
-        
-
-        _nodeService.setProperty(document, ContentModel.PROP_NAME, "testar.doc");
-
-        return null;
-      }
-    }, false, true);
-
-    assertEquals(title, _nodeService.getProperty(document, ContentModel.PROP_TITLE));
-    assertEquals(description, _nodeService.getProperty(document, ContentModel.PROP_DESCRIPTION));
-    Date modified1 = (Date) _nodeService.getProperty(document, ContentModel.PROP_MODIFIED);
-    Date modified2 = (Date) _nodeService.getProperty(document, VgrModel.PROP_DATE_SAVED);
-    assertTrue(modified1.equals(modified2));
-
-    _transactionHelper.doInTransaction(new RetryingTransactionCallback<Void>() {
-      @Override
-      public Void execute() throws Throwable {
-        _nodeService.setProperty(document, ContentModel.PROP_NAME, "testar");
-        return null;
-      }
-    }, false, true);
-
-    assertEquals("doc", _nodeService.getProperty(document, VgrModel.PROP_FORMAT_EXTENT_EXTENSION));
-
-    _transactionHelper.doInTransaction(new RetryingTransactionCallback<Void>() {
-      @Override
-      public Void execute() throws Throwable {
-        _nodeService.setProperty(document, ContentModel.PROP_NAME, "testar.pdf");
-
-        // the extension is a calculated property and can't be set
-        _nodeService.setProperty(document, VgrModel.PROP_TITLE, "simple_title");
-        return null;
-      }
-    }, false, true);
-
-    assertEquals("pdf", _nodeService.getProperty(document, VgrModel.PROP_FORMAT_EXTENT_EXTENSION));
-
-    assertEquals("application/msword", _nodeService.getProperty(document, VgrModel.PROP_FORMAT_EXTENT_MIMETYPE));
-
-    assertEquals(DEFAULT_USERNAME + " Test (" + DEFAULT_USERNAME + ")", _nodeService.getProperty(document, VgrModel.PROP_CONTRIBUTOR_SAVEDBY));
-    assertEquals(DEFAULT_USERNAME, _nodeService.getProperty(document, VgrModel.PROP_CONTRIBUTOR_SAVEDBY_ID));
-
-    String version1 = (String) _nodeService.getProperty(document, ContentModel.PROP_VERSION_LABEL);
-    String version2 = (String) _nodeService.getProperty(document, VgrModel.PROP_IDENTIFIER_VERSION);
-    assertTrue(version1.equals(version2));
-
-    assertEquals("simple_title.pdf", _nodeService.getProperty(document, ContentModel.PROP_NAME));
-    
-    _transactionHelper.doInTransaction(new RetryingTransactionCallback<Void>() {
-      @Override
-      public Void execute() throws Throwable {
-        _nodeService.setProperty(document, VgrModel.PROP_FORMAT_EXTENT_EXTENSION, "doc");
-        return null;
-      }
-    }, false, true);
-    
-    assertEquals("simple_title.pdf", _nodeService.getProperty(document, ContentModel.PROP_NAME));
-*/
   }
 }
