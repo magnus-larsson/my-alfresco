@@ -710,11 +710,12 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
       } catch (RenditionServiceException ex) {
         // handleFailedPdfaRendition(nodeRef, ex);
 
-        System.out.println(ex.getRenditionDefinition());
+        LOG.error(ex.getRenditionDefinition());
+        LOG.error(ex.getMessage(), ex);
 
         throw new RuntimeException(ex);
       } catch (Throwable ex) {
-        System.out.println(ex.getClass());
+        LOG.error(ex.getMessage(), ex);
 
         throw new RuntimeException(ex);
       }
