@@ -329,8 +329,6 @@
       <props>
         <prop key="Title">vgr:dc.title</prop>
         <prop key="nodeRef">sys:node-uuid</prop>
-        
-        <!-- 
         <prop key="DC.title.alternative">vgr:dc.title.alternative</prop>
 				<prop key="DC.title.filename">vgr:dc.title.filename</prop>
 				<prop key="DC.title.filename.native">vgr:dc.title.filename.native</prop>
@@ -420,7 +418,6 @@
 				<prop key="hc.status.document">vgr:hc.status.document</prop>
 				<prop key="DC.identifier.checksum.native">vgr:dc.identifier.checksum.native</prop>
 				<prop key="DC.identifier.checksum">vgr:dc.identifier.checksum</prop>
-				-->
       </props>
     </property>
   </bean>
