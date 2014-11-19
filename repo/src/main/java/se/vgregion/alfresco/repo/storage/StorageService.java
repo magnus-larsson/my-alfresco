@@ -6,7 +6,12 @@ import java.util.Map;
 import org.alfresco.service.cmr.repository.NodeRef;
 
 public interface StorageService {
+  public static final String ORIGIN_BARIUM = "Barium";
+  public static final String ORIGIN_ALFRESCO = "Alfresco";
 
+  public static final String STORAGE_LAGRET = "Lagret";
+  public static final String STORAGE_BARIUM = "Barium";
+  
   NodeRef publishToStorage(String nodeRef);
 
   NodeRef publishToStorage(String nodeRef, boolean async);

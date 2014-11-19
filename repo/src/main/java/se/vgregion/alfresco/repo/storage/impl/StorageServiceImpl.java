@@ -17,13 +17,13 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.executer.MailActionExecuter;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.dictionary.RepositoryLocation;
+import org.alfresco.repo.model.Repository;
 import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.rendition.executer.AbstractRenderingEngine;
 import org.alfresco.repo.rendition.executer.AbstractTransformationRenderingEngine;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
-import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionService;
@@ -71,6 +71,7 @@ import se.vgregion.alfresco.repo.storage.CreationCallback;
 import se.vgregion.alfresco.repo.storage.FailedRenditionInfo;
 import se.vgregion.alfresco.repo.storage.StorageService;
 import se.vgregion.alfresco.repo.utils.ApplicationContextHolder;
+import se.vgregion.alfresco.repo.utils.ServiceUtils;
 import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class StorageServiceImpl implements StorageService, InitializingBean {
@@ -81,15 +82,11 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
   private FileFolderService _fileFolderService;
 
-  private ServiceRegistry _serviceRegistry;
-
-  private String _storageNodeRef;
-
   private PermissionService _permissionService;
 
   private CopyService _copyService;
 
-  private ServiceUtilsImpl _serviceUtils;
+  private ServiceUtils _serviceUtils;
 
   private BehaviourFilter _behaviourFilter;
 
@@ -113,20 +110,18 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
   private NamespaceService _namespaceService;
 
+  private Repository _repository;
+
+  public void setRepository(Repository repository) {
+    this._repository = repository;
+  }
+
   public void setNodeService(final NodeService nodeService) {
     _nodeService = nodeService;
   }
 
   public void setFileFolderService(final FileFolderService fileFolderService) {
     _fileFolderService = fileFolderService;
-  }
-
-  public void setServiceRegistry(final ServiceRegistry serviceRegistry) {
-    _serviceRegistry = serviceRegistry;
-  }
-
-  public void setStorageNodeRef(final String storageNodeRef) {
-    _storageNodeRef = storageNodeRef;
   }
 
   public void setPermissionService(final PermissionService permissionService) {
@@ -137,7 +132,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     _copyService = copyService;
   }
 
-  public void setServiceUtils(final ServiceUtilsImpl serviceUtils) {
+  public void setServiceUtils(final ServiceUtils serviceUtils) {
     _serviceUtils = serviceUtils;
   }
 
@@ -197,8 +192,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
     try {
       // create the folder structure <year>/<month>/<day>
-      final NodeRef finalFolder = createFolderStructure();
-
+      final NodeRef finalFolder = createFolderStructure(nodeRef);
       return publishFileToStorage(nodeRef, finalFolder, async);
     } catch (final Exception ex) {
       LOG.error(ex.getMessage(), ex);
@@ -410,7 +404,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     }
   }
 
-  private NodeRef createFolderStructure() {
+  public NodeRef createAlfrescoFolderStructure() {
     final NodeRef storageNodeRef = getStorageNodeRef();
 
     final Calendar calendar = Calendar.getInstance();
@@ -427,35 +421,65 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     return dayFolder;
   }
 
-  private NodeRef getStorageNodeRef() {
-    final String query = "PATH:\"/app:company_home\"";
-
-    final ResultSet nodes = _searchService.query(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, SearchService.LANGUAGE_FTS_ALFRESCO, query);
-
-    try {
-      final NodeRef companyHome = nodes.getNodeRef(0);
-
-      NodeRef storage = _fileFolderService.searchSimple(companyHome, "Lagret");
-
-      if (storage == null) {
-        storage = AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<NodeRef>() {
-          @Override
-          public NodeRef doWork() throws Exception {
-            NodeRef nodeRef = _fileFolderService.create(companyHome, "Lagret", ContentModel.TYPE_FOLDER).getNodeRef();
-
-            _permissionService.setInheritParentPermissions(nodeRef, false);
-            _permissionService.setPermission(nodeRef, PermissionService.ALL_AUTHORITIES, PermissionService.CONSUMER, true);
-            _permissionService.setPermission(nodeRef, "guest", PermissionService.CONSUMER, true);
-
-            return nodeRef;
-          }
-
-        }, AuthenticationUtil.getSystemUserName());
-      }
-      return storage;
-    } finally {
-      ServiceUtilsImpl.closeQuietly(nodes);
+  public NodeRef createFolderStructure(final NodeRef nodeRef) {
+    final String sourceOrigin = (String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_ORIGIN);
+    if (ORIGIN_BARIUM.equals(sourceOrigin)) {
+      return createBariumFolderStructure(nodeRef);
+    } else if (ORIGIN_ALFRESCO.equals(sourceOrigin)) {
+      return createAlfrescoFolderStructure();
+    } else {
+      throw new UnsupportedOperationException("Only documents originating from alfresco or barium may be published");
     }
+  }
+
+  public NodeRef createBariumFolderStructure(final NodeRef nodeRef) {
+    /**
+     * Barium number 2, version X -> Lagret/Barium/2/versions/x Barium number
+     * 22, version X -> Lagret/Barium/2/2/versions/x Barium number 222, version
+     * X -> Lagret/Barium/2/2/2/versions/x
+     */
+    final NodeRef storageNodeRef = getStorageNodeRef();
+    final NodeRef bariumNodeRef = getOrCreateSubFolder(storageNodeRef, StorageService.STORAGE_BARIUM);
+    final String documentId = (String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_DOCUMENTID);
+    final String version = (String) _nodeService.getProperty(nodeRef, VgrModel.PROP_IDENTIFIER_VERSION);
+    try {
+      Long.parseLong(documentId);
+    } catch (NumberFormatException e) {
+      throw new AlfrescoRuntimeException("Barium document id is not a long which is expected:" + documentId, e);
+    }
+    NodeRef parentNodeRef = bariumNodeRef;
+    for (int i=0;i<documentId.length();i++) {
+      String character = documentId.substring(i, i+1);
+      parentNodeRef = getOrCreateSubFolder(parentNodeRef, character);
+    }
+    NodeRef versionsNodeRef = getOrCreateSubFolder(parentNodeRef, "versions");
+    NodeRef finalNodeRef = getOrCreateSubFolder(versionsNodeRef, version);    
+
+    return finalNodeRef;
+  }
+
+  private NodeRef getStorageNodeRef() {
+    final NodeRef companyHome = _repository.getCompanyHome();
+
+    NodeRef storage = _fileFolderService.searchSimple(companyHome, STORAGE_LAGRET);
+
+    if (storage == null) {
+      storage = AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<NodeRef>() {
+        @Override
+        public NodeRef doWork() throws Exception {
+          NodeRef nodeRef = _fileFolderService.create(companyHome, STORAGE_LAGRET, ContentModel.TYPE_FOLDER).getNodeRef();
+
+          _permissionService.setInheritParentPermissions(nodeRef, false);
+          _permissionService.setPermission(nodeRef, PermissionService.ALL_AUTHORITIES, PermissionService.CONSUMER, true);
+          _permissionService.setPermission(nodeRef, "guest", PermissionService.CONSUMER, true);
+
+          return nodeRef;
+        }
+
+      }, AuthenticationUtil.getSystemUserName());
+    }
+    return storage;
+
   }
 
   private NodeRef getOrCreateSubFolder(final NodeRef parentNodeRef, final String subFolder) {
@@ -526,7 +550,6 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   public void afterPropertiesSet() throws Exception {
     Assert.notNull(_fileFolderService);
     Assert.notNull(_nodeService);
-    Assert.notNull(_serviceRegistry);
     Assert.notNull(_permissionService);
     Assert.notNull(_copyService);
     Assert.notNull(_serviceUtils);
@@ -535,10 +558,10 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     Assert.notNull(_renditionService);
     Assert.notNull(_contentService);
     Assert.notNull(_searchService);
-    Assert.hasText(_storageNodeRef);
     Assert.notNull(_dictionaryService);
     Assert.notNull(_retryingTransactionHelper);
     Assert.notNull(_actionService);
+    Assert.notNull(_repository);
   }
 
   @Override
@@ -606,8 +629,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     assertPublishable(nodeRef);
 
     // create the folder structure <year>/<month>/<day>
-    final NodeRef finalFolder = createFolderStructure();
-
+    final NodeRef finalFolder = createFolderStructure(nodeRef);
     try {
       String sourceDocumentId = (String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_DOCUMENTID);
 
@@ -855,6 +877,11 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
     if (nodeType != FileFolderServiceType.FILE) {
       throw new AlfrescoRuntimeException("Only files can be published.");
+    }
+
+    final String sourceOrigin = (String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_ORIGIN);
+    if (!ORIGIN_BARIUM.equals(sourceOrigin) && !ORIGIN_ALFRESCO.equals(sourceOrigin)) {
+      throw new AlfrescoRuntimeException("Only documents originating from alfresco or barium may be published");
     }
 
     try {
