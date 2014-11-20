@@ -11,6 +11,8 @@ public interface StorageService {
 
   NodeRef publishToStorage(NodeRef nodeRef);
 
+  NodeRef publishToStorage(NodeRef nodeRef, boolean async);
+
   void unpublishFromStorage(String nodeRef);
 
   void moveToStorage(NodeRef fileNodeRef);

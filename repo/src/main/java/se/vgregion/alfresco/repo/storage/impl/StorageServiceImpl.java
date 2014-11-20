@@ -187,6 +187,11 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
   @Override
   public NodeRef publishToStorage(final NodeRef nodeRef) {
+    return publishToStorage(nodeRef, true);
+  }
+
+  @Override
+  public NodeRef publishToStorage(final NodeRef nodeRef, final boolean async) {
     // first check so that each and every condition is met before publishing
     assertPublishable(nodeRef);
 
@@ -194,7 +199,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
       // create the folder structure <year>/<month>/<day>
       final NodeRef finalFolder = createFolderStructure();
 
-      return publishFileToStorage(nodeRef, finalFolder);
+      return publishFileToStorage(nodeRef, finalFolder, async);
     } catch (final Exception ex) {
       LOG.error(ex.getMessage(), ex);
       throw new RuntimeException(ex);
@@ -208,7 +213,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     return publishToStorage(nodeRef);
   }
 
-  private NodeRef publishFileToStorage(final NodeRef nodeRef, final NodeRef finalFolder) {
+  private NodeRef publishFileToStorage(final NodeRef nodeRef, final NodeRef finalFolder, final boolean async) {
     final String oldName = (String) _nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
     final String newName = getUniqueName(finalFolder, oldName);
 
@@ -311,7 +316,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
           deleteRenditions(newNode);
 
           // create a PDF/A rendition of the nodeRef
-          createPdfaRendition(newNode);
+          createPdfaRendition(newNode, async);
 
           publishedNodeRef = newNode;
         }
