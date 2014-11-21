@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.annotation.Resource;
-
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnMoveNodePolicy;
@@ -18,6 +16,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Required;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
 
@@ -34,7 +33,6 @@ public class CreateSiteDocumentPolicy extends AbstractPolicy implements OnCreate
 
   private static boolean _initialized = false;
 
-  @Resource(name = "DictionaryService")
   protected DictionaryService _dictionaryService;
 
   @Override
@@ -140,6 +138,11 @@ public class CreateSiteDocumentPolicy extends AbstractPolicy implements OnCreate
       LOG.info(this.getClass().getName() + ".onCreateNode " + " is handled by delegate class");
       _policyComponent.bindClassBehaviour(OnMoveNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onMoveNode", NotificationFrequency.TRANSACTION_COMMIT));
     }
+  }
+  
+  @Required
+  public void setDictionaryService(DictionaryService dictionaryService) {
+    _dictionaryService = dictionaryService;
   }
 
 }

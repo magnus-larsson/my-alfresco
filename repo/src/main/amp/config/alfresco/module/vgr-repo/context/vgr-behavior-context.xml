@@ -42,8 +42,9 @@
 	<bean id="vgr.createSiteFolderPolicy" class="se.vgregion.alfresco.repo.node.CreateSiteFolderPolicy"
 		depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy" />
 
-	<bean id="vgr.createSiteDocumentPolicy" class="se.vgregion.alfresco.repo.node.CreateSiteDocumentPolicy"
-		depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy" />
+  <bean id="vgr.createSiteDocumentPolicy" class="se.vgregion.alfresco.repo.node.CreateSiteDocumentPolicy" depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy">
+    <property name="dictionaryService" ref="DictionaryService" />
+  </bean>
 
 	<bean id="vgr.updateSiteFolderMetadataPolicy"
 		class="se.vgregion.alfresco.repo.node.UpdateSiteFolderMetadataPolicy"
@@ -57,13 +58,13 @@
 		class="se.vgregion.alfresco.repo.node.DefaultSwedishLanguagePolicy"
 		depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy" />
 
-	<bean id="vgr.enableMetadataWriterPolicy"
-		class="se.vgregion.alfresco.repo.node.EnableMetadataWriterPolicy"
-		depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy" />
+  <bean id="vgr.enableMetadataWriterPolicy" class="se.vgregion.alfresco.repo.node.EnableMetadataWriterPolicy" depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy">
+    <property name="metadataContentFactory" ref="metadata-writer.contentFactory" />
+  </bean>
 
-	<bean id="vgr.moveWatchedDocuments"
-		class="se.vgregion.alfresco.repo.node.MoveWatchedDocumentsPolicy"
-		depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy" />
+  <bean id="vgr.moveWatchedDocuments" class="se.vgregion.alfresco.repo.node.MoveWatchedDocumentsPolicy" depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy">
+    <property name="storageService" ref="vgr.storageService" />
+  </bean>
 
 	<!-- Configuration done to replace the original version label calculation 
 		with a more flexible one that allows for setting parameters. -->
@@ -115,12 +116,16 @@
 			<value>5</value>
 		</property>
 	</bean>
-	
-	<bean id="vgr.autoPublishPolicy" class="se.vgregion.alfresco.repo.node.AutoPublishPolicy"
-		parent="vgr.abstractPolicy" depends-on="vgr.dictionaryBootstrap" />
 
-	<bean id="vgr.addPdfaPolicy" class="se.vgregion.alfresco.repo.node.AddPdfaPolicy"
-		parent="vgr.abstractPolicy" depends-on="vgr.dictionaryBootstrap" />
+  <bean id="vgr.autoPublishPolicy" class="se.vgregion.alfresco.repo.node.AutoPublishPolicy" parent="vgr.abstractPolicy" depends-on="vgr.dictionaryBootstrap">
+    <property name="fileFolderService" ref="FileFolderService" />
+    <property name="storageService" ref="vgr.storageService" />
+    <property name="transactionService" ref="TransactionService" />
+  </bean>
+
+  <bean id="vgr.addPdfaPolicy" class="se.vgregion.alfresco.repo.node.AddPdfaPolicy" parent="vgr.abstractPolicy" depends-on="vgr.dictionaryBootstrap">
+    <property name="contentService" ref="ContentService" />
+  </bean>
 
 	<bean id="vgr.preventPublishedDuplicatesPolicy"
 		class="se.vgregion.alfresco.repo.node.PreventPublishedDuplicatesPolicy"
@@ -135,7 +140,15 @@
        <property name="policyComponent" ref="policyComponent"/>
        <property name="behaviourFilter" ref="policyBehaviourFilter"/>
    </bean>
-   
-   <bean id="vgr.delegatedPolicies" class="se.vgregion.alfresco.repo.node.DelegatedPolicies" />
+
+  <bean id="vgr.delegatedPolicies" class="se.vgregion.alfresco.repo.node.DelegatedPolicies" depends-on="vgr.dictionaryBootstrap">
+    <property name="autoPublishPolicy" ref="vgr.autoPublishPolicy" />
+    <property name="changeTypePolicy" ref="vgr.changeTypePolicy" />
+    <property name="createSiteDocumentPolicy" ref="vgr.createSiteDocumentPolicy" />
+    <property name="defaultSwedishLanguagePolicy" ref="vgr.defaultSwedishLanguagePolicy" />
+    <property name="enableMetadataWriterPolicy" ref="vgr.enableMetadataWriterPolicy" />
+    <property name="moveWatchedDocumentsPolicy" ref="vgr.moveWatchedDocuments" />
+    <property name="policyComponent" ref="policyComponent" />
+  </bean>
 
 </beans>

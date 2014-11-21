@@ -17,7 +17,7 @@ import org.alfresco.service.namespace.QName;
 import org.apache.log4j.Logger;
 import org.redpill.alfresco.module.metadatawriter.factories.MetadataContentFactory;
 import org.redpill.alfresco.module.metadatawriter.model.MetadataWriterModel;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
 
@@ -31,7 +31,6 @@ public class EnableMetadataWriterPolicy extends AbstractPolicy implements OnChec
 
   private static final Logger LOG = Logger.getLogger(EnableMetadataWriterPolicy.class);
 
-  @Autowired
   protected MetadataContentFactory _metadataContentFactory;
 
   private static boolean _initialized = false;
@@ -144,5 +143,10 @@ public class EnableMetadataWriterPolicy extends AbstractPolicy implements OnChec
 
       _initialized = true;
     }
+  }
+  
+  @Required
+  public void setMetadataContentFactory(MetadataContentFactory metadataContentFactory) {
+    _metadataContentFactory = metadataContentFactory;
   }
 }

@@ -4,7 +4,7 @@ import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.storage.StorageService;
@@ -16,7 +16,6 @@ public class MoveWatchedDocumentsPolicy extends AbstractPolicy implements OnCrea
 
   private final static Logger LOG = Logger.getLogger(MoveWatchedDocumentsPolicy.class);
 
-  @Autowired
   protected StorageService _storageService;
 
   @Override
@@ -57,6 +56,11 @@ public class MoveWatchedDocumentsPolicy extends AbstractPolicy implements OnCrea
       }
 
     });
+  }
+  
+  @Required
+  public void setStorageService(StorageService storageService) {
+    _storageService = storageService;
   }
 
 }

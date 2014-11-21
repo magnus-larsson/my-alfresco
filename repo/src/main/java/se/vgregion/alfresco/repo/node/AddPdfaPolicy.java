@@ -5,8 +5,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import org.alfresco.model.ContentModel;
 import org.alfresco.model.RenditionModel;
 import org.alfresco.repo.content.ContentServicePolicies.OnContentUpdatePolicy;
@@ -19,6 +17,7 @@ import org.alfresco.service.namespace.QName;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.redpill.alfresco.module.metadatawriter.model.MetadataWriterModel;
+import org.springframework.beans.factory.annotation.Required;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
 
@@ -28,9 +27,9 @@ public class AddPdfaPolicy extends AbstractPolicy implements OnContentUpdatePoli
 
   private static boolean _initialized = false;
 
-  @Resource(name = "ContentService")
   protected ContentService _contentService;
 
+  @Override
   public void onContentUpdate(final NodeRef nodeRef, final boolean newContent) {
     if (LOG.isTraceEnabled()) {
       LOG.trace(this.getClass().getName() + " - onCreateNode begin");
@@ -164,5 +163,10 @@ public class AddPdfaPolicy extends AbstractPolicy implements OnContentUpdatePoli
 
       _initialized = true;
     }
+  }
+  
+  @Required
+  public void setContentService(ContentService contentService) {
+    _contentService = contentService;
   }
 }

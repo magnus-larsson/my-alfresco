@@ -1,6 +1,6 @@
 package se.vgregion.alfresco.repo.node;
 
-import javax.annotation.Resource;
+import javax.annotation.PostConstruct;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
@@ -20,7 +20,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.storage.StorageService;
@@ -32,14 +32,13 @@ public class AutoPublishPolicy extends AbstractPolicy implements OnCreateNodePol
   private static final String FILE_NODE_REF = AutoPublishPolicy.class.getName() + "_FILE_NODE_REF";
   private static final String FOLDER_NODE_REF = AutoPublishPolicy.class.getName() + "_FOLDER_NODE_REF";
 
-  @Resource(name = "FileFolderService")
   protected FileFolderService _fileFolderService;
 
-  @Autowired
   protected StorageService _storageService;
 
-  @Resource(name = "TransactionService")
   protected TransactionService _transactionService;
+
+  private boolean _initialized = false;
 
   @Override
   public void onCreateNode(ChildAssociationRef childAssocRef) {
@@ -165,11 +164,28 @@ public class AutoPublishPolicy extends AbstractPolicy implements OnCreateNodePol
     }
   }
 
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    super.afterPropertiesSet();
+  @PostConstruct
+  public void postConstruct() {
+    if (!_initialized) {
+      _policyComponent.bindClassBehaviour(OnUpdateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onUpdateNode", Behaviour.NotificationFrequency.TRANSACTION_COMMIT));
 
-    _policyComponent.bindClassBehaviour(OnUpdateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onUpdateNode", Behaviour.NotificationFrequency.TRANSACTION_COMMIT));
+      _initialized = true;
+    }
+  }
+ 
+  @Required
+  public void setFileFolderService(FileFolderService fileFolderService) {
+    _fileFolderService = fileFolderService;
+  }
+  
+  @Required
+  public void setStorageService(StorageService storageService) {
+    _storageService = storageService;
+  }
+  
+  @Required
+  public void setTransactionService(TransactionService transactionService) {
+    _transactionService = transactionService;
   }
 
 }
