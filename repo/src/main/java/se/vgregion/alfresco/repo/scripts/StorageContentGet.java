@@ -196,7 +196,7 @@ public class StorageContentGet extends ContentGet {
     filename = FilenameUtils.getBaseName(filename) + extension;
 
     if (quote) {
-      filename = "\"" + filename + extension + "\"";
+      filename = "\"" + filename + "\"";
     }
 
     return filename;
