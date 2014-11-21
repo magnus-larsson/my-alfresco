@@ -2,10 +2,12 @@
 <import resource="classpath:alfresco/templates/webscripts/publishtostorage/publish.lib.js">
 //evaluator, 343rader
 
+var async = json.has("async") ? json.get("async") : true;
+
 function publish(node) {
     if (!node.published) {
         if (!node.isFolder) { //only publish documents
-           storage.publishToStorage(node.ref);
+           storage.publishToStorage(node.ref, async);
            node.published = true;
         }        
         if (node.children) {
@@ -15,7 +17,6 @@ function publish(node) {
         }
     }
 }
-
 
 var res = Publish.processJSONPublishable(json);
 //check if this is a publish action and not just a lookup, and that we have no validation errors

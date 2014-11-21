@@ -207,10 +207,15 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   }
 
   @Override
-  public NodeRef publishToStorage(final String sourceNodeRef) {
-    final NodeRef nodeRef = new NodeRef(sourceNodeRef);
+  public NodeRef publishToStorage(String sourceNodeRef) {
+    return publishToStorage(sourceNodeRef, true);
+  }
 
-    return publishToStorage(nodeRef);
+  @Override
+  public NodeRef publishToStorage(String sourceNodeRef, boolean async) {
+    NodeRef nodeRef = new NodeRef(sourceNodeRef);
+
+    return publishToStorage(nodeRef, async);
   }
 
   private NodeRef publishFileToStorage(final NodeRef nodeRef, final NodeRef finalFolder, final boolean async) {

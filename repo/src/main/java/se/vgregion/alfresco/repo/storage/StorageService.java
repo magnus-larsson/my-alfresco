@@ -9,10 +9,12 @@ public interface StorageService {
 
   NodeRef publishToStorage(String nodeRef);
 
+  NodeRef publishToStorage(String nodeRef, boolean async);
+
   NodeRef publishToStorage(NodeRef nodeRef);
 
   NodeRef publishToStorage(NodeRef nodeRef, boolean async);
-
+  
   void unpublishFromStorage(String nodeRef);
 
   void moveToStorage(NodeRef fileNodeRef);
@@ -73,5 +75,6 @@ public interface StorageService {
   Map<String, FailedRenditionInfo> getFailedRenditions(NodeRef nodeRef);
 
   NodeRef getOrCreatePdfaRendition(NodeRef nodeRef);
+
 
 }

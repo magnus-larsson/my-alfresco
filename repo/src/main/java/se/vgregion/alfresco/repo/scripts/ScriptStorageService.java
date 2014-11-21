@@ -16,12 +16,12 @@ public class ScriptStorageService extends BaseProcessorExtension {
     _storageService = storageService;
   }
 
-  public void publishToStorage(final String nodeRef) {
+  public void publishToStorage(String nodeRef, Boolean async) {
     if (LOG.isDebugEnabled()) {
       LOG.debug("About to publish '" + nodeRef + "'");
     }
 
-    NodeRef publishedNodeRef = _storageService.publishToStorage(nodeRef);
+    NodeRef publishedNodeRef = _storageService.publishToStorage(nodeRef, async);
 
     if (LOG.isDebugEnabled()) {
       LOG.debug("Published '" + nodeRef + "' to '" + publishedNodeRef + "'");
