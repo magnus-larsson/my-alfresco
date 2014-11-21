@@ -34,7 +34,7 @@ public abstract class AbstractVgrRepoFunctionalTest extends AbstractRepoFunction
     json.put("async", false);
 
     Response response = given()
-        .baseUri(BASE_URI)
+        .baseUri(getBaseUri())
         .request()
         .body(json.toString())
         // .expect().statusCode(200)
@@ -45,7 +45,7 @@ public abstract class AbstractVgrRepoFunctionalTest extends AbstractRepoFunction
     }
 
     response = given()
-        .baseUri(BASE_URI)
+        .baseUri(getBaseUri())
         .pathParam("nodeRef", nodeRef)
         .when().get("/api/metadata?nodeRef={nodeRef}&shortQNames=true");
 
@@ -72,7 +72,7 @@ public abstract class AbstractVgrRepoFunctionalTest extends AbstractRepoFunction
     String username = null;
 
     Response response = given()
-        .baseUri(BASE_URI)
+        .baseUri(getBaseUri())
         .multiPart("filedata", filename, inputStream)
         .formParam("filename", filename)
         .formParam("destination", nodeRef)
@@ -104,7 +104,7 @@ public abstract class AbstractVgrRepoFunctionalTest extends AbstractRepoFunction
     json.put("description", "");
     
     Response response = given()
-        .baseUri(BASE_URI)
+        .baseUri(getBaseUri())
         .body(json.toString())
         .expect().statusCode(200)
         .when().post("/vgr/preupload/confirm");
@@ -123,7 +123,7 @@ public abstract class AbstractVgrRepoFunctionalTest extends AbstractRepoFunction
     String id = StringUtils.replace(nodeRef, "workspace://SpacesStore/", "");
     
     Response response = given()
-        .baseUri(BASE_URI)
+        .baseUri(getBaseUri())
         .pathParam("store_type", "workspace")
         .pathParam("store_id", "SpacesStore")
         .pathParam("node_id", id)
@@ -135,6 +135,11 @@ public abstract class AbstractVgrRepoFunctionalTest extends AbstractRepoFunction
     }
 
     return new JSONObject(response.asString());
+  }
+  
+  @Override
+  protected String getBaseUri() {
+    return "https://alfresco.vgregion.se/alfresco/service";
   }
 
 }

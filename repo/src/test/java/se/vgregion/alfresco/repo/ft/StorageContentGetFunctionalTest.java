@@ -55,7 +55,7 @@ public class StorageContentGetFunctionalTest extends AbstractVgrRepoFunctionalTe
       RestAssured.responseContentType("application/pdf");
 
       Response response = given()
-        .baseUri(BASE_URI)
+        .baseUri(getBaseUri())
         .pathParam("store_type", "workspace")
         .pathParam("store_id", "SpacesStore")
         .pathParam("id", publishedId)

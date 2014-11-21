@@ -45,7 +45,7 @@ public class MembershipFunctionalTest extends AbstractRepoFunctionalTest {
       addSiteMembership(site, username, "SiteManager");
       
       Response response = given()
-        .baseUri(BASE_URI)
+        .baseUri(getBaseUri())
         .pathParam("shortname", site)
         .expect().statusCode(200)
         .when().get("/api/sites/{shortname}/memberships?nf=" + username);
@@ -80,7 +80,7 @@ public class MembershipFunctionalTest extends AbstractRepoFunctionalTest {
       addSiteMembership(site, "admin", "SiteManager");
       
       Response response = given()
-        .baseUri(BASE_URI)
+        .baseUri(getBaseUri())
         .pathParam("shortname", site)
         .expect().statusCode(200)
         .when().get("/api/sites/{shortname}/memberships?nf=admin");
