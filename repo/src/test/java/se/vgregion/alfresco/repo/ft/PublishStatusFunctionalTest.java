@@ -65,17 +65,18 @@ public class PublishStatusFunctionalTest extends AbstractVgrRepoFunctionalTest {
       properties.put("vgr:dc.type.record", dcTypeRecord);
       properties.put("vgr:dc.type.record.id", dcTypeRecordId);
       properties.put("vgr:dc.title", title);
+      properties.put("vgr:dc.rights.accessrights", "Internet");
 
       String nodeRef = uploadDocument(filename, site);
 
       updateDocument(nodeRef, properties);
 
       nodeRef = publishDocument(nodeRef, false);
-
+      
       String downloadUrl = "vgr/storage/node/content/workspace/SpacesStore/" + StringUtils.replace(nodeRef, "workspace://SpacesStore/", "") + "/test.pdf?a=true&guest=true";
 
       InputStream inputStream = downloadDocument(downloadUrl, "application/pdf");
-
+      
       PDDocument pdfDocument = PDDocument.load(inputStream);
       
       try {
