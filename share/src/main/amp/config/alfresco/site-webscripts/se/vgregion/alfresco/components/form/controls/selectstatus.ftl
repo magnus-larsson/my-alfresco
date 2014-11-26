@@ -60,6 +60,7 @@
       <#if field.control.params.options?? && field.control.params.options != "">
          <select id="${fieldHtmlId}" name="${field.name}" tabindex="0"
                <#if field.description??>title="${field.description}"</#if>
+               <#if field.indexTokenisationMode??>class="non-tokenised"</#if>
                <#if field.control.params.size??>size="${field.control.params.size}"</#if> 
                <#if field.control.params.styleClass??>class="${field.control.params.styleClass}"</#if>
                <#if field.control.params.style??>style="${field.control.params.style}"</#if>
