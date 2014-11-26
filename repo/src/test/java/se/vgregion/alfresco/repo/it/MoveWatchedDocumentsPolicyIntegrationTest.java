@@ -1,6 +1,7 @@
 package se.vgregion.alfresco.repo.it;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.fail;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -64,6 +65,7 @@ public class MoveWatchedDocumentsPolicyIntegrationTest extends AbstractVgrRepoIn
 
   @Test
   public void testMoveWatchedDocument() {
+    LOG.debug("testMoveWatchedDocument begin");
     final NodeRef companyHome = _repository.getCompanyHome();
 
     final String folderName = "Transfer Folder " + System.currentTimeMillis();
@@ -87,32 +89,21 @@ public class MoveWatchedDocumentsPolicyIntegrationTest extends AbstractVgrRepoIn
     properties.put(VgrModel.PROP_TYPE_RECORD, "type record");
     properties.put(VgrModel.PROP_TYPE_RECORD_ID, "type.record.id");
     properties.put(VgrModel.PROP_PUBLISHER_PROJECT_ASSIGNMENT, (Serializable) projects);
-    properties.put(VgrModel.PROP_SOURCE_DOCUMENTID, System.currentTimeMillis());
     properties.put(VgrModel.PROP_IDENTIFIER_VERSION, "1.0");
     properties.put(VgrModel.PROP_SOURCE_ORIGIN, "Alfresco");
 
     String filename = "test_" + System.currentTimeMillis() + ".doc";
-
-    NodeRef document1 = uploadDocument(null, "test.doc", null, null, filename, folder, "vgr:document", properties).getNodeRef();
-
-    assertType(document1, VgrModel.TYPE_VGR_DOCUMENT);
-    assertHasAspect(document1, VgrModel.ASPECT_STANDARD);
-    assertHasAspect(document1, VgrModel.ASPECT_PUBLISHED);
-
-    //Make sure that the document has been moved
-    assertNotEquals(folder, _nodeService.getPrimaryParent(document1).getParentRef());
     try {
-      //Upload the document again
-      uploadDocument(null, "test.doc", null, null, filename, folder, "vgr:document", properties).getNodeRef();
-      LOG.warn("Upload of second document should be blocked");
-      LOG.warn("We cannot guarantee that duplicate documents are not created when the origin is Alfresco and the subsystem is solr");
-    } catch (Exception ex) {
-      LOG.info(ex);
+      NodeRef document1 = uploadDocument(null, "test.doc", null, null, filename, folder, "vgr:document", properties).getNodeRef();
+      fail("A document without source document id set should not be moved to storage");
+    } catch (Exception e) {
+
     }
   }
-  
+
   @Test
   public void testInvalidOriginOfDocument() {
+    LOG.debug("testInvalidOriginOfDocument begin");
     final NodeRef companyHome = _repository.getCompanyHome();
 
     final String folderName = "Transfer Folder " + System.currentTimeMillis();
@@ -142,16 +133,17 @@ public class MoveWatchedDocumentsPolicyIntegrationTest extends AbstractVgrRepoIn
 
     String filename = "test_" + System.currentTimeMillis() + ".doc";
     try {
-      //Upload the document again
+      // Upload the document again
       uploadDocument(null, "test.doc", null, null, filename, folder, "vgr:document", properties).getNodeRef();
       fail("Unsupported origins should not be allowed");
     } catch (AlfrescoRuntimeException ex) {
       LOG.debug(ex);
     }
   }
-  
+
   @Test
   public void testMoveWatchedBariumDocument() {
+    LOG.debug("testMoveWatchedBariumDocument begin");
     final NodeRef companyHome = _repository.getCompanyHome();
 
     final String folderName = "Barium " + System.currentTimeMillis();
@@ -187,10 +179,10 @@ public class MoveWatchedDocumentsPolicyIntegrationTest extends AbstractVgrRepoIn
     assertHasAspect(document1, VgrModel.ASPECT_STANDARD);
     assertHasAspect(document1, VgrModel.ASPECT_PUBLISHED);
 
-    //Make sure that the document has been moved
+    // Make sure that the document has been moved
     assertNotEquals(folder, _nodeService.getPrimaryParent(document1).getParentRef());
     try {
-      //Upload the document again
+      // Upload the document again
       uploadDocument(null, "test.doc", null, null, filename, folder, "vgr:document", properties).getNodeRef();
       fail("Upload of second barium document should be blocked");
     } catch (Exception ex) {

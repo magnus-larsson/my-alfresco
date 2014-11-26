@@ -7,10 +7,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
+import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
@@ -31,10 +32,12 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileFolderServiceType;
 import org.alfresco.service.cmr.model.FileInfo;
+import org.alfresco.service.cmr.model.FileNotFoundException;
 import org.alfresco.service.cmr.rendition.RenderCallback;
 import org.alfresco.service.cmr.rendition.RenditionDefinition;
 import org.alfresco.service.cmr.rendition.RenditionService;
 import org.alfresco.service.cmr.rendition.RenditionServiceException;
+import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -94,7 +97,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
   private ContentService _contentService;
 
-  private Properties _globalProperties;
+  // private Properties _globalProperties;
 
   private SearchService _searchService;
 
@@ -111,6 +114,12 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   private NamespaceService _namespaceService;
 
   private Repository _repository;
+
+  private boolean pdfaPilotEnabled = false;
+
+  public void setPdfaPilotEnabled(boolean pdfaPilotEnabled) {
+    this.pdfaPilotEnabled = pdfaPilotEnabled;
+  }
 
   public void setRepository(Repository repository) {
     this._repository = repository;
@@ -138,10 +147,6 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
   public void setBehaviourFilter(final BehaviourFilter behaviourFilter) {
     _behaviourFilter = behaviourFilter;
-  }
-
-  public void setGlobalProperties(final Properties globalProperties) {
-    _globalProperties = globalProperties;
   }
 
   public void setRenditionService(final RenditionService renditionService) {
@@ -334,7 +339,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   }
 
   private void removePublishedAssocs(final NodeRef nodeRef) {
-    final List<NodeRef> children = findPublishedDocuments(nodeRef.toString());
+    final Set<NodeRef> children = findPublishedDocuments(nodeRef.toString());
 
     for (final NodeRef child : children) {
       _nodeService.removeAssociation(nodeRef, child, VgrModel.ASSOC_PUBLISHED_TO_STORAGE);
@@ -352,7 +357,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   public NodeRef getPublishedNodeRef(final NodeRef nodeRef) {
     NodeRef result = null;
 
-    final List<NodeRef> children = findPublishedDocuments(nodeRef.toString());
+    final Set<NodeRef> children = findPublishedDocuments(nodeRef.toString());
 
     for (final NodeRef child : children) {
       final String sourceVersion = _serviceUtils.getStringValue(_nodeService.getProperty(nodeRef, VgrModel.PROP_IDENTIFIER_VERSION));
@@ -378,16 +383,63 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     return result;
   }
 
-  /**
-   * Finds all the published documents for a specific source document id.
-   * 
-   * @param sourceDocumentId
-   * @return
-   */
-  private List<NodeRef> findPublishedDocuments(String sourceDocumentId) {
+  protected List<NodeRef> findPublishedBariumDocuments(String id) {
+    List<NodeRef> result = new ArrayList<NodeRef>();
+    // First perform check for barium documents in a way that does not require
+    // search indexes
+    List<String> pathElements = new ArrayList<String>();
+    pathElements.add(StorageService.STORAGE_BARIUM);
+    for (int i = 0; i < id.length(); i++) {
+      String character = id.substring(i, i + 1);
+      pathElements.add(character);
+    }
+    pathElements.add(StorageService.STORAGE_BARIUM_VERSIONS);
+    FileInfo resolvedFolder = null;
+    try {
+      if (LOG.isTraceEnabled()) {
+
+        LOG.trace("Calculated storage folder: " + StringUtils.join(pathElements, "/"));
+      }
+      resolvedFolder = _fileFolderService.resolveNamePath(getStorageNodeRef(), pathElements, false);
+      if (resolvedFolder != null) {
+        List<ChildAssociationRef> childAssocs = _nodeService.getChildAssocs(resolvedFolder.getNodeRef(), ContentModel.TYPE_FOLDER, ContentModel.ASSOC_CONTAINS);
+        for (ChildAssociationRef childAssoc : childAssocs) {
+          List<ChildAssociationRef> documents = _nodeService.getChildAssocs(childAssoc.getChildRef(), VgrModel.TYPE_VGR_DOCUMENT, ContentModel.ASSOC_CONTAINS);
+          for (ChildAssociationRef document : documents) {
+            if (id.equals(_nodeService.getProperty(document.getChildRef(), VgrModel.PROP_SOURCE_DOCUMENTID))) {
+              result.add(document.getChildRef());
+            } else {
+              LOG.warn("Found barium document where source document id did not match expected published document source: id=" + id + " document nodeRef=" + document.getChildRef());
+            }
+          }
+        }
+      }
+    } catch (FileNotFoundException e) {
+
+    }
+    return result;
+  }
+
+  protected List<NodeRef> findPublishedAlfrescoDocuments(NodeRef id) {
+    List<NodeRef> result = new ArrayList<NodeRef>();
+    if (_nodeService.exists(id)) {
+      List<AssociationRef> documents = _nodeService.getTargetAssocs(id, VgrModel.ASSOC_PUBLISHED_TO_STORAGE);
+      for (AssociationRef document : documents) {
+        if (id.equals(_nodeService.getProperty(document.getTargetRef(), VgrModel.PROP_SOURCE_DOCUMENTID).toString())) {
+          result.add(document.getTargetRef());
+        } else {
+          LOG.warn("Found alfrseco document where source document id did not match expected published document source: id=" + id + " document nodeRef=" + document.getTargetRef());
+        }
+      }
+    }
+    return result;
+  }
+
+  protected List<NodeRef> findPublishedLegacyDocuments(String id) {
+    // Legacy search to find all other documents
     StringBuffer query = new StringBuffer();
     query.append("TYPE:\"vgr:document\" AND ASPECT:\"vgr:published\" AND ");
-    query.append("vgr:dc\\.source\\.documentid:\"" + sourceDocumentId + "\"");
+    query.append("vgr:dc\\.source\\.documentid:\"" + id + "\"");
 
     SearchParameters searchParameters = new SearchParameters();
 
@@ -395,13 +447,46 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     searchParameters.setQuery(query.toString());
     searchParameters.setLanguage(SearchService.LANGUAGE_FTS_ALFRESCO);
 
-    ResultSet result = _searchService.query(searchParameters);
+    ResultSet searchResult = _searchService.query(searchParameters);
 
     try {
-      return result.getNodeRefs();
+      return searchResult.getNodeRefs();
     } finally {
-      ServiceUtilsImpl.closeQuietly(result);
+      ServiceUtilsImpl.closeQuietly(searchResult);
     }
+  }
+
+  /**
+   * Finds all the published documents for a specific source document id.
+   * 
+   * @param sourceDocumentId
+   * @return
+   */
+  private Set<NodeRef> findPublishedDocuments(String sourceDocumentId) {
+    Set<NodeRef> result = new HashSet<NodeRef>();
+
+    if (!NodeRef.isNodeRef(sourceDocumentId)) {
+      // Barium document
+      List<NodeRef> findPublishedBariumDocuments = findPublishedBariumDocuments(sourceDocumentId);
+      if (findPublishedBariumDocuments != null) {
+        result.addAll(findPublishedBariumDocuments);
+      }
+    } else {
+      // Alfresco document
+      NodeRef nodeRef = new NodeRef(sourceDocumentId);
+      List<NodeRef> findPublishedAlfrescoDocuments = findPublishedAlfrescoDocuments(nodeRef);
+      if (findPublishedAlfrescoDocuments != null) {
+        result.addAll(findPublishedAlfrescoDocuments);
+      }
+    }
+
+    // Legacy documents
+    List<NodeRef> findPublishedLegacyDocuments = findPublishedLegacyDocuments(sourceDocumentId);
+    if (findPublishedLegacyDocuments != null) {
+      result.addAll(findPublishedLegacyDocuments);
+    }
+
+    return result;
   }
 
   public NodeRef createAlfrescoFolderStructure() {
@@ -442,23 +527,29 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     final NodeRef bariumNodeRef = getOrCreateSubFolder(storageNodeRef, StorageService.STORAGE_BARIUM);
     final String documentId = (String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_DOCUMENTID);
     final String version = (String) _nodeService.getProperty(nodeRef, VgrModel.PROP_IDENTIFIER_VERSION);
+    String path = StorageService.STORAGE_BARIUM;
     try {
       Long.parseLong(documentId);
     } catch (NumberFormatException e) {
       throw new AlfrescoRuntimeException("Barium document id is not a long which is expected:" + documentId, e);
     }
     NodeRef parentNodeRef = bariumNodeRef;
-    for (int i=0;i<documentId.length();i++) {
-      String character = documentId.substring(i, i+1);
+    for (int i = 0; i < documentId.length(); i++) {
+      String character = documentId.substring(i, i + 1);
+      path += "/" + character;
       parentNodeRef = getOrCreateSubFolder(parentNodeRef, character);
     }
-    NodeRef versionsNodeRef = getOrCreateSubFolder(parentNodeRef, "versions");
-    NodeRef finalNodeRef = getOrCreateSubFolder(versionsNodeRef, version);    
-
+    path += "/" + StorageService.STORAGE_BARIUM_VERSIONS;
+    path += "/" + version;
+    NodeRef versionsNodeRef = getOrCreateSubFolder(parentNodeRef, StorageService.STORAGE_BARIUM_VERSIONS);
+    NodeRef finalNodeRef = getOrCreateSubFolder(versionsNodeRef, version);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Created barium folder structure: " + path);
+    }
     return finalNodeRef;
   }
 
-  private NodeRef getStorageNodeRef() {
+  public NodeRef getStorageNodeRef() {
     final NodeRef companyHome = _repository.getCompanyHome();
 
     NodeRef storage = _fileFolderService.searchSimple(companyHome, STORAGE_LAGRET);
@@ -554,7 +645,6 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     Assert.notNull(_copyService);
     Assert.notNull(_serviceUtils);
     Assert.notNull(_behaviourFilter);
-    Assert.notNull(_globalProperties);
     Assert.notNull(_renditionService);
     Assert.notNull(_contentService);
     Assert.notNull(_searchService);
@@ -581,7 +671,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
         try {
           Date now = new Date();
 
-          final List<NodeRef> previouslyPublished = findPublishedDocuments(sourceDocumentId);
+          final Set<NodeRef> previouslyPublished = findPublishedDocuments(sourceDocumentId);
 
           if (previouslyPublished.isEmpty()) {
             return null;
@@ -697,6 +787,12 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   }
 
   protected boolean createPdfaRendition(final NodeRef nodeRef, final boolean async, Long timeout) {
+    // Check if pdfapilot is enabled
+    if (!pdfaPilotEnabled) {
+      LOG.warn("PDF/A pilot not enabled. Skipping creation of PDF/A rendition");
+      return false;
+    }
+
     // must first check whether the nodeRef can be transformed into a PDF/A or
     // not...
     if (!pdfaRendable(nodeRef)) {
@@ -905,6 +1001,16 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
       Assert.isTrue(publisherForunit.size() > 0 || publisherProjectAssignment.size() > 0, "Either 'dc.publisher.forunit' or 'dc.publisher.project-assignment' must be set.");
     } catch (Exception ex) {
       throw new AlfrescoRuntimeException(ex.getMessage(), ex);
+    }
+
+    String origin = (String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_ORIGIN);
+    String id = (String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_DOCUMENTID);
+    if (id == null) {
+      id = nodeRef.toString();
+    }
+    String version = (String) _nodeService.getProperty(nodeRef, VgrModel.PROP_IDENTIFIER_VERSION);
+    if (documentExistInStorage(id, version, origin)) {
+      throw new AlfrescoRuntimeException("Cannot publish a document which already exists in storage.");
     }
   }
 
@@ -1186,6 +1292,92 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     }
 
     return pdfRendition != null ? pdfRendition : nodeRef;
+  }
+
+  protected boolean bariumDocumentExists(String id, String version, String origin) {
+    // First perform check for barium documents in a way that does not require
+    // search indexes
+    List<String> pathElements = new ArrayList<String>();
+    pathElements.add(StorageService.STORAGE_BARIUM);
+    for (int i = 0; i < id.length(); i++) {
+      String character = id.substring(i, i + 1);
+      pathElements.add(character);
+    }
+    pathElements.add(StorageService.STORAGE_BARIUM_VERSIONS);
+    pathElements.add(version);
+    FileInfo resolvedFolder = null;
+    try {
+      if (LOG.isTraceEnabled()) {
+
+        LOG.trace("Calculated storage folder: " + StringUtils.join(pathElements, "/"));
+      }
+      resolvedFolder = _fileFolderService.resolveNamePath(getStorageNodeRef(), pathElements, false);
+    } catch (FileNotFoundException e) {
+      return false;
+    }
+    return resolvedFolder != null;
+  }
+
+  protected boolean alfrescoDocumentExists(String id, String version, String origin) {
+    if (NodeRef.isNodeRef(id)) {
+      NodeRef nodeRef = new NodeRef(id);
+      List<AssociationRef> targetAssocs = _nodeService.getTargetAssocs(nodeRef, VgrModel.ASSOC_PUBLISHED_TO_STORAGE);
+      for (AssociationRef assoc : targetAssocs) {
+        NodeRef targetRef = assoc.getTargetRef();
+        String storageId = (String) _nodeService.getProperty(targetRef, VgrModel.PROP_SOURCE_DOCUMENTID);
+        String storageVersion = (String) _nodeService.getProperty(targetRef, VgrModel.PROP_IDENTIFIER_VERSION);
+        if (id.equals(storageId) && version.equals(storageVersion)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  protected boolean otherDocumentExists(String id, String version, String origin) {
+    StringBuffer query = new StringBuffer();
+    query.append("TYPE:\"vgr:document\" AND ASPECT:\"vgr:published\" AND ");
+    query.append("vgr:dc\\.source\\.documentid:\"" + id + "\" AND ");
+    query.append("vgr:dc\\.identifier\\.version:\"" + version + "\"");
+
+    SearchParameters searchParameters = new SearchParameters();
+
+    searchParameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
+    searchParameters.setQuery(query.toString());
+    searchParameters.setLanguage(SearchService.LANGUAGE_FTS_ALFRESCO);
+
+    ResultSet result = _searchService.query(searchParameters);
+
+    try {
+      return result.getNodeRefs().size() > 1;
+    } finally {
+      ServiceUtilsImpl.closeQuietly(result);
+    }
+  }
+
+  public boolean documentExistInStorage(String id, String version, String origin) {
+    boolean found = false;
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("documentExistInStorage(" + id + ", " + version + ", " + origin + ")");
+    }
+    if (StorageService.ORIGIN_BARIUM.equals(origin)) {
+      found = bariumDocumentExists(id, version, origin);
+      if (found) {
+        LOG.trace("Found barium document in new structure in Storage");
+        return true;
+      }
+    } else if (StorageService.ORIGIN_ALFRESCO.equals(origin)) {
+      found = alfrescoDocumentExists(id, version, origin);
+      if (found) {
+        LOG.trace("Found alfresco document in new structure in Storage");
+        return true;
+      }
+    }
+    found = otherDocumentExists(id, version, origin);
+    if (found) {
+      LOG.trace("Other document found in Storage");
+    }
+    return found;
   }
 
 }

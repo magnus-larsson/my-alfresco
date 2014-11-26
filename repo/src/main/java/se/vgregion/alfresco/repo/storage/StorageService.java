@@ -11,7 +11,7 @@ public interface StorageService {
 
   public static final String STORAGE_LAGRET = "Lagret";
   public static final String STORAGE_BARIUM = "Barium";
-  
+  public static final String STORAGE_BARIUM_VERSIONS = "versions";
   NodeRef publishToStorage(String nodeRef);
 
   NodeRef publishToStorage(String nodeRef, boolean async);
@@ -29,14 +29,16 @@ public interface StorageService {
   boolean createPdfaRendition(NodeRef nodeRef);
 
   boolean createPdfaRendition(NodeRef nodeRef, boolean async);
-  
+
   boolean createPdfaRendition(NodeRef nodeRef, Long timeout);
-  
+
   NodeRef getPdfaRendition(NodeRef nodeRef);
 
   int createMissingPdfRenditions();
 
   int createMissingPdfRenditions(CreationCallback creationCallback);
+
+  NodeRef getStorageNodeRef();
 
   boolean pdfaRendable(NodeRef nodeRef);
 
@@ -81,5 +83,13 @@ public interface StorageService {
 
   NodeRef getOrCreatePdfaRendition(NodeRef nodeRef);
 
+  /**
+   * Checks for the existance of a document in storage
+   * @param id
+   * @param version
+   * @param origin
+   * @return
+   */
+  public boolean documentExistInStorage(String id, String version, String origin);
 
 }
