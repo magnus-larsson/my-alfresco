@@ -38,6 +38,28 @@ var CheckSolrIndexController = function($scope, Restangular, ngTableParams,
     return defer.promise;
   }
 
+  function mockAllSolrNodes() {
+    var defer = $q.defer();
+
+    var url = 'http://localhost:9000/data/solr_lagret.json';
+
+    $http({
+      method: 'GET',
+      url: url
+    }).success(function(data) {
+      var nodes = [];
+      angular.forEach(data.response.docs, function(value) {
+        nodes.push(value['dc.identifier.documentid'][0]);
+      });
+
+      defer.resolve(nodes);
+    }).error(function() {
+      defer.reject();
+    });
+
+    return defer.promise;
+  }
+
   function getAllSolrNodes() {
     var batch = 1000;
     var defer = $q.defer();
@@ -75,6 +97,23 @@ var CheckSolrIndexController = function($scope, Restangular, ngTableParams,
     return defer.promise;
   }
 
+  function mockAllAlfrescoNodes() {
+    var defer = $q.defer();
+
+    var url = 'http://localhost:9000/data/alfresco_lagret.json';
+
+    $http({
+      method: 'GET',
+      url: url
+    }).success(function(data) {
+      defer.resolve(data.data);
+    }).error(function() {
+      defer.reject();
+    });
+
+    return defer.promise;
+  }
+
   function getAllAlfrescoNodes() {
     var batch = 1000;
     var defer = $q.defer();
@@ -105,21 +144,26 @@ var CheckSolrIndexController = function($scope, Restangular, ngTableParams,
     return defer.promise;
   }
 
-  getAllAlfrescoNodes().then(function(nodes) {
+  mockAllAlfrescoNodes().then(function(nodes) {
+    // getAllSolrNodes().then(function(nodes) {
     console.log(nodes.length);
   });
 
-  /*
-  function foo() {
-    Restangular.all('published').getList({}).then(function(aNodes) {
-      if (!aNodes[0].published) {
-        continue;
-      }
+  mockAllSolrNodes().then(function(nodes) {
+    // getAllSolrNodes().then(function(nodes) {
+    console.log(nodes.length);
+  });
 
+  function foo() {
+    getAllAlfrescoNodes().then(function(aNodes) {
       getAllSolrNodes().then(function(sNodes) {
         var onlyAlfresco = [];
 
         for (var x = 0; x < aNodes.length; x++) {
+          if (!aNodes[x].published) {
+            continue;
+          }
+
           var alfrescoNode = aNodes[x].nodeRef;
 
           var found = false;
@@ -140,17 +184,18 @@ var CheckSolrIndexController = function($scope, Restangular, ngTableParams,
         }
 
         console.log('Only Alfresco');
-        console.log(onlyAlfresco);
+        console.log(onlyAlfresco.length);
 
         console.log('');
 
         console.log('Only Solr');
-        console.log(sNodes);
+        console.log(sNodes.length);
       });
-    }, function(error) {});
+    });
 
   }
-  */
+
+  foo();
 
   $scope.alfrescoPublishedTableParameters = new ngTableParams({
     page: 1,
