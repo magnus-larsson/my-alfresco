@@ -1,6 +1,6 @@
 package se.vgregion.alfresco.repo.it;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -9,6 +9,7 @@ import java.util.List;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
+import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.site.SiteInfo;
 import org.alfresco.service.cmr.site.SiteService;
@@ -23,50 +24,40 @@ public class AutoPublishPolicyIntegrationTest extends AbstractVgrRepoIntegration
 
   private static final Logger LOG = Logger.getLogger(AutoPublishPolicyIntegrationTest.class);
   
-  private static final String DEFAULT_USERNAME = "testuser";
+  private static final String DEFAULT_USERNAME = "testuser_" + System.currentTimeMillis();
+  private static SiteInfo site;
+  private static NodeRef user;
   
   @Autowired
   private StorageService _storageService;
 
+  @Override
+  public void beforeClassSetup() {
+    LOG.debug("beforeClassSetup");
+    super.beforeClassSetup();
+    user = createUser(DEFAULT_USERNAME);
+    LOG.debug("Created user " + DEFAULT_USERNAME + ": " + user);
+    _authenticationComponent.setCurrentUser(DEFAULT_USERNAME);
+    site = createSite();
+    LOG.debug("Created site " + site.getShortName());
+  }
+
+  @Override
+  public void afterClassSetup() {
+    LOG.debug("afterClassSetup");
+    super.afterClassSetup();
+    deleteSite(site);
+    _authenticationComponent.setCurrentUser(_authenticationComponent.getSystemUserName());
+    deleteUser(DEFAULT_USERNAME);
+    _authenticationComponent.clearCurrentSecurityContext();
+  }
+ 
   @Test
-  public void test() {
-    LOG.debug("Starting test...");
-    
-    try {
-      createUser(DEFAULT_USERNAME);
-
-      AuthenticationUtil.runAs(new RunAsWork<Void>() {
-
-        @Override
-        public Void doWork() throws Exception {
-          testAsUser();
-
-          return null;
-        }
-
-      }, DEFAULT_USERNAME);
-    } finally {
-      deleteUser(DEFAULT_USERNAME);
-    }
-    
-    LOG.debug("Ending test...");
-  }
-
-  protected void testAsUser() {
-    SiteInfo site = createSite();
-
-    try {
-      testInSite(site);
-    } finally {
-      deleteSite(site);
-    }
-  }
-
-  private void testInSite(SiteInfo site) {
+  public void testAutoPublish() {
     final NodeRef documentLibrary = _siteService.getContainer(site.getShortName(), SiteService.DOCUMENT_LIBRARY);
 
     NodeRef folder = _fileFolderService.create(documentLibrary, "testfolder", ContentModel.TYPE_FOLDER).getNodeRef();
-    
+    assertNotNull(folder);
     List<String> projects = new ArrayList<String>();
     projects.add("Project");
 
@@ -78,7 +69,9 @@ public class AutoPublishPolicyIntegrationTest extends AbstractVgrRepoIntegration
     _nodeService.setProperty(document, VgrModel.PROP_TYPE_RECORD_ID, "123456");
     _nodeService.setProperty(document, VgrModel.PROP_PUBLISHER_PROJECT_ASSIGNMENT, (Serializable) projects);
     
-    NodeRef publishedNode = _storageService.getPublishedNodeRef(document);
+    List<AssociationRef> targetAssocs = _nodeService.getTargetAssocs(document, VgrModel.ASSOC_PUBLISHED_TO_STORAGE);
+    assertEquals(1, targetAssocs.size());
+    NodeRef publishedNode = targetAssocs.get(0).getTargetRef();
     
     assertTrue(_nodeService.hasAspect(publishedNode, VgrModel.ASPECT_PUBLISHED));
   }

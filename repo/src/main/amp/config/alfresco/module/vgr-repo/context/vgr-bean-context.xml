@@ -18,13 +18,10 @@
   <bean id="vgr.storageService" class="se.vgregion.alfresco.repo.storage.impl.StorageServiceImpl">
     <property name="nodeService" ref="NodeService" />
     <property name="fileFolderService" ref="FileFolderService" />
-    <property name="serviceRegistry" ref="ServiceRegistry" />
     <property name="permissionService" ref="PermissionService" />
     <property name="copyService" ref="CopyService" />
     <property name="serviceUtils" ref="vgr.serviceUtils" />
     <property name="behaviourFilter" ref="policyBehaviourFilter" />
-    <property name="globalProperties" ref="global-properties" />
-    <property name="storageNodeRef" value="${vgr.storage.noderef}" />
     <property name="contentService" ref="ContentService" />
     <property name="searchService" ref="SearchService" />
     <property name="dictionaryService" ref="DictionaryService" />
@@ -34,6 +31,8 @@
     <property name="renditionService" ref="RenditionService" />
     <property name="personService" ref="PersonService" />
     <property name="namespaceService" ref="NamespaceService" />
+    <property name="repository" ref="repositoryHelper" />
+    <property name="pdfaPilotEnabled" value="${pdfapilot.enabled}" />
   </bean>
 
   <bean id="vgr.kivWsClient" class="se.vgregion.alfresco.repo.kivclient.KivWsClient">

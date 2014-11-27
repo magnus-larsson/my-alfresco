@@ -1,5 +1,7 @@
 package se.vgregion.alfresco.repo.it;
 
+import static org.junit.Assert.*;
+
 import javax.annotation.Resource;
 
 import org.alfresco.repo.content.transform.ContentTransformer;
@@ -58,9 +60,9 @@ public class PublishToStorageIntegrationTest extends AbstractVgrRepoIntegrationT
     setRequiresNew(true);
 
     // this happens if pdfaPilot is not enabled and isn't around to do the work
-    if (!_transformer.isTransformable("application/pdf", -1, "application/pdf", null)) {
+    /*if (!_transformer.isTransformable("application/pdf", -1, "application/pdf", null)) {
       return;
-    }
+    }*/
 
     final NodeRef sourceDocument = _transactionHelper.doInTransaction(new RetryingTransactionCallback<NodeRef>() {
 
@@ -90,6 +92,21 @@ public class PublishToStorageIntegrationTest extends AbstractVgrRepoIntegrationT
         return _storageService.publishToStorage(sourceDocument, false);
       }
     }, false, true);
+    
+    assertNotNull(publishedDocument);
+    assertTrue(_nodeService.exists(publishedDocument));
+    try {
+      _transactionHelper.doInTransaction(new RetryingTransactionCallback<NodeRef>() {
+  
+        @Override
+        public NodeRef execute() throws Throwable {
+          return _storageService.publishToStorage(sourceDocument, false);
+        }
+      }, false, true);
+      fail("Second publish of the same document should fail!");
+    } catch (Exception e) {
+      
+    }
+    
   }
-
 }

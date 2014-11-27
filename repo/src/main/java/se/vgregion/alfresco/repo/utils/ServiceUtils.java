@@ -37,6 +37,8 @@ public interface ServiceUtils {
   public boolean isSiteCollaborator(final NodeRef nodeRef);
 
   public boolean isAdmin();
+  
+  public boolean isAdmin(String username);
 
   public String getFileExtension(final Serializable content);
 
