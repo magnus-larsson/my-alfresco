@@ -35,9 +35,9 @@
     <!-- cron expression is set to fire every second minute -->
     <property name="cronExpression" value="0 0/2 * * * ?" />
   </bean>
-  
-  
-  
+
+
+
 
   <!-- *********************************************************************** -->
   <!-- Job for synchronizing the Apelon and KIV unit data source with Alfresco -->
@@ -140,7 +140,7 @@
     <property name="pushService" ref="vgr.pushService" />
     <property name="maxRepushCount" value="${vgr.push.max-repush-count}" />
     <property name="minimumPushAge" value="${vgr.push.minimum-push-age}" />
-    <property name="enabled" value="${vgr.repushToPubSubHubBubServer.enabled}"/>
+    <property name="enabled" value="${vgr.repushToPubSubHubBubServer.enabled}" />
   </bean>
 
   <bean id="vgr.repushServerJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
@@ -157,7 +157,7 @@
     <property name="scheduler" ref="schedulerFactory" />
     <!-- cron expression is set to fire every 10 minutes -->
     <property name="cronExpression" value="${vgr.repushToPubSubHubBubServer.cron}" />
-    
+
   </bean>
 
   <!-- ********************************************************************************* -->
