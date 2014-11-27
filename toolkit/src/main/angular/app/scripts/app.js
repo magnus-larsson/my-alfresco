@@ -29,7 +29,7 @@ angular
   '$rootScope',
   '$state',
   '$stateParams',
-  function($rootScope, $state, $stateParams) {
+  function ($rootScope, $state, $stateParams) {
     $rootScope.$state = $state;
     $rootScope.$stateParams = $stateParams;
   }
@@ -37,9 +37,9 @@ angular
 
 .config([
   'RestangularProvider',
-  function(RestangularProvider) {
+  function (RestangularProvider) {
     // add a response intereceptor
-    RestangularProvider.addResponseInterceptor(function(data, operation) {
+    RestangularProvider.addResponseInterceptor(function (data, operation) {
       var extractedData;
 
       // .. to look for getList operations
@@ -61,7 +61,7 @@ angular
 .config([
   '$stateProvider',
   '$urlRouterProvider',
-  function($stateProvider, $urlRouterProvider) {
+  function ($stateProvider, $urlRouterProvider) {
     $urlRouterProvider.otherwise('/');
   }
 ]);

@@ -12,9 +12,9 @@ import org.aspectj.lang.annotation.Pointcut;
 
 import se.vgregion.alfresco.repo.utils.ApplicationContextHolder;
 
-public @Aspect class CTFootnoesAspect {
+public @Aspect class CTFootnotesAspect {
 
-  private final static Logger LOG = Logger.getLogger(CTFootnoesAspect.class);
+  private final static Logger LOG = Logger.getLogger(CTFootnotesAspect.class);
 
   private final static long DEFAULT_LIMIT = 10;
 
@@ -89,8 +89,8 @@ public @Aspect class CTFootnoesAspect {
     return Long.valueOf(limit);
   }
 
-  public static CTFootnoesAspect aspectOf() {
-    return new CTFootnoesAspect();
+  public static CTFootnotesAspect aspectOf() {
+    return new CTFootnotesAspect();
   }
 
 }

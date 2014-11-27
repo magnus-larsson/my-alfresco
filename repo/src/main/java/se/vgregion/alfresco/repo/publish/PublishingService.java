@@ -30,11 +30,13 @@ public interface PublishingService {
   boolean isPublished(NodeRef nodeRef);
 
   boolean isPublished(NodeRef nodeRef, boolean excludeAlreadyPushed);
+  
+  boolean isPublished(NodeRef nodeRef, boolean excludeAlreadyPushed, boolean onlyOK);
 
   boolean isPublished(String nodeRef);
 
   boolean isPublished(String nodeRef, boolean excludeAlreadyPushed);
 
-
+  boolean isPublished(String nodeRef, boolean excludeAlreadyPushed, boolean onlyOK);
 
 }

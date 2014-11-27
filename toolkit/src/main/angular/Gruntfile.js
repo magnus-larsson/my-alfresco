@@ -7,7 +7,7 @@
 // use this if you want to recursively match all subfolders:
 // 'test/spec/**/*.js'
 
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
   // Load grunt tasks automatically
   require('load-grunt-tasks')(grunt);
@@ -79,7 +79,7 @@ module.exports = function(grunt) {
       livereload: {
         options: {
           open: true,
-          middleware: function(connect, options) {
+          middleware: function (connect, options) {
             var middlewares = [];
 
             if (!Array.isArray(options.base)) {
@@ -90,7 +90,7 @@ module.exports = function(grunt) {
             middlewares.push(require('grunt-connect-proxy/lib/utils').proxyRequest);
 
             // Serve static files
-            options.base.forEach(function(base) {
+            options.base.forEach(function (base) {
               middlewares.push(connect.static(base));
             });
 
@@ -108,7 +108,7 @@ module.exports = function(grunt) {
       test: {
         options: {
           port: 9001,
-          middleware: function(connect) {
+          middleware: function (connect) {
             return [
               connect.static('.tmp'),
               connect.static('test'),
@@ -129,9 +129,9 @@ module.exports = function(grunt) {
       },
       proxies: [{
         context: '/alfresco',
-        //host: 'localhost',
-        //port: 8080
-        host: 'alfresco-lager1.vgregion.se',
+        host: 'localhost',
+        // port: 8080
+        // host: 'alfresco-lager1.vgregion.se',
         port: 8080
           // host: 'alfresco.vgregion.se',
           // port: 443,
@@ -435,7 +435,7 @@ module.exports = function(grunt) {
 
 
   grunt.registerTask('serve', 'Compile then start a connect web server',
-    function(target) {
+    function (target) {
       if (target === 'dist') {
         return grunt.task.run(['build', 'connect:dist:keepalive']);
       }
@@ -453,7 +453,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('server',
     'DEPRECATED TASK. Use the "serve" task instead',
-    function(target) {
+    function (target) {
       grunt.log.warn(
         'The `server` task has been deprecated. Use `grunt serve` to start a server.'
       );
