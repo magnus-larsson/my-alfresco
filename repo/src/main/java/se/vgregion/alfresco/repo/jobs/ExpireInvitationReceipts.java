@@ -6,6 +6,8 @@ import java.util.List;
 import org.alfresco.repo.invitation.WorkflowModelNominatedInvitation;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
+import org.alfresco.repo.transaction.RetryingTransactionHelper;
+import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.cmr.workflow.WorkflowService;
 import org.alfresco.service.cmr.workflow.WorkflowTask;
 import org.alfresco.service.cmr.workflow.WorkflowTaskQuery;
@@ -34,23 +36,31 @@ public class ExpireInvitationReceipts extends ClusteredExecuter {
 
       @Override
       public Void doWork() throws Exception {
-        WorkflowTaskQuery taskQuery = new WorkflowTaskQuery();
-        taskQuery.setActive(null);
-        taskQuery.setWorkflowDefinitionName(WorkflowModelNominatedInvitation.WORKFLOW_DEFINITION_NAME_ACTIVITI);
-        taskQuery.setTaskName(WorkflowModelNominatedInvitation.WF_TASK_ACCEPT_INVITE);
-        taskQuery.setTaskState(WorkflowTaskState.IN_PROGRESS);
+        RetryingTransactionHelper transactionHelper = _transactionService.getRetryingTransactionHelper();
+        transactionHelper.doInTransaction(new RetryingTransactionCallback<Void>() {
+          @Override
+          public Void execute() throws Throwable {
+            WorkflowTaskQuery taskQuery = new WorkflowTaskQuery();
+            taskQuery.setActive(null);
+            taskQuery.setWorkflowDefinitionName(WorkflowModelNominatedInvitation.WORKFLOW_DEFINITION_NAME_ACTIVITI);
+            taskQuery.setTaskName(WorkflowModelNominatedInvitation.WF_TASK_ACCEPT_INVITE);
+            taskQuery.setTaskState(WorkflowTaskState.IN_PROGRESS);
 
-        List<WorkflowTask> queryTasks = new ArrayList<WorkflowTask>();
+            List<WorkflowTask> queryTasks = new ArrayList<WorkflowTask>();
 
-        queryTasks.addAll(workflowService.queryTasks(taskQuery, true));
-        taskQuery.setTaskName(WorkflowModelNominatedInvitation.WF_TASK_REJECT_INVITE);
-        queryTasks.addAll(workflowService.queryTasks(taskQuery, false));
-        for (WorkflowTask task : queryTasks) {
-          if (LOG.isDebugEnabled()) {
-            LOG.info("Ending stale invitation receipt " + task.getPath().getInstance().getId() + ": " + task.getId());
+            queryTasks.addAll(workflowService.queryTasks(taskQuery, true));
+            taskQuery.setTaskName(WorkflowModelNominatedInvitation.WF_TASK_REJECT_INVITE);
+            queryTasks.addAll(workflowService.queryTasks(taskQuery, false));
+            for (WorkflowTask task : queryTasks) {
+              if (LOG.isDebugEnabled()) {
+                LOG.info("Ending stale invitation receipt " + task.getPath().getInstance().getId() + ": " + task.getId());
+              }
+              workflowService.endTask(task.getId(), null);
+            }
+
+            return null;
           }
-          workflowService.endTask(task.getId(), null);
-        }
+        }, false, true);
         return null;
       }
     }, AuthenticationUtil.SYSTEM_USER_NAME);
