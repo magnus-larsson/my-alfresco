@@ -250,5 +250,29 @@
     <!-- cron expression is set to fire at 08:00 every day -->
     <property name="cronExpression" value="0 0 08 1/1 * ? *" />
   </bean>
+  
+   <!-- ****************************************************************** -->
+  <!-- Job for expiring (completing) stale invitation workflow receipts   -->
+  <!-- ****************************************************************** -->
+
+  <bean id="vgr.expireInvitationReceipts" class="se.vgregion.alfresco.repo.jobs.ExpireInvitationReceipts" parent="vgr.clusteredExecuter">
+    <property name="workflowService" ref="WorkflowService" />
+  </bean>
+
+  <bean id="vgr.expireInvitationReceiptsJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <property name="jobClass" value="se.vgregion.alfresco.repo.jobs.ExpireInvitationReceiptsJob" />
+    <property name="jobDataAsMap">
+      <map>
+        <entry key="expireInvitationReceipts" value-ref="vgr.expireInvitationReceipts" />
+      </map>
+    </property>
+  </bean>
+
+  <bean id="vgr.expireInvitationReceiptsTrigger" class="org.alfresco.util.CronTriggerBean">
+    <property name="jobDetail" ref="vgr.expireInvitationReceiptsJobDetail" />
+    <property name="scheduler" ref="schedulerFactory" />
+    <!-- cron expression is set to fire at 04:00 every day -->
+    <property name="cronExpression" value="0 0 4 1/1 * ? *" />
+  </bean>
 
 </beans>
