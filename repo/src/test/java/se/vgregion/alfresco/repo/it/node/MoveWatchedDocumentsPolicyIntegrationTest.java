@@ -1,4 +1,4 @@
-package se.vgregion.alfresco.repo.it;
+package se.vgregion.alfresco.repo.it.node;
 
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.fail;
@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import se.vgregion.alfresco.repo.it.AbstractVgrRepoIntegrationTest;
 import se.vgregion.alfresco.repo.model.VgrModel;
 
 /**

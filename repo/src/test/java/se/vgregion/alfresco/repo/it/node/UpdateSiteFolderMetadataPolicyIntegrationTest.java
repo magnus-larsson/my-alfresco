@@ -1,4 +1,4 @@
-package se.vgregion.alfresco.repo.it;
+package se.vgregion.alfresco.repo.it.node;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -11,6 +11,7 @@ import org.alfresco.service.cmr.site.SiteInfo;
 import org.alfresco.service.cmr.site.SiteService;
 import org.junit.Test;
 
+import se.vgregion.alfresco.repo.it.AbstractVgrRepoIntegrationTest;
 import se.vgregion.alfresco.repo.model.VgrModel;
 
 /**

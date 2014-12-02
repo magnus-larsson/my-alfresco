@@ -1,4 +1,4 @@
-package se.vgregion.alfresco.repo.it;
+package se.vgregion.alfresco.repo.it.storage;
 
 import static org.junit.Assert.*;
 
@@ -11,6 +11,7 @@ import org.alfresco.service.cmr.site.SiteInfo;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import se.vgregion.alfresco.repo.it.AbstractVgrRepoIntegrationTest;
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.storage.StorageService;
 

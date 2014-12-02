@@ -1,4 +1,4 @@
-package se.vgregion.alfresco.repo.it;
+package se.vgregion.alfresco.repo.it.node;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
+import se.vgregion.alfresco.repo.it.AbstractVgrRepoIntegrationTest;
 import se.vgregion.alfresco.repo.model.VgrModel;
 
 public class AddPdfaPolicyIntegrationTest extends AbstractVgrRepoIntegrationTest {
