@@ -50,7 +50,8 @@
 	
 	Alfresco.DocumentVersions.prototype.onShowAllVersions = function(event, scope) {
 		// prevent the default on click
-		event.preventDefault();
+		if (event.preventDefault) event.preventDefault();
+		event.returnValue = false; //IE8 workaround
 
 		// remove the number of version restriction
 		scope.widgets.alfrescoDataTable.widgets.dataSource.liveData = scope.widgets.alfrescoDataTable.widgets.dataSource.liveData + '&total=' + ALL_VERSIONS;
