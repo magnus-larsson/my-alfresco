@@ -30,6 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
+import se.vgregion.alfresco.repo.publish.PublishingService;
 import se.vgregion.alfresco.repo.storage.impl.StorageServiceImpl;
 import se.vgregion.alfresco.repo.utils.ServiceUtils;
 
@@ -50,6 +51,7 @@ public class StorageServiceTest {
   private Repository repository;
   private ActionService actionService;
   private RetryingTransactionHelper retryingTransactionHelper;
+  private PublishingService publishingService;
 
   final NodeRef nodeRef1 = new NodeRef("workspace://SpacesStore/node1");
   final NodeRef companyHomeNodeRef = new NodeRef("workspace://SpacesStore/CompanyHome");
@@ -71,6 +73,7 @@ public class StorageServiceTest {
     dictionaryService = m.mock(DictionaryService.class);
     repository = m.mock(Repository.class);
     actionService = m.mock(ActionService.class);
+    publishingService = m.mock(PublishingService.class);
     retryingTransactionHelper = m.mock(RetryingTransactionHelper.class);
 
     ssi = new StorageServiceImpl();
@@ -87,6 +90,7 @@ public class StorageServiceTest {
     ssi.setRepository(repository);
     ssi.setActionService(actionService);
     ssi.setRetryingTransactionHelper(retryingTransactionHelper);
+    ssi.setPublishingService(publishingService);
     ssi.afterPropertiesSet();
 
     m.checking(new Expectations() {

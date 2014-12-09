@@ -33,6 +33,7 @@
     <property name="namespaceService" ref="NamespaceService" />
     <property name="repository" ref="repositoryHelper" />
     <property name="pdfaPilotEnabled" value="${pdfapilot.enabled}" />
+    <property name="publishingService" ref="vgr.publishingService" />
   </bean>
 
   <bean id="vgr.kivWsClient" class="se.vgregion.alfresco.repo.kivclient.KivWsClient">

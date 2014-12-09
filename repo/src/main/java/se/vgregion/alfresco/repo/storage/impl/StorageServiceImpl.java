@@ -67,6 +67,8 @@ import org.springframework.extensions.surf.util.I18NUtil;
 import org.springframework.util.Assert;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
+import se.vgregion.alfresco.repo.publish.PublishingService;
+import se.vgregion.alfresco.repo.push.impl.PushLogger;
 import se.vgregion.alfresco.repo.rendition.executer.AddFailedRenditionActionExecuter;
 import se.vgregion.alfresco.repo.rendition.executer.NodeEligibleForRerenderingEvaluator;
 import se.vgregion.alfresco.repo.rendition.executer.PdfaPilotRenderingEngine;
@@ -114,6 +116,8 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   private NamespaceService _namespaceService;
 
   private Repository _repository;
+  
+  private PublishingService _publishingService;
 
   private boolean pdfaPilotEnabled = false;
 
@@ -183,6 +187,10 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
   public void setNamespaceService(NamespaceService namespaceService) {
     _namespaceService = namespaceService;
+  }
+  
+  public void setPublishingService(PublishingService publishingService) {
+    _publishingService = publishingService;
   }
 
   @Override
@@ -652,6 +660,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     Assert.notNull(_retryingTransactionHelper);
     Assert.notNull(_actionService);
     Assert.notNull(_repository);
+    Assert.notNull(_publishingService);
   }
 
   @Override
@@ -848,7 +857,23 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
         throw new RuntimeException(ex);
       }
     }
-
+    
+    //TODO if we get to this point we should send the file to index again.
+    if (_publishingService.isPublished(nodeRef)) {
+      //Clear publish flags and push again
+      PushLogger.logNodeForRepushAfterNewPdfa(nodeRef, _nodeService);
+      
+      _behaviourFilter.disableBehaviour();
+      try {
+        // null the pushed for publish/unpublish properties to force a re-push
+        _nodeService.setProperty(nodeRef, ContentModel.PROP_MODIFIED, new Date());
+        _nodeService.setProperty(nodeRef, VgrModel.PROP_PUSHED_FOR_PUBLISH, null);
+        _nodeService.setProperty(nodeRef, VgrModel.PROP_PUSHED_FOR_UNPUBLISH, null);
+        _nodeService.setProperty(nodeRef, VgrModel.PROP_PUSHED_COUNT, null);
+      } finally {
+        _behaviourFilter.enableBehaviour();
+      }
+    }
     return true;
   }
 
