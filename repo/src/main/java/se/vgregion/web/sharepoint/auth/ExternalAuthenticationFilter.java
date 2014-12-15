@@ -1,15 +1,23 @@
 package se.vgregion.web.sharepoint.auth;
 
+import java.io.IOException;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.SessionUser;
 import org.alfresco.repo.management.subsystems.ActivateableBean;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.external.RemoteUserMapper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.webdav.auth.AuthenticationDriver;
 import org.alfresco.repo.webdav.auth.HTTPRequestAuthenticationFilter;
-import org.alfresco.repo.webdav.auth.RemoteUserMapper;
 import org.alfresco.repo.webdav.auth.SharepointConstants;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -21,15 +29,9 @@ import org.alfresco.web.bean.repository.User;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-
 /**
- * This is a modified version of {@link HTTPRequestAuthenticationFilter} for use by the sharepoint module.
+ * This is a modified version of {@link HTTPRequestAuthenticationFilter} for use
+ * by the sharepoint module.
  *
  * @author michaelboeckling
  */
@@ -57,8 +59,7 @@ public class ExternalAuthenticationFilter implements AuthenticationDriver, Activ
   private boolean _active;
 
   @Override
-  public boolean authenticateRequest(ServletContext context, final HttpServletRequest httpReq,
-                                     HttpServletResponse httpResp) throws IOException, ServletException {
+  public boolean authenticateRequest(ServletContext context, final HttpServletRequest httpReq, HttpServletResponse httpResp) throws IOException, ServletException {
     // Get the user details object from the session
     SessionUser user = (SessionUser) httpReq.getSession().getAttribute(USER_SESSION_ATTRIBUTE);
 
@@ -77,25 +78,24 @@ public class ExternalAuthenticationFilter implements AuthenticationDriver, Activ
         }
 
         // Get the authorization header
-        user = _transactionService.getRetryingTransactionHelper().doInTransaction(
-                new RetryingTransactionHelper.RetryingTransactionCallback<SessionUser>() {
+        user = _transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<SessionUser>() {
 
-                  public SessionUser execute() throws Throwable {
-                    try {
-                      // Authenticate the user
-                      _authenticationComponent.clearCurrentSecurityContext();
-                      _authenticationComponent.setCurrentUser(userName);
+          public SessionUser execute() throws Throwable {
+            try {
+              // Authenticate the user
+              _authenticationComponent.clearCurrentSecurityContext();
+              _authenticationComponent.setCurrentUser(userName);
 
-                      return createUserEnvironment(httpReq.getSession(), userName, _authenticationService.getCurrentTicket(), true);
-                    } catch (AuthenticationException ex) {
-                      if (LOG.isDebugEnabled()) {
-                        LOG.debug("Failed", ex);
-                      }
+              return createUserEnvironment(httpReq.getSession(), userName, _authenticationService.getCurrentTicket(), true);
+            } catch (AuthenticationException ex) {
+              if (LOG.isDebugEnabled()) {
+                LOG.debug("Failed", ex);
+              }
 
-                      return null;
-                    }
-                  }
-                });
+              return null;
+            }
+          }
+        });
 
       } else {
         // Check if the request includes an authentication ticket
@@ -103,8 +103,7 @@ public class ExternalAuthenticationFilter implements AuthenticationDriver, Activ
 
         if (ticket != null && ticket.length() > 0) {
           if (LOG.isDebugEnabled())
-            LOG.debug("Logon via ticket from " + httpReq.getRemoteHost() + " ("
-                    + httpReq.getRemoteAddr() + ":" + httpReq.getRemotePort() + ")" + " ticket=" + ticket);
+            LOG.debug("Logon via ticket from " + httpReq.getRemoteHost() + " (" + httpReq.getRemoteAddr() + ":" + httpReq.getRemotePort() + ")" + " ticket=" + ticket);
 
           try {
             // Validate the ticket
@@ -135,24 +134,28 @@ public class ExternalAuthenticationFilter implements AuthenticationDriver, Activ
   }
 
   @Override
-  public void restartLoginChallenge(ServletContext context, HttpServletRequest request, HttpServletResponse response)
-          throws IOException {
+  public void restartLoginChallenge(ServletContext context, HttpServletRequest request, HttpServletResponse response) throws IOException {
     // nothing to do here
   }
 
   /**
    * Callback to create the User environment as appropriate for a filter impl.
    *
-   * @param session      HttpSession
-   * @param userName     String
-   * @param ticket       the ticket
-   * @param externalAuth has the user been authenticated by SSO?
+   * @param session
+   *          HttpSession
+   * @param userName
+   *          String
+   * @param ticket
+   *          the ticket
+   * @param externalAuth
+   *          has the user been authenticated by SSO?
    * @return SessionUser
-   * @throws IOException      Signals that an I/O exception has occurred.
-   * @throws ServletException the servlet exception
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   * @throws ServletException
+   *           the servlet exception
    */
-  private SessionUser createUserEnvironment(HttpSession session, final String userName, final String ticket,
-                                            boolean externalAuth) throws IOException, ServletException {
+  private SessionUser createUserEnvironment(HttpSession session, final String userName, final String ticket, boolean externalAuth) throws IOException, ServletException {
     SessionUser user = doInSystemTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<SessionUser>() {
 
       public SessionUser execute() throws Throwable {
@@ -179,7 +182,8 @@ public class ExternalAuthenticationFilter implements AuthenticationDriver, Activ
   /**
    * Executes a callback in a transaction as the system user
    *
-   * @param callback the callback
+   * @param callback
+   *          the callback
    * @return the return value from the callback
    */
   private <T> T doInSystemTransaction(final RetryingTransactionHelper.RetryingTransactionCallback<T> callback) {
@@ -195,10 +199,14 @@ public class ExternalAuthenticationFilter implements AuthenticationDriver, Activ
   /**
    * Create the user object that will be stored in the session.
    *
-   * @param userName     String
-   * @param ticket       String
-   * @param personNode   NodeRef
-   * @param homeSpaceRef NodeRef
+   * @param userName
+   *          String
+   * @param ticket
+   *          String
+   * @param personNode
+   *          NodeRef
+   * @param homeSpaceRef
+   *          NodeRef
    * @return SessionUser
    */
   private SessionUser createUserObject(String userName, String ticket, NodeRef personNode, NodeRef homeSpaceRef) {
@@ -212,8 +220,10 @@ public class ExternalAuthenticationFilter implements AuthenticationDriver, Activ
   /**
    * Sets or clears the external authentication flag on the session
    *
-   * @param session      the session
-   * @param externalAuth was the user authenticated externally?
+   * @param session
+   *          the session
+   * @param externalAuth
+   *          was the user authenticated externally?
    */
   private void setExternalAuth(HttpSession session, boolean externalAuth) {
     if (externalAuth) {
@@ -226,8 +236,9 @@ public class ExternalAuthenticationFilter implements AuthenticationDriver, Activ
   /**
    * Activates or deactivates the bean
    *
-   * @param active <code>true</code> if the bean is active and initialization
-   *               should complete
+   * @param active
+   *          <code>true</code> if the bean is active and initialization should
+   *          complete
    */
   public final void setActive(boolean active) {
     _active = active;

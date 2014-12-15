@@ -1,4 +1,6 @@
+<#-- @overridden projects/slingshot/config/alfresco/site-webscripts/org/alfresco/components/guest/login.get.html.ftl -->
 <#-- @overridden projects/slingshot/config/alfresco/templates/org/alfresco/global/slingshot-login.ftl -->
+
 
 <#include "../include/alfresco-template.ftl" />
 <@templateHeader>
