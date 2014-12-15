@@ -14,12 +14,14 @@ import org.junit.Test;
 
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.parsing.Parser;
 import com.jayway.restassured.response.Response;
 
 public class StorageContentGetFunctionalTest extends AbstractVgrRepoFunctionalTest {
   
   @Before
   public void setUp() {
+    RestAssured.defaultParser = Parser.JSON;
     RestAssured.authentication = preemptive().basic("admin", "admin");
   }
 
@@ -45,7 +47,7 @@ public class StorageContentGetFunctionalTest extends AbstractVgrRepoFunctionalTe
       
       updateDocument(nodeRef, properties);
       
-      String publishedNodeRef = publishDocument(nodeRef);
+      String publishedNodeRef = publishDocument(nodeRef, true);
       
       String publishedId = StringUtils.replace(publishedNodeRef, "workspace://SpacesStore/", "");
       
@@ -53,7 +55,7 @@ public class StorageContentGetFunctionalTest extends AbstractVgrRepoFunctionalTe
       RestAssured.responseContentType("application/pdf");
 
       Response response = given()
-        .baseUri(BASE_URI)
+        .baseUri(getBaseUri())
         .pathParam("store_type", "workspace")
         .pathParam("store_id", "SpacesStore")
         .pathParam("id", publishedId)
@@ -65,9 +67,10 @@ public class StorageContentGetFunctionalTest extends AbstractVgrRepoFunctionalTe
       assertEquals("application/pdf;charset=UTF-8", response.contentType());
       
       String contentDisposition = response.getHeader("Content-Disposition");
+      
+      System.out.println(contentDisposition);
 
-      assertEquals("attachment; filename*=UTF-8''%22test.pdf%22; filename=\"\"test.pdf\"\"", contentDisposition);
-      // assertEquals("attachment; filename=\"\"test.pdf\"\"; filename*=UTF-8''%22test.pdf%22", contentDisposition);
+      assertEquals("attachment; filename=\"\"test.pdf\"\"; filename*=UTF-8''%22test.pdf%22", contentDisposition);
     } finally {
       deleteSite(site);
     }
