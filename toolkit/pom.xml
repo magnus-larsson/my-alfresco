@@ -56,6 +56,55 @@
 
     <plugins>
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <configuration>
+          <workingDirectory>src/main/angular</workingDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <id>exec-npm-install</id>
+            <phase>generate-sources</phase>
+            <configuration>
+              <executable>npm</executable>
+              <arguments>
+                <argument>install</argument>
+              </arguments>
+            </configuration>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>exec-bower-install</id>
+            <phase>generate-sources</phase>
+            <configuration>
+              <executable>bower</executable>
+              <arguments>
+                <argument>install</argument>
+              </arguments>
+            </configuration>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>exec-grunt</id>
+            <phase>process-resources</phase>
+            <configuration>
+              <executable>grunt</executable>
+              <arguments>
+                <argument>--force</argument>
+              </arguments>
+            </configuration>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <version>2.5.3</version>
