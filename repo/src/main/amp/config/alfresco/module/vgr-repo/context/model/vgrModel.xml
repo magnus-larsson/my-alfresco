@@ -638,7 +638,7 @@
         <!-- Start group -->
         <property name="vgr:dc.type.document.serie">
           <type>d:text</type>
-          <!-- <multiple>true</multiple> -->
+          <multiple>true</multiple>
         </property>
         <property name="vgr:dc.type.document.id">
           <type>d:text</type>

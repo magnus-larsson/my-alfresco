@@ -461,7 +461,9 @@
             </control>
           </field>
           <field id="vgr:dc.identifier.diarie.id" label-id="vgr.dc.identifier.diarie.id" set="kontext" help-id="vgr.help.dc.identifier.diarie.id" description-id="vgr.description.dc.identifier.diarie.id" />
-          <field id="vgr:dc.type.document.serie" label-id="vgr.dc.type.document.serie" set="kontext" help-id="vgr.help.dc.type.document.serie" description-id="vgr.description.dc.type.document.serie" />
+          <field id="vgr:dc.type.document.serie" label-id="vgr.dc.type.document.serie" set="kontext" help-id="vgr.help.dc.type.document.serie" description-id="vgr.description.dc.type.document.serie">
+            <control template="/se/vgregion/alfresco/components/form/controls/textfield.ftl" />
+          </field>
           <field id="vgr:dc.type.document.id" label-id="vgr.dc.type.document.id" set="kontext" help-id="vgr.help.dc.type.document.id" description-id="vgr.description.dc.type.document.id" />
 
           <set id="sokstod" appearance="accordion" label-id="vgr.set.sokstod" />
@@ -770,7 +772,7 @@
             description-id="vgr.description.dc.contributor.controlledby.unit.freetext" />
 
           <set id="publicerare" appearance="accordion" label-id="vgr.set.publicerare" parent="standardmetadata" />
-          <!-- TODO: Develop a KIV connector -->          
+          <!-- TODO: Develop a KIV connector -->
           <field id="vgr:dc.publisher.forunit" label-id="vgr.dc.publisher.forunit" set="publicerare" help-id="vgr.help.dc.publisher.forunit" description-id="vgr.description.dc.publisher.forunit">
             <control template="/se/vgregion/alfresco/components/form/controls/treeselect.ftl">
               <control-param name="ds">/page/components/treeview/kiv</control-param>
@@ -780,7 +782,7 @@
               <control-param name="alwaysShowDflt" />
             </control>
           </field>
-          
+
           <field id="vgr:dc.publisher.forunit.id" set="publicerare">
             <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
@@ -812,7 +814,9 @@
             </control>
           </field>
           <field id="vgr:dc.identifier.diarie.id" label-id="vgr.dc.identifier.diarie.id" set="kontext" help-id="vgr.help.dc.identifier.diarie.id" description-id="vgr.description.dc.identifier.diarie.id" />
-          <field id="vgr:dc.type.document.serie" label-id="vgr.dc.type.document.serie" set="kontext" help-id="vgr.help.dc.type.document.serie" description-id="vgr.description.dc.type.document.serie" />
+          <field id="vgr:dc.type.document.serie" label-id="vgr.dc.type.document.serie" set="kontext" help-id="vgr.help.dc.type.document.serie" description-id="vgr.description.dc.type.document.serie">
+            <control template="/se/vgregion/alfresco/components/form/controls/textfield.ftl" />
+          </field>
           <field id="vgr:dc.type.document.id" label-id="vgr.dc.type.document.id" set="kontext" help-id="vgr.help.dc.type.document.id" description-id="vgr.description.dc.type.document.id" />
 
           <set id="sokstod" appearance="accordion" label-id="vgr.set.sokstod" parent="standardmetadata" />
