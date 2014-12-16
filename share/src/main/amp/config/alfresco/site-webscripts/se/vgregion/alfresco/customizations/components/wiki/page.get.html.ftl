@@ -1,31 +1,10 @@
 <#-- @overridden projects/slingshot/config/alfresco/site-webscripts/org/alfresco/components/wiki/page.get.html.ftl -->
 
-<@markup id="css" >
-   <#-- CSS Dependencies -->
-   <@link href="${url.context}/res/components/wiki/wiki.css" group="wiki"/>
-   <@link href="${url.context}/res/modules/document-picker/document-picker.css" group="wiki"/>
-   <@link href="${url.context}/res/components/object-finder/object-finder.css" group="wiki"/>
-   <@link href="${url.context}/res/modules/simple-editor.css" group="wiki"/>
-   <@link href="${url.context}/res/modules/taglibrary/taglibrary.css" group="wiki"/>
-   <@link href="${url.context}/res/modules/wiki/revert-wiki-version.css" group="wiki"/>
+<@markup id="vgr-css" action="after" target="css">
+   <@link href="${page.url.context}/res/components/wiki/vgr-wiki.css" group="wiki" />
 </@>
 
-<@markup id="js">
-   <#-- JavaScript Dependencies -->
-   <@script src="${url.context}/res/components/wiki/parser.js" group="wiki"/>
-   <@script src="${url.context}/res/components/wiki/page.js" group="wiki"/>
-   <@script src="${url.context}/res/modules/document-picker/document-picker.js" group="wiki"/>
-   <@script src="${url.context}/res/components/object-finder/object-finder.js" group="wiki"/>
-   <@script src="${url.context}/res/modules/simple-editor.js" group="wiki"/>
-   <@script src="${url.context}/res/modules/taglibrary/taglibrary.js" group="wiki"/>
-   <@script src="${url.context}/res/modules/wiki/revert-wiki-version.js" group="wiki"/>
-</@>
-
-<@markup id="widgets">
-   <@createWidgets group="wiki"/>
-</@>
-
-<@markup id="html">
+<@markup id="vgr-html" action="replace" target="html">
    <link rel="alternate" type="application/wiki" href="${page.url.servletContext}/site/${page.url.templateArgs.site}/wiki-page?title=${(page.url.args.title!"")?url}&amp;action=edit" />
    <@uniqueIdDiv>
       <#-- Version History -->

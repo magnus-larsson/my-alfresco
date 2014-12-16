@@ -1,21 +1,6 @@
 <#-- @overridden projects/slingshot/config/alfresco/site-webscripts/org/alfresco/components/dashlets/my-tasks.get.html.ftl -->
 
-<@markup id="css" >
-   <#-- CSS Dependencies -->
-   <@link rel="stylesheet" type="text/css" href="${url.context}/res/components/dashlets/my-tasks.css" group="dashlets"  />
-</@>
-
-<@markup id="js">
-   <#-- JavaScript Dependencies -->
-   <@script type="text/javascript" src="${url.context}/res/components/workflow/workflow-actions.js" group="dashlets"/>
-   <@script type="text/javascript" src="${url.context}/res/components/dashlets/my-tasks.js" group="dashlets"/>
-</@>
-
-<@markup id="widgets">
-   <@createWidgets group="dashlets"/>
-</@>
-
-<@markup id="html">
+<@markup id="vgr-html" target="html" action="replace">
    <@uniqueIdDiv>
       <#assign id = args.htmlid?html>
       <div class="dashlet my-tasks">
