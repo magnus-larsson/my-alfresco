@@ -24,33 +24,6 @@
 
     <!-- override menu so that repository can be hidden when not admin -->
     <header>
-      <app-items>
-        <!-- defaults: icon="{id}.png" label="header.{id}.label" description="header.{id}.description" -->
-        <item type="link" id="my-dashboard">{userdashboardpage}</item>
-        <item type="js" id="sites">Alfresco.module.Sites</item>
-        <item type="link" id="people">/people-finder</item>
-        <item type="link" id="repository" condition="conditionRepositoryRootNode" permission="admin">/repository</item>
-        <item type="container" id="more">
-          <container-group id="my">
-            <!-- <item type="link" id="my-tasks">/my-tasks</item> -->
-            <!-- <item type="link" id="my-workflows">/my-workflows</item> -->
-            <item type="link" id="my-content">/user/user-content</item>
-            <item type="link" id="my-sites">/user/user-sites</item>
-            <item type="link" id="my-profile">{userprofilepage}</item>
-            <!-- <item type="js" id="saved-searches" condition="false">Alfresco.module.SavedSearches</item> -->
-          </container-group>
-          <container-group id="tools" permission="admin">
-            <item type="link" id="application">/console/admin-console/application</item>
-            <item type="link" id="groups">/console/admin-console/groups</item>
-            <item type="link" id="replication-jobs" condition="!conditionEditionTeam">/console/admin-console/replication-jobs</item>
-            <item type="link" id="repository">/console/admin-console/repository</item>
-            <item type="link" id="users">/console/admin-console/users</item>
-            <item type="link" id="trashcan">/console/admin-console/trashcan</item>
-            <item type="link" id="more">/console/admin-console/</item>
-          </container-group>
-        </item>
-        <item type="link" id="my-sites">/user/user-sites</item>
-      </app-items>
       <user-items>
         <item type="container" id="user" icon="" description="">
           <container-group id="usermenu" label="">
@@ -96,19 +69,6 @@
 
   <config evaluator="string-compare" condition="WebFramework">
     <web-framework>
-      <!-- SpringSurf Autowire Runtime Settings -->
-      <!-- Developers can set mode to 'development' to disable; SpringSurf caches, FreeMarker template caching and Rhino JavaScript compilation. -->
-      <autowire>
-        <!-- Pick the mode: "production" or "development" -->
-        <mode>development</mode>
-      </autowire>
-
-      <module-deployment>
-        <!-- Allow extension modules with <auto-deploy> set to true to be automatically deployed -->
-        <mode>manual</mode>
-        <enable-auto-deploy-modules>true</enable-auto-deploy-modules>
-      </module-deployment>
-
       <!-- This is the user factory we use to provide the user object in share with the specific properties for VGR -->
       <defaults>
         <user-factory>webframework.factory.user.vgr</user-factory>
@@ -126,21 +86,10 @@
 
   <!-- Document Library config section -->
   <config evaluator="string-compare" condition="DocumentLibrary">
-
-    <!-- <tree> -->
-    <!-- Whether the folder Tree component should enumerate child folders or not. This is a relatively expensive operation, so should be set to "false" for Repositories with broad folder structures. -->
-    <!-- <evaluate-child-folders>false</evaluate-child-folders> -->
-
-    <!-- Optionally limit the number of folders shown in treeview throughout Share. -->
-    <!-- <maximum-folder-count>-1</maximum-folder-count> -->
-    <!-- </tree> -->
-
     <!-- Used by the "Manage Aspects" action For custom aspects, remember to also add the relevant i18n string(s) cm_myaspect=My Aspect -->
     <aspects>
       <!-- Aspects that a user can see -->
-      <visible>
-
-      </visible>
+      <visible></visible>
 
       <!-- Aspects that a user can add. Same as "visible" if left empty -->
       <addable></addable>
@@ -155,25 +104,7 @@
       <type name="cm:content">
         <subtype name="vgr:document" />
       </type>
-
-      <!-- <type name="cm:folder"> </type> -->
     </types>
-
-    <!-- If set, will present a WebDAV link for the current item on the Document and Folder details pages. Also used to generate the "View in Alfresco Explorer" action for folders. -->
-    <!-- <repository-url>http://localhost:8080/alfresco</repository-url> -->
-
-    <!-- Google Docs™ integration -->
-    <google-docs>
-      <!-- Enable/disable the Google Docs UI integration (Extra types on Create Content menu, Google Docs actions). -->
-      <enabled>false</enabled>
-
-      <!-- The mimetypes of documents Google Docs allows you to create via the Share interface. The I18N label is created from the "type" attribute, e.g. google-docs.doc=Google Docs&trade; Document -->
-      <creatable-types>
-        <creatable type="doc">application/msword</creatable>
-        <creatable type="xls">application/vnd.ms-excel</creatable>
-        <creatable type="ppt">application/vnd.ms-powerpoint</creatable>
-      </creatable-types>
-    </google-docs>
 
     <!-- File upload configuration -->
     <file-upload>
@@ -210,9 +141,6 @@
     <tree>
       <!-- Whether the folder Tree component should enumerate child folders or not. This is a relatively expensive operation, so should be set to "false" for Repositories with broad folder structures. -->
       <evaluate-child-folders>false</evaluate-child-folders>
-
-      <!-- Optionally limit the number of folders shown in treeview throughout Share. -->
-      <!-- <maximum-folder-count>500</maximum-folder-count> -->
     </tree>
   </config>
 
