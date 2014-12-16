@@ -23,7 +23,7 @@
   <modules>
     <module>repo</module>
     <module>share</module>
-    <module>toolkit</module>
+    <!-- <module>toolkit</module> -->
   </modules>
 
   <build>
@@ -84,9 +84,9 @@
     </pluginManagement>
   </build>
   <repositories>
-    <repository> 
-      <id>alfresco-hotfix-releases</id> 
-      <url>https://artifacts.alfresco.com/nexus/content/repositories/hotfix-releases</url> 
-    </repository> 
-  </repositories> 
+    <repository>
+      <id>alfresco-hotfix-releases</id>
+      <url>https://artifacts.alfresco.com/nexus/content/repositories/hotfix-releases</url>
+    </repository>
+  </repositories>
 </project>
