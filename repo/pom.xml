@@ -16,7 +16,7 @@
     <alfresco.client.war>alfresco</alfresco.client.war>
     <tomcat.home>${tomcat.repo.home}</tomcat.home>
     <aspectj.version>1.6.11</aspectj.version><!-- Needs to match the alfresco included version -->
-    <failsafe.argLine>-javaagent:${settings.localRepository}/org/springframework/spring-instrument/3.0.5.RELEASE/spring-instrument-3.0.5.RELEASE.jar</failsafe.argLine>
+    <failsafe.argLine>-javaagent:${settings.localRepository}/org/springframework/spring-instrument/3.0.5.RELEASE/spring-instrument-3.0.5.RELEASE.jar -XX:-UseSplitVerifier</failsafe.argLine>
   </properties>
 
   <dependencies>
