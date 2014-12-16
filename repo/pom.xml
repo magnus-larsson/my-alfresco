@@ -15,7 +15,7 @@
     <module.id>vgr-repo</module.id>
     <alfresco.client.war>alfresco</alfresco.client.war>
     <tomcat.home>${tomcat.repo.home}</tomcat.home>
-    <aspectj.version>1.8.2</aspectj.version>
+    <aspectj.version>1.6.11</aspectj.version><!-- Needs to match the alfresco included version -->
     <failsafe.argLine>-javaagent:${settings.localRepository}/org/springframework/spring-instrument/3.0.5.RELEASE/spring-instrument-3.0.5.RELEASE.jar</failsafe.argLine>
   </properties>
 
@@ -163,9 +163,19 @@
           <artifactId>commons-lang</artifactId>
           <groupId>commons-lang</groupId>
         </exclusion>
+        <exclusion>
+          <artifactId>org.slf4j</artifactId>
+          <groupId>jcl-over-slf4j</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
-
+    <!-- Added correct version of jcl-overslf4j to override Spring-ldap-core-tigers version -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <version>1.5.11</version>
+    </dependency>
+    
     <dependency>
       <groupId>org.redpill-linpro.alfresco.module</groupId>
       <artifactId>metadatawriter</artifactId>
@@ -175,13 +185,6 @@
     <dependency>
       <groupId>org.redpill-linpro.alfresco</groupId>
       <artifactId>alfresco-cluster-probe</artifactId>
-      <version>${alfresco-cluster-probe.version}</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>spring-surf</artifactId>
-          <groupId>org.springframework.extensions.surf</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
@@ -207,6 +210,7 @@
       <groupId>org.aspectj</groupId>
       <artifactId>aspectjrt</artifactId>
       <version>${aspectj.version}</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -238,6 +242,10 @@
         <exclusion>
           <artifactId>bctsp-jdk14</artifactId>
           <groupId>bouncycastle</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>xml-apis</artifactId>
+          <groupId>xml-apis</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -342,10 +350,15 @@
       <scope>test</scope>
     </dependency>
 
+    
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <version>1.7.1</version>
+      <groupId>org.sharextras</groupId>
+      <artifactId>media-viewers</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.redpill-linpro.alfresco.translations</groupId>
+      <artifactId>alfresco-swedish-repo</artifactId>
+      <version>${languagepack.version}</version>
     </dependency>
   </dependencies>
 

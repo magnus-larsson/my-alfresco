@@ -1,5 +1,6 @@
+// @override projects/slingshot/source/web/components/dashlets/my-sites.js
 /**
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -29,28 +30,21 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event,
-      Selector = YAHOO.util.Selector;
+       Event = YAHOO.util.Event,
+       Selector = YAHOO.util.Selector;
 
    /**
     * Alfresco Slingshot aliases
     */
    var $html = Alfresco.util.encodeHTML,
-      $links = Alfresco.util.activateLinks;
+       $links = Alfresco.util.activateLinks;
 
    /**
     * Use the getDomId function to get some unique names for global event handling
     */
    var FAV_EVENTCLASS = Alfresco.util.generateDomId(null, "fav-site"),
-      IMAP_EVENTCLASS = Alfresco.util.generateDomId(null, "imap-site"),
-      LIKE_EVENTCLASS = Alfresco.util.generateDomId(null, "like-site"),
-      DELETE_EVENTCLASS = Alfresco.util.generateDomId(null, "del-site");
-
-   /**
-    * Preferences
-    */
-   var PREFERENCES_SITES = "org.alfresco.share.sites",
-      PREFERENCES_SITES_DASHLET_FILTER = PREFERENCES_SITES + ".dashlet.filter";
+       IMAP_EVENTCLASS = Alfresco.util.generateDomId(null, "imap-site"),
+       DELETE_EVENTCLASS = Alfresco.util.generateDomId(null, "del-site");
 
    /**
     * Dashboard PublicSites constructor.
@@ -69,7 +63,6 @@
 
       // Services
       this.services.preferences = new Alfresco.service.Preferences();
-      this.services.likes = new Alfresco.service.Ratings(Alfresco.service.Ratings.LIKES);
 
       // Listen for events from other components
       YAHOO.Bubbling.on("siteDeleted", this.onSiteDeleted, this);
@@ -79,6 +72,12 @@
 
    YAHOO.extend(Alfresco.dashlet.PublicSites, Alfresco.component.Base,
    {
+      /**
+       * Preferences
+       */
+      PREFERENCES_SITES_DASHLET: "",
+      PREFERENCES_SITES_DASHLET_FILTER: "",
+
       /**
        * Site data
        *
@@ -94,6 +93,30 @@
        * @type Alfresco.module.CreateSite
        */
       createSite: null,
+      
+      /**
+       * Favorite sites list
+       * 
+       * @property favSites
+       * @type Object
+       */
+      favSites: null,
+      
+      /**
+       * IMAP Favorite sites list
+       * 
+       * @property imapfavSites
+       * @type Object
+       */
+      imapfavSites: null,
+      
+      /**
+       * Selected filter value
+       * 
+       * @property filter
+       * @type String
+       */
+      filter: null,
 
       /**
        * Object container for initialization options
@@ -112,9 +135,10 @@
          validFilters:
          {
             "all": true,
-            "favSites": true
+            "favSites": true,
+            "recentSites": true
          },
-          
+         
          /**
           * Flag if IMAP server is enabled
           *
@@ -142,6 +166,10 @@
       {
          var me = this;
 
+         // Fetch preferences
+         this.PREFERENCES_SITES_DASHLET = this.services.preferences.getDashletId(this, "sites");
+         this.PREFERENCES_SITES_DASHLET_FILTER = this.PREFERENCES_SITES_DASHLET + ".filter";
+
          // Create Dropdown filter
          this.widgets.type = Alfresco.util.createYUIButton(this, "type", this.onTypeFilterChanged,
          {
@@ -151,7 +179,11 @@
          });
 
          // Listen on clicks for the create site link
-         Event.addListener(this.id + "-createSite-button", "click", this.onCreateSite, this, true);
+         var createSiteLink = Dom.get(this.id + "-createSite-button");
+         if (createSiteLink)
+         {
+            Event.addListener(createSiteLink, "click", this.onCreateSite, this, true);
+         }
 
          // DataSource definition
          this.widgets.dataSource = new YAHOO.util.DataSource(this.sites,
@@ -228,7 +260,6 @@
 
          registerEventHandler(FAV_EVENTCLASS, this.onFavouriteSite);
          registerEventHandler(IMAP_EVENTCLASS, this.onImapFavouriteSite);
-         registerEventHandler(LIKE_EVENTCLASS, this.onLikes);
          registerEventHandler(DELETE_EVENTCLASS, this.onDeleteSite);
 
          // Enable row highlighting
@@ -236,6 +267,7 @@
          this.widgets.dataTable.subscribe("rowMouseoutEvent", this.widgets.dataTable.onEventUnhighlightRow);
 
          // Load sites & preferences
+         this.initPreferences();
          this.loadSites();
       },
 
@@ -251,19 +283,72 @@
          var menuItem = p_aArgs[1];
          if (menuItem)
          {
-            this.widgets.type.set("label", menuItem.cfg.getProperty("text"));
+            this.widgets.type.set("label", menuItem.cfg.getProperty("text") + " " + Alfresco.constants.MENU_ARROW_SYMBOL);
             this.widgets.type.value = menuItem.value;
 
-            // Save preferences and load sites afterwards
-            this.services.preferences.set(PREFERENCES_SITES_DASHLET_FILTER, menuItem.value,
+            // Save preferences
+            this.services.preferences.set(this.PREFERENCES_SITES_DASHLET_FILTER, menuItem.value,
             {
                successCallback:
                {
-                  fn: this.loadSites,
+                  fn: function() 
+                  {
+                     // Update local cached copy of current filter
+                     this.filter = menuItem.value;
+
+                     // Reload the sites list
+                     this.loadSites();
+                  },
                   scope: this
                }
             });
          }
+      },
+
+      /**
+       * Init cached state from User Preferences
+       *
+       * @method initPreferences
+       */
+      initPreferences: function PublicSites_initPreferences()
+      {
+         var prefs = this.services.preferences.get();
+
+         // Retrieve fav sites preferences
+         var favSites = Alfresco.util.findValueByDotNotation(prefs, "org.alfresco.share.sites.favourites");
+         if (favSites === null)
+         {
+            favSites = {};
+         }
+         this.favSites = favSites;
+         var imapfavSites = Alfresco.util.findValueByDotNotation(prefs, "org.alfresco.share.sites.imapFavourites");
+         if (imapfavSites === null)
+         {
+            imapfavSites = {};
+         }
+         this.imapfavSites = imapfavSites;
+
+         var recentSites = Alfresco.util.findValueByDotNotation(prefs, "org.alfresco.share.sites.recent");
+         if (recentSites === null)
+         {
+            recentSites = {};
+         }
+
+         var recentSitesArray = [];
+
+         for (key in recentSites)
+         {
+            recentSitesArray.push(recentSites[key]);
+         }
+
+         this.recentSites = recentSites;
+         this.recentSitesArray = recentSitesArray;
+
+
+
+         // Retrieve the preferred filter for the UI
+         var filter = Alfresco.util.findValueByDotNotation(prefs, this.PREFERENCES_SITES_DASHLET_FILTER, "all");
+         this.filter = this.options.validFilters.hasOwnProperty(filter) ? filter : "all";
       },
 
       /**
@@ -273,6 +358,18 @@
        */
       loadSites: function PublicSites_loadSites()
       {
+         var filter;
+         switch (this.filter)
+         {
+            case "favSites":
+               filter = "/favourites";
+               break;
+            case "recentSites":
+               filter = "/recent";
+               break;
+            default:
+               filter = "";
+         }
          // Load sites
          Alfresco.util.Ajax.request(
          {
@@ -286,55 +383,19 @@
       },
 
       /**
-       * Retrieve user preferences after sites data has loaded
+       * Process user preferences after sites data has loaded and display the sites list
        *
        * @method onSitesLoaded
        * @param p_response {object} Response from "api/people/{userId}/sites" query
        */
       onSitesLoaded: function PublicSites_onSitesLoaded(p_response)
       {
-         // Load preferences (after which the appropriate sites will be displayed)
-         this.services.preferences.request(PREFERENCES_SITES,
-         {
-            successCallback:
-            {
-               fn: this.onPreferencesLoaded,
-               scope: this,
-               obj: p_response.json
-            }
-         });
-      },
-
-      /**
-       * Process response from sites and preferences queries
-       *
-       * @method onPreferencesLoaded
-       * @param p_response {object} Response from "api/people/{userId}/preferences" query
-       * @param p_items {object} Response from "api/people/{userId}/sites" query
-       */
-      onPreferencesLoaded: function PublicSites_onPreferencesLoaded(p_response, p_items)
-      {
-         var favSites = {},
-            imapfavSites = {},
-            siteManagers, i, j, k, l,
-            ii = 0;
-
-         // Save preferences
-         if (p_response.json.org)
-         {
-            favSites = p_response.json.org.alfresco.share.sites.favourites;
-            if (typeof(favSites) === "undefined")
-            {
-               favSites = {};
-            } 
-            imapfavSites = p_response.json.org.alfresco.share.sites.imapFavourites;
-         }
+         var p_items = p_response.json,
+             siteManagers, i, j, k, l, ii = 0;
 
          // Select the preferred filter in the ui
-         var filter = Alfresco.util.findValueByDotNotation(p_response.json, PREFERENCES_SITES_DASHLET_FILTER, "all");
-         filter = this.options.validFilters.hasOwnProperty(filter) ? filter : "all";
-         this.widgets.type.set("label", this.msg("filter." + filter));
-         this.widgets.type.value = filter;
+         this.widgets.type.set("label", this.msg("filter." + this.filter) + " " + Alfresco.constants.MENU_ARROW_SYMBOL);
+         this.widgets.type.value = this.filter;
 
          // Display the toolbar now that we have selected the filter
          Dom.removeClass(Selector.query(".toolbar div", this.id, true), "hidden");
@@ -342,10 +403,11 @@
          for (i = 0, j = p_items.length; i < j; i++)
          {
             p_items[i].isSiteManager = p_items[i].siteRole === "SiteManager";
-            p_items[i].isFavourite = typeof(favSites[p_items[i].shortName]) == "undefined" ? false : favSites[p_items[i].shortName];
-            if (imapfavSites)
+            p_items[i].isFavourite = !this.favSites[p_items[i].shortName] ? false : this.favSites[p_items[i].shortName];
+            p_items[i].isRecent = Alfresco.util.arrayContains(this.recentSitesArray, p_items[i].shortName);
+            if (this.imapfavSites)
             {
-               p_items[i].isIMAPFavourite = typeof(imapfavSites[p_items[i].shortName]) == "undefined" ? false : imapfavSites[p_items[i].shortName];
+               p_items[i].isIMAPFavourite = !this.imapfavSites[p_items[i].shortName] ? false : this.imapfavSites[p_items[i].shortName];
             }
          }
 
@@ -398,6 +460,9 @@
 
             case "favSites":
                return (site.isFavourite || (this.options.imapEnabled && site.isIMAPFavourite));
+
+            case "recentSites":
+               return (site.isRecent);
          }
          return false;
       },
@@ -444,39 +509,6 @@
          {
             html = '<a class="favourite-imap ' + IMAP_EVENTCLASS + '" title="' + this.msg("favourite.imap-site.add.tip") + '" tabindex="0">' + this.msg("favourite.imap-site.add.label") + '</a>';
          }
-
-         return html;
-      },
-
-      /**
-       * Generate "Likes" UI
-       *
-       * @method generateLikes
-       * @param record {object} DataTable record
-       * @return {string} HTML mark-up for Likes UI
-       */
-      generateLikes: function PublicSites_generateLikes(record)
-      {
-         var likes = record.getData("likes"),
-            html = "";
-
-         // TODO: Remove when Site Service supports "Likes"
-         likes = YAHOO.lang.merge(
-         {
-            isLiked: false,
-            totalLikes: 0
-         }, likes || {});
-         
-         if (likes.isLiked)
-         {
-            html = '<a class="like-action ' + LIKE_EVENTCLASS + ' enabled" title="' + this.msg("like.site.remove.tip") + '" tabindex="0"></a>';
-         }
-         else
-         {
-            html = '<a class="like-action ' + LIKE_EVENTCLASS + '" title="' + this.msg("like.site.add.tip") + '" tabindex="0">' + this.msg("like.site.add.label") + '</a>';
-         }
-
-         html += '<span class="likes-count">' + $html(likes.totalLikes) + '</span>';
 
          return html;
       },
@@ -529,21 +561,16 @@
                description = $links($html(site.description));
             }
 
-            desc += '<h3 class="site-title"><a href="' + Alfresco.constants.URL_PAGECONTEXT + 'site/' + site.shortName + '/default-redirect" class="theme-color-1">' + $html(site.title) + '</a></h3>';
+            desc += '<h3 class="site-title"><a href="' + Alfresco.constants.URL_PAGECONTEXT + 'site/' + site.shortName + '/dashboard" class="theme-color-1">' + $html(site.title) + '</a></h3>';
             desc += '<div class="detail"><span>' + description + '</span></div>';
 
-            /* Favourite / IMAP / (Likes) */
+            /* Favourite / IMAP */
             desc += '<div class="detail detail-social">';
             desc +=    '<span class="item item-social">' + this.generateFavourite(oRecord) + '</span>';
             if (this.options.imapEnabled)
             {
                desc +=    '<span class="item item-social item-separator">' + this.generateIMAPFavourite(oRecord) + '</span>';
             }
-            /**
-             * Not in Alfresco Team
-             *
-            desc +=    '<span class="item item-social">' + this.generateLikes(oRecord) + '</span>';
-            */
             desc += '</div>';
          }
 
@@ -625,7 +652,8 @@
          site.isFavourite = !site.isFavourite;
 
          this.widgets.dataTable.updateRow(record, site);
-
+         var fnPref = site.isFavourite ? "favouriteSite" : "unFavouriteSite";
+         
          // Assume the call will succeed, but register a failure handler to replace the UI state on failure
          var responseConfig =
          {
@@ -667,7 +695,10 @@
             }
          };
 
-         this.services.preferences.set(Alfresco.service.Preferences.FAVOURITE_SITES + "." + siteId, site.isFavourite, responseConfig);
+         this.services.preferences[fnPref].call(this.services.preferences, siteId, responseConfig);
+
+         // Update cached local copy
+         this.favSites[siteId] = site.isFavourite;
       },
 
       /**
@@ -712,77 +743,11 @@
             }
          };
 
+         // Update user preferences
          this.services.preferences.set(Alfresco.service.Preferences.IMAP_FAVOURITE_SITES + "." + siteId, site.isIMAPFavourite, responseConfig);
-      },
 
-      /**
-       * Like/Unlike event handler
-       *
-       * @method onLikes
-       * @param row {HTMLElement} DOM reference to a TR element (or child thereof)
-       */
-      onLikes: function PublicSites_onLikes(row)
-      {
-         var record = this.widgets.dataTable.getRecord(row),
-            site = record.getData(),
-            nodeRef = new Alfresco.util.NodeRef(site.nodeRef),
-            likes = site.likes;
-
-         likes.isLiked = !likes.isLiked;
-         likes.totalLikes += (likes.isLiked ? 1 : -1);
-
-         var responseConfig =
-         {
-            successCallback:
-            {
-               fn: function PublicSites_onLikes_success(event, p_nodeRef)
-               {
-                  var data = event.json.data;
-                  if (data)
-                  {
-                     // Update the record with the server's value
-                     var record = this._findRecordByParameter(p_nodeRef, "nodeRef"),
-                        site = record.getData(),
-                        likes = site.likes;
-
-                     likes.totalLikes = data.ratingsCount;
-                     this.widgets.dataTable.updateRow(record, site);
-                  }
-               },
-               scope: this,
-               obj: nodeRef.toString()
-            },
-            failureCallback:
-            {
-               fn: function PublicSites_onLikes_failure(event, p_nodeRef)
-               {
-                  // Reset the flag to it's previous state
-                  var record = this._findRecordByParameter(p_nodeRef, "nodeRef"),
-                     site = record.getData(),
-                     likes = site.likes;
-
-                  likes.isLiked = !likes.isLiked;
-                  likes.totalLikes += (likes.isLiked ? 1 : -1);
-                  this.widgets.dataTable.updateRow(record, site);
-                  Alfresco.util.PopupManager.displayPrompt(
-                  {
-                     text: this.msg("message.save.failure", site.title)
-                  });
-               },
-               scope: this,
-               obj: nodeRef.toString()
-            }
-         };
-
-         if (likes.isLiked)
-         {
-            this.services.likes.set(nodeRef, 1, responseConfig);
-         }
-         else
-         {
-            this.services.likes.remove(nodeRef, responseConfig);
-         }
-         this.widgets.dataTable.updateRow(record, site);
+         // Update cached local copy
+         this.imapfavSites[siteId] = site.isIMAPFavourite;
       },
 
       /**

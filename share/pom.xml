@@ -42,19 +42,21 @@
     <dependency>
       <groupId>org.redpill-linpro.alfresco</groupId>
       <artifactId>alfresco-cluster-probe</artifactId>
-      <version>${alfresco-cluster-probe.version}</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>spring-surf</artifactId>
-          <groupId>org.springframework.extensions.surf</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
       <version>2.6</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sharextras</groupId>
+      <artifactId>media-viewers</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.redpill-linpro.alfresco.translations</groupId>
+      <artifactId>alfresco-swedish-share</artifactId>
+      <version>${languagepack.version}</version>
     </dependency>
   </dependencies>
 
