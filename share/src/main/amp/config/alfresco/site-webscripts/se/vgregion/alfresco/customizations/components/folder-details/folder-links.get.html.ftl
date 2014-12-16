@@ -5,8 +5,6 @@
 </@>
 
 <@markup id="vgr-js" action="after" target="js">
-   <@script src="${url.context}/res/components/document-details/document-links.js" group="folder-details"/>
-   <@script src="${url.context}/res/components/folder-details/folder-links.js" group="folder-details"/>
    <@script src="${url.context}/res/components/folder-details/vgr-folder-links.js" group="folder-details" />
 </@>
 

@@ -96,7 +96,7 @@
        <#if field.control.params.password??>type="password"<#else>type="text"</#if>
        <#if field.control.params.styleClass??>class="${field.control.params.styleClass}"</#if>
        <#if field.control.params.style??>style="${field.control.params.style}"</#if>
-       value="${value}"
+       <#if field.value?is_number>value="${field.value?c}"<#else>value="${field.value?html}"</#if>
        <#if field.description??>title="${field.description?html}"</#if>
        <#if field.control.params.maxLength??>maxlength="${field.control.params.maxLength}"<#else>maxlength="1024"</#if> 
        <#if field.control.params.size??>size="${field.control.params.size}"</#if> 

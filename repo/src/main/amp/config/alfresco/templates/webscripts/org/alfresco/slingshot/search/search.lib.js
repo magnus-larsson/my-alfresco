@@ -125,6 +125,18 @@ function getRepositoryItem(folderPath, node, populate)
          };
          item.modifiedBy = getPersonDisplayName(item.modifiedByUser);
          item.createdBy = getPersonDisplayName(item.createdByUser);
+         if (node.hasAspect("{http://www.alfresco.org/model/content/1.0}thumbnailModification"))
+         {
+            var dates = node.properties["lastThumbnailModification"];
+            for (var i=0; i<dates.length; i++)
+            {
+               if (dates[i].indexOf("doclib") !== -1)
+               {
+                  item.lastThumbnailModification = dates[i];
+                  break;
+               }
+            }
+         }
       }
       if (node.isContainer)
       {
@@ -182,6 +194,18 @@ function getDocumentItem(siteId, containerId, pathParts, node, populate)
          };
          item.modifiedBy = getPersonDisplayName(item.modifiedByUser);
          item.createdBy = getPersonDisplayName(item.createdByUser);
+         if (node.hasAspect("{http://www.alfresco.org/model/content/1.0}thumbnailModification"))
+         {
+            var dates = node.properties["lastThumbnailModification"];
+            for (var i=0; i<dates.length; i++)
+            {
+               if (dates[i].indexOf("doclib") !== -1)
+               {
+                  item.lastThumbnailModification = dates[i];
+                  break;
+               }
+            }
+         }
       }
       if (node.isContainer)
       {
@@ -546,18 +570,16 @@ function splitQNamePath(node, rootNodeDisplayPath, rootNodeQNamePath)
 {
    var path = node.qnamePath,
        displayPath = utils.displayPath(node).split("/"),
-       parts = null;
+       parts = null,
+       overriden = false;
    
    // restructure the display path of the node if we have an overriden root node
    if (rootNodeDisplayPath != null && path.indexOf(rootNodeQNamePath) === 0)
    {
       var nodeDisplayPath = utils.displayPath(node).split("/");
       nodeDisplayPath = nodeDisplayPath.splice(rootNodeDisplayPath.length);
-      for (var i = 0; i < rootNodeQNamePath.split("/").length-1; i++)
-      {
-         nodeDisplayPath.unshift(null);
-      }
       displayPath = nodeDisplayPath;
+      overriden = true;
    }
    
    if (path.match("^"+SITES_SPACE_QNAME_PATH) == SITES_SPACE_QNAME_PATH)
@@ -566,6 +588,14 @@ function splitQNamePath(node, rootNodeDisplayPath, rootNodeQNamePath)
           pos = tmp.indexOf('/');
       if (pos >= 1)
       {
+         if (rootNodeQNamePath != null && path.indexOf(rootNodeQNamePath) === 0)
+         {
+            for (var i = 0; i < rootNodeQNamePath.split("/").length-1; i++)
+            {
+               nodeDisplayPath.unshift(null);
+            }
+            displayPath = nodeDisplayPath;
+         }
          // site id is the cm:name for the site - we cannot use the encoded QName version
          var siteId = displayPath[3];
          tmp = tmp.substring(pos + 1);
@@ -579,6 +609,11 @@ function splitQNamePath(node, rootNodeDisplayPath, rootNodeQNamePath)
             parts = [ siteId, containerId, displayPath.slice(5, displayPath.length) ];
          }
       }
+   }
+   
+   if (overriden && parts == null)
+   {
+      displayPath.unshift("");
    }
    
    return (parts !== null ? parts : [ null, null, displayPath ]);
@@ -772,7 +807,7 @@ function resolveRootNode(reference)
       {
          node = companyhome.childrenByXPath("st:sites")[0];
       }
-      else if (reference == "alfresco://shared")
+      else if (reference == "alfresco://shared/folder")
       {
          node = companyhome.childrenByXPath("app:shared")[0];
       }

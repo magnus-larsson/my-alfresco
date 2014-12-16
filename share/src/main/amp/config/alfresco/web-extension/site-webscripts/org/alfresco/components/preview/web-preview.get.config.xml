@@ -9,7 +9,7 @@
       When a condition matches the nodes' mimeType and/or thumbails its list of plugins are tested from the top.
       Every plugin will be created and get an opportunity to decide if it may be used in the users browser environment.
       If the plugin can't be used it will give a report back to the user that will be displayed if neither of the
-      plugins in the list can be used.
+      plugins in the list can be used.     
    -->
 
    <plugin-conditions>
@@ -195,6 +195,7 @@
          <plugin>FlashFox</plugin>
          <plugin>Video</plugin>
       </condition>
+
       <condition mimeType="video/x-flv">
          <plugin>StrobeMediaPlayback</plugin>
          <plugin>FlashFox</plugin>
