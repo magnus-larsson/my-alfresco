@@ -44,12 +44,6 @@
         </item>
       </user-items>
       <dependencies>
-        <css src="/modules/create-site.css" />
-        <css src="/modules/vgr-create-site.css" />
-        <css src="/modules/header/sites.css" />
-        <js src="/modules/create-site.js" />
-        <js src="/modules/vgr-create-site.js" />
-        <js src="/modules/header/sites.js" />
         <js src="/modules/header/vgr-sites.js" />
         <js src="/modules/header/tycktill.js" />
       </dependencies>

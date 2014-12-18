@@ -148,26 +148,17 @@
                 </evaluation>
               </evaluations>
             </sub-component>
-            <!-- You can't pick content-type in Drag & Drop, so disable this one <sub-component id="vgr-dnd-upload"> <evaluations> <evaluation id="vgr-dnd-upload"> <url>/components/upload/dnd-upload</url> 
-              </evaluation> </evaluations> </sub-component> -->
-          </sub-components>
-        </component>
-
-        <component>
-          <scope>template</scope>
-          <region-id>dnd-upload</region-id>
-          <source-id>documentlibrary</source-id>
-          <sub-components>
-            <sub-component id="default">
+            <!-- You can't pick content-type in Drag & Drop, so disable this one -->
+            <sub-component id="vgr-dnd-upload">
               <evaluations>
-                <evaluation id="vgr-hide">
-                  <render>false</render>
+                <evaluation id="vgr-dnd-upload">
+                  <url>/components/upload/dnd-upload</url>
                 </evaluation>
               </evaluations>
             </sub-component>
           </sub-components>
         </component>
-
+        <!-- <component> <scope>template</scope> <region-id>dnd-upload</region-id> <source-id>documentlibrary</source-id> <sub-components> <sub-component id="default"> <evaluations> <evaluation id="vgr-hide"> <render>false</render> </evaluation> </evaluations> </sub-component> </sub-components> </component> -->
         <!-- General Share pages -->
         <component>
           <region-id>footer</region-id>
