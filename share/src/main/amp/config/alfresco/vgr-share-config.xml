@@ -43,9 +43,6 @@
           </container-group>
         </item>
       </user-items>
-      <dependencies>
-        <js src="/modules/header/tycktill.js" />
-      </dependencies>
     </header>
 
     <!-- misc configuration -->

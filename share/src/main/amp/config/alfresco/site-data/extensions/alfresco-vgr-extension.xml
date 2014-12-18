@@ -3,6 +3,7 @@
 
     <module>
       <id>VGR Global</id>
+      <version>${project.version}</version>
       <auto-deploy>true</auto-deploy>
 
       <!-- Base evaluator that decides if any of the component bindings should be used at all -->
@@ -18,7 +19,7 @@
       <customizations>
         <customization>
           <targetPackageRoot>org.alfresco</targetPackageRoot>
-          <sourcePackageRoot>se.vgregion.alfresco.customizations</sourcePackageRoot>
+          <sourcePackageRoot>se.vgregion.alfresco.customizations.global</sourcePackageRoot>
         </customization>
       </customizations>
 
@@ -189,5 +190,40 @@
 
     </module>
 
+    <module>
+      <id>VGR Tyck till</id>
+      <version>${project.version}</version>
+      <auto-deploy>true</auto-deploy>
+      
+      <!-- Base evaluator that decides if any of the component bindings should be used at all -->
+      <evaluator type="site.module.evaluator">
+        <params>
+          <sites>.*</sites>
+          <sitePresets>.*</sitePresets>
+          <applyForNonSites>true</applyForNonSites>
+        </params>
+      </evaluator>
+
+      <!-- Apply the following customizations when the base evaluator above passes -->
+      <customizations>
+        <customization>
+          <targetPackageRoot>org.alfresco</targetPackageRoot>
+          <sourcePackageRoot>se.vgregion.alfresco.customizations.tycktill</sourcePackageRoot>
+        </customization>
+      </customizations>
+      
+      
+      <configurations>
+        <config evaluator="string-compare" condition="WebFramework" replace="false">
+          <web-framework>
+            <dojo-pages>
+              <packages>
+                <package name="tycktill" location="js/vgr/tycktill" />
+              </packages>
+            </dojo-pages>
+          </web-framework>
+        </config>
+      </configurations>
+    </module>
   </modules>
 </extension>
