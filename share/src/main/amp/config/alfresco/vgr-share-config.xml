@@ -44,7 +44,6 @@
         </item>
       </user-items>
       <dependencies>
-        <js src="/modules/header/vgr-sites.js" />
         <js src="/modules/header/tycktill.js" />
       </dependencies>
     </header>
