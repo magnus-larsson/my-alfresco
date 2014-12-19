@@ -193,8 +193,8 @@
     <module>
       <id>VGR Tyck till</id>
       <version>${project.version}</version>
-      <auto-deploy>true</auto-deploy>
-      
+      <auto-deploy>false</auto-deploy>
+
       <!-- Base evaluator that decides if any of the component bindings should be used at all -->
       <evaluator type="site.module.evaluator">
         <params>
@@ -211,8 +211,8 @@
           <sourcePackageRoot>se.vgregion.alfresco.customizations.tycktill</sourcePackageRoot>
         </customization>
       </customizations>
-      
-      
+
+
       <configurations>
         <config evaluator="string-compare" condition="WebFramework" replace="false">
           <web-framework>
@@ -224,6 +224,72 @@
           </web-framework>
         </config>
       </configurations>
+    </module>
+
+    <module>
+      <id>VGR Header menu - Hide my files</id>
+      <version>${project.version}</version>
+      <auto-deploy>false</auto-deploy>
+      <!-- Base evaluator that decides if any of the component bindings should be used at all -->
+      <evaluator type="site.module.evaluator">
+        <params>
+          <sites>.*</sites>
+          <sitePresets>.*</sitePresets>
+          <applyForNonSites>true</applyForNonSites>
+        </params>
+      </evaluator>
+
+      <!-- Apply the following customizations when the base evaluator above passes -->
+      <customizations>
+        <customization>
+          <targetPackageRoot>org.alfresco</targetPackageRoot>
+          <sourcePackageRoot>se.vgregion.alfresco.customizations.headermenu-hidemyfiles</sourcePackageRoot>
+        </customization>
+      </customizations>
+    </module>
+    
+    <module>
+      <id>VGR Header menu - Hide shared files</id>
+      <version>${project.version}</version>
+      <auto-deploy>false</auto-deploy>
+      <!-- Base evaluator that decides if any of the component bindings should be used at all -->
+      <evaluator type="site.module.evaluator">
+        <params>
+          <sites>.*</sites>
+          <sitePresets>.*</sitePresets>
+          <applyForNonSites>true</applyForNonSites>
+        </params>
+      </evaluator>
+
+      <!-- Apply the following customizations when the base evaluator above passes -->
+      <customizations>
+        <customization>
+          <targetPackageRoot>org.alfresco</targetPackageRoot>
+          <sourcePackageRoot>se.vgregion.alfresco.customizations.headermenu-hidesharedfiles</sourcePackageRoot>
+        </customization>
+      </customizations>
+    </module>
+    
+    <module>
+      <id>VGR Header menu - Hide tasks</id>
+      <version>${project.version}</version>
+      <auto-deploy>false</auto-deploy>
+      <!-- Base evaluator that decides if any of the component bindings should be used at all -->
+      <evaluator type="site.module.evaluator">
+        <params>
+          <sites>.*</sites>
+          <sitePresets>.*</sitePresets>
+          <applyForNonSites>true</applyForNonSites>
+        </params>
+      </evaluator>
+
+      <!-- Apply the following customizations when the base evaluator above passes -->
+      <customizations>
+        <customization>
+          <targetPackageRoot>org.alfresco</targetPackageRoot>
+          <sourcePackageRoot>se.vgregion.alfresco.customizations.headermenu-hidetasks</sourcePackageRoot>
+        </customization>
+      </customizations>
     </module>
   </modules>
 </extension>
