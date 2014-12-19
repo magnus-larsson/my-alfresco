@@ -191,7 +191,7 @@
     </module>
 
     <module>
-      <id>VGR Tyck till</id>
+      <id>VGR Header menu - Tyck till</id>
       <version>${project.version}</version>
       <auto-deploy>false</auto-deploy>
 
@@ -208,7 +208,7 @@
       <customizations>
         <customization>
           <targetPackageRoot>org.alfresco</targetPackageRoot>
-          <sourcePackageRoot>se.vgregion.alfresco.customizations.tycktill</sourcePackageRoot>
+          <sourcePackageRoot>se.vgregion.alfresco.customizations.headermenu-tycktill</sourcePackageRoot>
         </customization>
       </customizations>
 
@@ -288,6 +288,28 @@
         <customization>
           <targetPackageRoot>org.alfresco</targetPackageRoot>
           <sourcePackageRoot>se.vgregion.alfresco.customizations.headermenu-hidetasks</sourcePackageRoot>
+        </customization>
+      </customizations>
+    </module>
+    
+    <module>
+      <id>VGR Header menu - Help</id>
+      <version>${project.version}</version>
+      <auto-deploy>false</auto-deploy>
+      <!-- Base evaluator that decides if any of the component bindings should be used at all -->
+      <evaluator type="site.module.evaluator">
+        <params>
+          <sites>.*</sites>
+          <sitePresets>.*</sitePresets>
+          <applyForNonSites>true</applyForNonSites>
+        </params>
+      </evaluator>
+
+      <!-- Apply the following customizations when the base evaluator above passes -->
+      <customizations>
+        <customization>
+          <targetPackageRoot>org.alfresco</targetPackageRoot>
+          <sourcePackageRoot>se.vgregion.alfresco.customizations.headermenu-help</sourcePackageRoot>
         </customization>
       </customizations>
     </module>

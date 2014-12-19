@@ -22,29 +22,6 @@
       <client-debug-autologging>false</client-debug-autologging>
     </flags>
 
-    <!-- override menu so that repository can be hidden when not admin -->
-    <header>
-      <user-items>
-        <item type="container" id="user" icon="" description="">
-          <container-group id="usermenu" label="">
-            <item type="user" id="status">{userprofilepage}</item>
-            <item type="link" id="my-profile">{userprofilepage}</item>
-            <item type="link" id="change-password" condition="user.capabilities.isMutable">/user/change-password</item>
-            <item type="external-link" id="help-external" icon="help.png">{share-help-external}</item>
-            <item type="external-link" id="help-internal" icon="help.png">{share-help-internal}</item>
-            <item type="post" id="logout" condition="!context.externalAuthentication">dologout</item>
-          </container-group>
-        </item>
-        <item type="js" id="tycktill" label="Tyck till" icon="">Alfresco.thirdparty.module.TyckTill</item>
-        <item type="container" id="help" icon="">
-          <container-group id="helpmenu" label="">
-            <item type="external-link" id="help-external" icon="help.png">{share-help-external}</item>
-            <item type="external-link" id="help-internal" icon="help.png">{share-help-internal}</item>
-          </container-group>
-        </item>
-      </user-items>
-    </header>
-
     <!-- misc configuration -->
     <kivurl>http://sokikiv.vgregion.se/sokikiv/visaperson?vgrid={id}</kivurl>
   </config>
