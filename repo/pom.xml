@@ -214,7 +214,7 @@
     <dependency>
       <groupId>org.redpill-linpro.alfresco.repo.content.transform</groupId>
       <artifactId>pdfa-pilot-converter</artifactId>
-      <version>1.0.6.3</version>
+      <version>1.0.6.4</version>
     </dependency>
 
     <dependency>
