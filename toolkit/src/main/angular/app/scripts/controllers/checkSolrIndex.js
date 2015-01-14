@@ -13,30 +13,49 @@ var CheckSolrIndexController = function ($scope, Restangular, ngTableParams,
   };
 
   Restangular.one('cache', 'alfresco_orphans').get().then(function (data) {
-    var result = [];
+    $scope.alfrescoOrphans = [];
 
     for (var x = 0; x < data.orphans.length; x++) {
-      result.push({
+      var node = {
         nodeRef: data.orphans[x]
+      };
+
+      $http.get('/alfresco/service/vgr/toolkit/cache/check', {
+        params: {
+          nodeRef: node.nodeRef
+        }
+      }).success(function (data2, status) {
+        if (!data2.result) {
+          $scope.alfrescoOrphans.push(node);
+
+          $scope.alfrescoOrphansTableParameters.reload();
+        }
+      }).error(function (data, status) {
+        toaster.pop('error', 'Check Failure', 'Check of cached node failed, message "' + status + '"');
       });
     }
 
-    $scope.alfrescoOrphans = result;
     $scope.alfrescoOrphansModified = data.cacheDate;
   }).then(function () {
     $scope.alfrescoOrphansTableParameters.reload();
   });
 
   Restangular.one('cache', 'solr_orphans').get().then(function (data) {
-    var result = [];
+    $scope.solrOrphans = [];
 
     for (var x = 0; x < data.orphans.length; x++) {
-      result.push({
-        nodeRef: data.orphans[x]
-      });
+      var node = {
+        nodeRef: data.orphans[x],
+      };
+
+      $http.get('/alfresco/service/api/metadata?nodeRef=' + node.nodeRef)
+        .success(function (result) {
+          node.exists = Object.keys(result).length !== 0;
+        });
+
+      $scope.solrOrphans.push(node);
     }
 
-    $scope.solrOrphans = result;
     $scope.solrOrphansModified = data.cacheDate;
   }).then(function () {
     $scope.solrOrphansTableParameters.reload();
