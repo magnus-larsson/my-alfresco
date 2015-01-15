@@ -25,13 +25,15 @@ public class PropertyReplicationPolicy extends AbstractPolicy implements OnUpdat
 
   private Behaviour _behaviour;
 
+  private static boolean _initialized = false;
+
   @Override
   public void onUpdateProperties(final NodeRef nodeRef, final Map<QName, Serializable> before, final Map<QName, Serializable> after) {
     // Run as system user to prevent certain access restriction errors which may
     // appear when property updates are made by alfresco when new renditions are
     // created
     AuthenticationUtil.runAsSystem(new AuthenticationUtil.RunAsWork<Void>() {
-      
+
       @Override
       public Void doWork() throws Exception {
         _behaviourFilter.disableBehaviour();
@@ -215,10 +217,13 @@ public class PropertyReplicationPolicy extends AbstractPolicy implements OnUpdat
   @Override
   public void afterPropertiesSet() throws Exception {
     super.afterPropertiesSet();
+    if (!_initialized) {
+      LOG.info("Initialized " + this.getClass().getName());
+      _behaviour = new JavaBehaviour(this, "onUpdateProperties", Behaviour.NotificationFrequency.TRANSACTION_COMMIT);
 
-    _behaviour = new JavaBehaviour(this, "onUpdateProperties", Behaviour.NotificationFrequency.TRANSACTION_COMMIT);
-
-    _policyComponent.bindClassBehaviour(OnUpdatePropertiesPolicy.QNAME, VgrModel.TYPE_VGR_DOCUMENT, _behaviour);
+      _policyComponent.bindClassBehaviour(OnUpdatePropertiesPolicy.QNAME, VgrModel.TYPE_VGR_DOCUMENT, _behaviour);
+      _initialized = true;
+    }
   }
 
 }

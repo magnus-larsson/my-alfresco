@@ -5,17 +5,17 @@
   <parent>
     <groupId>com.redpill-linpro.alfresco</groupId>
     <artifactId>alfresco-base</artifactId>
-    <version>1.1.1.5</version>
+    <version>1.1.1.6</version>
   </parent>
 
   <groupId>se.vgregion.alfresco</groupId>
   <artifactId>alfresco-vgr</artifactId>
-  <version>2.1.6.6</version>
+  <version>2.1.7</version>
   <packaging>pom</packaging>
   <name>VGR Alfresco Base Project</name>
 
   <properties>
-    <alfresco.version>4.1.9.4</alfresco.version>
+    <alfresco.version>4.1.9.6</alfresco.version>
     <alfresco.groupId>org.alfresco.enterprise</alfresco.groupId>
     <alfresco-cluster-probe.version>1.0.4</alfresco-cluster-probe.version>
   </properties>
@@ -23,7 +23,7 @@
   <modules>
     <module>repo</module>
     <module>share</module>
-    <module>toolkit</module>
+    <!-- <module>toolkit</module> -->
   </modules>
 
   <build>
@@ -83,5 +83,10 @@
       </plugins>
     </pluginManagement>
   </build>
-
+  <repositories>
+    <repository>
+      <id>alfresco-hotfix-releases</id>
+      <url>https://artifacts.alfresco.com/nexus/content/repositories/hotfix-releases</url>
+    </repository>
+  </repositories>
 </project>

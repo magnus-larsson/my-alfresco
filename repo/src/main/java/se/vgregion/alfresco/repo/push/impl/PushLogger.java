@@ -55,4 +55,20 @@ public class PushLogger {
           "\tDate Modified: " + nodeService.getProperty(nodeRef, ContentModel.PROP_MODIFIED));
     }
   }	
+  
+  public static void logNodeForRepushAfterNewPdfa(NodeRef nodeRef, NodeService nodeService) {
+    if(LOG.isDebugEnabled()) {
+      LOG.debug("Marking node for repush due to new PDF/A: " + nodeRef.toString() + 
+          "\tType: " + nodeService.getType(nodeRef) + 
+          "\tHas published aspect: " + nodeService.hasAspect(nodeRef, VgrModel.ASPECT_PUBLISHED) +
+          "\tPush count: " + nodeService.getProperty(nodeRef, VgrModel.PROP_PUSHED_COUNT) +
+          "\tPublish status: " + nodeService.getProperty(nodeRef, VgrModel.PROP_PUBLISH_STATUS) +
+          "\tUnpublish status: " + nodeService.getProperty(nodeRef, VgrModel.PROP_UNPUBLISH_STATUS) +
+          "\tDate available from: " + nodeService.getProperty(nodeRef, VgrModel.PROP_DATE_AVAILABLE_FROM) +
+          "\tDate available to: " + nodeService.getProperty(nodeRef, VgrModel.PROP_DATE_AVAILABLE_TO) + 
+          "\tPushed for publish: " + nodeService.getProperty(nodeRef, VgrModel.PROP_PUSHED_FOR_PUBLISH) + 
+          "\tPushed for unpublish: " + nodeService.getProperty(nodeRef, VgrModel.PROP_PUSHED_FOR_UNPUBLISH) + 
+          "\tDate Modified: " + nodeService.getProperty(nodeRef, ContentModel.PROP_MODIFIED));
+    }
+  }
 }

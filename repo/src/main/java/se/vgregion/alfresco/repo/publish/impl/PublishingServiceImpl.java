@@ -9,6 +9,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.util.ParameterCheck;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -192,6 +193,11 @@ public class PublishingServiceImpl implements PublishingService, InitializingBea
 
   @Override
   public boolean isPublished(NodeRef nodeRef, boolean excludeAlreadyPushed) {
+    return isPublished(nodeRef, excludeAlreadyPushed, false);
+  }
+
+  @Override
+  public boolean isPublished(NodeRef nodeRef, boolean excludeAlreadyPushed, boolean onlyOK) {
     if (!_nodeService.hasAspect(nodeRef, VgrModel.ASPECT_PUBLISHED)) {
       return false;
     }
@@ -224,6 +230,14 @@ public class PublishingServiceImpl implements PublishingService, InitializingBea
         return false;
       }
     }
+    
+    if (onlyOK) {
+      String status = (String) _nodeService.getProperty(nodeRef, VgrModel.PROP_PUBLISH_STATUS);
+      
+      if (StringUtils.isNotBlank(status)) {
+        return "ok".equalsIgnoreCase(status);
+      }
+    }
 
     return true;
   }
@@ -236,6 +250,11 @@ public class PublishingServiceImpl implements PublishingService, InitializingBea
   @Override
   public boolean isPublished(String nodeRef, boolean excludeAlreadyPushed) {
     return isPublished(new NodeRef(nodeRef), excludeAlreadyPushed);
+  }
+
+  @Override
+  public boolean isPublished(String nodeRef, boolean excludeAlreadyPushed, boolean onlyOK) {
+    return isPublished(new NodeRef(nodeRef), excludeAlreadyPushed, onlyOK);
   }
 
   public void setServiceUtils(ServiceUtils serviceUtils) {
@@ -251,5 +270,6 @@ public class PublishingServiceImpl implements PublishingService, InitializingBea
     ParameterCheck.mandatory("nodeService", _nodeService);
     ParameterCheck.mandatory("serviceUtils", _serviceUtils);
   }
+
 
 }

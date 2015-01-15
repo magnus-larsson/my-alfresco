@@ -4,7 +4,7 @@
   <parent>
     <groupId>se.vgregion.alfresco</groupId>
     <artifactId>alfresco-vgr</artifactId>
-    <version>2.1.6.6</version>
+    <version>2.1.7</version>
   </parent>
 
   <artifactId>alfresco-vgr-repo</artifactId>
@@ -165,7 +165,7 @@
     <dependency>
       <groupId>org.redpill-linpro.alfresco.module</groupId>
       <artifactId>metadatawriter</artifactId>
-      <version>4.2.2.11</version>
+      <version>4.2.2.12</version>
     </dependency>
 
     <dependency>
@@ -214,7 +214,7 @@
     <dependency>
       <groupId>org.redpill-linpro.alfresco.repo.content.transform</groupId>
       <artifactId>pdfa-pilot-converter</artifactId>
-      <version>1.0.6.3</version>
+      <version>1.0.6.4</version>
     </dependency>
 
     <dependency>
@@ -319,6 +319,27 @@
       <artifactId>javamelody-core</artifactId>
       <version>1.51.0</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.redpill-linpro.alfresco</groupId>
+      <artifactId>alfresco-test-repo</artifactId>
+      <version>1.0.4</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-instrument</artifactId>
+      <version>3.0.5.RELEASE</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>de.schlichtherle.truezip</groupId>
+      <artifactId>truezip-kernel</artifactId>
+      <version>7.7.4</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <repositories>
@@ -358,7 +379,56 @@
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>functional-test</id>
+            <configuration>
+              <excludes>
+                <exclude>**/*IntegrationTest.java</exclude>
+                <!-- Disable these two functional tests as they depend on callas pdfaPilot -->
+                <exclude>**/PublishStatusFunctionalTest.java</exclude>
+                <exclude>**/StorageContentGetFunctionalTest.java</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <!-- This profile is active if there's pdfaPilot is enabled -->
+    <profile>
+      <activation>
+        <property>
+          <name>pdfapilot.enabled</name>
+          <value>true</value>
+        </property>
+      </activation>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>functional-test</id>
+                <configuration>
+                  <excludes>
+                    <exclude>**/*IntegrationTest.java</exclude>
+                  </excludes>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

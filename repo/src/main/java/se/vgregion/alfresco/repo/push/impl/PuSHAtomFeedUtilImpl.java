@@ -199,6 +199,7 @@ public class PuSHAtomFeedUtilImpl implements InitializingBean, PuSHAtomFeedUtil 
     multipleSet.add("DC.type.process.name");
     multipleSet.add("DC.type.file.process");
     multipleSet.add("DC.type.file");
+    multipleSet.add("DC.type.document.serie");
     multipleSet.add("DC.format.extent");
     multipleSet.add("DC.relation.replaces");
     multipleSet.add("DC.coverage.hsacode");

@@ -16,9 +16,14 @@ import se.vgregion.alfresco.repo.model.VgrModel;
 public class ChecksumUpdatePolicy extends AbstractPolicy implements OnContentPropertyUpdatePolicy {
 
   private final static Logger LOG = Logger.getLogger(ChecksumUpdatePolicy.class);
+  private static boolean _initialized = false;
 
   @Override
   public void onContentPropertyUpdate(final NodeRef nodeRef, final QName propertyQName, final ContentData beforeValue, final ContentData afterValue) {
+    if (LOG.isTraceEnabled()) {
+      LOG.trace(this.getClass().getName() + " - onContentPropertyUpdate begin");
+    }
+
     runSafe(new DefaultRunSafe(nodeRef) {
 
       @Override
@@ -27,6 +32,10 @@ public class ChecksumUpdatePolicy extends AbstractPolicy implements OnContentPro
       }
 
     });
+
+    if (LOG.isTraceEnabled()) {
+      LOG.trace(this.getClass().getName() + " - onContentPropertyUpdate end");
+    }
   }
 
   private void doContentPropertyUpdate(final NodeRef nodeRef, final QName propertyQName) {
@@ -49,6 +58,11 @@ public class ChecksumUpdatePolicy extends AbstractPolicy implements OnContentPro
     if (_lockService.getLockStatus(nodeRef) != LockStatus.NO_LOCK) {
       return;
     }
+    
+    // if it's not a VGR document, bail out
+    if (!_nodeService.getType(nodeRef).isMatch(VgrModel.TYPE_VGR_DOCUMENT)) {
+      return;
+    }
 
     // if it's not the workspace store, do nothing
     if (!StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.equals(nodeRef.getStoreRef())) {
@@ -57,17 +71,17 @@ public class ChecksumUpdatePolicy extends AbstractPolicy implements OnContentPro
 
     _serviceUtils.addChecksum(nodeRef);
 
-    if (LOG.isDebugEnabled()) {
-      LOG.debug(this.getClass().getName());
-    }
   }
 
   @Override
   public void afterPropertiesSet() throws Exception {
     super.afterPropertiesSet();
 
-    _policyComponent.bindClassBehaviour(OnContentPropertyUpdatePolicy.QNAME, VgrModel.TYPE_VGR_DOCUMENT, new JavaBehaviour(this,
-        "onContentPropertyUpdate", NotificationFrequency.TRANSACTION_COMMIT));
+    if (!_initialized) {
+      LOG.info("Initialized " + this.getClass().getName());
+      _policyComponent
+          .bindClassBehaviour(OnContentPropertyUpdatePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onContentPropertyUpdate", NotificationFrequency.TRANSACTION_COMMIT));
+    }
   }
 
 }

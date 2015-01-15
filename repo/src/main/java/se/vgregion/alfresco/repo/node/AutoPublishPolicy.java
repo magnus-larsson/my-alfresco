@@ -1,5 +1,7 @@
 package se.vgregion.alfresco.repo.node;
 
+import javax.annotation.PostConstruct;
+
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
@@ -10,7 +12,6 @@ import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
-import org.alfresco.repo.transaction.TransactionListener;
 import org.alfresco.repo.transaction.TransactionListenerAdapter;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
@@ -19,6 +20,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Required;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.storage.StorageService;
@@ -30,35 +32,13 @@ public class AutoPublishPolicy extends AbstractPolicy implements OnCreateNodePol
   private static final String FILE_NODE_REF = AutoPublishPolicy.class.getName() + "_FILE_NODE_REF";
   private static final String FOLDER_NODE_REF = AutoPublishPolicy.class.getName() + "_FOLDER_NODE_REF";
 
-  private FileFolderService _fileFolderService;
+  protected FileFolderService _fileFolderService;
 
-  private StorageService _storageService;
+  protected StorageService _storageService;
 
-  private TransactionService _transactionService;
+  protected TransactionService _transactionService;
 
-  private TransactionListener _transactionListener;
-
-  public void setStorageService(StorageService storageService) {
-    _storageService = storageService;
-  }
-
-  public void setFileFolderService(FileFolderService fileFolderService) {
-    _fileFolderService = fileFolderService;
-  }
-
-  public void setTransactionService(TransactionService transactionService) {
-    _transactionService = transactionService;
-  }
-
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    super.afterPropertiesSet();
-
-    _transactionListener = new AutoPublishTransactionListener();
-
-    _policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onCreateNode", Behaviour.NotificationFrequency.TRANSACTION_COMMIT));
-    _policyComponent.bindClassBehaviour(OnUpdateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onUpdateNode", Behaviour.NotificationFrequency.TRANSACTION_COMMIT));
-  }
+  private boolean _initialized = false;
 
   @Override
   public void onCreateNode(ChildAssociationRef childAssocRef) {
@@ -116,7 +96,7 @@ public class AutoPublishPolicy extends AbstractPolicy implements OnCreateNodePol
     AlfrescoTransactionSupport.bindResource(FILE_NODE_REF, fileNodeRef);
     AlfrescoTransactionSupport.bindResource(FOLDER_NODE_REF, folderNodeRef);
 
-    AlfrescoTransactionSupport.bindListener(_transactionListener);
+    AlfrescoTransactionSupport.bindListener(new AutoPublishTransactionListener());
   }
 
   private class AutoPublishTransactionListener extends TransactionListenerAdapter {
@@ -182,6 +162,30 @@ public class AutoPublishPolicy extends AbstractPolicy implements OnCreateNodePol
     } catch (AlfrescoRuntimeException ex) {
       LOG.debug("Publish to storage failed cause document misses some properties.");
     }
+  }
+
+  @PostConstruct
+  public void postConstruct() {
+    if (!_initialized) {
+      _policyComponent.bindClassBehaviour(OnUpdateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onUpdateNode", Behaviour.NotificationFrequency.TRANSACTION_COMMIT));
+
+      _initialized = true;
+    }
+  }
+ 
+  @Required
+  public void setFileFolderService(FileFolderService fileFolderService) {
+    _fileFolderService = fileFolderService;
+  }
+  
+  @Required
+  public void setStorageService(StorageService storageService) {
+    _storageService = storageService;
+  }
+  
+  @Required
+  public void setTransactionService(TransactionService transactionService) {
+    _transactionService = transactionService;
   }
 
 }

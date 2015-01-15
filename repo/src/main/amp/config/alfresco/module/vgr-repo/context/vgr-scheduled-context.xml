@@ -35,9 +35,9 @@
     <!-- cron expression is set to fire every second minute -->
     <property name="cronExpression" value="0 0/2 * * * ?" />
   </bean>
-  
-  
-  
+
+
+
 
   <!-- *********************************************************************** -->
   <!-- Job for synchronizing the Apelon and KIV unit data source with Alfresco -->
@@ -140,7 +140,7 @@
     <property name="pushService" ref="vgr.pushService" />
     <property name="maxRepushCount" value="${vgr.push.max-repush-count}" />
     <property name="minimumPushAge" value="${vgr.push.minimum-push-age}" />
-    <property name="enabled" value="${vgr.repushToPubSubHubBubServer.enabled}"/>
+    <property name="enabled" value="${vgr.repushToPubSubHubBubServer.enabled}" />
   </bean>
 
   <bean id="vgr.repushServerJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
@@ -157,7 +157,7 @@
     <property name="scheduler" ref="schedulerFactory" />
     <!-- cron expression is set to fire every 10 minutes -->
     <property name="cronExpression" value="${vgr.repushToPubSubHubBubServer.cron}" />
-    
+
   </bean>
 
   <!-- ********************************************************************************* -->
@@ -249,6 +249,30 @@
     <property name="scheduler" ref="schedulerFactory" />
     <!-- cron expression is set to fire at 08:00 every day -->
     <property name="cronExpression" value="0 0 08 1/1 * ? *" />
+  </bean>
+  
+   <!-- ****************************************************************** -->
+  <!-- Job for expiring (completing) stale invitation workflow receipts   -->
+  <!-- ****************************************************************** -->
+
+  <bean id="vgr.expireInvitationReceipts" class="se.vgregion.alfresco.repo.jobs.ExpireInvitationReceipts" parent="vgr.clusteredExecuter">
+    <property name="workflowService" ref="WorkflowService" />
+  </bean>
+
+  <bean id="vgr.expireInvitationReceiptsJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <property name="jobClass" value="se.vgregion.alfresco.repo.jobs.ExpireInvitationReceiptsJob" />
+    <property name="jobDataAsMap">
+      <map>
+        <entry key="expireInvitationReceipts" value-ref="vgr.expireInvitationReceipts" />
+      </map>
+    </property>
+  </bean>
+
+  <bean id="vgr.expireInvitationReceiptsTrigger" class="org.alfresco.util.CronTriggerBean">
+    <property name="jobDetail" ref="vgr.expireInvitationReceiptsJobDetail" />
+    <property name="scheduler" ref="schedulerFactory" />
+    <!-- cron expression is set to fire at 04:00 every day -->
+    <property name="cronExpression" value="0 0 4 1/1 * ? *" />
   </bean>
 
 </beans>

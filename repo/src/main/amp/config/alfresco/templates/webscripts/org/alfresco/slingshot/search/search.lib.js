@@ -949,7 +949,16 @@ function getSearchResults(params)
                      }
                      else
                      {
-                        formQuery += (first ? '' : ' AND ') + escapeQName(propName) + ':\\"' + propValue + '\\"';
+                        var index = propValue.lastIndexOf(" ");
+                        formQuery += (first ? '' : ' AND ') + escapeQName(propName)
+                        if (index > 0 && index < propValue.length - 1)
+                        {
+                           formQuery += ':(' + propValue + ')';
+                        }
+                        else
+                        {
+                           formQuery += ':"' + propValue + '"';
+                        }
                      }
                      first = false;
                   }

@@ -94,12 +94,13 @@ public class Index extends AbstractIndex {
         String name = (String) _nodeService.getProperty(node, ContentModel.PROP_NAME);
         String path = _nodeService.getPath(node).toDisplayPath(_nodeService, _permissionService);
         Map<String, FailedRenditionInfo> failedRenditions = _storageService.getFailedRenditions(node);
+        FailedRenditionInfo failedRendition = failedRenditions.get("pdfa");
 
         nodeMap.put("nodeRef", node.toString());
         nodeMap.put("name", name);
         nodeMap.put("path", path);
-        nodeMap.put("last", failedRenditions.get("pdfa").getMostRecentFailure());
-        nodeMap.put("count", failedRenditions.get("pdfa").getFailureCount());
+        nodeMap.put("last", failedRendition != null ? failedRendition.getMostRecentFailure() : null);
+        nodeMap.put("count", failedRendition != null ? failedRendition.getFailureCount() : null);
 
         nodes.add(nodeMap);
       }

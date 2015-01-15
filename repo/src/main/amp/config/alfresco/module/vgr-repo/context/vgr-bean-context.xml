@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+  xmlns:context="http://www.springframework.org/schema/context"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
                            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
                            http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd
@@ -18,13 +18,10 @@
   <bean id="vgr.storageService" class="se.vgregion.alfresco.repo.storage.impl.StorageServiceImpl">
     <property name="nodeService" ref="NodeService" />
     <property name="fileFolderService" ref="FileFolderService" />
-    <property name="serviceRegistry" ref="ServiceRegistry" />
     <property name="permissionService" ref="PermissionService" />
     <property name="copyService" ref="CopyService" />
     <property name="serviceUtils" ref="vgr.serviceUtils" />
     <property name="behaviourFilter" ref="policyBehaviourFilter" />
-    <property name="globalProperties" ref="global-properties" />
-    <property name="storageNodeRef" value="${vgr.storage.noderef}" />
     <property name="contentService" ref="ContentService" />
     <property name="searchService" ref="SearchService" />
     <property name="dictionaryService" ref="DictionaryService" />
@@ -34,6 +31,9 @@
     <property name="renditionService" ref="RenditionService" />
     <property name="personService" ref="PersonService" />
     <property name="namespaceService" ref="NamespaceService" />
+    <property name="repository" ref="repositoryHelper" />
+    <property name="pdfaPilotEnabled" value="${pdfapilot.enabled}" />
+    <property name="publishingService" ref="vgr.publishingService" />
   </bean>
 
   <bean id="vgr.kivWsClient" class="se.vgregion.alfresco.repo.kivclient.KivWsClient">
@@ -322,7 +322,7 @@
     <property name="serviceName" value="vgr.metadata-writer.service" />
     <property name="converters">
       <list>
-      	<ref bean="vgr.metadata-writer.dateConverter" />
+        <ref bean="vgr.metadata-writer.dateConverter" />
       </list>
     </property>
     <property name="mappings">
@@ -330,98 +330,98 @@
         <prop key="Title">vgr:dc.title</prop>
         <prop key="nodeRef">sys:node-uuid</prop>
         <prop key="DC.title.alternative">vgr:dc.title.alternative</prop>
-				<prop key="DC.title.filename">vgr:dc.title.filename</prop>
-				<prop key="DC.title.filename.native">vgr:dc.title.filename.native</prop>
-				<prop key="updated">cm:modified</prop>
-				<prop key="dcterms.created">cm:created</prop>
-				<prop key="DC.creator">vgr:dc.creator</prop>
-				<prop key="DC.creator.id">vgr:dc.creator.id</prop>
-				<prop key="summary">vgr:dc.description</prop>
-				<prop key="DC.description">vgr:dc.description</prop>
-				<prop key="DC.format.extent.mimetype">vgr:dc.format.extent.mimetype</prop>
-				<prop key="DC.format.extent.mimetype.native">vgr:dc.format.extent.mimetype.native</prop>
-				<prop key="DC.subject.authorkeywords">vgr:dc.subject.authorkeywords</prop>
-				<prop key="DC.subject.keywords">vgr:dc.subject.keywords</prop>
-				<prop key="DC.subject.keywords.id">vgr:dc.subject.keywords.id</prop>
-				<prop key="DC.creator.freetext">vgr:dc.creator.freetext</prop>
-				<prop key="DC.creator.document">vgr:dc.creator.document</prop>
-				<prop key="DC.creator.document.id">vgr:dc.creator.document.id</prop>
-				<prop key="DC.creator.function">vgr:dc.creator.function</prop>
-				<prop key="DC.creator.forunit">vgr:dc.creator.forunit</prop>
-				<prop key="DC.creator.forunit.id">vgr:dc.creator.forunit.id</prop>
-				<prop key="DC.creator.recordscreator">vgr:dc.creator.recordscreator</prop>
-				<prop key="DC.creator.recordscreator.id">vgr:dc.creator.recordscreator.id</prop>
-				<prop key="DC.creator.project-assignment">vgr:dc.creator.project-assignment</prop>
-				<prop key="DC.publisher">vgr:dc.publisher</prop>
-				<prop key="DC.publisher.id">vgr:dc.publisher.id</prop>
-				<prop key="DC.publisher.forunit">vgr:dc.publisher.forunit</prop>
-				<prop key="DC.publisher.forunit.id">vgr:dc.publisher.forunit.id</prop>
-				<prop key="DC.publisher.project-assignment">vgr:dc.publisher.project-assignment</prop>
-				<prop key="DC.date.issued">vgr:dc.date.issued</prop>
-				<prop key="DC.date.accepted">vgr:dc.date.accepted</prop>
-				<prop key="DC.date.controlled">vgr:dc.date.controlled</prop>
-				<prop key="DC.date.validfrom">vgr:dc.date.validfrom</prop>
-				<prop key="DC.date.validto">vgr:dc.date.validto</prop>
-				<prop key="DC.date.availablefrom">vgr:dc.date.availablefrom</prop>
-				<prop key="DC.date.availableto">vgr:dc.date.availableto</prop>
-				<prop key="DC.date.copyrighted">vgr:dc.date.copyrighted</prop>
-				<prop key="DC.contributor.savedby">vgr:dc.contributor.savedby</prop>
-				<prop key="DC.contributor.savedby.id">vgr:dc.contributor.savedby.id</prop>
-				<prop key="DC.contributor.acceptedby">vgr:dc.contributor.acceptedby</prop>
-				<prop key="DC.contributor.acceptedby.id">vgr:dc.contributor.acceptedby.id</prop>
-				<prop key="DC.contributor.acceptedby.freetext">vgr:dc.contributor.acceptedby.freetext</prop>
-				<prop key="DC.contributor.acceptedby.role">vgr:dc.contributor.acceptedby.role</prop>
-				<prop key="DC.contributor.acceptedby.unit.freetext">vgr:dc.contributor.acceptedby.unit.freetext</prop>
-				<prop key="DC.contributor.controlledby">vgr:dc.contributor.controlledby</prop>
-				<prop key="DC.contributor.controlledby.id">vgr:dc.contributor.controlledby.id</prop>
-				<prop key="DC.contributor.controlledby.freetext">vgr:dc.contributor.controlledby.freetext</prop>
-				<prop key="DC.contributor.controlledby.role">vgr:dc.contributor.controlledby.role</prop>
-				<prop key="DC.contributor.controlledby.unit.freetext">vgr:dc.contributor.controlledby.unit.freetext</prop>
-				<prop key="DC.type.document">vgr:dc.type.document</prop>
-				<prop key="DC.type.document.structure">vgr:dc.type.document.structure</prop>
-				<prop key="DC.type.document.structure.id">vgr:dc.type.document.structure.id</prop>
-				<prop key="DC.type.templatename">vgr:dc.type.templatename</prop>
-				<prop key="DC.type.record">vgr:dc.type.record</prop>
-				<prop key="DC.type.record.id">vgr:dc.type.record.id</prop>
-				<prop key="DC.type.process.name">vgr:dc.type.process.name</prop>
-				<prop key="DC.type.file.process">vgr:dc.type.file.process</prop>
-				<prop key="DC.type.file">vgr:dc.type.file</prop>
-				<prop key="DC.type.document.serie">vgr:dc.type.document.serie</prop>
-				<prop key="DC.type.document.id">vgr:dc.type.document.id</prop>
-				<prop key="DC.format.extent">vgr:dc.format.extent</prop>
-				<prop key="DC.format.extension">vgr:dc.format.extension</prop>
-				<prop key="DC.format.extension.native">vgr:dc.format.extension.native</prop>
-				<prop key="DC.identifier">vgr:dc.identifier</prop>
-				<prop key="DC.identifier.native">vgr:dc.identifier.native</prop>
-				<prop key="DC.identifier.checksum">vgr:dc.identifier.native.checksum</prop>
-				<prop key="DC.identifier.checksum.native">vgr:dc.identifier.native.checksum.native</prop>
-				<prop key="DC.identifier.version">vgr:dc.identifier.version</prop>
-				<prop key="DC.identifier.diarie.id">vgr:dc.identifier.diarie.id</prop>
-				<prop key="DC.identifier.location">vgr:dc.identifier.location</prop>
-				<prop key="DC.source">vgr:dc.source</prop>
-				<prop key="DC.source.documentid">vgr:dc.source.documentid</prop>
-				<prop key="DC.source.origin">vgr:dc.source.origin</prop>
-				<prop key="DC.relation.isversionof">vgr:dc.relation.isversionof</prop>
-				<prop key="DC.relation.replaces">vgr:dc.relation.replaces</prop>
-				<prop key="DC.coverage.hsacode">vgr:dc.coverage.hsacode</prop>
-				<prop key="DC.coverage.hsacode.id">vgr:dc.coverage.hsacode.id</prop>
-				<prop key="dcterms.audience">vgr:dc.audience</prop>
-				<prop key="dcterms.audience.id">vgr:dc.audience.id</prop>
-				<prop key="VGR.status.document">vgr:vgr.status.document</prop>
-				<prop key="VGR.status.document">vgr:vgr.status.document.id</prop>
-				<prop key="DC:identifier.documentid">vgr:dc.identifier.documentid</prop>
-				<prop key="DC.contributor.unit">vgr:dc.contributor.unit</prop>
-				<prop key="DC.date.saved">vgr:dc.date.saved</prop>
-				<prop key="DC.date.created">vgr:dc.date.created</prop>
-				<prop key="DC.language">vgr:dc.language</prop>
-				<prop key="DC.rights.accessrights">vgr:dc.rights.accessrights</prop>
-				<prop key="hc.status.document">vgr:hc.status.document</prop>
-				<prop key="DC.identifier.checksum.native">vgr:dc.identifier.checksum.native</prop>
-				<prop key="DC.identifier.checksum">vgr:dc.identifier.checksum</prop>
+        <prop key="DC.title.filename">vgr:dc.title.filename</prop>
+        <prop key="DC.title.filename.native">vgr:dc.title.filename.native</prop>
+        <prop key="updated">cm:modified</prop>
+        <prop key="dcterms.created">cm:created</prop>
+        <prop key="DC.creator">vgr:dc.creator</prop>
+        <prop key="DC.creator.id">vgr:dc.creator.id</prop>
+        <prop key="summary">vgr:dc.description</prop>
+        <prop key="DC.description">vgr:dc.description</prop>
+        <prop key="DC.format.extent.mimetype">vgr:dc.format.extent.mimetype</prop>
+        <prop key="DC.format.extent.mimetype.native">vgr:dc.format.extent.mimetype.native</prop>
+        <prop key="DC.subject.authorkeywords">vgr:dc.subject.authorkeywords</prop>
+        <prop key="DC.subject.keywords">vgr:dc.subject.keywords</prop>
+        <prop key="DC.subject.keywords.id">vgr:dc.subject.keywords.id</prop>
+        <prop key="DC.creator.freetext">vgr:dc.creator.freetext</prop>
+        <prop key="DC.creator.document">vgr:dc.creator.document</prop>
+        <prop key="DC.creator.document.id">vgr:dc.creator.document.id</prop>
+        <prop key="DC.creator.function">vgr:dc.creator.function</prop>
+        <prop key="DC.creator.forunit">vgr:dc.creator.forunit</prop>
+        <prop key="DC.creator.forunit.id">vgr:dc.creator.forunit.id</prop>
+        <prop key="DC.creator.recordscreator">vgr:dc.creator.recordscreator</prop>
+        <prop key="DC.creator.recordscreator.id">vgr:dc.creator.recordscreator.id</prop>
+        <prop key="DC.creator.project-assignment">vgr:dc.creator.project-assignment</prop>
+        <prop key="DC.publisher">vgr:dc.publisher</prop>
+        <prop key="DC.publisher.id">vgr:dc.publisher.id</prop>
+        <prop key="DC.publisher.forunit">vgr:dc.publisher.forunit</prop>
+        <prop key="DC.publisher.forunit.id">vgr:dc.publisher.forunit.id</prop>
+        <prop key="DC.publisher.project-assignment">vgr:dc.publisher.project-assignment</prop>
+        <prop key="DC.date.issued">vgr:dc.date.issued</prop>
+        <prop key="DC.date.accepted">vgr:dc.date.accepted</prop>
+        <prop key="DC.date.controlled">vgr:dc.date.controlled</prop>
+        <prop key="DC.date.validfrom">vgr:dc.date.validfrom</prop>
+        <prop key="DC.date.validto">vgr:dc.date.validto</prop>
+        <prop key="DC.date.availablefrom">vgr:dc.date.availablefrom</prop>
+        <prop key="DC.date.availableto">vgr:dc.date.availableto</prop>
+        <prop key="DC.date.copyrighted">vgr:dc.date.copyrighted</prop>
+        <prop key="DC.contributor.savedby">vgr:dc.contributor.savedby</prop>
+        <prop key="DC.contributor.savedby.id">vgr:dc.contributor.savedby.id</prop>
+        <prop key="DC.contributor.acceptedby">vgr:dc.contributor.acceptedby</prop>
+        <prop key="DC.contributor.acceptedby.id">vgr:dc.contributor.acceptedby.id</prop>
+        <prop key="DC.contributor.acceptedby.freetext">vgr:dc.contributor.acceptedby.freetext</prop>
+        <prop key="DC.contributor.acceptedby.role">vgr:dc.contributor.acceptedby.role</prop>
+        <prop key="DC.contributor.acceptedby.unit.freetext">vgr:dc.contributor.acceptedby.unit.freetext</prop>
+        <prop key="DC.contributor.controlledby">vgr:dc.contributor.controlledby</prop>
+        <prop key="DC.contributor.controlledby.id">vgr:dc.contributor.controlledby.id</prop>
+        <prop key="DC.contributor.controlledby.freetext">vgr:dc.contributor.controlledby.freetext</prop>
+        <prop key="DC.contributor.controlledby.role">vgr:dc.contributor.controlledby.role</prop>
+        <prop key="DC.contributor.controlledby.unit.freetext">vgr:dc.contributor.controlledby.unit.freetext</prop>
+        <prop key="DC.type.document">vgr:dc.type.document</prop>
+        <prop key="DC.type.document.structure">vgr:dc.type.document.structure</prop>
+        <prop key="DC.type.document.structure.id">vgr:dc.type.document.structure.id</prop>
+        <prop key="DC.type.templatename">vgr:dc.type.templatename</prop>
+        <prop key="DC.type.record">vgr:dc.type.record</prop>
+        <prop key="DC.type.record.id">vgr:dc.type.record.id</prop>
+        <prop key="DC.type.process.name">vgr:dc.type.process.name</prop>
+        <prop key="DC.type.file.process">vgr:dc.type.file.process</prop>
+        <prop key="DC.type.file">vgr:dc.type.file</prop>
+        <prop key="DC.type.document.serie">vgr:dc.type.document.serie</prop>
+        <prop key="DC.type.document.id">vgr:dc.type.document.id</prop>
+        <prop key="DC.format.extent">vgr:dc.format.extent</prop>
+        <prop key="DC.format.extension">vgr:dc.format.extension</prop>
+        <prop key="DC.format.extension.native">vgr:dc.format.extension.native</prop>
+        <prop key="DC.identifier">vgr:dc.identifier</prop>
+        <prop key="DC.identifier.native">vgr:dc.identifier.native</prop>
+        <prop key="DC.identifier.checksum">vgr:dc.identifier.native.checksum</prop>
+        <prop key="DC.identifier.checksum.native">vgr:dc.identifier.native.checksum.native</prop>
+        <prop key="DC.identifier.version">vgr:dc.identifier.version</prop>
+        <prop key="DC.identifier.diarie.id">vgr:dc.identifier.diarie.id</prop>
+        <prop key="DC.identifier.location">vgr:dc.identifier.location</prop>
+        <prop key="DC.source">vgr:dc.source</prop>
+        <prop key="DC.source.documentid">vgr:dc.source.documentid</prop>
+        <prop key="DC.source.origin">vgr:dc.source.origin</prop>
+        <prop key="DC.relation.isversionof">vgr:dc.relation.isversionof</prop>
+        <prop key="DC.relation.replaces">vgr:dc.relation.replaces</prop>
+        <prop key="DC.coverage.hsacode">vgr:dc.coverage.hsacode</prop>
+        <prop key="DC.coverage.hsacode.id">vgr:dc.coverage.hsacode.id</prop>
+        <prop key="dcterms.audience">vgr:dc.audience</prop>
+        <prop key="dcterms.audience.id">vgr:dc.audience.id</prop>
+        <prop key="VGR.status.document">vgr:vgr.status.document</prop>
+        <prop key="VGR.status.document">vgr:vgr.status.document.id</prop>
+        <prop key="DC:identifier.documentid">vgr:dc.identifier.documentid</prop>
+        <prop key="DC.contributor.unit">vgr:dc.contributor.unit</prop>
+        <prop key="DC.date.saved">vgr:dc.date.saved</prop>
+        <prop key="DC.date.created">vgr:dc.date.created</prop>
+        <prop key="DC.language">vgr:dc.language</prop>
+        <prop key="DC.rights.accessrights">vgr:dc.rights.accessrights</prop>
+        <prop key="hc.status.document">vgr:hc.status.document</prop>
+        <prop key="DC.identifier.checksum.native">vgr:dc.identifier.checksum.native</prop>
+        <prop key="DC.identifier.checksum">vgr:dc.identifier.checksum</prop>
       </props>
     </property>
   </bean>
-  
+
   <bean id="vgr.metadata-writer.dateConverter" class="org.redpill.alfresco.module.metadatawriter.converters.impl.DateConverter">
     <constructor-arg type="java.lang.String" value="yyyy-MM-dd" />
   </bean>
@@ -497,13 +497,11 @@
   <!-- Overridden bean for implementing external users specific for VGR -->
   <!-- **************************************************************** -->
 
-  <bean id="vgr.externalUsersInvitationService" class="org.alfresco.repo.invitation.ExternalUsersInvitationServiceImpl" p:authenticationService-ref="AuthenticationService"
-    p:externalUsersService-ref="vgr.externalUsers" p:namespaceService-ref="NamespaceService" p:invitationService-ref="invitationService" p:workflowService-ref="WorkflowService" p:personService-ref="PersonService"
-    p:permissionService-ref="PermissionService" p:siteService-ref="SiteService" p:nodeService-ref="NodeService" p:userSynchronizer-ref="vgr.userSynchronizer" p:userRegistrySynchronizer-ref="userRegistrySynchronizer"
+  <bean id="vgr.externalUsersInvitationService" class="org.alfresco.repo.invitation.ExternalUsersInvitationServiceImpl" p:authenticationService-ref="AuthenticationService" p:externalUsersService-ref="vgr.externalUsers" p:namespaceService-ref="NamespaceService" p:invitationService-ref="invitationService"
+    p:workflowService-ref="WorkflowService" p:personService-ref="PersonService" p:permissionService-ref="PermissionService" p:siteService-ref="SiteService" p:nodeService-ref="NodeService" p:userSynchronizer-ref="vgr.userSynchronizer" p:userRegistrySynchronizer-ref="userRegistrySynchronizer"
     p:serviceUtils-ref="vgr.serviceUtils" />
 
-  <bean id="vgr.invitationServiceInterceptor" class="se.vgregion.alfresco.repo.invitation.InvitationServiceInterceptor" p:externalActivation="${vgr.external.activation}"
-    p:externalUsersInvitationService-ref="vgr.externalUsersInvitationService" />
+  <bean id="vgr.invitationServiceInterceptor" class="se.vgregion.alfresco.repo.invitation.InvitationServiceInterceptor" p:externalActivation="${vgr.external.activation}" p:externalUsersInvitationService-ref="vgr.externalUsersInvitationService" />
 
   <bean id="InvitationService" class="org.springframework.aop.framework.ProxyFactoryBean" p:targetName="invitationService">
     <property name="proxyInterfaces">
@@ -522,8 +520,8 @@
     </property>
   </bean>
 
-  <bean id="vgr.userSynchronizer" class="se.vgregion.alfresco.repo.security.UserSynchronizer" p:applicationContextManager-ref="Authentication" p:authorityService-ref="authorityService"
-    p:personService-ref="personService" p:ruleService-ref="ruleService" p:transactionService-ref="transactionService" p:zone="${vgr.external.users.zone}" />
+  <bean id="vgr.userSynchronizer" class="se.vgregion.alfresco.repo.security.UserSynchronizer" p:applicationContextManager-ref="Authentication" p:authorityService-ref="authorityService" p:personService-ref="personService" p:ruleService-ref="ruleService" p:transactionService-ref="transactionService"
+    p:zone="${vgr.external.users.zone}" />
 
   <!-- ****************************************************** -->
   <!-- Thumbnail definition that is actually a PDF preview :) -->

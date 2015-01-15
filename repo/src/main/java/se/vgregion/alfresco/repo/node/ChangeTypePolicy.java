@@ -2,13 +2,12 @@ package se.vgregion.alfresco.repo.node;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
-import org.alfresco.repo.policy.Behaviour;
-import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.service.cmr.lock.LockStatus;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.apache.log4j.Logger;
+
 import se.vgregion.alfresco.repo.model.VgrModel;
 
 /**
@@ -23,6 +22,10 @@ public class ChangeTypePolicy extends AbstractPolicy implements OnCreateNodePoli
 
   @Override
   public void onCreateNode(final ChildAssociationRef childAssocRef) {
+    if (LOG.isTraceEnabled()) {
+      LOG.trace(this.getClass().getName() + " - onCreateNode begin");
+    }
+
     final NodeRef nodeRef = childAssocRef.getChildRef();
 
     runSafe(new DefaultRunSafe(nodeRef) {
@@ -33,6 +36,10 @@ public class ChangeTypePolicy extends AbstractPolicy implements OnCreateNodePoli
       }
 
     });
+    
+    if (LOG.isTraceEnabled()) {
+      LOG.trace(this.getClass().getName() + " - onCreateNode end");
+    }
   }
 
   private void doCreateNode(NodeRef nodeRef) {
@@ -83,15 +90,8 @@ public class ChangeTypePolicy extends AbstractPolicy implements OnCreateNodePoli
     _nodeService.setType(nodeRef, VgrModel.TYPE_VGR_DOCUMENT);
 
     if (LOG.isDebugEnabled()) {
-      LOG.debug(this.getClass().getName());
+      LOG.debug("Document type for '" + nodeRef + "' changed to 'vgr:document'");
     }
   }
 
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    super.afterPropertiesSet();
-
-    _policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this,
-            "onCreateNode", Behaviour.NotificationFrequency.TRANSACTION_COMMIT));
-  }
 }

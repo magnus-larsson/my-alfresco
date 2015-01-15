@@ -1,7 +1,13 @@
 package se.vgregion.alfresco.repo.node;
 
+import java.io.InputStream;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.alfresco.model.ContentModel;
 import org.alfresco.model.RenditionModel;
+import org.alfresco.repo.content.ContentServicePolicies.OnContentUpdatePolicy;
 import org.alfresco.repo.policy.Behaviour;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -11,16 +17,9 @@ import org.alfresco.service.namespace.QName;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.redpill.alfresco.module.metadatawriter.model.MetadataWriterModel;
-import org.springframework.util.Assert;
+import org.springframework.beans.factory.annotation.Required;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
-
-import java.io.InputStream;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.alfresco.repo.content.ContentServicePolicies.OnContentUpdatePolicy;
 
 public class AddPdfaPolicy extends AbstractPolicy implements OnContentUpdatePolicy {
 
@@ -28,19 +27,14 @@ public class AddPdfaPolicy extends AbstractPolicy implements OnContentUpdatePoli
 
   private static boolean _initialized = false;
 
-  private ContentService _contentService;
+  protected ContentService _contentService;
 
-  private Behaviour _behaviour;
-
-  public void setContentService(ContentService contentService) {
-    _contentService = contentService;
-  }
-
+  @Override
   public void onContentUpdate(final NodeRef nodeRef, final boolean newContent) {
-    // have to disable this particular behaviour, otherwise a endless loop is
-    // created
-    _behaviour.disable();
-
+    if (LOG.isTraceEnabled()) {
+      LOG.trace(this.getClass().getName() + " - onCreateNode begin");
+    }
+    
     runSafe(new DefaultRunSafe(nodeRef) {
 
       @Override
@@ -49,8 +43,10 @@ public class AddPdfaPolicy extends AbstractPolicy implements OnContentUpdatePoli
       }
 
     });
-
-    _behaviour.enable();
+    
+    if (LOG.isTraceEnabled()) {
+      LOG.trace(this.getClass().getName() + " - onCreateNode end");
+    }
   }
 
   private void doContentUpdate(NodeRef nodeRef, boolean newContent) {
@@ -160,14 +156,17 @@ public class AddPdfaPolicy extends AbstractPolicy implements OnContentUpdatePoli
   public void afterPropertiesSet() throws Exception {
     super.afterPropertiesSet();
 
-    Assert.notNull(_contentService);
-
     if (!_initialized) {
-      _behaviour = new JavaBehaviour(this, "onContentUpdate", Behaviour.NotificationFrequency.TRANSACTION_COMMIT);
+      JavaBehaviour behaviour = new JavaBehaviour(this, "onContentUpdate", Behaviour.NotificationFrequency.TRANSACTION_COMMIT);
 
-      _policyComponent.bindClassBehaviour(OnContentUpdatePolicy.QNAME, ContentModel.TYPE_CONTENT, _behaviour);
+      _policyComponent.bindClassBehaviour(OnContentUpdatePolicy.QNAME, ContentModel.TYPE_CONTENT, behaviour);
 
       _initialized = true;
     }
+  }
+  
+  @Required
+  public void setContentService(ContentService contentService) {
+    _contentService = contentService;
   }
 }

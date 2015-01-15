@@ -70,8 +70,7 @@
 -->
 <#macro subMenu prefix item>
 <div id="${id}-${prefix}menu_${item.generatedId}" class="yuimenu">
-
-   <script>
+      <script>
       YAHOO.util.Event.on("${id}-${prefix}menu_${item.generatedId}", "mouseover", function (e) {
          var iframe = YAHOO.util.Dom.get("${id}-${prefix}menu_${item.generatedId}-iframe");
          var bdDiv = YAHOO.util.Dom.get("${id}-${prefix}menu_${item.generatedId}-bd"); 
@@ -148,7 +147,13 @@
          </span>
       </div>
    </span>
-</li>   
+</li>
+<#elseif item.type = "post">
+   <#assign post>${id}_post_${item.generatedId}</#assign>
+   <script type="text/javascript">//<![CDATA[
+   function ${post}() {Alfresco.util.Ajax.jsonRequest({method:"POST",url:Alfresco.constants.URL_PAGECONTEXT+"${item.value}"});}
+   //]]></script>
+   <li><a ${attrStyle} ${attrTitle} onclick="${post}()" tabindex="0" ${attrTarget!""}>${msg(item.label!"")}</a>
 <#else>
    <#assign attrTarget><#if item.type = "external-link">target="_blank"</#if></#assign>
 <li><a ${attrStyle} ${attrTitle} ${attrHref} tabindex="0" ${attrTarget!""}>${msg(item.label!"")}</a>

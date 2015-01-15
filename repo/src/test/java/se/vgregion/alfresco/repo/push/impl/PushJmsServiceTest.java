@@ -45,9 +45,7 @@ public class PushJmsServiceTest {
    */
   final static String CONSUMER_REMOTE_URL = "tcp://localhost:12345";
 
-  final static String DEV_CONSUMER_REMOTE_URL = "failover:(tcp://vgms0141:61616)";
-
-  final static String QUEUE_NAME = "DOCPUBLISHING.PUBLISHINGSTATUS.IN";
+    final static String QUEUE_NAME = "DOCPUBLISHING.PUBLISHINGSTATUS.IN";
 
   final static String SENDER_ID = "Alfresco";
   final static String RECEIVER_ID = "Docpublishing";
@@ -128,9 +126,10 @@ public class PushJmsServiceTest {
     TempUsage tempUsage = new TempUsage();
     tempUsage.setLimit(100 * 1024 * 1024); // 100mb
     memoryManager.setTempUsage(tempUsage);
-
+    
+    this.logger.info("222222222222222");
     this.consumerBroker = new BrokerService();
-
+    this.consumerBroker.setDataDirectory("target/activemq_data");
     this.consumerBroker.setSystemUsage(memoryManager);
 
     this.consumerBroker.setBrokerName("consumer");
@@ -138,6 +137,7 @@ public class PushJmsServiceTest {
     /* Explicitly add the remote URL so the broker is reachable via TCP */
     this.consumerBroker.addConnector(PushJmsServiceTest.CONSUMER_REMOTE_URL);
     this.consumerBroker.start();
+    this.logger.info("33333333333333333333");
   }
 
   @After

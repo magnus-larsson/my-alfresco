@@ -1,175 +1,121 @@
 'use strict';
 
-var CheckSolrIndexController = function($scope, Restangular, ngTableParams,
-  $http, $q) {
+var CheckSolrIndexController = function ($scope, Restangular, ngTableParams,
+  $http, $q, splash, toaster) {
 
-  function getSolrNodes(rows, start) {
-    var defer = $q.defer();
-
-    var url = 'http://solr-index.vgregion.se:8080/solr/core0/select';
-
-    $http({
-      method: 'JSONP',
-      url: url,
-      params: {
-        fq: 'source:p-facet.source.pubsub',
-        fl: 'dc.identifier.documentid',
-        rows: rows,
-        start: start,
-        wt: 'json',
-        'json.wrf': 'JSON_CALLBACK'
-      }
-    }).success(function(data) {
-      var nodes = [];
-      angular.forEach(data.response.docs, function(value) {
-        nodes.push(value['dc.identifier.documentid'][0]);
-      });
-
-      defer.resolve({
-        total: data.response.numFound,
-        nodes: nodes,
-        rows: rows,
-        start: start
-      });
-    }).error(function() {
-      defer.reject();
+  $scope.refresh = function () {
+    $http.get('/alfresco/service/vgr/toolkit/cache/refresh', {}).success(function (data, status) {
+      toaster.pop('success', 'Refresh Success', 'Refresh cache job is started, it will take some time to finish.');
+      node.repushed = true;
+    }).error(function (data, status) {
+      toaster.pop('error', 'Refresh Failure', 'Refresh if cache failed, message "' + data + '"');
     });
+  };
 
-    return defer.promise;
-  }
-
-  function getAllSolrNodes() {
-    var batch = 1000;
-    var defer = $q.defer();
+  Restangular.one('cache', 'alfresco_orphans').get().then(function (data) {
     var result = [];
 
-    getSolrNodes(1, 0).then(function(initial) {
-      var pages = Math.ceil(initial.total / batch);
-
-      for (var page = 0; page < pages; page++) {
-        getSolrNodes(batch, page * batch).then(function(nodes) {
-          result = result.concat(nodes.nodes);
-
-          if (nodes.total === result.length) {
-            defer.resolve(result);
-          }
-        });
-      }
-    });
-
-    return defer.promise;
-  }
-
-  function getAlfrescoNodes(rows, start) {
-    var defer = $q.defer();
-
-    Restangular.all('published').getList({
-      rows: rows,
-      start: start
-    }).then(function(nodes) {
-      defer.resolve(nodes);
-    }, function(error) {
-      defer.reject(error);
-    });
-
-    return defer.promise;
-  }
-
-  function getAllAlfrescoNodes() {
-    var batch = 1000;
-    var defer = $q.defer();
-    var result = [];
-    var more = true;
-    var start = 0;
-
-    async.whilst(function() {
-      return more;
-    }, function(callback) {
-      getAlfrescoNodes(batch, start).then(function(nodes) {
-        start += nodes.total;
-
-        result = result.concat(nodes);
-
-        console.log(nodes.length);
-
-        if (nodes.total === 0) {
-          more = false;
-        }
-
-        callback();
+    for (var x = 0; x < data.orphans.length; x++) {
+      result.push({
+        nodeRef: data.orphans[x]
       });
-    }, function(callback) {
-      defer.resolve(result);
-    });
+    }
 
-    return defer.promise;
-  }
-
-  getAllAlfrescoNodes().then(function(nodes) {
-    console.log(nodes.length);
+    $scope.alfrescoOrphans = result;
+    $scope.alfrescoOrphansModified = data.cacheDate;
+  }).then(function () {
+    $scope.alfrescoOrphansTableParameters.reload();
   });
 
-  /*
-  function foo() {
-    Restangular.all('published').getList({}).then(function(aNodes) {
-      if (!aNodes[0].published) {
-        continue;
-      }
+  Restangular.one('cache', 'solr_orphans').get().then(function (data) {
+    var result = [];
 
-      getAllSolrNodes().then(function(sNodes) {
-        var onlyAlfresco = [];
-
-        for (var x = 0; x < aNodes.length; x++) {
-          var alfrescoNode = aNodes[x].nodeRef;
-
-          var found = false;
-
-          for (var y = 0; y < sNodes.length; y++) {
-            var solrNode = sNodes[y];
-
-            if (solrNode === alfrescoNode) {
-              found = true;
-              sNodes.splice(y, 1);
-              break;
-            }
-          }
-
-          if (!found) {
-            onlyAlfresco.push(alfrescoNode);
-          }
-        }
-
-        console.log('Only Alfresco');
-        console.log(onlyAlfresco);
-
-        console.log('');
-
-        console.log('Only Solr');
-        console.log(sNodes);
+    for (var x = 0; x < data.orphans.length; x++) {
+      result.push({
+        nodeRef: data.orphans[x]
       });
-    }, function(error) {});
+    }
 
-  }
-  */
+    $scope.solrOrphans = result;
+    $scope.solrOrphansModified = data.cacheDate;
+  }).then(function () {
+    $scope.solrOrphansTableParameters.reload();
+  });
 
-  $scope.alfrescoPublishedTableParameters = new ngTableParams({
+  $scope.alfrescoOrphansTableParameters = new ngTableParams({
     page: 1,
     count: 5
   }, {
     counts: [],
     total: 1,
-    getData: function($defer, params) {}
+    getData: function ($defer, params) {
+      if (!$scope.alfrescoOrphans) {
+        return;
+      }
+
+      $defer.resolve($scope.alfrescoOrphans);
+    }
   });
+
+  $scope.solrOrphansTableParameters = new ngTableParams({
+    page: 1,
+    count: 5
+  }, {
+    counts: [],
+    total: 1,
+    getData: function ($defer, params) {
+      if (!$scope.solrOrphans) {
+        return;
+      }
+
+      $defer.resolve($scope.solrOrphans);
+    }
+  });
+
+  $scope.getMetadata = function (node) {
+    $http.get('/alfresco/service/api/metadata?nodeRef=' + node.nodeRef)
+      .success(function (result) {
+        splash.open({
+          title: 'Metadata',
+          message: angular.toJson(result, 3)
+        });
+      });
+  }
+
+  $scope.repush = function (node) {
+    $http.put('/alfresco/service/vgr/toolkit/repush', {
+      nodeRef: node.nodeRef
+    }).success(function (data, status) {
+      var status = data.success;
+
+      if (status === 'REPUSHED_FOR_PUBLISHED') {
+        status = 'published';
+      } else {
+        status = 'unpublished';
+      }
+
+      toaster.pop('success', 'Repush Success', 'Repush of "' + node.nodeRef + '" as "' + status + '" successfull.');
+      node.repushed = true;
+    }).error(function (data, status) {
+      var message = 'Repush of "' + node.nodeRef + '" failed.';
+
+      if (status === 404) {
+        message = data;
+      }
+
+      toaster.pop('error', 'Repush Failure', message);
+    });
+  }
 
 };
 
-CheckSolrIndexController.$inject = ['$scope', 'Restangular', 'ngTableParams', '$http', '$q'];
+CheckSolrIndexController.$inject = ['$scope', 'Restangular', 'ngTableParams', '$http', '$q', 'splash', 'toaster'];
 
 angular.module('toolkitApp')
 
 .config([
   '$stateProvider',
-  function($stateProvider) {
+  function ($stateProvider) {
     $stateProvider
       .state('checkSolrIndex', {
         url: '/checksolrindex',

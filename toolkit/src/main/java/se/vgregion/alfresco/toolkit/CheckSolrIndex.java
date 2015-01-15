@@ -1,42 +1,57 @@
 package se.vgregion.alfresco.toolkit;
 
 import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Date;
+
+import javax.annotation.Resource;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.model.Repository;
+import org.alfresco.repo.policy.BehaviourFilter;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.search.ResultSet;
-import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
-import org.apache.commons.lang.StringUtils;
+import org.alfresco.util.CronTriggerBean;
+import org.alfresco.util.ISO8601DateFormat;
+import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONWriter;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
 import org.springframework.stereotype.Component;
 
+import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.publish.PublishingService;
 
 import com.github.dynamicextensionsalfresco.webscripts.annotations.Authentication;
 import com.github.dynamicextensionsalfresco.webscripts.annotations.AuthenticationType;
 import com.github.dynamicextensionsalfresco.webscripts.annotations.HttpMethod;
 import com.github.dynamicextensionsalfresco.webscripts.annotations.Uri;
+import com.github.dynamicextensionsalfresco.webscripts.annotations.UriVariable;
 import com.github.dynamicextensionsalfresco.webscripts.annotations.WebScript;
+import com.github.dynamicextensionsalfresco.webscripts.resolutions.ErrorResolution;
 import com.github.dynamicextensionsalfresco.webscripts.resolutions.JsonWriterResolution;
 import com.github.dynamicextensionsalfresco.webscripts.resolutions.Resolution;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 @Component
 @WebScript(families = { "VGR" })
 @Authentication(AuthenticationType.ADMIN)
 public class CheckSolrIndex {
+
+  private static final Logger LOG = Logger.getLogger(CheckSolrIndex.class);
+
+  public enum RepushStatus {
+    REPUSHED_FOR_PUBLISHED, REPUSHED_FOR_UNPUBLISHED, DOCUMENT_MISSING
+  }
 
   @Autowired
   private SearchService _searchService;
@@ -50,58 +65,174 @@ public class CheckSolrIndex {
   @Autowired
   private NamespacePrefixResolver _namespacePrefixResolver;
 
+  @Autowired
+  private Repository _repository;
+
+  @Autowired
+  private ContentService _contentService;
+
+  @Autowired
+  private IndexCacheService _indexCacheService;
+
+  @Autowired
+  @Resource(name = "policyBehaviourFilter")
+  private BehaviourFilter _behaviourFilter;
+
+  @Resource(name = "vgr.refreshPublishedCachesTrigger")
+  private CronTriggerBean _refreshPublishedCachesTriggerBean;
+
   /**
-   * Gets a list and count of all the published nodeRefs.
+   * Refreshes the cache nodes.
    * 
    * @param response
    * @return
    * @throws IOException
    */
-  @Uri(method = HttpMethod.GET, value = { "/vgr/toolkit/published" }, defaultFormat = "json")
-  public Resolution published(WebScriptRequest request, WebScriptResponse response) throws IOException {
-    String rows = request.getParameter("rows");
-    String start = request.getParameter("start");
-
-    String query = "SELECT v.* FROM cmis:document AS D JOIN vgr:document AS v ON D.cmis:objectId = v.cmis:objectId JOIN vgr:published AS pub ON D.cmis:objectId = pub.cmis:objectId";
-
-    SearchParameters parameters = new SearchParameters();
-    parameters.setLanguage(SearchService.LANGUAGE_CMIS_ALFRESCO);
-    parameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
-    parameters.setQuery(query);
-
-    if (StringUtils.isNotBlank(rows) && StringUtils.isNotBlank(start)) {
-      parameters.setMaxItems(Integer.parseInt(rows));
-      parameters.setSkipCount(Integer.parseInt(start));
-    }
-    
-    ResultSet result = _searchService.query(parameters);
-
-    final List<Map<String, Serializable>> nodes = new ArrayList<Map<String, Serializable>>();
+  @Uri(method = HttpMethod.GET, value = { "/vgr/toolkit/cache/refresh" }, defaultFormat = "json")
+  public Resolution refreshCache(WebScriptRequest request, WebScriptResponse response) throws IOException {
+    String jobName = _refreshPublishedCachesTriggerBean.getJobDetail().getName();
+    String groupName = _refreshPublishedCachesTriggerBean.getJobDetail().getGroup();
 
     try {
-      for (NodeRef nodeRef : result.getNodeRefs()) {
-        String name = (String) _nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
-
-        Map<String, Serializable> properties = new HashMap<String, Serializable>();
-
-        properties.put(ContentModel.PROP_NAME.toPrefixString(_namespacePrefixResolver), name);
-        properties.put("nodeRef", nodeRef);
-        properties.put("published", _publishingService.isPublished(nodeRef));
-
-        nodes.add(properties);
-      }
-    } finally {
-      result.close();
+      _refreshPublishedCachesTriggerBean.getScheduler().triggerJob(jobName, groupName);
+    } catch (SchedulerException ex) {
+      return new ErrorResolution(500, ex.getMessage());
     }
 
     return new JsonWriterResolution() {
 
       @Override
       protected void writeJson(JSONWriter jsonWriter) throws JSONException {
-        jsonWriter.object().key("total").value(nodes.size()).key("data").value(nodes).endObject();
+        jsonWriter.object().key("result").value(true).endObject();
       }
 
     };
+  }
+
+  @Uri(method = HttpMethod.GET, value = { "/vgr/toolkit/cache/{key}" })
+  public Resolution cacheGet(@UriVariable(value = "key") String cacheKey, WebScriptRequest request, WebScriptResponse response) {
+    NodeRef cache = _indexCacheService.getCacheNode(cacheKey);
+
+    final ContentReader contentReader = _contentService.getReader(cache, ContentModel.PROP_CONTENT);
+
+    if (contentReader == null || !contentReader.exists()) {
+      return new ErrorResolution(404);
+    }
+
+    final JSONArray json;
+
+    try {
+      json = new JSONArray(contentReader.getContentString());
+    } catch (Exception ex) {
+      return new ErrorResolution(500, ex.getMessage());
+    }
+
+    final Date modified = (Date) _nodeService.getProperty(cache, ContentModel.PROP_MODIFIED);
+    
+    final String cacheDate = ISO8601DateFormat.format(modified);
+
+    return new JsonWriterResolution() {
+
+      @Override
+      protected void writeJson(JSONWriter jsonWriter) throws JSONException {
+        jsonWriter.object().key("cacheDate").value(cacheDate).key("orphans").value(json).endObject();
+      }
+
+    };
+  }
+
+  @Uri(method = HttpMethod.PUT, value = { "/vgr/toolkit/cache/{key}" })
+  public Resolution cachePut(@UriVariable(value = "key") String cacheKey, WebScriptRequest request, WebScriptResponse response) {
+    NodeRef cache = _indexCacheService.getCacheNode(cacheKey);
+
+    ContentWriter contentWriter = _contentService.getWriter(cache, ContentModel.PROP_CONTENT, true);
+
+    try {
+      contentWriter.putContent(request.getContent().getInputStream());
+    } catch (Exception ex) {
+      ex.printStackTrace();
+
+      return new ErrorResolution(500, ex.getMessage());
+    }
+
+    return new JsonWriterResolution() {
+
+      @Override
+      protected void writeJson(JSONWriter jsonWriter) throws JSONException {
+        jsonWriter.object().key("success").value(true).endObject();
+      }
+
+    };
+  }
+
+  @Uri(method = HttpMethod.PUT, value = { "/vgr/toolkit/repush" })
+  public Resolution repush(WebScriptRequest request, WebScriptResponse response) throws IOException {
+    JsonObject json = new JsonParser().parse(request.getContent().getContent()).getAsJsonObject();
+
+    NodeRef nodeRef = new NodeRef(json.get("nodeRef").getAsString());
+
+    final RepushStatus status = repushDocument(nodeRef);
+
+    if (status == RepushStatus.DOCUMENT_MISSING) {
+      return new ErrorResolution(404, "Document '" + nodeRef + "' does not exist and can't be repushed...");
+    }
+
+    return new JsonWriterResolution() {
+
+      @Override
+      protected void writeJson(JSONWriter jsonWriter) throws JSONException {
+        jsonWriter.object().key("success").value(status).endObject();
+      }
+
+    };
+  }
+
+  private RepushStatus repushDocument(NodeRef document) {
+    if (!_nodeService.exists(document)) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Document '" + document + "' does not exist and can't be repushed...");
+      }
+
+      return RepushStatus.DOCUMENT_MISSING;
+    }
+
+    _behaviourFilter.disableBehaviour(ContentModel.ASPECT_AUDITABLE);
+    _behaviourFilter.disableBehaviour(ContentModel.ASPECT_VERSIONABLE);
+
+    try {
+      RepushStatus result;
+
+      Date now = new Date();
+      Date unpublishDate = (Date) _nodeService.getProperty(document, VgrModel.PROP_DATE_AVAILABLE_TO);
+
+      if (unpublishDate != null && now.after(unpublishDate)) {
+        _nodeService.setProperty(document, VgrModel.PROP_PUSHED_FOR_UNPUBLISH, null);
+        _nodeService.setProperty(document, VgrModel.PROP_UNPUBLISH_STATUS, null);
+
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Repushing storage node (Unpublish) " + document.toString());
+        }
+
+        result = RepushStatus.REPUSHED_FOR_UNPUBLISHED;
+      } else {
+        _nodeService.setProperty(document, VgrModel.PROP_PUSHED_FOR_PUBLISH, null);
+        _nodeService.setProperty(document, VgrModel.PROP_PUBLISH_STATUS, null);
+
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Repushing storage node (Publish) " + document.toString());
+        }
+
+        result = RepushStatus.REPUSHED_FOR_PUBLISHED;
+      }
+
+      _nodeService.setProperty(document, ContentModel.PROP_MODIFIED, new Date());
+      _nodeService.setProperty(document, VgrModel.PROP_PUSHED_COUNT, null);
+
+      return result;
+    } finally {
+      _behaviourFilter.enableBehaviour(ContentModel.ASPECT_AUDITABLE);
+      _behaviourFilter.enableBehaviour(ContentModel.ASPECT_VERSIONABLE);
+    }
   }
 
 }
