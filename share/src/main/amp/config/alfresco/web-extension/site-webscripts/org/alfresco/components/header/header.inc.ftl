@@ -135,7 +135,8 @@
    </#if>
 <#if item.type = "user">
 <li class="user-menuitem HEADER-MARKER">
-   <a class="avatar" ${attrHref} tabindex="0"><img src="${url.context}/proxy/alfresco/slingshot/profile/avatar/${user.name?url}" alt="avatar" /></a>
+   <#assign avatarNodeRef>${user.properties["avatar"]!"avatar"}</#assign>
+   <a class="avatar" ${attrHref} tabindex="0"><img src="${url.context}/proxy/alfresco/slingshot/profile/avatar/${avatarNodeRef?string?replace('://','/')}" alt="avatar" /></a>
    <span class="user-status">
       <textarea id="${id}-statusText" tabindex="0">${userStatus?html}</textarea>
       <div id="${id}-statusTime" class="user-status-time" title="${userStatusTime?html}"></div>
@@ -156,7 +157,7 @@
    <li><a ${attrStyle} ${attrTitle} onclick="${post}()" tabindex="0" ${attrTarget!""}>${msg(item.label!"")}</a>
 <#else>
    <#assign attrTarget><#if item.type = "external-link">target="_blank"</#if></#assign>
-<li><a ${attrStyle} ${attrTitle} ${attrHref} tabindex="0" ${attrTarget!""}>${msg(item.label!"")}</a>
+<li><a ${attrStyle} ${attrTitle} ${attrHref} id="${id}-${item.id}" tabindex="0" ${attrTarget!""}>${msg(item.label!"")}</a>
    <#if item.type = "container"><@subMenu item /></#if>
 </li>
 </#if>

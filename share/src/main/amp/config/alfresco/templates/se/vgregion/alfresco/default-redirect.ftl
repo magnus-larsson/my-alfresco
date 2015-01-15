@@ -9,6 +9,6 @@
    
 </head>
 <body>
-Om du inte blir automatiskt omdirigerad klicka här: <a href="${page.url.context}/page/site/${shortName}/${defaultPage}">${page.url.context}/page/site/${shortName}/${defaultPage}</a>
+${msg("default-redirect.label.redirect")}: <a href="${page.url.context}/page/site/${shortName}/${defaultPage}">${page.url.context}/page/site/${shortName}/${defaultPage}</a>
 </body>
 </html>

@@ -48,17 +48,18 @@
          var values = hiddenIdInput.value.split(this.options.optionSeparator);
 
          var options = YAHOO.util.Dom.get(this.id).options;
+         if (options!==undefined) {
+           for ( var x = 0; x < options.length; x++) {
+              var option = options[x];
 
-         for ( var x = 0; x < options.length; x++) {
-            var option = options[x];
+              for ( var y = 0; y < values.length; y++) {
+                 var value = values[y];
 
-            for ( var y = 0; y < values.length; y++) {
-               var value = values[y];
-
-               if (value == option.id) {
-                  option.selected = true;
-               }
-            }
+                 if (value == option.id) {
+                    option.selected = true;
+                 }
+              }
+           }
          }
       }
 

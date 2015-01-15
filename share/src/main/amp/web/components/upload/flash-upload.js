@@ -65,7 +65,7 @@
    {
       Alfresco.FlashUpload.superclass.constructor.call(this, "Alfresco.FlashUpload", htmlId, ["button", "container", "datatable", "datasource", "cookie", "uploader"]);
 
-      this.swf = Alfresco.constants.URL_CONTEXT + "yui/uploader/assets/uploader.swf?dt=" + (new Date()).getTime();
+      this.swf = Alfresco.constants.URL_CONTEXT + "res/yui/uploader/assets/uploader.swf?dt=" + (new Date()).getTime();
       this.hasRequiredFlashPlayer = Alfresco.util.hasRequiredFlashPlayer(9, 0, 45);
       
       this.fileStore = {};
@@ -409,14 +409,10 @@
             {
                p.showEvent.unsubscribe(p.showMacGeckoScrollbars, p);
             }
-            if (Config.alreadySubscribed(p.showEvent, p.hideMacGeckoScrollbars, p))
+            if (Config.alreadySubscribed(p.hideEvent, p.hideMacGeckoScrollbars, p))
             {
-               p.showEvent.unsubscribe(p.hideMacGeckoScrollbars, p);
+               p.hideEvent.unsubscribe(p.hideMacGeckoScrollbars, p);
             }
-
-            // Remove the toggling of the "overview" style property for the dialog itself.
-            p.showMacGeckoScrollbars = function(){};
-            p.hideMacGeckoScrollbars = function(){};
 
             // Add a class for special bug fix css classes
             Dom.addClass(p.element, "reinstantiated-fix");
@@ -489,12 +485,10 @@
       {
          this.uploader.enable();
          this.uploader.setAllowMultipleFiles(this.showConfig.mode === this.MODE_MULTI_UPLOAD);
-         
-         if (!this.showConfig.filter) {
-            this.showConfig.filter = [];
+         if (this.showConfig.filter)
+         {
+            this.uploader.setFileFilters(this.showConfig.filter);
          }
-         
-         this.uploader.setFileFilters(this.showConfig.filter);
       },
 
       /**
@@ -607,6 +601,11 @@
       _resetGUI: function FlashUpload__resetGUI()
       {
          // Reset references and the gui before showing it
+         if (this.statusText == null)
+         {
+            this.onReady(); 
+         }
+         
          this.state = this.STATE_BROWSING;
          this.noOfFailedUploads = 0;
          this.noOfSuccessfulUploads = 0;

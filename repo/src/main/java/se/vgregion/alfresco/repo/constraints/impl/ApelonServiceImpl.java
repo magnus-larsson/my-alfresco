@@ -10,7 +10,7 @@ import java.util.UUID;
 import keywordservices.wsdl.metaservice_vgr_se.v2.GetKeywordsRequest;
 import keywordservices.wsdl.metaservice_vgr_se.v2.KeywordService;
 
-import org.alfresco.repo.cache.EhCacheAdapter;
+import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -52,11 +52,11 @@ public class ApelonServiceImpl implements ApelonService {
 
   private NodeService _nodeService;
 
-  private EhCacheAdapter<String, List<NodeRef>> _cache;
+  private SimpleCache<Serializable, List<NodeRef>> _cache;
 
   private KeywordService _keywordService;
 
-  public void setCache(EhCacheAdapter<String, List<NodeRef>> cache) {
+  public void setCache(SimpleCache<Serializable, List<NodeRef>> cache) {
     _cache = cache;
   }
 

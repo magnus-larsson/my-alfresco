@@ -85,6 +85,12 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
 
       @Override
       public void processNodeRef(NodeRef nodeRef) {
+        if (_transactionService.isReadOnly()) {
+          LOG.debug(getJobName() + " bypassed; the system is read-only.");
+
+          return;
+        }
+
         refreshLock();
 
         PushLogger.logBeforePush(nodeRef, now, _nodeService);

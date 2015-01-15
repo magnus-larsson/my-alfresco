@@ -18,8 +18,7 @@ function main()
    var shortName = json.get("shortName");
    
    // See if the shortName is available
-   var site = siteService.getSite(shortName);
-   if (site != null)
+   if (siteService.hasSite(shortName))
    {
       status.setCode(status.STATUS_BAD_REQUEST, "error.duplicateShortName");
       return;
@@ -82,7 +81,7 @@ function main()
    }
    
    // Create the site 
-   var site = null;   
+   var site = null;
    if (sitetype == null)
    {
       site = siteService.createSite(sitePreset, shortName, title, description, visibility);

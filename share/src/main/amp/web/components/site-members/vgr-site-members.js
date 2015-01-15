@@ -39,7 +39,7 @@
          // create the reset password button
          var button = new YAHOO.widget.Button({
             container : self.id + '-button-resetPassword-' + userName,
-            label : self._msg("site-members.resetPassword"),
+            label : self.msg("site-members.resetPassword"),
             onclick : {
                fn : self.showResetPasswordDialog,
                obj : userName,
@@ -58,11 +58,11 @@
    };
 
    Alfresco.SiteMembers.prototype.onReady = function() {
+      this.widgets.showallButton = Alfresco.util.createYUIButton(this, "showall", this.onShowAll);
+
       onReady.call(this);
 
       self = this;
-
-      this.widgets.showallButton = Alfresco.util.createYUIButton(this, "showall", this.onShowAll);
 
       this.widgets.dataTable.insertColumn({
          key : "resetPassword",
@@ -77,17 +77,17 @@
       var parent = this;
 
       Alfresco.util.PopupManager.displayPrompt({
-         title : parent._msg("site-members.reset-password.dialog.title", user),
-         text : parent._msg("site-members.reset-password.dialog.text", user),
+         title : parent.msg("site-members.reset-password.dialog.title", user),
+         text : parent.msg("site-members.reset-password.dialog.text", user),
          buttons : [ {
-            text : parent._msg("button.reset-password"),
+            text : parent.msg("button.reset-password"),
             handler : function() {
                parent.doResetPassword(event, user);
 
                this.destroy();
             }
          }, {
-            text : parent._msg("button.close"),
+            text : parent.msg("button.close"),
             handler : function() {
                this.destroy();
             },
@@ -108,7 +108,7 @@
    Alfresco.SiteMembers.prototype.doResetPassword = function(event, user) {
       // show a wait message
       this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage({
-         text : this._msg("message.reset-password"),
+         text : this.msg("message.reset-password"),
          spanClass : "wait",
          displayTime : 0,
          effect : null
@@ -121,7 +121,7 @@
 
          // show popup message to confirm
          Alfresco.util.PopupManager.displayMessage({
-            text : this._msg("site-members.reset-password-success", user)
+            text : this.msg("site-members.reset-password-success", user)
          });
 
       };
@@ -141,7 +141,7 @@
             obj : user,
             scope : this
          },
-         failureMessage : this._msg("site-members.reset-password-failure", user),
+         failureMessage : this.msg("site-members.reset-password-failure", user),
          failureCallback : {
             fn : failure,
             scope : this

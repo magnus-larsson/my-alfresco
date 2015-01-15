@@ -25,7 +25,7 @@ public class VgrSiteMembershipsGet extends SiteMembershipsGet implements Initial
   @Override
   protected Map<String, Object> executeImpl(SiteInfo site, WebScriptRequest req, Status status, Cache cache) {
     Map<String, Object> model = super.executeImpl(site, req, status, cache);
-
+    
     Map<String, String> zones = new HashMap<String, String>();
 
     String authorityType = req.getParameter("authorityType");

@@ -51,24 +51,22 @@ function runAction(p_params)
          }
          else
          {
-            result.id = fileNode.name;
-            result.type = fileNode.isContainer ? "folder" : "document";
+            result.type = fileNode.isContainer ? "folder" : "document"
             
             // Retain the name of the site the node is currently in. Null if it's not in a site.
-            fromSite = String(fileNode.siteShortName);
+            fromSite = fileNode.siteShortName;
             
             // copy the node (deep copy for containers)
             if (fileNode.isContainer)
             {
                copiedNode = fileNode.copy(destNode, true);
-               result.nodeRef = copiedNode.nodeRef.toString();
             }
             else
             {
                copiedNode = fileNode.copy(destNode);
-               result.nodeRef = copiedNode.nodeRef.toString();
             }
-            
+
+            result.id = copiedNode.name;
             result.nodeRef = copiedNode.nodeRef.toString();
             result.success = (result.nodeRef != null);
             
@@ -78,9 +76,9 @@ function runAction(p_params)
                copiedNode.addAspect('{http://www.vgregion.se/model/1.0}donottouch');
                
                // If this was an inter-site copy, we'll need to clean up the permissions on the node
-               if (fromSite !== copiedNode.nodeRef.siteShortName)
+               if ((fromSite) && (String(fromSite) != String(copiedNode.siteShortName)))
                {
-                  siteService.cleanSitePermissions(copiedNode.nodeRef);
+                  siteService.cleanSitePermissions(copiedNode);
                }
                  
                // reset some properties on the copy since they are not to be copied

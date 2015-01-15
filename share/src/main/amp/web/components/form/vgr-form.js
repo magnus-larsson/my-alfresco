@@ -5,18 +5,21 @@
    Alfresco.util.updateMultiSelectListValue = function(list, hiddenField, signalChange, optionSeparator) {
       var listElement = YUIDom.get(list);
 
-      if (listElement !== null) {
+      if (listElement !== null)
+      {
          var values = new Array();
-
-         for ( var j = 0, jj = listElement.options.length; j < jj; j++) {
-            if (listElement.options[j].selected) {
+         for ( var j = 0, jj = listElement.options.length; j < jj; j++) 
+         {
+            if (listElement.options[j].selected) 
+            {
                values.push(listElement.options[j].value);
             }
          }
 
          YUIDom.get(hiddenField).value = values.join(optionSeparator);
 
-         if (signalChange) {
+         if (signalChange) 
+         {
             YAHOO.Bubbling.fire("mandatoryControlValueUpdated", this);
          }
       }

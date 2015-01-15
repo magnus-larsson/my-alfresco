@@ -19,10 +19,10 @@
 package se.vgregion.alfresco.repo.web.scripts.content;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.web.scripts.content.ContentGet;
-import org.alfresco.repo.webdav.WebDAVHelper;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.io.FilenameUtils;
@@ -41,12 +41,12 @@ public class VgrContentGet extends ContentGet {
   }
 
   @Override
-  protected void streamContent(WebScriptRequest req, WebScriptResponse res, NodeRef nodeRef, QName propertyQName, boolean attach, String attachFileName) throws IOException {
+  protected void streamContent(WebScriptRequest req, WebScriptResponse res, NodeRef nodeRef, QName propertyQName, boolean attach, String attachFileName, Map<String, Object> model) throws IOException {
     if (attach && StringUtils.isNotBlank(attachFileName)) {
       String filename = extractFilename(nodeRef);
-      super.streamContent(req, res, nodeRef, propertyQName, attach, filename);
+      super.streamContent(req, res, nodeRef, propertyQName, attach, filename, model);
     } else {
-      super.streamContent(req, res, nodeRef, propertyQName, attach, attachFileName);
+      super.streamContent(req, res, nodeRef, propertyQName, attach, attachFileName, model);
     }
   }
 
@@ -64,20 +64,5 @@ public class VgrContentGet extends ContentGet {
     // return "\"" + filename + extension + "\"";
     return filename + extension;
   }
-
-  @Override
-  protected void setAttachment(final WebScriptRequest req, final WebScriptResponse res, boolean attach, String attachFileName) {
-    if (attach) {
-      String headerValue = "attachment";
-      
-      if (StringUtils.isNotBlank(attachFileName)) {
-        headerValue += "; filename*=UTF-8''" + WebDAVHelper.encodeURL(attachFileName) + "; filename=\"" + attachFileName + "\"";
-      }
-
-      // set header based on filename - will force a Save As from the browse if it doesn't recognize it
-      // this is better than the default response of the browser trying to display the contents
-      res.setHeader("Content-Disposition", headerValue);
-    }
-  }
-
+  
 }
