@@ -105,40 +105,43 @@
             var values1 = hiddenIdInput.value.split("${optionSeparator}");
             var values2 = "${fieldValue}".split("${optionSeparator}");
             
-            var options = YAHOO.util.Dom.get('${fieldHtmlId}-entry').options;
-            
-            for (x = 0; x < options.length; x++) {
-               var option = options[x];
-               
-               for (y = 0; y < values1.length; y++) {
-                  var value = values1[y];
-
-                  // if't empty values, just go on
-                  if ((value === null || value.length === 0) && (option.label === null || option.label.length === 0)) {
-                     continue;
-                  }
-                  
-                  if (value === option.value) {
-                     option.selected = true;
-                  }
-               }
-
-               for (y = 0; y < values2.length; y++) {
-                  var value = values2[y];
-                  
-                  // if't empty values, just go on
-                  if ((value === null || value.length === 0) && (option.label === null || option.label.length === 0)) {
-                     continue;
-                  }
-                  
-                  if (value === option.label) {
-                     option.selected = true;
-
-                     // this must be here in order for the hidden ID field to be updated accordingly...                     
-                     Alfresco.util.updateHsaCodeValue('${fieldHtmlId}-entry', '${fieldHtmlId}', <#if field.mandatory>true<#else>false</#if>);
-                  }
-               }
-            }
+            var field = YAHOO.util.Dom.get('${fieldHtmlId}-entry');
+            if (field !== null) {
+	            var options = field.options;
+	            
+	            for (x = 0; x < options.length; x++) {
+	               var option = options[x];
+	               
+	               for (y = 0; y < values1.length; y++) {
+	                  var value = values1[y];
+	
+	                  // if't empty values, just go on
+	                  if ((value === null || value.length === 0) && (option.label === null || option.label.length === 0)) {
+	                     continue;
+	                  }
+	                  
+	                  if (value === option.value) {
+	                     option.selected = true;
+	                  }
+	               }
+	
+	               for (y = 0; y < values2.length; y++) {
+	                  var value = values2[y];
+	                  
+	                  // if't empty values, just go on
+	                  if ((value === null || value.length === 0) && (option.label === null || option.label.length === 0)) {
+	                     continue;
+	                  }
+	                  
+	                  if (value === option.label) {
+	                     option.selected = true;
+	
+	                     // this must be here in order for the hidden ID field to be updated accordingly...                     
+	                     Alfresco.util.updateHsaCodeValue('${fieldHtmlId}-entry', '${fieldHtmlId}', <#if field.mandatory>true<#else>false</#if>);
+	                  }
+	               }
+	            }
+	         }
          });
          
       </script>
