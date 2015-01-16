@@ -181,10 +181,12 @@ public class GetPublishStatus extends DeclarativeWebScript implements Initializi
               model.put("result", STATUS_SENT_FOR_PUBLISH);
             }
           }
-        } else if (storageVersions.size() > 0 && !someVersionIsPublished) {
-          model.put("result", STATUS_SENT_FOR_PUBLISH);
-        } else if (storageVersions.size() > 0 && someVersionIsPublished) {
+        } else if (storageVersions.size() > 1 && someVersionIsPublished) {
           model.put("result", STATUS_PREVIOUS_VERSION_PUBLISHED);
+        } if (storageVersions.size() > 0 && !someVersionIsPublished) {
+          model.put("result", STATUS_PREVIOUSLY_PUBLISHED);
+        } else if (storageVersions.size() > 0) {
+          model.put("result", STATUS_SENT_FOR_PUBLISH);
         } else {
           model.put("result", STATUS_NOT_PUBLISHED);
         }
