@@ -115,7 +115,7 @@ public class CheckSolrIndex {
 
   @Uri(method = HttpMethod.GET, value = { "/vgr/toolkit/cache/check" }, defaultFormat = "json")
   public Resolution check(WebScriptRequest request) {
-    String nodeRef = request.getParameter("nodeRef");
+    final String nodeRef = request.getParameter("nodeRef");
 
     if (StringUtils.isBlank(nodeRef)) {
       return new ErrorResolution(500, "No 'nodeRef' parameter found!");
@@ -153,7 +153,7 @@ public class CheckSolrIndex {
 
         @Override
         protected void writeJson(JSONWriter jsonWriter) throws JSONException {
-          jsonWriter.object().key("result").value(count > 0).endObject();
+          jsonWriter.object().key("result").value(count > 0).key("nodeRef").value(nodeRef).endObject();
         }
 
       };

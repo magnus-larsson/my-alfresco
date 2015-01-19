@@ -16,17 +16,15 @@ var CheckSolrIndexController = function ($scope, Restangular, ngTableParams,
     $scope.alfrescoOrphans = [];
 
     for (var x = 0; x < data.orphans.length; x++) {
-      var node = {
-        nodeRef: data.orphans[x]
-      };
-
       $http.get('/alfresco/service/vgr/toolkit/cache/check', {
         params: {
-          nodeRef: node.nodeRef
+          nodeRef: data.orphans[x]
         }
       }).success(function (data2, status) {
-        if (!data2.result) {
-          $scope.alfrescoOrphans.push(node);
+        if (data2.result === false) {
+          $scope.alfrescoOrphans.push({
+            nodeRef: data2.nodeRef
+          });
 
           $scope.alfrescoOrphansTableParameters.reload();
         }
