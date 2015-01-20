@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+
+import javax.annotation.Resource;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.model.Repository;
@@ -22,6 +25,7 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +39,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
 @Component
-public class IndexCacheService {
+public class IndexCacheService implements InitializingBean {
 
   private static final String CACHE_KEY_SOLR_IFEED = "solr_ifeed";
 
@@ -63,6 +67,11 @@ public class IndexCacheService {
 
   @Autowired
   private NamespacePrefixResolver _namespacePrefixResolver;
+
+  @Resource(name = "global-properties")
+  private Properties _globalProperties;
+
+  private String _solrUrl;
 
   /**
    * Loads the cached nodes and calculates the orphan nodes and caches them.
@@ -165,8 +174,8 @@ public class IndexCacheService {
   }
 
   /**
-   * Fetches and caches all published nodes from Solr (core0 & ifeed).
-   * Fetches and caches all published and unpublished nodes from Alfresco.
+   * Fetches and caches all published nodes from Solr (core0 & ifeed). Fetches
+   * and caches all published and unpublished nodes from Alfresco.
    * 
    * @return
    */
@@ -290,13 +299,16 @@ public class IndexCacheService {
 
   private JsonObject getSolrCore0Nodes(int rows, int start) {
     try {
-      String url = "http://solr-index.vgregion.se:8080/solr/core0/select";
+      String url = _solrUrl + "/solr/core0/select";
 
       url += "?fq=source:p-facet.source.pubsub";
       url += "&fl=dc.identifier.documentid";
       url += "&rows=" + rows;
       url += "&start=" + start;
       url += "&wt=json";
+
+      System.out.println("Getting Solr core0 nodes with url:");
+      System.out.println(url);
 
       HttpClient client = new HttpClient();
 
@@ -314,13 +326,16 @@ public class IndexCacheService {
 
   private JsonObject getSolrIfeedNodes(int rows, int start) {
     try {
-      String url = "http://solr-index.vgregion.se:8080/solr/ifeed/select";
+      String url = _solrUrl + "/solr/ifeed/select";
 
       url += "?fq=published:true";
       url += "&fl=dc.identifier.documentid";
       url += "&rows=" + rows;
       url += "&start=" + start;
       url += "&wt=json";
+
+      System.out.println("Getting Solr ifeed nodes with url:");
+      System.out.println(url);
 
       HttpClient client = new HttpClient();
 
@@ -436,6 +451,13 @@ public class IndexCacheService {
     } finally {
       result.close();
     }
+  }
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    _solrUrl = _globalProperties.getProperty("vgr.solr.url", "http://solr-index.vgregion.se:8080");
+
+    System.out.println("VGR Solr URL: " + _solrUrl);
   }
 
 }

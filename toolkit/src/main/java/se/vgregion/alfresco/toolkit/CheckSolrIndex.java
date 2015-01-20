@@ -2,6 +2,7 @@ package se.vgregion.alfresco.toolkit;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Properties;
 
 import javax.annotation.Resource;
 
@@ -17,12 +18,17 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.util.CronTriggerBean;
 import org.alfresco.util.ISO8601DateFormat;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONWriter;
 import org.quartz.SchedulerException;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.extensions.surf.util.URLEncoder;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
 import org.springframework.stereotype.Component;
@@ -45,7 +51,7 @@ import com.google.gson.JsonParser;
 @Component
 @WebScript(families = { "VGR" })
 @Authentication(AuthenticationType.ADMIN)
-public class CheckSolrIndex {
+public class CheckSolrIndex implements InitializingBean {
 
   private static final Logger LOG = Logger.getLogger(CheckSolrIndex.class);
 
@@ -81,6 +87,11 @@ public class CheckSolrIndex {
   @Resource(name = "vgr.refreshPublishedCachesTrigger")
   private CronTriggerBean _refreshPublishedCachesTriggerBean;
 
+  @Resource(name = "global-properties")
+  private Properties _globalProperties;
+
+  private String _solrUrl;
+
   /**
    * Refreshes the cache nodes.
    * 
@@ -109,6 +120,56 @@ public class CheckSolrIndex {
     };
   }
 
+  @Uri(method = HttpMethod.GET, value = { "/vgr/toolkit/cache/check" }, defaultFormat = "json")
+  public Resolution check(WebScriptRequest request) {
+    final String nodeRef = request.getParameter("nodeRef");
+
+    if (StringUtils.isBlank(nodeRef)) {
+      return new ErrorResolution(500, "No 'nodeRef' parameter found!");
+    }
+
+    NodeRef node = new NodeRef(nodeRef);
+
+    if (!_nodeService.exists(node)) {
+      return new ErrorResolution(404, "Document with nodeRef '" + nodeRef + "' does not exist.");
+    }
+
+    String url = _solrUrl + "/solr/core0/select";
+    String fq = "dc.identifier.documentid:\"" + nodeRef + "\"";
+
+    url += "?fq=" + URLEncoder.encodeUriComponent(fq);
+    url += "&fl=dc.identifier.documentid";
+    url += "&wt=json";
+
+    try {
+      HttpClient client = new HttpClient();
+
+      System.out.println("Checking Solr core0 published document with url:");
+      System.out.println(url);
+
+      GetMethod get = new GetMethod(url);
+
+      client.executeMethod(get);
+
+      JsonParser parser = new JsonParser();
+
+      JsonObject json = parser.parse(get.getResponseBodyAsString()).getAsJsonObject();
+
+      final int count = json.getAsJsonObject("response").get("numFound").getAsInt();
+
+      return new JsonWriterResolution() {
+
+        @Override
+        protected void writeJson(JSONWriter jsonWriter) throws JSONException {
+          jsonWriter.object().key("result").value(count > 0).key("nodeRef").value(nodeRef).endObject();
+        }
+
+      };
+    } catch (Exception ex) {
+      return new ErrorResolution(500, ex.getMessage());
+    }
+  }
+
   @Uri(method = HttpMethod.GET, value = { "/vgr/toolkit/cache/{key}" })
   public Resolution cacheGet(@UriVariable(value = "key") String cacheKey, WebScriptRequest request, WebScriptResponse response) {
     NodeRef cache = _indexCacheService.getCacheNode(cacheKey);
@@ -128,7 +189,7 @@ public class CheckSolrIndex {
     }
 
     final Date modified = (Date) _nodeService.getProperty(cache, ContentModel.PROP_MODIFIED);
-    
+
     final String cacheDate = ISO8601DateFormat.format(modified);
 
     return new JsonWriterResolution() {
@@ -203,9 +264,20 @@ public class CheckSolrIndex {
       RepushStatus result;
 
       Date now = new Date();
+      Date publishDate = (Date) _nodeService.getProperty(document, VgrModel.PROP_DATE_AVAILABLE_FROM);
       Date unpublishDate = (Date) _nodeService.getProperty(document, VgrModel.PROP_DATE_AVAILABLE_TO);
 
+      if (publishDate == null) {
+        publishDate = (Date) _nodeService.getProperty(document, VgrModel.PROP_DATE_ISSUED);
+      }
+
+      if (publishDate == null) {
+        publishDate = (Date) _nodeService.getProperty(document, ContentModel.PROP_CREATED);
+      }
+
       if (unpublishDate != null && now.after(unpublishDate)) {
+        _nodeService.setProperty(document, VgrModel.PROP_PUSHED_FOR_PUBLISH, publishDate);
+        _nodeService.setProperty(document, VgrModel.PROP_PUBLISH_STATUS, "OK");
         _nodeService.setProperty(document, VgrModel.PROP_PUSHED_FOR_UNPUBLISH, null);
         _nodeService.setProperty(document, VgrModel.PROP_UNPUBLISH_STATUS, null);
 
@@ -233,6 +305,13 @@ public class CheckSolrIndex {
       _behaviourFilter.enableBehaviour(ContentModel.ASPECT_AUDITABLE);
       _behaviourFilter.enableBehaviour(ContentModel.ASPECT_VERSIONABLE);
     }
+  }
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    _solrUrl = _globalProperties.getProperty("vgr.solr.url", "http://solr-index.vgregion.se:8080");
+
+    System.out.println("VGR Solr URL: " + _solrUrl);
   }
 
 }
