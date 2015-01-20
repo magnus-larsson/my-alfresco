@@ -45,8 +45,9 @@ public class RepushToPubSubHubBubServer extends ClusteredExecuter {
   protected void executeInternal() {
     if (!_enabled) {
       if (LOG.isDebugEnabled()) {
-        LOG.debug("RepushToPubSubHubBubServer is not enabled, exiting...");
+        LOG.debug("RepushToPubSubHubBubServer is not enabled, exiting...");        
       }
+      return;
     }
     
     RetryingTransactionCallback<Void> callback = new RetryingTransactionCallback<Void>() {
