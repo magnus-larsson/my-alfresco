@@ -2,6 +2,7 @@ package se.vgregion.alfresco.toolkit;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Properties;
 
 import javax.annotation.Resource;
 
@@ -25,6 +26,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONWriter;
 import org.quartz.SchedulerException;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.extensions.surf.util.URLEncoder;
 import org.springframework.extensions.webscripts.WebScriptRequest;
@@ -49,7 +51,7 @@ import com.google.gson.JsonParser;
 @Component
 @WebScript(families = { "VGR" })
 @Authentication(AuthenticationType.ADMIN)
-public class CheckSolrIndex {
+public class CheckSolrIndex implements InitializingBean {
 
   private static final Logger LOG = Logger.getLogger(CheckSolrIndex.class);
 
@@ -84,6 +86,11 @@ public class CheckSolrIndex {
 
   @Resource(name = "vgr.refreshPublishedCachesTrigger")
   private CronTriggerBean _refreshPublishedCachesTriggerBean;
+
+  @Resource(name = "global-properties")
+  private Properties _globalProperties;
+
+  private String _solrUrl;
 
   /**
    * Refreshes the cache nodes.
@@ -126,6 +133,7 @@ public class CheckSolrIndex {
     if (!_nodeService.exists(node)) {
       return new ErrorResolution(404, "Document with nodeRef '" + nodeRef + "' does not exist.");
     }
+    String url = _solrUrl + "/solr/core0/select";
 
     // http://solr-index.vgregion.se:8080/solr/ifeed/select/?fq=*:*&version=2.2&start=0&rows=10&indent=on&fl=*&fq=dc.source.documentid:8800
 
@@ -138,6 +146,9 @@ public class CheckSolrIndex {
 
     try {
       HttpClient client = new HttpClient();
+
+      System.out.println("Checking Solr core0 published document with url:");
+      System.out.println(url);
 
       GetMethod get = new GetMethod(url);
 
@@ -297,6 +308,13 @@ public class CheckSolrIndex {
       _behaviourFilter.enableBehaviour(ContentModel.ASPECT_AUDITABLE);
       _behaviourFilter.enableBehaviour(ContentModel.ASPECT_VERSIONABLE);
     }
+  }
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    _solrUrl = _globalProperties.getProperty("vgr.solr.url", "http://solr-index.vgregion.se:8080");
+
+    System.out.println("VGR Solr URL: " + _solrUrl);
   }
 
 }
