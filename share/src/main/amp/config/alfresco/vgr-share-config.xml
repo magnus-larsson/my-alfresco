@@ -14,14 +14,6 @@
   <config replace="true">
     <probe-host>localhost</probe-host>
 
-    <flags>
-      <!-- Developer debugging setting to turn on DEBUG mode for client scripts in the browser -->
-      <client-debug>true</client-debug>
-
-      <!-- LOGGING can always be toggled at runtime when in DEBUG mode (Ctrl, Ctrl, Shift, Shift). This flag automatically activates logging on page load. -->
-      <client-debug-autologging>false</client-debug-autologging>
-    </flags>
-
     <!-- misc configuration -->
     <kivurl>http://sokikiv.vgregion.se/sokikiv/visaperson?vgrid={id}</kivurl>
   </config>

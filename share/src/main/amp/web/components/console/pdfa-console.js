@@ -135,9 +135,11 @@ if (typeof RL == "undefined" || !RL) {
             });
 
             parent.widgets.dataTable.doBeforeLoadData = function (request, response, payload) {
-               payload.totalRecords = response.meta.totalRecords;
-               payload.pagination.recordOffset = response.meta.recordOffset;
-               return payload;
+              if (payload!==undefined) {
+                payload.totalRecords = response.meta.totalRecords;
+                payload.pagination.recordOffset = response.meta.recordOffset;
+              }
+              return true;
             }
          }
       });
@@ -263,7 +265,6 @@ if (typeof RL == "undefined" || !RL) {
             if (loadingMessage) {
                loadingMessage.destroy();
             }
-
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, request, response, payload);
          };
 
@@ -290,7 +291,7 @@ if (typeof RL == "undefined" || !RL) {
             }
          };
 
-         this.widgets.dataSource.sendRequest('?skip=0&max=25', {
+         this.widgets.dataTable.getDataSource().sendRequest('?skip=0&max=25', {
             success: successHandler,
             failure: failureHandler,
             scope: this

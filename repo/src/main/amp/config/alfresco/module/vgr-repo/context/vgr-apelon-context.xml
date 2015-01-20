@@ -100,7 +100,7 @@
   </bean>
 
    <bean name="vgr.apelonCache" factory-bean="cacheFactory" factory-method="createCache">
-      <constructor-arg value="cache.apelonCache"/>
+      <constructor-arg value="cache.vgr.apelonCache"/>
    </bean>
 
 </beans>
