@@ -1,10 +1,23 @@
+<@markup id="css" >
+  <#-- CSS Dependencies -->
+  <@link href="${url.context}/res/components/console/push-report.css" group="console"/>  
+  <@link href="${url.context}/res/modules/documentlibrary/global-folder.css" group="console"/>
+</@>
+
+<@markup id="js">
+  <@script type="text/javascript" src="${url.context}/res/components/console/consoletool.js" group="console" />
+  <@script type="text/javascript" src="${url.context}/res/components/console/push-report.js" group="console" />
+  <@script type="text/javascript" src="${url.context}/res/modules/documentlibrary/global-folder.js" group="console" />
+  <@script type="text/javascript" src="${url.context}/res/yui/resize/resize.js" group="console" />  
+</@>
+
+<@markup id="widgets">
+  <@createWidgets group="console"/>
+</@>
+
+<#compress>
 <#assign el=args.htmlid?html>
-<script type="text/javascript">//<![CDATA[
-	var sentinelUrl = "${sentinelUrl?js_string}";
-   new RL.PushReport("${el}").setMessages(
-      ${messages}
-   );
-//]]></script>
+
 
 <div id="${el}-body" class="push-report">
 
@@ -52,3 +65,5 @@
       
 	</div>
 </div>
+
+</#compress>

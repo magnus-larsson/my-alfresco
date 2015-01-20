@@ -153,7 +153,7 @@ if (typeof RL == "undefined" || !RL) {
           }
           
           function onSentinelButtonClick(p_oEvent) {
-            var url = sentinelUrl.replace("#placeholder#", nodeRef);
+            var url = this.options.sentinelUrl.replace("#placeholder#", nodeRef);
             var win=window.open(url, '_blank');
             win.focus();
             
@@ -268,6 +268,23 @@ if (typeof RL == "undefined" || !RL) {
   };
 
   YAHOO.extend(RL.PushReport, Alfresco.ConsoleTool, {
+
+    /**
+     * Set multiple initialization options at once.
+     *
+     * @method setOptions
+     * @param obj {object} Object literal specifying a set of options
+     */
+    setOptions: function ReplaceAssignee_setOptions(obj)
+    {
+       this.options = YAHOO.lang.merge(this.options, obj);
+       return this;
+    },
+
+    options:
+    {
+      sentinelUrl : null
+    },
 
     /**
      * Fired by YUI when parent element is available for scripting. Component
