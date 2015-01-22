@@ -1,3 +1,4 @@
+// @overridden projects/slingshot/source/web/components/upload/flash-upload.js
 /*
  * Copyright (C) 2005-2010 Alfresco Software Limited.
  *
@@ -411,7 +412,7 @@
             }
             if (Config.alreadySubscribed(p.hideEvent, p.hideMacGeckoScrollbars, p))
             {
-               p.hideEvent.unsubscribe(p.hideMacGeckoScrollbars, p);
+            	 p.hideEvent.unsubscribe(p.hideMacGeckoScrollbars, p);
             }
 
             // Add a class for special bug fix css classes
@@ -470,6 +471,23 @@
             correctScope: true
          });
          
+         if (this.uploader._swf && this.uploader._swf.tagName.toLowerCase() == "embed")
+         {
+            this.widgets.uploaderListener = new KeyListener(this.uploader._swf,
+            {
+               keys: KeyListener.KEY.TAB
+            },
+            {
+               fn: function change_swf_focus_on_first_element(obj)
+               {
+                  this.widgets.panel.setFirstLastFocusable();
+                  this.widgets.panel.firstElement.focus();
+               },
+               scope: this,
+               correctScope: true
+            });
+         }
+
          YAHOO.lang.later(this, 2000, function()
          {
             Dom.addClass(this.id + "-flashuploader-div", "hidden");
@@ -564,6 +582,25 @@
          }
          this.widgets.panel.setFirstLastFocusable();
 
+         if (this.uploader._swf && this.uploader._swf.tagName.toLowerCase() == "embed")
+         {
+            this.widgets.panel.firstElement = this.uploader._swf;
+            this.widgets.lastElListener = new KeyListener(this.widgets.panel.lastElement,
+         {
+            keys: KeyListener.KEY.TAB
+         },
+         {
+            fn: function change_last_element_focus_on_swf(obj)
+            {
+               this.widgets.panel.firstElement = this.uploader._swf;
+            },
+               scope: this,
+               correctScope: true
+            });
+            this.widgets.lastElListener.enable();
+            this.widgets.uploaderListener.enable();
+         }
+
          // Show the upload panel
          this.widgets.panel.show();
 
@@ -603,7 +640,7 @@
          // Reset references and the gui before showing it
          if (this.statusText == null)
          {
-            this.onReady(); 
+            this.onReady();
          }
          
          this.state = this.STATE_BROWSING;
@@ -841,8 +878,8 @@
             fileInfo.rawJson = json;  // Added for CSV upload
          }
 
-         // Add the label "Successful" after the filename, updating the fileName from the response
-         fileInfo.progressInfo.innerHTML = fileInfo.progressInfo.innerHTML.replace(oldFileName, fileInfo.fileName) + " " + this.msg("label.success");
+         // Add the label "Successful" after the fileSize
+         fileInfo.fileSizeInfo["innerHTML"] = fileInfo.fileSizeInfo["innerHTML"] + " (" + this.msg("label.success") + ")";
 
          // Change the style of the progress bar
          Dom.removeClass(fileInfo.progress, "fileupload-progressSuccess-span");
@@ -899,7 +936,7 @@
             {
                msg = Alfresco.util.message("label.failure", this.name);
             }
-            fileInfo.progressInfo["innerHTML"] = fileInfo.progressInfo["innerHTML"] + " (" + msg + ")";
+            fileInfo.fileSizeInfo["innerHTML"] = fileInfo.fileSizeInfo["innerHTML"] + " (" + msg + ")";
             fileInfo.progressInfo.setAttribute("title", msg);
             fileInfo.progressInfoCell.setAttribute("title", msg);
 
@@ -1396,7 +1433,7 @@
             if (progressInfo.length == 1)
             {
                // Display the file size in human readable format after the filename.
-               var fileInfoStr = record.name + " (" + Alfresco.util.formatFileSize(record.size) + ")";
+               var fileInfoStr = record.name;
                templateInstance.setAttribute("title", fileInfoStr);
 
                // Display the file name and size.
@@ -1406,6 +1443,16 @@
 
                // Save the cell element
                this.fileStore[flashId].progressInfoCell = el;
+            }
+
+            var fileSize = Dom.getElementsByClassName("fileupload-filesize-span", "span", templateInstance);
+            if (fileSize.length == 1)
+            {
+               // Display the file size in human readable format below the filename.
+               var fileInfoStr = Alfresco.util.formatFileSize(record.size);
+               fileSize = fileSize[0];
+               this.fileStore[flashId].fileSizeInfo = fileSize;
+               fileSize.innerHTML = fileInfoStr;
             }
 
             // Save a reference to the contentType dropdown so we can find each file's contentType before upload.            
