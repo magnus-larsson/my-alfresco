@@ -170,25 +170,6 @@
       var me = this;
       this._launchOnlineEditorDisplayPrompt(function() {
          _actionEditOnlineInternal.call(me, record);
-      });   
-      /*if (record.onlineEditUrl.length > 260)
-      {
-         Alfresco.util.PopupManager.displayMessage(
-         {
-            text: this.msg("message.edit-online.office.path.failure")
-         });
-      }
-      this._launchOnlineEditorDisplayPrompt(function() {
-         var result = this._launchOnlineEditor.call(record);
-
-         if (result) {
-            YAHOO.Bubbling.fire("metadataRefresh");
-         } else {
-            Alfresco.util.PopupManager.displayMessage({
-               text : this.msg("message.edit-online.office.failure")
-            });
-         }
       });
-*/
    }
 })(Alfresco.doclib.Actions.prototype.actionEditOnlineInternal)

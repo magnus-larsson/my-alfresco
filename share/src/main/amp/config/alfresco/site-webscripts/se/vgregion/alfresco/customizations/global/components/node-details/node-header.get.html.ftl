@@ -1,12 +1,12 @@
 <#-- @overridden projects/slingshot/config/alfresco/site-webscripts/org/alfresco/components/node-details/node-header.get.html.ftl -->
 
 <@markup id="vgr-css" action="after" target="css">
-   <@link rel="stylesheet" type="text/css" href="${page.url.context}/res/components/node-details/vgr-node-header.css" group="node-header" />
+   <@link rel="stylesheet" type="text/css" href="${url.context}/res/components/node-details/vgr-node-header.css" group="node-header" />
 </@>
 
 <@markup id="vgr-js" action="after" target="js">
-   <@script type="text/javascript" src="${page.url.context}/res/components/node-details/vgr-node-header.js" group="node-header" />
-   <@script type="text/javascript" src="${page.url.context}/res/components/documentlibrary/vgr-publish-status.js" group="node-header" />
+   <@script type="text/javascript" src="${url.context}/res/components/node-details/vgr-node-header.js" group="node-header" />
+   <@script type="text/javascript" src="${url.context}/res/components/documentlibrary/vgr-publish-status.js" group="node-header" />
 </@>
 
 <@markup id="vgr-html" action="replace" target="html">
