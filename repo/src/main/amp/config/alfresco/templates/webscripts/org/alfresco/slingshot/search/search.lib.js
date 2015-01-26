@@ -559,64 +559,60 @@ function getItem(siteId, containerId, pathParts, node, populate)
 }
 
 /**
- * Splits the qname path to a node.
+ * Splits the qname path to a node to extract Site information and display path parts.
+ * The display path will be truncated to match the overridden root node if present.
  * 
  * Returns an array with:
- * [0] = site
- * [1] = container or null if the node does not match
+ * [0] = site or null
+ * [1] = container or null
  * [2] = remaining part of the cm:name based path to the object - as an array
  */
 function splitQNamePath(node, rootNodeDisplayPath, rootNodeQNamePath)
 {
    var path = node.qnamePath,
        displayPath = utils.displayPath(node).split("/"),
-       parts = null,
-       overriden = false;
-   
-   // restructure the display path of the node if we have an overriden root node
-   if (rootNodeDisplayPath != null && path.indexOf(rootNodeQNamePath) === 0)
-   {
-      var nodeDisplayPath = utils.displayPath(node).split("/");
-      nodeDisplayPath = nodeDisplayPath.splice(rootNodeDisplayPath.length);
-      displayPath = nodeDisplayPath;
-      overriden = true;
-   }
+       siteId = null,
+       containerId = null;
    
    if (path.match("^"+SITES_SPACE_QNAME_PATH) == SITES_SPACE_QNAME_PATH)
    {
-      var tmp = path.substring(SITES_SPACE_QNAME_PATH.length),
-          pos = tmp.indexOf('/');
-      if (pos >= 1)
+      // this item is contained within a Site
+      
+      // ensure we have not matched a Site folder directly or some node created under the st:sites folder that is not a Site
+      var qpathUnderSitesFolder = path.substring(SITES_SPACE_QNAME_PATH.length),
+          positionContainer = qpathUnderSitesFolder.indexOf("/");
+      if (positionContainer !== -1)
       {
-         if (rootNodeQNamePath != null && path.indexOf(rootNodeQNamePath) === 0)
+         // site id is the actual cm:name for the site - we cannot use the encoded QName version
+         // the displayPath will look something like this: ["", "Company Home", "Sites", "MySite", "documentLibrary", "MyFolder"]
+         siteId = displayPath[3];
+         var qpathContainer = qpathUnderSitesFolder.substring(positionContainer + 1);
+         var positionUnderContainer = qpathContainer.indexOf("/");
+         if (positionUnderContainer !== -1)
          {
-            for (var i = 0; i < rootNodeQNamePath.split("/").length-1; i++)
-            {
-               nodeDisplayPath.unshift(null);
-            }
-            displayPath = nodeDisplayPath;
-         }
-         // site id is the cm:name for the site - we cannot use the encoded QName version
-         var siteId = displayPath[3];
-         tmp = tmp.substring(pos + 1);
-         pos = tmp.indexOf('/');
-         if (pos >= 1)
-         {
-            // strip container id from the path
-            var containerId = tmp.substring(0, pos);
+            // extract container id from the qname path - strip off namespace
+            containerId = qpathContainer.substring(0, positionUnderContainer);
             containerId = containerId.substring(containerId.indexOf(":") + 1);
             
-            parts = [ siteId, containerId, displayPath.slice(5, displayPath.length) ];
+            // construct remaining part of the cm:name based display path to the object
+            // by removing everything up to the path of the item under the container folder
+            displayPath = displayPath.slice(5, displayPath.length);
          }
       }
    }
-   
-   if (overriden && parts == null)
+   else
    {
-      displayPath.unshift("");
+      // check if we have an overridden root node and the node is under that path
+      if (rootNodeDisplayPath !== null && path.indexOf(rootNodeQNamePath) === 0)
+      {
+         // restructure the display path of the node
+         displayPath = displayPath.splice(rootNodeDisplayPath.length);
+         // empty element is required at the start of the repository paths - we want to show it as the repo root later
+         displayPath.unshift("");
+      }
    }
    
-   return (parts !== null ? parts : [ null, null, displayPath ]);
+   return [ siteId, containerId, displayPath ];
 }
 
 /**
@@ -826,11 +822,16 @@ function resolveRootNode(reference)
       }
       else if (reference.substring(0, 1) == "/")
       {
-         node = search.xpathSearch(reference)[0];
+         var res = search.xpathSearch(reference);
+         if (res.length === 0)
+         {
+            logger.warn("Unable to resolve specified root node reference: " + reference);
+         }
+         else node = res[0];
       }
       if (node === null)
       {
-         logger.log("Unable to resolve specified root node reference: " + reference);
+         logger.warn("Unable to resolve specified root node reference: " + reference);
       }
    }
    catch (e)
@@ -1087,9 +1088,9 @@ function getSearchResults(params)
       {
          ftsQuery = 'PATH:"' + path + '/*" AND (' + ftsQuery + ')';
       }
-      ftsQuery = '(' + ftsQuery + ') AND -TYPE:"cm:thumbnail" AND -TYPE:"cm:failedThumbnail" AND -TYPE:"cm:rating"';
-      ftsQuery = '(' + ftsQuery + ') AND NOT ASPECT:"sys:hidden"';
-
+      ftsQuery = '(' + ftsQuery + ') AND -TYPE:"cm:thumbnail" AND -TYPE:"cm:failedThumbnail" AND -TYPE:"cm:rating" AND -TYPE:"st:site"' +
+                 ' AND -ASPECT:"st:siteContainer" AND -ASPECT:"sys:hidden"';
+      
       // sort field - expecting field to in one of the following formats:
       //  - short QName form such as: cm:name
       //  - pseudo cm:content field starting with "." such as: .size
@@ -1130,18 +1131,93 @@ function getSearchResults(params)
       
       if (logger.isLoggingEnabled())
          logger.log("Query:\r\n" + ftsQuery + "\r\nSortby: " + (sort != null ? sort : ""));
+         
+      var maxResults = 0,
+          skipCount = 0,
+          result = (
+          {
+             paging:
+             {
+                totalRecords: 0,
+                totalRecordsUpper: 0,
+                startIndex: params.startIndex ? params.startIndex : 0
+             },
+             items: []
+          }),
+          pageNumber = params.startIndex / params.pageSize + 1,
+          startIndex = params.startIndex,
+          moreResults = true,
+          maxPageResults = params.pageSize < params.maxResults ? params.pageSize : params.maxResults;
+
+      switch (pageNumber)
+      {
+         // results for the first 10 pages, when 1-6 page was selected.
+         case 1:
+         case 2:
+         case 3:
+         case 4:
+         case 5:
+         case 6:
+         maxResults = params.pageSize * 10;
+         break;
+         default:  // start from 7th page, we need to add subsequent 4 pages for pagination needs.
+         maxResults = params.pageSize * (pageNumber + 4);
+      }
       
-      // perform fts-alfresco language query
-      var queryDef = {
-         query: ftsQuery,
-         language: "fts-alfresco",
-         page: {maxItems: params.maxResults * 2},    // allow for space for filtering out results
-         templates: getQueryTemplate(),
-         defaultField: "keywords",
-         onerror: "no-results",
-         sort: sortColumns 
-      };
-      nodes = search.query(queryDef);
+      while (moreResults)
+      {
+         // perform fts-alfresco language query
+         var queryDef = {
+            query: ftsQuery,
+            language: "fts-alfresco",
+            page: {maxItems: maxResults + 1, skipCount: skipCount},
+            templates: getQueryTemplate(),
+            defaultField: "keywords",
+            onerror: "no-results",
+            sort: sortColumns 
+         };
+         nodes = search.query(queryDef);
+         
+         // get results
+         var procRes = processResults(nodes, maxPageResults, startIndex, rootNode);
+         
+         // add all counts
+         result.paging.totalRecordsUpper += procRes.paging.totalRecordsUpper;
+         result.paging.totalRecords += procRes.paging.totalRecords;
+         
+         // copy required items
+         if (result.items.length < maxPageResults)
+         {
+            var i = result.items.length,
+                size = (maxPageResults - i) > procRes.items.length ? procRes.items.length : (maxPageResults - i);
+            
+            for (j = 0; j < size; j++)
+            {
+               result.items[i+j] = procRes.items[j];
+            }
+         }
+         
+         // check that required items were processed for pagination
+         if (nodes.length > maxResults && result.paging.totalRecordsUpper < maxResults)
+         {
+            skipCount += maxResults + 1;
+            maxResults -= result.paging.totalRecordsUpper;
+         }
+         else if (nodes.length > maxResults && result.items.length < maxPageResults)
+         {
+            // get more items
+            skipCount += maxResults + 1;
+            maxResults = params.pageSize;
+         }
+         else
+         {
+            moreResults = false;
+         }
+         
+         startIndex = 0;
+      }
+      
+      return result;
    }
    else
    {

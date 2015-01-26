@@ -69,7 +69,7 @@
         </exclusion>
         <exclusion>
           <groupId>org.springframework</groupId>
-          <artifactId>spring-context</artifactId>          
+          <artifactId>spring-context</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -173,14 +173,7 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!-- Added correct version of jcl-overslf4j to override Spring-ldap-core-tigers version
-    Maybe not needed. Excluded 
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <version>1.5.11</version>
-    </dependency>
-     -->
+    <!-- Added correct version of jcl-overslf4j to override Spring-ldap-core-tigers version Maybe not needed. Excluded <dependency> <groupId>org.slf4j</groupId> <artifactId>jcl-over-slf4j</artifactId> <version>1.5.11</version> </dependency> -->
     <dependency>
       <groupId>org.redpill-linpro.alfresco.module</groupId>
       <artifactId>metadatawriter</artifactId>
@@ -239,7 +232,7 @@
         <exclusion>
           <artifactId>bcmail-jdk14</artifactId>
           <groupId>bouncycastle</groupId>
-        </exclusion>        
+        </exclusion>
         <exclusion>
           <artifactId>bcprov-jdk14</artifactId>
           <groupId>bouncycastle</groupId>
@@ -361,7 +354,6 @@
       <scope>test</scope>
     </dependency>
 
-    
     <dependency>
       <groupId>org.sharextras</groupId>
       <artifactId>media-viewers</artifactId>

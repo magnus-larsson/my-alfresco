@@ -86,24 +86,6 @@
 
 (function() {
 
-   Alfresco.doclib.Actions.prototype._launchOnlineEditorDisplayPrompt = function(callback) {
-      Alfresco.util.PopupManager.displayPrompt({
-         title : this.msg("actions.document.edit-online"),
-         text : "<span style='color: red'>" + this.msg("actions.document.edit-online.information") + "</span>",
-         modal : true,
-         noEscape : true,
-         buttons : [ {
-            text : this.msg("button.ok"),
-            handler : function() {
-               this.destroy();
-
-               callback();
-            },
-            isDefault : true
-         } ]
-      });
-   };
-
    /**
     * Same as onActionUploadNewVersion, but performs an document id check. User can still choose to overwrite.
     */
@@ -163,79 +145,50 @@
 
 }());
 
-(function(_launchOnlineEditorIE) {
+(function (_actionEditOnlineInternal) {
 
-   Alfresco.doclib.Actions.prototype._launchOnlineEditorIE = function(controlProgID, record, appProgID) {
-      this._launchOnlineEditorDisplayPrompt(function() {
-         var result = _launchOnlineEditorIE.call(this, controlProgID, record, appProgID);
+   Alfresco.doclib.Actions.prototype._launchOnlineEditorDisplayPrompt = function(callback) {
+      Alfresco.util.PopupManager.displayPrompt({
+         title : this.msg("actions.document.edit-online"),
+         text : "<span style='color: red'>" + this.msg("actions.document.edit-online.information") + "</span>",
+         modal : true,
+         noEscape : true,
+         buttons : [ {
+            text : this.msg("button.ok"),
+            handler : function() {
+               this.destroy();
 
-         if (result) {
-            YAHOO.Bubbling.fire("metadataRefresh");
-         } else {
-            Alfresco.util.PopupManager.displayMessage({
-               text : this.msg("message.edit-online.office.failure")
-            });
-         }
+               callback();
+            },
+            isDefault : true
+         } ]
       });
-
-      return;
    };
 
-}(Alfresco.doclib.Actions.prototype._launchOnlineEditorIE));
 
-(function(_launchOnlineEditorPlugin) {
-
-   Alfresco.doclib.Actions.prototype._launchOnlineEditorPlugin = function(record, appProgID) {
+   Alfresco.doclib.Actions.prototype.actionEditOnlineInternal = function(record) {
+      var me = this;
       this._launchOnlineEditorDisplayPrompt(function() {
-         var result = _launchOnlineEditorPlugin.call(this, record, appProgID);
-
-         if (result) {
-            YAHOO.Bubbling.fire("metadataRefresh");
-         } else {
-            Alfresco.util.PopupManager.displayMessage({
-               text : this.msg("message.edit-online.office.failure")
-            });
-         }
-
-      });
-
-      return;
-   };
-
-}(Alfresco.doclib.Actions.prototype._launchOnlineEditorPlugin));
-
-(function(onActionEditOnline) {
-
-   var $isValueSet = Alfresco.util.isValueSet;
-
-   Alfresco.doclib.Actions.prototype.onActionEditOnline = function(record) {
-      //MNT-8609 Edit online fails for files which URL is too long      
-      if (!$isValueSet(record.onlineEditUrl))
-      {
-         record.onlineEditUrl = Alfresco.util.onlineEditUrl(this.doclistMetadata.custom.vtiServer, record.location);
-      }
-   
-      if (record.onlineEditUrl.length > 260)
+         _actionEditOnlineInternal.call(me, record);
+      });   
+      /*if (record.onlineEditUrl.length > 260)
       {
          Alfresco.util.PopupManager.displayMessage(
          {
             text: this.msg("message.edit-online.office.path.failure")
          });
-         
-         return;
       }
+      this._launchOnlineEditorDisplayPrompt(function() {
+         var result = this._launchOnlineEditor.call(record);
 
-      var result = this._launchOnlineEditor(record);
-
-      if (result == null) {
-         return;
-      } else if (!result) {
-         Alfresco.util.PopupManager.displayMessage({
-            text : this.msg("message.edit-online.office.failure")
-         });
-      }
-
-      return;
-   };
-
-}(Alfresco.doclib.Actions.prototype.onActionEditOnline));
+         if (result) {
+            YAHOO.Bubbling.fire("metadataRefresh");
+         } else {
+            Alfresco.util.PopupManager.displayMessage({
+               text : this.msg("message.edit-online.office.failure")
+            });
+         }
+      });
+*/
+   }
+})(Alfresco.doclib.Actions.prototype.actionEditOnlineInternal)
