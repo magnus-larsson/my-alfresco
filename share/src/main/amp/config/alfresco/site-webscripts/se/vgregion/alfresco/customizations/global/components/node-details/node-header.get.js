@@ -7,6 +7,10 @@
  */
 
 function vgr_main() {
+   //Prevent error which appears when a working copy is checked in
+   if (model.node==null) {
+      return;
+   }
    var aspects = model.item.node.aspects;
    
    var status = [];

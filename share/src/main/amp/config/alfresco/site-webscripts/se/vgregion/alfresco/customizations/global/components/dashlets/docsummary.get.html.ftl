@@ -3,8 +3,8 @@
    <@script src="${url.context}/res/components/upload/html-upload.js" group="upload"/>
    <@script src="${url.context}/res/components/upload/flash-upload.js" group="upload"/>
    <@script src="${url.context}/res/components/upload/dnd-upload.js" group="upload"/>
-   <@script type="text/javascript" src="${page.url.context}/res/components/checkin/checkin.js" group="upload" />
-   <@script type="text/javascript" src="${page.url.context}/res/components/dashlets/vgr-docsummary.js" group="dashlets" />
+   <@script type="text/javascript" src="${url.context}/res/components/checkin/checkin.js" group="upload" />
+   <@script type="text/javascript" src="${url.context}/res/components/dashlets/vgr-docsummary.js" group="dashlets" />
 </@>
 
 <@markup id="vgr-widgets" action="after" target="widgets">

@@ -20,21 +20,21 @@
 
          Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
-         var title = this.msg('title.cancel.editing').replace('{0}', data.lockedBy);
+         var title = this.msg('checkin.title.cancel.editing').replace('{0}', data.lockedBy);
 
          // if locked by user offer check in
          if (data.lockedByUser === username && data.permissions.userAccess.edit) {
-            elCell.innerHTML = '<button>' + this.msg('label.checkin') + '</button>';
+            elCell.innerHTML = '<button>' + this.msg('checkin.label.checkin') + '</button>';
 
             // make a check in button
-            Alfresco.thirdparty.createCheckInButton(Dom.getFirstChild(elCell), data.nodeRef, data.displayName, function() {
+            Alfresco.thirdparty.createCheckInButton(Dom.getFirstChild(elCell), data, function() {
                me.reloadDataTable();
 
                YAHOO.Bubbling.fire('checkin.document', nodeRef);
             }, me);
          } else if (data.permissions.userAccess['cancel-checkout']) {
             // if locked by other we might have the right to cancel
-            elCell.innerHTML = '<button title="' + title + '">' + this.msg('label.cancel.editing') + '</button>';
+            elCell.innerHTML = '<button title="' + title + '">' + this.msg('checkin.label.cancel.editing') + '</button>';
 
             // make a check in button
             Alfresco.thirdparty.createCancelEditingButton(Dom.getFirstChild(elCell), data.nodeRef, function() {

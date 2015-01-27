@@ -18,6 +18,8 @@
     <property name="mimetypeService" ref="MimetypeService" />
     <property name="CMISRenditionService" ref="CMISRenditionService" />
     <property name="delegate" ref="webscript.content.streamer" />
+    <property name="contentService" ref="contentService" />
+    <property name="serviceUtils" ref="vgr.serviceUtils" />
   </bean>
 
 </beans>

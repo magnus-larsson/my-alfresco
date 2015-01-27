@@ -32,11 +32,11 @@
       return this;
    };
 
-   YAHOO.extend(Alfresco.thirdparty.CheckIn, Alfresco.FileUpload, {
+   YAHOO.extend(Alfresco.thirdparty.CheckIn, Alfresco.component.Base, {
 
       uploadersReady : false,
       msg_scope : null,
-
+      uploader : null,
       callbacks : {},
 
       /**
@@ -56,11 +56,11 @@
        *           {object} (optional) scope for callbacks
        * @return {object} the YUIButton
        */
-      createCheckInButton : function(el, nodeRef, displayName, success, failure, scope) {
+      createCheckInButton : function(el, record, success, failure, scope) {
          var me = this;
 
          return Alfresco.util.createYUIButton(this, '', function() {
-            me.checkIn(nodeRef, displayName, success, failure, scope);
+            me.checkIn(record, success, failure, scope);
          }, {}, el);
       },
 
@@ -81,69 +81,76 @@
        *           {object} (optional) extra show configurations
        * @return {object} the YUIButton
        */
-      checkIn : function(nodeRef, displayName, success, failure, scope, options) {
+      checkIn : function(record, success, failure, scope, options) {
          var me = this;
+         var displayName = record.displayName,
+            nodeRef = record.nodeRef,
+            version = record.version;
 
-         if (this.uploadersReady === false) {
-            var flashUploader = Alfresco.util.ComponentManager.findFirst(this.options.flashUploader);
-            var htmlUploader = Alfresco.util.ComponentManager.findFirst(this.options.htmlUploader);
-
-            // http://yuilibrary.com/projects/yui2/ticket/2104642
-            // onContentReady on nodes inside onContentReady doesn't work
-            // this means _onReady is never fired when used from within another component, i.e. dashlet
-            if (flashUploader && !flashUploader.panel) {
-               flashUploader.onReady();
-            }
-
-            if (htmlUploader && !htmlUploader.panel) {
-               htmlUploader.onReady();
-            }
-
-            // subscribe to uploadCompleteData som we can nick the temporary filename
-            flashUploader.uploader.subscribe("uploadCompleteData", this.onUploadCompleteData, this, true);
-            this.uploadersReady = true; // only do this once
-
-            // monkey patch htmlUploader since it has no events
-            htmlUploader.onUploadSuccess = function(response) {
-               htmlUploader.widgets.feedbackMessage.hide();
-               me.onUploadCompleteData(response);
-            };
-            htmlUploader.onUploadFailure = function(response) {
-               htmlUploader.widgets.feedbackMessage.hide();
-               me.failure();
-            };
-
+         if (!this.fileUpload)
+         {
+            this.fileUpload = Alfresco.getFileUploadInstance();
          }
 
+         // Show uploader for multiple files
+         var description = this.msg("label.filter-description", displayName),
+            extensions = "*";
+
+         if (displayName && new RegExp(/[^\.]+\.[^\.]+/).exec(displayName))
+         {
+            // Only add a filtering extension if filename contains a name and a suffix
+            extensions = "*" + displayName.substring(displayName.lastIndexOf("."));
+         }
+
+         if (record.workingCopy && record.workingCopy.workingCopyVersion)
+         {
+            version = record.workingCopy.workingCopyVersion;
+         }
+
+         var zIndex = 0;
+         if (this.fullscreen !== undefined && ( this.fullscreen.isWindowOnly || Dom.hasClass(this.id, 'alf-fullscreen')))
+         {
+            zIndex = 1000;
+         } 
+
+         var singleUpdateConfig =
+         {
+            updateNodeRef: nodeRef.toString(),
+            updateFilename: displayName,
+            updateVersion: version,
+            overwrite: true,
+            filter: [
+            {
+               description: description,
+               extensions: extensions
+            }],
+            mode: this.fileUpload.MODE_SINGLE_UPDATE,
+            onFileUploadComplete:
+            {
+               fn: this.onUploadCompleteData,
+               scope: this
+            },
+            htmlUploadURL : "vgr/preupload.html",
+            flashUploadURL : "vgr/preupload",
+         };
+
+         this.fileUpload.options.zIndex = zIndex;
+
          // store current callbacks, used in onUploadCompleteData
-         scope = isObject(scope) ? scope : (!isFunction(failure) && isObject(failure) ? failure : this);
+         var scope = isObject(scope) ? scope : (!isFunction(failure) && isObject(failure) ? failure : this);
 
          this.callbacks.success = function(json, data, res) {
-            success.call(scope, res.json.nodeRef, data.filename, data);
+            success.call(scope, res.json.nodeRef, data.fileName, data);
          };
 
          this.callbacks.failure = YAHOO.lang.isFunction(failure) ? function(cause, data) {
-            failure.call(scope, nodeRef, data.filename, cause, data);
+            failure.call(scope, nodeRef, data.fileName, cause, data);
          } : function() {
             me.failure();
          }
 
-         // Show uploader
-         var uploadConfig = {
-            destination : nodeRef,
-            filter : this.sameExtensionAs(displayName),
-            mode : this.MODE_SINGLE_UPDATE,
-            htmlUploadURL : "vgr/preupload.html",
-            flashUploadURL : "vgr/preupload",
-            updateFilename : displayName
-         };
-
-         // user options
-         if (options && isObject(options)) {
-            YAHOO.lang.augmentObject(uploadConfig, options, true);
-         }
-
-         this.show(uploadConfig);
+       
+         this.fileUpload.show(singleUpdateConfig);
       },
 
       /**
@@ -155,15 +162,28 @@
        */
       onUploadCompleteData : function(e) {
          var me = this;
-         var json = e;
+         var json = null;
+
+         
+         if (e.successful!==undefined && e.successful.length >= 1) {
+            //Try DND-data first
+            var uploader = this.fileUpload.uploader;
+            if (uploader.fileStore!==undefined && uploader.fileStore["file0"]!==undefined) {
+              if (uploader.fileStore["file0"].request !== undefined) {
+                //DND uploader
+                json = Alfresco.util.parseJSON(uploader.fileStore["file0"].request.responseText);
+              } else if (uploader.fileStore["file0"].rawJson !== undefined) {
+                //Flash uploader
+                json = uploader.fileStore["file0"].rawJson;
+              } 
+            } else if (e.successful[0].response!==undefined) {
+              json = e.successful[0].response;
+            }  
+         } 
 
          // close window
          this.close();
 
-         if (YAHOO.lang.isString(e.data)) {
-            // Extract response data
-            json = Alfresco.util.parseJSON(e.data);
-         }
          if (json) {
             var result = json.status;
             
@@ -177,12 +197,12 @@
             } else if (result === 'nomatch') {
                // no match on noderef, display a dialog and as the user what she wants
                Alfresco.util.PopupManager.displayPrompt({
-                  title : this.msg('nomatch.title'),
-                  text : this.msg('nomatch.text'),
+                  title : this.msg('checkin.nomatch.title'),
+                  text : this.msg('checkin.nomatch.text'),
                   noEscape : true,
                   modal : true,
                   buttons : [ {
-                     text : this.msg("button.upload.anyway"),
+                     text : this.msg("checkin.button.upload.anyway"),
                      handler : function() {
                         this.destroy();
                         me.confirmUpload(json, scb);
@@ -209,19 +229,20 @@
       },
 
       close : function() {
+        var uploader = this.fileUpload.uploader;
          // FIXME: implement html
-         if (this.uploader && this.uploader.name === 'Alfresco.FlashUpload') {
+         if (uploader && uploader.name === 'Alfresco.FlashUpload') {
             // Remove all files and references for this upload "session"
-            this.uploader._clear();
+            //uploader._clear();
 
             // Hide the panel
-            this.uploader.hide();
+            uploader.hide();
 
             // Hide the Flash movie
-            Dom.addClass(this.uploader.id + "-flashuploader-div", "hidden");
+            //Dom.addClass(this.uploader.id + "-flashuploader-div", "hidden");
 
             // Disable the Esc key listener
-            this.uploader.widgets.escapeListener.disable();
+            //uploader.widgets.escapeListener.disable();
          }
       },
 
@@ -230,8 +251,8 @@
        */
       failure : function() {
          Alfresco.util.PopupManager.displayPrompt({
-            title : this.msg('failure.title'),
-            text : this.msg('failure.text'),
+            title : this.msg('checkin.failure.title'),
+            text : this.msg('checkin.failure.text'),
             modal : true,
             buttons : [ {
                text : this.msg("ok"),
@@ -253,7 +274,7 @@
        */
       confirmUpload : function(data, callback) {
          var popup = Alfresco.util.PopupManager.displayMessage({
-            text : this.msg("msg.confirming"),
+            text : this.msg("checkin.msg.confirming"),
             spanClass : "wait",
             displayTime : 0
          // infinite
@@ -287,7 +308,7 @@
                },
                scope : this
             },
-            failureMessage : this.msg('msg.confirming.failed'),
+            failureMessage : this.msg('checkin.msg.confirming.failed'),
             execScripts : true
          });
       },
@@ -315,7 +336,7 @@
 
       cancelEditing : function(nodeRef, callback) {
          var popup = Alfresco.util.PopupManager.displayMessage({
-            text : this.msg("msg.cancel.editing"),
+            text : this.msg("checkin.msg.cancel.editing"),
             spanClass : "wait",
             displayTime : 0
          // infinite
@@ -347,7 +368,7 @@
                },
                scope : this
             },
-            failureMessage : this.msg('msg.cancel.failed'),
+            failureMessage : this.msg('checkin.msg.cancel.failed'),
             execScripts : true
          });
       },
@@ -385,18 +406,16 @@
    /**
     * onActionUploadNewVersion
     */
-   Alfresco.thirdparty.onActionCheckInNewVersion = function(asset, msg_scope, callback, scope, options) {
-      var displayName = asset.displayName, nodeRef = new Alfresco.util.NodeRef(asset.nodeRef);
-
+   Alfresco.thirdparty.onActionCheckInNewVersion = function(record, msg_scope, callback, scope, options) {
       var upload = Alfresco.thirdparty.getCheckInInstance();
-      upload.setOptions(options);
+      //upload.setOptions(options);
 
       // do a little dance with the message scope to get messages working
       if (msg_scope) {
          upload.msg_scope = msg_scope;
       }
 
-      upload.checkIn(nodeRef.toString(), displayName, callback, null, scope, options);
+      upload.checkIn(record, callback, null, scope, options);
 
    }
 

@@ -22,6 +22,8 @@
 <@link rel="stylesheet" type="text/css" href="${url.context}/res/modules/cloud/cloud-folder-picker.css" group="${dependencyGroup}"/>
 <@link rel="stylesheet" type="text/css" href="${url.context}/res/modules/cloud/cloud-sync-status.css" group="${dependencyGroup}"/>
 
+<@script type="text/javascript" src="${url.context}/res/components/checkin/checkin.js" group="${dependencyGroup}" />
+
 <@script type="text/javascript" src="${url.context}/res/components/documentlibrary/vgr-actions.js" group="${dependencyGroup}" />
 <@link rel="stylesheet" type="text/css" href="${url.context}/res/components/documentlibrary/vgr-actions.css" group="${dependencyGroup}" />
 

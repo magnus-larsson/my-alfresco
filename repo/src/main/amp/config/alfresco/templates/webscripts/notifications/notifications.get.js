@@ -54,7 +54,7 @@ if (res && res.length > 0) {
             var endTime   = item.properties['{http://www.vgregion.se/datalist/1.0}systemMessageEndTime'];
             d(startTime);
             d(endTime);
-            if (startTime <= now && now <= endTime) {
+            if (startTime <= now && now <= endTime || startTime === null && now <= endTime || startTime <= now && endTime === null || startTime ===null && endTime === null) {
                 msgs.push({
                     id: item.id,
                     title: minimal(item.properties['{http://www.vgregion.se/datalist/1.0}systemMessageTitle']),

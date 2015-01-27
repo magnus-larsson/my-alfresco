@@ -22,8 +22,15 @@ function main() {
    var mcns = "{http://www.alfresco.org/model/content/1.0}";
    var name = n.properties[mcns + "name"];
 
-   model.nodeRef = nodeRef;
-   model.name = name;
+   var widget = {
+      id : "PdfMaximise", 
+      name : "Alfresco.thirdparty.PdfMaximise",
+      options : {
+         nodeRef: nodeRef,
+         name: name
+      }
+   };
+   model.widgets = [widget];
 }
 
 main();

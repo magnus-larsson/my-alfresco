@@ -8,15 +8,28 @@ var values = function () {
     majorVersion: false
   };
 
+  var filename = null;
+
   for each(field in formdata.fields) {
     switch (String(field.name).toLowerCase()) {
-      case "filedata":
-        if (field.isFile) {
-          vals.filename = field.filename;
-          vals.content = field.content;
-          vals.content2 = field.content;
-        }
+      case "filename":
+       filename = fnFieldValue(field);
+       break;
+            
+        case "filedata":
+           if (field.isFile)
+           {
+              vals.filename = filename ? filename : field.filename;
+              vals.content = field.content;
+              vals.content2 = field.content;
+              vals.mimetype = field.mimetype;
+           }
+           break;
+
+      case "updatenoderef":
+        vals.updateNodeRef = fnFieldValue(field);
         break;
+
       case "noderef":
         vals.nodeRef = fnFieldValue(field);
         break;
@@ -47,11 +60,13 @@ function main() {
   //set values on model
   model.filename = data.filename;
   model.nodeRef = data.nodeRef;
+  model.updateNodeRef = data.updateNodeRef;
   model.majorVersion = data.majorVersion;
   model.description = data.description;
-
+  model.mimetype = data.mimetype;
+  
   //sanity check
-  if (!data.filename || !data.content || !data.nodeRef) {
+  if (!data.filename || !data.content || !data.updateNodeRef) {
     return;
   }
 
@@ -63,7 +78,7 @@ function main() {
   model.tempFilename = data.tempFilename;
 
   //find node
-  var n = search.findNode(data.nodeRef);
+  var n = search.findNode(data.updateNodeRef);
   if (!n) {
     return;
   }
@@ -97,14 +112,14 @@ function main() {
 
     var source = "";
 
-    var dataNode = search.findNode(data.nodeRef);
+    var dataNode = search.findNode(data.updateNodeRef);
 
     if (dataNode) {
       source = dataNode.assocs['cm:original'].length > 0 ? dataNode.assocs['cm:original'][0].nodeRef.toString() : "";
     }
     
     // check if the uuid parts match either the working copy or the original
-    if (data.nodeRef.indexOf(storedUUID) != -1 || source.indexOf(storedUUID) != -1) {
+    if (data.updateNodeRef.indexOf(storedUUID) != -1 || source.indexOf(storedUUID) != -1) {
       model.result = "match";
       return;
     }
