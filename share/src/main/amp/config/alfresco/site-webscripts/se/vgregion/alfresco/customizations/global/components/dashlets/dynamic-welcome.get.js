@@ -1,3 +1,6 @@
+// @overridden projects/slingshot/config/alfresco/site-webscripts/org/alfresco/components/dashlets/dynamic-welcome.get.js
+
+
 // Get the tutorial link from the config (taking care to avoid scripting errors!)
 var tutorial = config.scoped["HelpPages"];
 

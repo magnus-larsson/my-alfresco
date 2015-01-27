@@ -1,3 +1,5 @@
+<#-- @overridden projects/slingshot/config/alfresco/site-webscripts/org/alfresco/components/dashlets/my-documents.get.html.ftl -->
+
 <@markup id="vgr-js" action="after" target="js">
    <@script src="${url.context}/res/components/upload/file-upload.js" group="upload"/>
    <@script src="${url.context}/res/components/upload/html-upload.js" group="upload"/>
