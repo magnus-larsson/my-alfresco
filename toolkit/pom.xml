@@ -58,6 +58,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
+        <version>1.3.2</version>
         <configuration>
           <workingDirectory>src/main/angular</workingDirectory>
         </configuration>
@@ -79,7 +80,7 @@
             <id>exec-bower-install</id>
             <phase>generate-sources</phase>
             <configuration>
-              <executable>bower</executable>
+              <executable>./node_modules/.bin/bower</executable>
               <arguments>
                 <argument>install</argument>
               </arguments>
@@ -92,7 +93,7 @@
             <id>exec-grunt</id>
             <phase>process-resources</phase>
             <configuration>
-              <executable>grunt</executable>
+              <executable>./node_modules/.bin/grunt</executable>
               <arguments>
                 <argument>--force</argument>
               </arguments>
