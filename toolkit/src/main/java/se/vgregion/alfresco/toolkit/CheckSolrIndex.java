@@ -133,11 +133,10 @@ public class CheckSolrIndex implements InitializingBean {
     if (!_nodeService.exists(node)) {
       return new ErrorResolution(404, "Document with nodeRef '" + nodeRef + "' does not exist.");
     }
+    
     String url = _solrUrl + "/solr/core0/select";
-
     // http://solr-index.vgregion.se:8080/solr/ifeed/select/?fq=*:*&version=2.2&start=0&rows=10&indent=on&fl=*&fq=dc.source.documentid:8800
-
-    String url = "http://solr-index.vgregion.se:8080/solr/core0/select";
+    // String url = "http://solr-index.vgregion.se:8080/solr/core0/select";
     String fq = "dc.identifier.documentid:\"" + nodeRef + "\"";
 
     url += "?fq=" + URLEncoder.encodeUriComponent(fq);
