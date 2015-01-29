@@ -1,0 +1,3 @@
+- installera nodejs (apt-get install nodejs nodejs-legacy)
+- installera npm (apt-get install npm)
+- installera compass (gem install compass)
