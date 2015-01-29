@@ -24,7 +24,30 @@
       </customizations>
 
       <configurations>
+        <!-- Replace -->
         <config evaluator="string-compare" condition="DocumentLibrary" replace="true">
+          <!-- Used by the "Manage Aspects" action For custom aspects, remember to also add the relevant i18n string(s) cm_myaspect=My Aspect -->
+          <aspects>
+            <!-- Aspects that a user can see -->
+            <visible></visible>
+            <!-- Aspects that a user can add. Same as "visible" if left empty -->
+            <addable></addable>
+            <!-- Aspects that a user can remove. Same as "visible" if left empty -->
+            <removeable></removeable>
+          </aspects>
+          <!-- File upload configuration -->
+          <file-upload>
+            <!-- Adobe Flash™ In certain environments, an HTTP request originating from Flash cannot be authenticated using an existing session. See: http://bugs.adobe.com/jira/browse/FP-4830 For these cases, it is useful to disable the Flash-based uploader for Share Document Libraries. -->
+            <adobe-flash-enabled>true</adobe-flash-enabled>
+          </file-upload>
+
+          <!-- Used by the "Change Type" action Define valid subtypes using the following example: <type name="cm:content"> <subtype name="cm:mysubtype" /> </type> Remember to also add the relevant i18n string(s): cm_mysubtype=My SubType -->
+          <types>
+            <type name="cm:content">
+              <subtype name="vgr:document" />
+            </type>
+          </types>
+
           <create-content>
             <content id="document" label="menu.create-content.vgr-document" type="pagelink" index="10" icon="text">
               <param name="page">create-content?destination={nodeRef}&amp;itemId=vgr:document</param>
@@ -35,6 +58,38 @@
           </create-content>
 
           <create-content-by-template>false</create-content-by-template>
+
+          <multi-select>
+            <action type="action-link" id="onActionDownload" label="menu.selected-items.download" />
+            <action type="action-link" id="onActionCopyTo" label="menu.selected-items.copy" />
+            <action type="action-link" id="onActionMoveTo" permission="Delete" label="menu.selected-items.move" />
+            <!-- <action type="action-link" id="onActionAssignWorkflow" asset="document" label="menu.selected-items.assign-workflow" /> -->
+            <action type="action-link" id="onActionDelete" permission="Delete" label="menu.selected-items.delete" notAspect="hwf:hybridWorkflow" />
+            <action type="action-link" id="onActionCloudSync" asset="document" permission="CreateChildren" label="menu.selected-items.cloudSync" notAspect="sync:syncSetMemberNode" syncMode="ON_PREMISE" />
+            <action type="action-link" id="onActionCloudSyncRequest" label="menu.selected-items.cloudRequestSync" hasAspect="sync:syncSetMemberNode" syncMode="ON_PREMISE" />
+          </multi-select>
+        </config>
+
+        <!-- Extend -->
+        <config evaluator="string-compare" condition="DocumentLibrary" replace="false">
+          <indicators>
+            <indicator id="vgr-publish-status-placeholder" index="39" icon="loading.gif">
+              <evaluator>evaluator.doclib.indicator.vgr-publish-status</evaluator>
+            </indicator>
+            <indicator id="auto-publish-all-versions" index="39">
+              <evaluator>evaluator.doclib.indicator.auto-publish-all-versions</evaluator>
+            </indicator>
+            <indicator id="auto-publish-major-version" index="39">
+              <evaluator>evaluator.doclib.indicator.auto-publish-major-version</evaluator>
+            </indicator>
+          </indicators>
+        </config>
+
+        <!-- DocLibCustom section -->
+        <config evaluator="string-compare" condition="DocLibCustom">
+          <dependencies>
+            <js src="/components/documentlibrary/vgr-publish-status.js" />
+          </dependencies>
         </config>
 
       </configurations>
@@ -164,6 +219,37 @@
 
     </module>
 
+    <module>
+      <id>VGR Site</id>
+      <version>${project.version}</version>
+      <auto-deploy>true</auto-deploy>
+
+      <!-- Base evaluator that decides if any of the component bindings should be used at all -->
+      <evaluator type="site.module.evaluator">
+        <params>
+          <sites>.*</sites>
+          <sitePresets>.*</sitePresets>
+          <applyForNonSites>false</applyForNonSites>
+        </params>
+      </evaluator>
+
+      <!-- Apply the following customizations when the base evaluator above passes -->
+      <customizations>
+        <customization>
+          <targetPackageRoot>org.alfresco</targetPackageRoot>
+          <sourcePackageRoot>se.vgregion.alfresco.customizations.site</sourcePackageRoot>
+        </customization>
+      </customizations>
+      <configurations>
+        <!-- Extend -->
+        <config evaluator="string-compare" condition="DocumentLibrary" replace="false">
+          <multi-select>
+            <action type="action-link" id="onActionPublishToStorage" permission="Write" label="actions.document.publish-to-storage" notAspect="vgr:published" />
+            <action type="action-link" id="onActionUnpublishFromStorage" permission="Write" label="actions.document.unpublish-from-storage" notAspect="vgr:published" />
+          </multi-select>
+        </config>
+      </configurations>
+    </module>
     <module>
       <id>VGR Header menu - Tyck till</id>
       <version>${project.version}</version>
