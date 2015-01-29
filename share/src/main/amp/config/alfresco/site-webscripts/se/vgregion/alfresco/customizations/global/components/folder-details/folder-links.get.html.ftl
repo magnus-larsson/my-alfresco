@@ -4,7 +4,7 @@
    <@link rel="stylesheet" type="text/css" href="${url.context}/res/components/folder-details/vgr-folder-links.css" group="folder-details" />
 </@>
 
-<@markup id="vgr-js" action="after" target="js">
+<@markup id="vgr-js-after" action="before" target="widgets">
    <@script src="${url.context}/res/components/folder-details/vgr-folder-links.js" group="folder-details" />
 </@>
 
