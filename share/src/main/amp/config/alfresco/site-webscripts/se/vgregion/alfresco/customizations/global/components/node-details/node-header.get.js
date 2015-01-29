@@ -1,3 +1,5 @@
+// @overridden projects/slingshot/config/alfresco/site-webscripts/org/alfresco/components/node-details/node-header.get.js
+
 /**
  * This extension adds the missing status values that was present in the old slingshot doclib repo script.
  * 

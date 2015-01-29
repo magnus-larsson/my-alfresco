@@ -1,3 +1,5 @@
+<#-- @overridden projects/slingshot/config/alfresco/site-webscripts/org/alfresco/components/guest/login.get.html.ftl -->
+
 <@markup id="vgr-css" action="after" target="css">
    <@link href="${url.context}/res/components/guest/vgr-login.css" group="login"/>
 </@>

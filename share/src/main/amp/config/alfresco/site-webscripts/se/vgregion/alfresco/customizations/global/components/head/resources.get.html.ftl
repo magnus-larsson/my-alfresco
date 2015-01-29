@@ -1,4 +1,4 @@
-<#include "/org/alfresco/components/component.head.inc">
+<#-- @overridden projects/slingshot/config/alfresco/site-webscripts/org/alfresco/components/head/resources.get.html.ftl -->
 
 <@markup id="vgr-yui" action="after" target="yui" scope="global">
    <@script type="text/javascript" src="${url.context}/res/js/bubbling.js"></@script>
