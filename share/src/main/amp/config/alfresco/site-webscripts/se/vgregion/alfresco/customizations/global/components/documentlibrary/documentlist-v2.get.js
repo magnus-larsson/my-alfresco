@@ -1,4 +1,5 @@
 <import resource="classpath:/alfresco/templates/org/alfresco/import/alfresco-util.js">
+// @overridden projects/slingshot/config/alfresco/site-webscripts/org/alfresco/components/documentlibrary/documentlist-v2.get.js
 
 function vgr_main()
 {

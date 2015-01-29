@@ -1,3 +1,5 @@
+<#-- @overridden projects/slingshot/config/alfresco/site-webscripts/org/alfresco/components/folder-details/folder-metadata.get.html.ftl -->
+
 <@markup id="vgr-css" target="css" action="after">
   <#-- CSS Dependencies -->
   <@link rel="stylesheet" type="text/css" href="${url.context}/res/components/form/controls/treeselect.css" group="folder-details" />
