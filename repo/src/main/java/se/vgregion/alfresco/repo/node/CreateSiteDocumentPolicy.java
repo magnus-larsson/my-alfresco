@@ -1,6 +1,9 @@
 package se.vgregion.alfresco.repo.node;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -34,6 +37,8 @@ public class CreateSiteDocumentPolicy extends AbstractPolicy implements OnCreate
   private static boolean _initialized = false;
 
   protected DictionaryService _dictionaryService;
+  
+  private List<String> _blacklisted = new ArrayList<String>();
 
   @Override
   public void onCreateNode(final ChildAssociationRef childAssocRef) {
@@ -108,6 +113,10 @@ public class CreateSiteDocumentPolicy extends AbstractPolicy implements OnCreate
 
     for (final Entry<QName, Serializable> folderProperty : folderProperties.entrySet()) {
       final QName key = folderProperty.getKey();
+      
+      if (isBlacklisted(key)) {
+        continue;
+      }
 
       final AspectDefinition aspectMetadata = _dictionaryService.getAspect(VgrModel.ASPECT_METADATA);
 
@@ -130,19 +139,50 @@ public class CreateSiteDocumentPolicy extends AbstractPolicy implements OnCreate
 
   }
 
+  /**
+   * Checks if a property is blacklisted.
+   * 
+   * @param property
+   * @return
+   */
+  private boolean isBlacklisted(QName property) {
+    for (String blacklisted : _blacklisted) {
+      if (blacklisted.equalsIgnoreCase(property.getLocalName())) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+
   @Override
   public void afterPropertiesSet() throws Exception {
     super.afterPropertiesSet();
+
     if (!_initialized) {
       LOG.info("Initialized " + this.getClass().getName() + ".onMoveNode");
       LOG.info(this.getClass().getName() + ".onCreateNode " + " is handled by delegate class");
       _policyComponent.bindClassBehaviour(OnMoveNodePolicy.QNAME, ContentModel.TYPE_CONTENT, new JavaBehaviour(this, "onMoveNode", NotificationFrequency.TRANSACTION_COMMIT));
     }
   }
-  
+
   @Required
   public void setDictionaryService(DictionaryService dictionaryService) {
     _dictionaryService = dictionaryService;
+  }
+  
+  public void setBlacklisted(String blacklisted) {
+    if (StringUtils.isBlank(blacklisted)) {
+      return;
+    }
+    
+    String[] array = StringUtils.split(blacklisted, ",");
+    
+    if (array.length == 0) {
+      return;
+    }
+    
+    _blacklisted = Arrays.asList(array);
   }
 
 }

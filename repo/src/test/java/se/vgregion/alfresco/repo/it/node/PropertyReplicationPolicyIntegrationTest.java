@@ -20,7 +20,7 @@ import se.vgregion.alfresco.repo.model.VgrModel;
 public class PropertyReplicationPolicyIntegrationTest extends AbstractVgrRepoIntegrationTest {
 
   private static final String DEFAULT_USERNAME = "testuser_" + System.currentTimeMillis();
-  private SiteInfo site;
+  private static SiteInfo site;
 
   @Override
   public void beforeClassSetup() {
@@ -90,6 +90,6 @@ public class PropertyReplicationPolicyIntegrationTest extends AbstractVgrRepoInt
     // calculated from name)
     _nodeService.setProperty(document, VgrModel.PROP_FORMAT_EXTENT_EXTENSION, "pdf");
     assertEquals("test4.pdf", _nodeService.getProperty(document, ContentModel.PROP_NAME));
-
   }
+
 }

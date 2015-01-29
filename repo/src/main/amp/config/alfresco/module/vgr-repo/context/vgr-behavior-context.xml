@@ -35,6 +35,7 @@
 
   <bean id="vgr.createSiteDocumentPolicy" class="se.vgregion.alfresco.repo.node.CreateSiteDocumentPolicy" depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy">
     <property name="dictionaryService" ref="DictionaryService" />
+    <property name="blacklisted" value="${vgr.metadata.inheritance.blacklist}" />
   </bean>
 
   <bean id="vgr.updateSiteFolderMetadataPolicy" class="se.vgregion.alfresco.repo.node.UpdateSiteFolderMetadataPolicy" depends-on="vgr.dictionaryBootstrap" parent="vgr.abstractPolicy" p:fileFolderService-ref="FileFolderService" />
