@@ -156,7 +156,7 @@ public class CreateSiteDocumentPolicy extends AbstractPolicy implements OnCreate
   }
 
   @Override
-  public void afterPropertiesSet() throws Exception {
+  public void afterPropertiesSet() {
     super.afterPropertiesSet();
 
     if (!_initialized) {

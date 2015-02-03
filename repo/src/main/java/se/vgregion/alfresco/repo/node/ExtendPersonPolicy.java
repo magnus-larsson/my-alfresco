@@ -48,7 +48,7 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
 
   private static final String KEY_PERSON_INFO = ExtendPersonPolicy.class.getName() + ".personInfoUpdate";
   private static final Logger LOG = Logger.getLogger(ExtendPersonPolicy.class);
-  private KivWsClient _kivWsClient;
+  //private KivWsClient _kivWsClient;
   private static Boolean _initialized = false;
   private static String avatarName = "ad_avatar.jpg";
 
@@ -208,20 +208,15 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
     _transactionService = transactionService;
   }
 
-  public void setKivWsClient(KivWsClient kivWsClient) {
-    _kivWsClient = kivWsClient;
-  }
-
   public void setContentService(ContentService contentService) {
     _contentService = contentService;
   }
 
   @Override
-  public void afterPropertiesSet() throws Exception {
+  public void afterPropertiesSet() {
     super.afterPropertiesSet();
 
     Assert.notNull(_threadPoolExecutor);
-    Assert.notNull(_kivWsClient);
     Assert.notNull(_contentService);
 
     if (!_initialized) {

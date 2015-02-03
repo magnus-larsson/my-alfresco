@@ -67,7 +67,6 @@ public class ExtendPersonPolicyTest {
 
     ExtendPersonPolicy policy = new ExtendPersonPolicy();
     policy.setNodeService(_nodeService);
-    policy.setKivWsClient(_kivWsClient);
     policy.setBehaviourFilter(_behaviourFilter);
 
     NodeRef personNodeRef = new NodeRef("workspace://SpaceStore/kallekula");
