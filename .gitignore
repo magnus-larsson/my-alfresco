@@ -19,3 +19,5 @@ rebel.xml
 .DS_Store
 alf_data_dev
 *.orig
+build.sh
+it.sh
