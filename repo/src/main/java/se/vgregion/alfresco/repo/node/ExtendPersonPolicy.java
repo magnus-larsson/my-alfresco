@@ -2,7 +2,9 @@ package se.vgregion.alfresco.repo.node;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.alfresco.model.ContentModel;
@@ -113,8 +115,6 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
           writer.setMimetype("image/jpeg");
           writer.putContent(BAIS);
 
-          LOG.debug("Wr: " + writer.getMimetype());
-
           // Remove old avatar assoc if there is one
           List<AssociationRef> targetAssocs = _nodeService.getTargetAssocs(nodeRef, ContentModel.ASSOC_AVATAR);
 
@@ -128,10 +128,6 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
 
           // Add an avatar association for backwards compatability
           _nodeService.createAssociation(nodeRef, imageNodeRef, ContentModel.ASSOC_AVATAR);
-
-          if (LOG.isDebugEnabled()) {
-            LOG.debug("Avatar node: " + imageNodeRef);
-          }
 
           _behaviourFilter.enableBehaviour();
 
@@ -148,7 +144,7 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
       LOG.debug("User does not have a thumbnail photo");
     } else {
       if (LOG.isInfoEnabled()) {
-        LOG.info("User have a thumbnail photo " + nodeRef);
+        LOG.info("User have a thumbnail photo ");
       }
     }
 
@@ -196,7 +192,12 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
    */
   private void updatePersonInfo(NodeRef personNodeRef) {
     AlfrescoTransactionSupport.bindListener(_transactionListener);
-    AlfrescoTransactionSupport.bindResource(KEY_PERSON_INFO, personNodeRef);
+    Set<NodeRef> nodeRefs = (Set<NodeRef>) AlfrescoTransactionSupport.getResource(KEY_PERSON_INFO);
+    if (nodeRefs == null) {
+      nodeRefs = new HashSet<NodeRef>(5);
+      AlfrescoTransactionSupport.bindResource(KEY_PERSON_INFO, nodeRefs);
+    }
+    nodeRefs.add(personNodeRef);
   }
 
   public void setThreadPoolExecutor(ThreadPoolExecutor threadPoolExecutor) {
@@ -241,15 +242,18 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
 
     @Override
     public void afterCommit() {
-      NodeRef personNodeRef = (NodeRef) AlfrescoTransactionSupport.getResource(KEY_PERSON_INFO);
+      Set<NodeRef> personNodeRefs = (Set<NodeRef>) AlfrescoTransactionSupport.getResource(KEY_PERSON_INFO);
+      if (personNodeRefs != null) {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Requesting person info update for " + personNodeRefs.size() + " users");
+        }
+        for (NodeRef personNodeRef : personNodeRefs) {
 
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Requesting person info update for " + personNodeRef);
+          Runnable runnable = new PersonInfoUpdater(personNodeRef);
+
+          _threadPoolExecutor.execute(runnable);
+        }
       }
-
-      Runnable runnable = new PersonInfoUpdater(personNodeRef);
-
-      _threadPoolExecutor.execute(runnable);
     }
 
   }
@@ -279,7 +283,7 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
               return null;
             }
 
-          }, false, true);
+          }, false, false);
 
         }
       }, AuthenticationUtil.getSystemUserName());
