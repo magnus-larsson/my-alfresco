@@ -13,6 +13,5 @@
 
 <@markup id="vgr-js-after" target="widgets" action="before">
   <#-- JavaScript Dependencies -->
-  <@script type="text/javascript" src="${url.context}/res/components/site-finder/vgr-site-finder.js" group="site-finder"/>
   <@script type="text/javascript" src="${url.context}/res/modules/vgr-delete-site.js" group="site-finder"/>
 </@>

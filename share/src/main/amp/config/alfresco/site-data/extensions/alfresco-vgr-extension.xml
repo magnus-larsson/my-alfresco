@@ -415,5 +415,34 @@
         </component>
       </components>
     </module>
+
+    <module>
+      <id>VGR Site - Default Redirect</id>
+      <version>${project.version}</version>
+      <auto-deploy>false</auto-deploy>
+      <!-- Base evaluator that decides if any of the component bindings should be used at all -->
+      <evaluator type="site.module.evaluator">
+        <params>
+          <sites>.*</sites>
+          <sitePresets>.*</sitePresets>
+          <applyForNonSites>true</applyForNonSites>
+        </params>
+      </evaluator>
+
+      <!-- Extension consists of: -->
+      <!-- site-data/template-instances/default-redirect.xml -->
+      <!-- site-data/pages/default-redirect.xml -->
+      <!-- customizations/site-default-redirect  --> 
+      <!-- vgr-defaultredirect-my-sites.js -->
+      <!-- vgr-defaultredirect-site-finder.js -->
+      
+      <!-- Apply the following customizations when the base evaluator above passes -->
+      <customizations>
+        <customization>
+          <targetPackageRoot>org.alfresco</targetPackageRoot>
+          <sourcePackageRoot>se.vgregion.alfresco.customizations.site-defaultredirect</sourcePackageRoot>
+        </customization>
+      </customizations>
+    </module>
   </modules>
 </extension>
