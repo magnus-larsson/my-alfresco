@@ -13,7 +13,7 @@
       // Prefix some of the urls with values from the client
       Dom.get(this.id + "-page-url-text").innerHTML = document.location.href;
       
-      var downloadUrl = Alfresco.constants.PROXY_URI + "api/node/content/" + this.options.nodeRef.replace(":/", "") + "/" + this.options.fileName;
+      var downloadUrl = Alfresco.constants.PROXY_URI + "api/node/content/" + this.options.nodeRef.replace(":/", "") + "/" + encodeURIComponent(this.options.fileName);
       
       Dom.get(this.id + "-download-url-text").innerHTML = downloadUrl + "?a=true";
       
