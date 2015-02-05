@@ -29,6 +29,7 @@ import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileFolderServiceType;
 import org.alfresco.service.cmr.model.FileInfo;
@@ -99,8 +100,6 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
   private ContentService _contentService;
 
-  // private Properties _globalProperties;
-
   private SearchService _searchService;
 
   private DictionaryService _dictionaryService;
@@ -116,10 +115,16 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   private NamespaceService _namespaceService;
 
   private Repository _repository;
-  
+
   private PublishingService _publishingService;
 
+  private LockService _lockService;
+
   private boolean pdfaPilotEnabled = false;
+
+  public void setLockService(LockService lockService) {
+    this._lockService = lockService;
+  }
 
   public void setPdfaPilotEnabled(boolean pdfaPilotEnabled) {
     this.pdfaPilotEnabled = pdfaPilotEnabled;
@@ -188,7 +193,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   public void setNamespaceService(NamespaceService namespaceService) {
     _namespaceService = namespaceService;
   }
-  
+
   public void setPublishingService(PublishingService publishingService) {
     _publishingService = publishingService;
   }
@@ -661,6 +666,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     Assert.notNull(_actionService);
     Assert.notNull(_repository);
     Assert.notNull(_publishingService);
+    Assert.notNull(_lockService);
   }
 
   @Override
@@ -857,12 +863,12 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
         throw new RuntimeException(ex);
       }
     }
-    
-    //TODO if we get to this point we should send the file to index again.
+
+    // TODO if we get to this point we should send the file to index again.
     if (_publishingService.isPublished(nodeRef)) {
-      //Clear publish flags and push again
+      // Clear publish flags and push again
       PushLogger.logNodeForRepushAfterNewPdfa(nodeRef, _nodeService);
-      
+
       _behaviourFilter.disableBehaviour();
       try {
         // null the pushed for publish/unpublish properties to force a re-push
@@ -998,6 +1004,14 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
     if (nodeType != FileFolderServiceType.FILE) {
       throw new AlfrescoRuntimeException("Only files can be published.");
+    }
+
+    if (_nodeService.hasAspect(nodeRef, ContentModel.ASPECT_WORKING_COPY)) {
+      throw new AlfrescoRuntimeException("Working copies cannot be published.");
+    }
+
+    if (_lockService.getLockType(nodeRef) != null) {
+      throw new AlfrescoRuntimeException("Locked nodes cannot be published.");
     }
 
     final String sourceOrigin = (String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_ORIGIN);

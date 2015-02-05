@@ -34,6 +34,7 @@
     <property name="repository" ref="repositoryHelper" />
     <property name="pdfaPilotEnabled" value="${pdfapilot.enabled}" />
     <property name="publishingService" ref="vgr.publishingService" />
+    <property name="lockService" ref="LockService" />
   </bean>
 
   <bean id="vgr.kivWsClient" class="se.vgregion.alfresco.repo.kivclient.KivWsClient">

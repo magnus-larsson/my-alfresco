@@ -4,12 +4,17 @@ import static org.junit.Assert.*;
 
 import javax.annotation.Resource;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.transform.ContentTransformer;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
+import org.alfresco.service.cmr.lock.LockService;
+import org.alfresco.service.cmr.lock.LockType;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.site.SiteInfo;
+import org.apache.chemistry.opencmis.server.support.query.CmisQlExtParser_CmisBaseGrammar.null_predicate_return;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import se.vgregion.alfresco.repo.it.AbstractVgrRepoIntegrationTest;
 import se.vgregion.alfresco.repo.model.VgrModel;
@@ -28,6 +33,10 @@ public class PublishToStorageIntegrationTest extends AbstractVgrRepoIntegrationT
 
   @Autowired
   protected StorageService _storageService;
+
+  @Autowired
+  @Qualifier(value = "LockService")
+  protected LockService _lockService;
 
   @Resource(name = "transformer.pdfaPilot")
   protected ContentTransformer _transformer;
@@ -61,9 +70,10 @@ public class PublishToStorageIntegrationTest extends AbstractVgrRepoIntegrationT
     setRequiresNew(true);
 
     // this happens if pdfaPilot is not enabled and isn't around to do the work
-    /*if (!_transformer.isTransformable("application/pdf", -1, "application/pdf", null)) {
-      return;
-    }*/
+    /*
+     * if (!_transformer.isTransformable("application/pdf", -1,
+     * "application/pdf", null)) { return; }
+     */
 
     final NodeRef sourceDocument = _transactionHelper.doInTransaction(new RetryingTransactionCallback<NodeRef>() {
 
@@ -93,12 +103,12 @@ public class PublishToStorageIntegrationTest extends AbstractVgrRepoIntegrationT
         return _storageService.publishToStorage(sourceDocument, false);
       }
     }, false, true);
-    
+
     assertNotNull(publishedDocument);
     assertTrue(_nodeService.exists(publishedDocument));
     try {
       _transactionHelper.doInTransaction(new RetryingTransactionCallback<NodeRef>() {
-  
+
         @Override
         public NodeRef execute() throws Throwable {
           return _storageService.publishToStorage(sourceDocument, false);
@@ -106,8 +116,100 @@ public class PublishToStorageIntegrationTest extends AbstractVgrRepoIntegrationT
       }, false, true);
       fail("Second publish of the same document should fail!");
     } catch (Exception e) {
-      
+
     }
-    
+
+  }
+
+  @Test
+  public void testPublishOfLockedNode() {
+
+    setRequiresNew(true);
+
+    // this happens if pdfaPilot is not enabled and isn't around to do the work
+    /*
+     * if (!_transformer.isTransformable("application/pdf", -1,
+     * "application/pdf", null)) { return; }
+     */
+
+    final NodeRef sourceDocument = _transactionHelper.doInTransaction(new RetryingTransactionCallback<NodeRef>() {
+
+      @Override
+      public NodeRef execute() throws Throwable {
+        return uploadDocument(_site, "test.doc", null, null, "test_lock.doc").getNodeRef();
+      }
+    }, false, true);
+
+    _transactionHelper.doInTransaction(new RetryingTransactionCallback<Void>() {
+
+      @Override
+      public Void execute() throws Throwable {
+        _nodeService.setProperty(sourceDocument, VgrModel.PROP_TYPE_RECORD, "type record");
+        _nodeService.setProperty(sourceDocument, VgrModel.PROP_TYPE_RECORD_ID, "dc.type.record");
+        _nodeService.setProperty(sourceDocument, VgrModel.PROP_PUBLISHER_PROJECT_ASSIGNMENT, "publisher project assignment");
+        _nodeService.setProperty(sourceDocument, VgrModel.PROP_TITLE, "title");
+        _lockService.lock(sourceDocument, LockType.WRITE_LOCK);
+        return null;
+      }
+    }, false, true);
+
+    try {
+      _transactionHelper.doInTransaction(new RetryingTransactionCallback<NodeRef>() {
+
+        @Override
+        public NodeRef execute() throws Throwable {
+          return _storageService.publishToStorage(sourceDocument, false);
+        }
+      }, false, true);
+      fail("Publishing should not be accepted on a locked node");
+    } catch (Exception e) {
+
+    }
+  }
+
+  @Test
+  public void testPublishOfWorkingCopyNode() {
+
+    setRequiresNew(true);
+
+    // this happens if pdfaPilot is not enabled and isn't around to do the work
+    /*
+     * if (!_transformer.isTransformable("application/pdf", -1,
+     * "application/pdf", null)) { return; }
+     */
+
+    final NodeRef sourceDocument = _transactionHelper.doInTransaction(new RetryingTransactionCallback<NodeRef>() {
+
+      @Override
+      public NodeRef execute() throws Throwable {
+        return uploadDocument(_site, "test.doc", null, null, "test_working_copy.doc").getNodeRef();
+      }
+    }, false, true);
+
+    _transactionHelper.doInTransaction(new RetryingTransactionCallback<Void>() {
+
+      @Override
+      public Void execute() throws Throwable {
+        _nodeService.setProperty(sourceDocument, VgrModel.PROP_TYPE_RECORD, "type record");
+        _nodeService.setProperty(sourceDocument, VgrModel.PROP_TYPE_RECORD_ID, "dc.type.record");
+        _nodeService.setProperty(sourceDocument, VgrModel.PROP_PUBLISHER_PROJECT_ASSIGNMENT, "publisher project assignment");
+        _nodeService.setProperty(sourceDocument, VgrModel.PROP_TITLE, "title");
+        _nodeService.addAspect(sourceDocument, ContentModel.ASPECT_WORKING_COPY, null);
+        return null;
+      }
+    }, false, true);
+
+    try {
+      _transactionHelper.doInTransaction(new RetryingTransactionCallback<NodeRef>() {
+
+        @Override
+        public NodeRef execute() throws Throwable {
+          return _storageService.publishToStorage(sourceDocument, false);
+        }
+      }, false, true);
+      fail("Publishing should not be accepted on a working copy node");
+    } catch (Exception e) {
+
+    }
   }
 }

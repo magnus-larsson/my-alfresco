@@ -11,6 +11,7 @@ import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.rendition.RenditionService;
@@ -52,7 +53,7 @@ public class StorageServiceTest {
   private ActionService actionService;
   private RetryingTransactionHelper retryingTransactionHelper;
   private PublishingService publishingService;
-
+  private LockService lockService;
   final NodeRef nodeRef1 = new NodeRef("workspace://SpacesStore/node1");
   final NodeRef companyHomeNodeRef = new NodeRef("workspace://SpacesStore/CompanyHome");
   final NodeRef storageNodeRef = new NodeRef("workspace://SpacesStore/StorageNodeRef");
@@ -75,7 +76,7 @@ public class StorageServiceTest {
     actionService = m.mock(ActionService.class);
     publishingService = m.mock(PublishingService.class);
     retryingTransactionHelper = m.mock(RetryingTransactionHelper.class);
-
+    lockService = m.mock(LockService.class);
     ssi = new StorageServiceImpl();
     ssi.setFileFolderService(fileFolderService);
     ssi.setNodeService(nodeService);
@@ -91,6 +92,7 @@ public class StorageServiceTest {
     ssi.setActionService(actionService);
     ssi.setRetryingTransactionHelper(retryingTransactionHelper);
     ssi.setPublishingService(publishingService);
+    ssi.setLockService(lockService);
     ssi.afterPropertiesSet();
 
     m.checking(new Expectations() {
