@@ -21,3 +21,4 @@ alf_data_dev
 *.orig
 build.sh
 it.sh
+rebel.xml
