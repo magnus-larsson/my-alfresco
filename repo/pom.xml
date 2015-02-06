@@ -177,7 +177,7 @@
     <dependency>
       <groupId>org.redpill-linpro.alfresco.module</groupId>
       <artifactId>metadatawriter</artifactId>
-      <version>4.2.2.12</version>
+      <version>4.2.4</version>
     </dependency>
 
     <dependency>
@@ -322,8 +322,6 @@
     <dependency>
       <groupId>org.redpill-linpro.alfresco</groupId>
       <artifactId>alfresco-test-repo</artifactId>
-      <version>1.0.4</version>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
