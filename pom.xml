@@ -61,11 +61,6 @@
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>org.redpill-linpro.alfresco.translations</groupId>
-        <artifactId>alfresco-swedish-share</artifactId>
-        <version>${languagepack.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.sharextras</groupId>
         <artifactId>media-viewers</artifactId>
         <version>2.6.0</version>
