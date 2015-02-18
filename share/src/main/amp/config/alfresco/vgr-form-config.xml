@@ -60,7 +60,10 @@
           <field id="vgr:dc.type.document.structure.id" set="dokumentbeskrivning">
             <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
-          <field id="vgr:dc.type.document" label-id="vgr.dc.type.document" set="dokumentbeskrivning">
+          <field id="vgr:dc.type.document" label-id="vgr.dc.type.document" set="dokumentbeskrivning" mandatory="true">
+          <constraint-handlers>
+              <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.mandatory" event="change" />
+            </constraint-handlers>
             <control template="/se/vgregion/alfresco/components/form/controls/ajaxselectone.ftl">
               <control-param name="ds">/service/components/documentTypes</control-param>
               <control-param name="emptyTitle">Välj gruppering av handlingstyper</control-param>
@@ -290,7 +293,10 @@
           <field id="vgr:dc.type.document.structure.id" set="dokumentbeskrivning">
             <control template="/se/vgregion/alfresco/components/form/controls/hidden.ftl" />
           </field>
-          <field id="vgr:dc.type.document" label-id="vgr.dc.type.document" set="dokumentbeskrivning" help-id="vgr.help.dc.type.document" description-id="vgr.description.dc.type.document">
+          <field id="vgr:dc.type.document" label-id="vgr.dc.type.document" set="dokumentbeskrivning" mandatory="true" help-id="vgr.help.dc.type.document" description-id="vgr.description.dc.type.document">
+            <constraint-handlers>
+              <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.mandatory" event="change" />
+            </constraint-handlers>
             <control template="/se/vgregion/alfresco/components/form/controls/ajaxselectone.ftl">
               <control-param name="ds">/service/components/documentTypes</control-param>
               <control-param name="emptyTitle">Välj gruppering av handlingstyper</control-param>

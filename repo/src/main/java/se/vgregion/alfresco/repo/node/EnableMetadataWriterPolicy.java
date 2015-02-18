@@ -131,7 +131,7 @@ public class EnableMetadataWriterPolicy extends AbstractPolicy implements OnChec
   }
 
   @Override
-  public void afterPropertiesSet() throws Exception {
+  public void afterPropertiesSet() {
     super.afterPropertiesSet();
 
     if (!_initialized) {

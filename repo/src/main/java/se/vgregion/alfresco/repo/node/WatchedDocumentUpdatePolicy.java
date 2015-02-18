@@ -34,7 +34,7 @@ public class WatchedDocumentUpdatePolicy extends AbstractPolicy implements Initi
   }
 
   @Override
-  public void afterPropertiesSet() throws Exception {
+  public void afterPropertiesSet() {
     _policyComponent.bindClassBehaviour(OnCheckIn.QNAME, VgrModel.TYPE_VGR_DOCUMENT, new JavaBehaviour(this, "onCheckIn",
             NotificationFrequency.TRANSACTION_COMMIT));
 

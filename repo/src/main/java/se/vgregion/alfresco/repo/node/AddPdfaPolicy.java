@@ -153,7 +153,7 @@ public class AddPdfaPolicy extends AbstractPolicy implements OnContentUpdatePoli
   }
 
   @Override
-  public void afterPropertiesSet() throws Exception {
+  public void afterPropertiesSet() {
     super.afterPropertiesSet();
 
     if (!_initialized) {

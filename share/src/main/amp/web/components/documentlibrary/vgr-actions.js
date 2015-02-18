@@ -38,8 +38,11 @@
             markupParams.pageUrl = Alfresco.util.substituteDotNotation(p_action.params.page, p_record);
 
             /**
-             * If the page starts with a "{" character we're going to assume it's a placeholder variable that will be resolved by the getActionsUrls() function. In which case, we do not want to use
-             * the $siteURL() function here as that will result in a double-prefix.
+             * If the page starts with a "{" character we're going to assume
+             * it's a placeholder variable that will be resolved by the
+             * getActionsUrls() function. In which case, we do not want to use
+             * the $siteURL() function here as that will result in a
+             * double-prefix.
              */
             if (p_action.params.page.charAt(0) !== "{") {
                var recordSiteName = $isValueSet(p_record.location.site) ? p_record.location.site.name : null;
@@ -86,7 +89,8 @@
    };
 
    /**
-    * Same as onActionUploadNewVersion, but performs an document id check. User can still choose to overwrite.
+    * Same as onActionUploadNewVersion, but performs an document id check. User
+    * can still choose to overwrite.
     */
    Alfresco.doclib.Actions.prototype.onActionCheckInNewVersion = function(asset) {
       if (Alfresco.thirdparty && Alfresco.thirdparty.onActionCheckInNewVersion) {
@@ -112,7 +116,7 @@
                Alfresco.util.PopupManager.displayMessage({
                   text : self.msg('message.create-final-version.waiting')
                });
-               
+
                Alfresco.util.Ajax.jsonPost({
                   url : Alfresco.constants.PROXY_URI_RELATIVE + "se/vgregion/alfresco/nodes/createfinalversion",
                   dataObj : {
@@ -140,6 +144,59 @@
             scope : self
          }
       });
+   };
+
+   Alfresco.doclib.Actions.prototype.onActionRecreatePdfa = function(record, owner) {
+      // Get action params
+      var params = this.getAction(record, owner).params, displayName = record.displayName;
+
+      // Deactivate action
+      var ownerTitle = owner.title;
+      owner.title = owner.title + "_deactivated";
+
+      // Prepare genericAction config
+      var config = {
+         success : {
+            callback : {
+               fn : function() {
+                  Alfresco.util.PopupManager.displayMessage({
+                     text : this.msg("message.recreate-pdfa.success", record.nodeRef)
+                  });
+               },
+               obj : record,
+               scope : this
+            }
+         },
+         failure : {
+            callback : {
+               fn : function(error) {
+                  Alfresco.util.PopupManager.displayPrompt({
+                     text : this.msg("message.recreate-pdfa.failure", record.nodeRef)
+                  });
+               },
+               obj : record,
+               scope : this
+            }
+         },
+         webscript : {
+            method : Alfresco.util.Ajax.POST,
+            stem : Alfresco.constants.PROXY_URI + "api/",
+            name : "actionQueue"
+         },
+         config : {
+            requestContentType : Alfresco.util.Ajax.JSON,
+            dataObj : {
+               actionedUponNode : record.nodeRef,
+               actionDefinitionName : 'vgr.action.recreate-pdfa'
+            }
+         },
+         wait: {
+            message: this.msg("message.recreate-pdfa.wait", record.nodeRef)
+         }
+      };
+
+      // Execute the repo action
+      this.modules.actions.genericAction(config);
    };
 
 }());
@@ -190,19 +247,16 @@
    var $isValueSet = Alfresco.util.isValueSet;
 
    Alfresco.doclib.Actions.prototype.onActionEditOnline = function(record) {
-      //MNT-8609 Edit online fails for files which URL is too long      
-      if (!$isValueSet(record.onlineEditUrl))
-      {
+      // MNT-8609 Edit online fails for files which URL is too long
+      if (!$isValueSet(record.onlineEditUrl)) {
          record.onlineEditUrl = Alfresco.util.onlineEditUrl(this.doclistMetadata.custom.vtiServer, record.location);
       }
-   
-      if (record.onlineEditUrl.length > 260)
-      {
-         Alfresco.util.PopupManager.displayMessage(
-         {
-            text: this.msg("message.edit-online.office.path.failure")
+
+      if (record.onlineEditUrl.length > 260) {
+         Alfresco.util.PopupManager.displayMessage({
+            text : this.msg("message.edit-online.office.path.failure")
          });
-         
+
          return;
       }
 

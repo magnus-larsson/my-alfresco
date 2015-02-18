@@ -74,7 +74,7 @@ public class ChecksumUpdatePolicy extends AbstractPolicy implements OnContentPro
   }
 
   @Override
-  public void afterPropertiesSet() throws Exception {
+  public void afterPropertiesSet() {
     super.afterPropertiesSet();
 
     if (!_initialized) {

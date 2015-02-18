@@ -215,7 +215,7 @@ public class PropertyReplicationPolicy extends AbstractPolicy implements OnUpdat
   }
 
   @Override
-  public void afterPropertiesSet() throws Exception {
+  public void afterPropertiesSet() {
     super.afterPropertiesSet();
     if (!_initialized) {
       LOG.info("Initialized " + this.getClass().getName());
