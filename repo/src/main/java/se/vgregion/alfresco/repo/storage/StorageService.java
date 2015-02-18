@@ -32,6 +32,12 @@ public interface StorageService {
 
   boolean createPdfaRendition(NodeRef nodeRef, Long timeout);
 
+  /**
+   * Gets the PDF/A rendition for the node.
+   * 
+   * @param nodeRef the node to get the PDF/A rendition from
+   * @return the nodeRef of the PDF/A rendition
+   */
   NodeRef getPdfaRendition(NodeRef nodeRef);
 
   int createMissingPdfRenditions();

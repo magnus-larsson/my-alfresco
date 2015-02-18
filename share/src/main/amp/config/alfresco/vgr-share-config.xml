@@ -65,9 +65,14 @@
 
   <!-- Custom DocLibActions config section -->
   <config evaluator="string-compare" condition="DocLibActions">
-
     <!-- Action definitions -->
     <actions>
+      <action id="document-recreate-pdfa" type="javascript" label="actions.document.recreate-pdfa" icon="document-reload">
+        <param name="function">onActionRecreatePdfa</param>
+        <evaluator>evaluator.isAdmin</evaluator>
+        <evaluator>evaluator.doclib.metadata.isPublishedAspect</evaluator>
+        <evaluator>evaluator.doclib.metadata.isVgrDocument</evaluator>
+      </action>
 
       <action id="action-header-edit" type="header">
         <param name="foobar">{foobar}</param>
@@ -192,6 +197,8 @@
         <action index="203" id="document-unpublish-from-storage" />
         <action index="203" id="document-unpublish-old-from-storage" />
 
+        <action index="204" id="document-recreate-pdfa" />
+
         <action index="211" id="document-create-final-version" />
 
         <action index="280" id="document-assign-workflow">
@@ -247,6 +254,7 @@
         <action index="310" id="document-manage-aspects">
           <evaluator>evaluator.doclib.action.disableAction</evaluator>
         </action>
+        <action index="341" id="document-recreate-pdfa" />
         <action index="320" id="document-change-type">
           <evaluator>evaluator.doclib.action.disableAction</evaluator>
         </action>

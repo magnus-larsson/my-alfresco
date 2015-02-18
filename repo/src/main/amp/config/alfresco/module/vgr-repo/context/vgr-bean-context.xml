@@ -34,6 +34,7 @@
     <property name="repository" ref="repositoryHelper" />
     <property name="pdfaPilotEnabled" value="${pdfapilot.enabled}" />
     <property name="publishingService" ref="vgr.publishingService" />
+    <property name="lockService" ref="LockService" />
   </bean>
 
   <bean id="vgr.kivWsClient" class="se.vgregion.alfresco.repo.kivclient.KivWsClient">
@@ -384,7 +385,7 @@
         <prop key="dcterms.audience.id">vgr:dc.audience.id</prop>
         <prop key="VGR.status.document">vgr:vgr.status.document</prop>
         <prop key="VGR.status.document">vgr:vgr.status.document.id</prop>
-        <prop key="DC:identifier.documentid">vgr:dc.identifier.documentid</prop>
+        <prop key="DC.identifier.documentid">vgr:dc.identifier.documentid</prop>
         <prop key="DC.contributor.unit">vgr:dc.contributor.unit</prop>
         <prop key="DC.date.saved">vgr:dc.date.saved</prop>
         <prop key="DC.date.created">vgr:dc.date.created</prop>

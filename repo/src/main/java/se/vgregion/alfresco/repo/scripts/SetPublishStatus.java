@@ -133,7 +133,6 @@ public class SetPublishStatus extends DeclarativeWebScript implements Initializi
       final NodeRef aNodeRef = nodeRef;
       AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>() {
 
-
         @Override
         public Void doWork() throws Exception {
           _behaviourFilter.disableBehaviour();
@@ -146,11 +145,10 @@ public class SetPublishStatus extends DeclarativeWebScript implements Initializi
           return null;
         }
       }, AuthenticationUtil.getSystemUserName());
-
     }
-
     model.put("result", "OK");
-
+    if (LOG.isDebugEnabled())
+      LOG.debug("Setting " + type + " status " + publishingStatus + " for node " + nodeRef);
     return model;
   }
 

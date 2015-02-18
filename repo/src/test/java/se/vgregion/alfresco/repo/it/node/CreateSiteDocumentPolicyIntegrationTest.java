@@ -1,11 +1,12 @@
 package se.vgregion.alfresco.repo.it.node;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.security.authentication.AuthenticationUtil;
-import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
-import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.site.SiteInfo;
 import org.alfresco.service.cmr.site.SiteService;
@@ -125,6 +126,20 @@ public class CreateSiteDocumentPolicyIntegrationTest extends AbstractVgrRepoInte
     template = (String) _nodeService.getProperty(copy, VgrModel.PROP_TYPE_TEMPLATENAME);
 
     assertEquals("very nice template", template);
+  }
+
+  @Test
+  public void testBlacklistedInSite() throws InterruptedException {
+    String folderTitle = "This is a nice title";
+    
+    NodeRef documentLibrary = _siteService.getContainer(site.getShortName(), SiteService.DOCUMENT_LIBRARY);
+    NodeRef folder = _fileFolderService.create(documentLibrary, "testfolder4", ContentModel.TYPE_FOLDER).getNodeRef();
+    _nodeService.setProperty(folder, VgrModel.PROP_TITLE, folderTitle);
+    
+    NodeRef document = uploadDocument(site, "test.doc", null, null, "test.doc", folder).getNodeRef();
+    String documentTitle = (String) _nodeService.getProperty(document, ContentModel.PROP_NAME);
+       
+    assertFalse(documentTitle.startsWith(folderTitle));
   }
 
 }

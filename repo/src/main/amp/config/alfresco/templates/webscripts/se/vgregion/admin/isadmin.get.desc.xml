@@ -1,0 +1,9 @@
+<webscript>
+   <shortname>Checks whether the user is an admin or not</shortname>
+   <description>Checks whether the user is an admin or not</description>
+   <url>/vgr/admin/isadmin?username={username}</url>
+   <format default="json">argument</format>
+   <authentication>user</authentication>
+   <transaction allow="readonly">required</transaction>
+   <family>VGR</family>
+</webscript>

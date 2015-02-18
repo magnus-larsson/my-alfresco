@@ -68,7 +68,7 @@ public abstract class AbstractPolicy implements InitializingBean {
   }
 
   @Override
-  public void afterPropertiesSet() throws Exception {
+  public void afterPropertiesSet() {
     Assert.notNull(_nodeService);
     Assert.notNull(_permissionService);
     Assert.notNull(_policyComponent);

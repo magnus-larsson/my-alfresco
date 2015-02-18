@@ -143,6 +143,59 @@
       });
    };
 
+   Alfresco.doclib.Actions.prototype.onActionRecreatePdfa = function(record, owner) {
+      // Get action params
+      var params = this.getAction(record, owner).params, displayName = record.displayName;
+
+      // Deactivate action
+      var ownerTitle = owner.title;
+      owner.title = owner.title + "_deactivated";
+
+      // Prepare genericAction config
+      var config = {
+         success : {
+            callback : {
+               fn : function() {
+                  Alfresco.util.PopupManager.displayMessage({
+                     text : this.msg("message.recreate-pdfa.success", record.nodeRef)
+                  });
+               },
+               obj : record,
+               scope : this
+            }
+         },
+         failure : {
+            callback : {
+               fn : function(error) {
+                  Alfresco.util.PopupManager.displayPrompt({
+                     text : this.msg("message.recreate-pdfa.failure", record.nodeRef)
+                  });
+               },
+               obj : record,
+               scope : this
+            }
+         },
+         webscript : {
+            method : Alfresco.util.Ajax.POST,
+            stem : Alfresco.constants.PROXY_URI + "api/",
+            name : "actionQueue"
+         },
+         config : {
+            requestContentType : Alfresco.util.Ajax.JSON,
+            dataObj : {
+               actionedUponNode : record.nodeRef,
+               actionDefinitionName : 'vgr.action.recreate-pdfa'
+            }
+         },
+         wait: {
+            message: this.msg("message.recreate-pdfa.wait", record.nodeRef)
+         }
+      };
+
+      // Execute the repo action
+      this.modules.actions.genericAction(config);
+   };
+
 }());
 
 (function (_actionEditOnlineInternal) {

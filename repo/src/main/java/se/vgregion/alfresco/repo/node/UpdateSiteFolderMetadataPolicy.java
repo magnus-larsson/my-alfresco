@@ -134,7 +134,7 @@ public class UpdateSiteFolderMetadataPolicy extends AbstractPolicy implements On
   }
 
   @Override
-  public void afterPropertiesSet() throws Exception {
+  public void afterPropertiesSet() {
     super.afterPropertiesSet();
 
     _behaviour = new JavaBehaviour(this, "onUpdateProperties", Behaviour.NotificationFrequency.TRANSACTION_COMMIT);
