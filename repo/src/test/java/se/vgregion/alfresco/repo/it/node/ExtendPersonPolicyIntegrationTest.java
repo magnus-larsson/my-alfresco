@@ -11,7 +11,6 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.site.SiteInfo;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
@@ -25,7 +24,7 @@ public class ExtendPersonPolicyIntegrationTest extends AbstractVgrRepoIntegratio
   private static final Logger LOG = Logger.getLogger(ExtendPersonPolicyIntegrationTest.class);
   private static final String USER1_USERNAME = "testuser1";
   private static final String USER2_USERNAME = "testuser2";
-  //private static SiteInfo site;
+  // private static SiteInfo site;
   private static NodeRef user1;
   private static NodeRef user2;
   final static String organisationDn = "ou=Bemanningsservice Poolmedarbetare,ou=Verksamhet Bemanningsservice,ou=Område 2,ou=Sahlgrenska Universitetssjukhuset,ou=Org,o=VGR";
@@ -35,15 +34,15 @@ public class ExtendPersonPolicyIntegrationTest extends AbstractVgrRepoIntegratio
   public void beforeClassSetup() {
     LOG.debug("beforeClassSetup");
     super.beforeClassSetup();
-    
+
     user1 = createUser(USER1_USERNAME);
     LOG.debug("Created user " + USER1_USERNAME + ": " + user1);
-    
+
     user2 = createUser(USER2_USERNAME);
     LOG.debug("Created user " + USER2_USERNAME + ": " + user2);
-    
+
     _authenticationComponent.setCurrentUser(_authenticationComponent.getSystemUserName());
-    
+
   }
 
   @Override
@@ -96,7 +95,7 @@ public class ExtendPersonPolicyIntegrationTest extends AbstractVgrRepoIntegratio
 
     String organizationId = (String) _nodeService.getProperty(user1, ContentModel.PROP_ORGID);
     assertNull(organizationId);
-    
+
     organization = (String) _nodeService.getProperty(user2, ContentModel.PROP_ORGANIZATION);
     assertNull(organization);
 
@@ -112,13 +111,19 @@ public class ExtendPersonPolicyIntegrationTest extends AbstractVgrRepoIntegratio
         return null;
       }
     }, false, true);
-    Thread.sleep(2000); //We need to sleep here since the properties are updated in an transaction listener
-    organization = (String) _nodeService.getProperty(user1, ContentModel.PROP_ORGANIZATION);
+    for (int i = 0; i < 10; i++) {
+      Thread.sleep(2000); // We need to sleep here since the properties are
+                          // updated in an transaction listener
+      organization = (String) _nodeService.getProperty(user1, ContentModel.PROP_ORGANIZATION);
+      if (expectedOrganisation.equals(organization)) {
+        break;
+      }
+    }
     assertEquals(expectedOrganisation, organization);
 
     organizationId = (String) _nodeService.getProperty(user1, ContentModel.PROP_ORGID);
     assertEquals(expectedOrganisation, organizationId);
-    
+
     organization = (String) _nodeService.getProperty(user2, ContentModel.PROP_ORGANIZATION);
     assertEquals(expectedOrganisation, organization);
 
