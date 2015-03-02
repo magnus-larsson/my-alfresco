@@ -477,7 +477,30 @@
     p:workflowService-ref="WorkflowService" p:personService-ref="PersonService" p:permissionService-ref="PermissionService" p:siteService-ref="SiteService" p:nodeService-ref="NodeService" p:userSynchronizer-ref="vgr.userSynchronizer" p:userRegistrySynchronizer-ref="userRegistrySynchronizer"
     p:serviceUtils-ref="vgr.serviceUtils" />
 
-  <bean id="vgr.invitationServiceInterceptor" class="se.vgregion.alfresco.repo.invitation.InvitationServiceInterceptor" p:externalActivation="${vgr.external.activation}" p:externalUsersInvitationService-ref="vgr.externalUsersInvitationService" />
+  <bean id="vgr.inviteNotificationHelper" class="se.vgregion.alfresco.repo.invitation.impl.InvitationNotificationHelperImpl">
+    <property name="sysAdminParams" ref="sysAdminParams" />
+    <property name="globalProperties" ref="global-properties" />
+    <property name="personService" ref="PersonService" />
+    <property name="actionService" ref="ActionService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="siteService" ref="SiteService" />
+    <property name="repository" ref="repositoryHelper" />
+    <property name="serviceRegistry" ref="ServiceRegistry" />
+  </bean>
+
+  <bean id="vgr.invitationServiceInterceptor" class="se.vgregion.alfresco.repo.invitation.InvitationServiceInterceptor">
+    <property name="externalActivation" value="${vgr.external.activation}" />
+    <property name="externalUsersInvitationService" ref="vgr.externalUsersInvitationService" />
+    <property name="personService" ref="PersonService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="inviteNotificationHelper" ref="vgr.inviteNotificationHelper" />
+  </bean>
+
+  <bean id="InviteHelper" class="org.alfresco.repo.invitation.CustomInviteHelper">
+    <property name="serviceRegistry" ref="ServiceRegistry" />
+    <property name="repositoryHelper" ref="repositoryHelper" />
+    <property name="messageService" ref="messageService" />
+  </bean>
 
   <bean id="InvitationService" class="org.springframework.aop.framework.ProxyFactoryBean" p:targetName="invitationService">
     <property name="proxyInterfaces">
@@ -491,7 +514,7 @@
         <idref bean="AuditMethodInterceptor" />
         <idref bean="exceptionTranslator" />
         <idref bean="InvitationService_security" />
-        <idref local="vgr.invitationServiceInterceptor" />
+        <idref bean="vgr.invitationServiceInterceptor" />
       </list>
     </property>
   </bean>
