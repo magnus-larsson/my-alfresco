@@ -190,7 +190,7 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
    * 
    * @param personNodeRef
    */
-  private void updatePersonInfo(NodeRef personNodeRef) {
+  private synchronized void updatePersonInfo(NodeRef personNodeRef) {
     AlfrescoTransactionSupport.bindListener(_transactionListener);
     Set<NodeRef> nodeRefs = (Set<NodeRef>) AlfrescoTransactionSupport.getResource(KEY_PERSON_INFO);
     if (nodeRefs == null) {
