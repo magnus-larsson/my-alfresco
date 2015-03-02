@@ -111,11 +111,13 @@ public class ExtendPersonPolicyIntegrationTest extends AbstractVgrRepoIntegratio
         return null;
       }
     }, false, true);
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 20; i++) {
       Thread.sleep(2000); // We need to sleep here since the properties are
                           // updated in an transaction listener
       organization = (String) _nodeService.getProperty(user1, ContentModel.PROP_ORGANIZATION);
-      if (expectedOrganisation.equals(organization)) {
+      String organization2 = (String) _nodeService.getProperty(user2, ContentModel.PROP_ORGANIZATION);
+
+      if (expectedOrganisation.equals(organization) && expectedOrganisation.equals(organization2)) {
         break;
       }
     }
