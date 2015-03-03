@@ -2,10 +2,7 @@ package se.vgregion.alfresco.repo.node;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
@@ -13,11 +10,6 @@ import org.alfresco.repo.node.NodeServicePolicies.OnUpdateNodePolicy;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
-import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
-import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
-import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
-import org.alfresco.repo.transaction.TransactionListener;
-import org.alfresco.repo.transaction.TransactionListenerAdapter;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -25,14 +17,12 @@ import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
-import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.util.Assert;
 
-import se.vgregion.alfresco.repo.kivclient.KivWsClient;
 import se.vgregion.alfresco.repo.model.VgrModel;
 
 /**
@@ -41,14 +31,9 @@ import se.vgregion.alfresco.repo.model.VgrModel;
  */
 public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePolicy, OnCreateNodePolicy {
 
-  private ThreadPoolExecutor _threadPoolExecutor;
-  private TransactionListener _transactionListener;
-  private TransactionService _transactionService;
   private ContentService _contentService;
 
-  private static final String KEY_PERSON_INFO = ExtendPersonPolicy.class.getName() + ".personInfoUpdate";
   private static final Logger LOG = Logger.getLogger(ExtendPersonPolicy.class);
-  //private KivWsClient _kivWsClient;
   private static Boolean _initialized = false;
   private static String avatarName = "ad_avatar.jpg";
 
@@ -190,22 +175,55 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
    * 
    * @param personNodeRef
    */
-  private synchronized void updatePersonInfo(NodeRef personNodeRef) {
-    AlfrescoTransactionSupport.bindListener(_transactionListener);
-    Set<NodeRef> nodeRefs = (Set<NodeRef>) AlfrescoTransactionSupport.getResource(KEY_PERSON_INFO);
-    if (nodeRefs == null) {
-      nodeRefs = new HashSet<NodeRef>(5);
-      AlfrescoTransactionSupport.bindResource(KEY_PERSON_INFO, nodeRefs);
+  private void updatePersonInfo(final NodeRef personNodeRef) {
+
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Handling person info update for " + personNodeRef);
     }
-    nodeRefs.add(personNodeRef);
-  }
+    AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>() {
 
-  public void setThreadPoolExecutor(ThreadPoolExecutor threadPoolExecutor) {
-    _threadPoolExecutor = threadPoolExecutor;
-  }
+      @Override
+      public Void doWork() throws Exception {
+        try {
+          String username = (String) _nodeService.getProperty(personNodeRef, ContentModel.PROP_USERNAME);
 
-  public void setTransactionService(TransactionService transactionService) {
-    _transactionService = transactionService;
+          String organizationDn = (String) _nodeService.getProperty(personNodeRef, VgrModel.PROP_PERSON_ORGANIZATION_DN);
+
+          if (organizationDn != null && organizationDn.length() > 0) {
+            _behaviourFilter.disableBehaviour(personNodeRef);
+            try {
+
+              String[] ous = organizationDn.split(",");
+
+              ArrayUtils.reverse(ous);
+
+              List<String> result = new ArrayList<String>();
+
+              for (String ou : ous) {
+                ou = ou.split("=")[1];
+
+                result.add(ou);
+              }
+
+              String organization = StringUtils.join(result, "/");
+
+              _nodeService.setProperty(personNodeRef, ContentModel.PROP_ORGANIZATION, organization);
+
+              _nodeService.setProperty(personNodeRef, ContentModel.PROP_ORGID, organization);
+            } finally {
+              _behaviourFilter.enableBehaviour(personNodeRef);
+            }
+          } else {
+            LOG.warn("User organzationDn is empty for user: " + username);
+          }
+        } catch (Exception e) {
+          LOG.error("Error while searching for person employment", e);
+        }
+        return null;
+      }
+
+    }, AuthenticationUtil.getSystemUserName());
+
   }
 
   public void setContentService(ContentService contentService) {
@@ -215,8 +233,6 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
   @Override
   public void afterPropertiesSet() {
     super.afterPropertiesSet();
-
-    Assert.notNull(_threadPoolExecutor);
     Assert.notNull(_contentService);
 
     if (!_initialized) {
@@ -226,109 +242,5 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
 
       _initialized = true;
     }
-
-    _transactionListener = new UpdatePersonInfoTransactionListener();
   }
-
-  /**
-   * Transaction listener, fires off the new thread after transaction commit.
-   */
-  private class UpdatePersonInfoTransactionListener extends TransactionListenerAdapter {
-
-    @Override
-    public void afterCommit() {
-      Set<NodeRef> personNodeRefs = (Set<NodeRef>) AlfrescoTransactionSupport.getResource(KEY_PERSON_INFO);
-      if (personNodeRefs != null) {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("Requesting person info update for " + personNodeRefs.size() + " users");
-        }
-        for (NodeRef personNodeRef : personNodeRefs) {
-
-          Runnable runnable = new PersonInfoUpdater(personNodeRef);
-
-          _threadPoolExecutor.execute(runnable);
-        }
-      }
-    }
-
-  }
-
-  /**
-   * Updates the person user with additional details from KIV
-   */
-  public class PersonInfoUpdater implements Runnable {
-    private NodeRef _personNodeRef;
-
-    public PersonInfoUpdater(NodeRef personNodeRef) {
-      _personNodeRef = personNodeRef;
-    }
-
-    /**
-     * Runner
-     */
-    public void run() {
-      AuthenticationUtil.runAs(new RunAsWork<Void>() {
-        public Void doWork() throws Exception {
-          return _transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Void>() {
-
-            @Override
-            public Void execute() throws Throwable {
-              runInternal();
-
-              return null;
-            }
-
-          }, false, false);
-
-        }
-      }, AuthenticationUtil.getSystemUserName());
-    }
-
-    /**
-     * Internal function to allow for unit testing
-     * 
-     */
-    public void runInternal() {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Handling person info update for " + _personNodeRef);
-      }
-
-      try {
-        String username = (String) _nodeService.getProperty(_personNodeRef, ContentModel.PROP_USERNAME);
-
-        String organizationDn = (String) _nodeService.getProperty(_personNodeRef, VgrModel.PROP_PERSON_ORGANIZATION_DN);
-
-        if (organizationDn != null && organizationDn.length() > 0) {
-          _behaviourFilter.disableBehaviour(_personNodeRef);
-          try {
-
-            String[] ous = organizationDn.split(",");
-
-            ArrayUtils.reverse(ous);
-
-            List<String> result = new ArrayList<String>();
-
-            for (String ou : ous) {
-              ou = ou.split("=")[1];
-
-              result.add(ou);
-            }
-
-            String organization = StringUtils.join(result, "/");
-
-            _nodeService.setProperty(_personNodeRef, ContentModel.PROP_ORGANIZATION, organization);
-
-            _nodeService.setProperty(_personNodeRef, ContentModel.PROP_ORGID, organization);
-          } finally {
-            _behaviourFilter.enableBehaviour(_personNodeRef);
-          }
-        } else {
-          LOG.warn("User organzationDn is empty for user: " + username);
-        }
-      } catch (Exception e) {
-        LOG.error("Error while searching for person employment", e);
-      }
-    }
-  }
-
 }
