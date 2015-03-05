@@ -134,9 +134,15 @@ public class PropertyReplicationPolicy extends AbstractPolicy implements OnUpdat
    * @param nodeRef
    */
   private void setTitle(final NodeRef nodeRef) {
-    final String title = _serviceUtils.getStringValue(nodeRef, VgrModel.PROP_TITLE);
+    String title = _serviceUtils.getStringValue(nodeRef, VgrModel.PROP_TITLE);
 
     if (StringUtils.isNotBlank(title)) {
+      // trim the string
+      title = title.trim();
+
+      // remove all trailing dots
+      title = title.replaceAll("\\.+$", "");
+
       // if the title is set, replicate it to cm:title
       _nodeService.setProperty(nodeRef, ContentModel.PROP_TITLE, title);
 
@@ -146,7 +152,14 @@ public class PropertyReplicationPolicy extends AbstractPolicy implements OnUpdat
     // if the title has not been set, use the cm:name and remove the extension
     String name = _serviceUtils.getStringValue(nodeRef, ContentModel.PROP_NAME);
 
+    // remove the extension
     name = FilenameUtils.removeExtension(name);
+
+    // trim the string
+    name = name.trim();
+
+    // remove all trailing dots
+    name = name.replaceAll("\\.+$", "");
 
     _nodeService.setProperty(nodeRef, VgrModel.PROP_TITLE, name);
     _nodeService.setProperty(nodeRef, ContentModel.PROP_TITLE, name);
