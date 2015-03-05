@@ -28,6 +28,7 @@ import org.springframework.extensions.webscripts.WebScriptResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import se.vgregion.alfresco.repo.publish.PublishingService;
 import se.vgregion.alfresco.repo.storage.FailedRenditionInfo;
 import se.vgregion.alfresco.repo.storage.StorageService;
 
@@ -56,6 +57,9 @@ public class Index extends AbstractIndex {
 
   @Autowired
   private PermissionService _permissionService;
+  
+  @Autowired
+  private PublishingService _publishingService;
 
   @Override
   public String getIndexHtmlPath() {
@@ -77,11 +81,13 @@ public class Index extends AbstractIndex {
   public Resolution failed(WebScriptRequest request, WebScriptResponse response) throws IOException {
     boolean ascending = (request.getParameter("sort") != null) ? request.getParameter("sort").equalsIgnoreCase("asc") : false;
 
+    String query = _publishingService.findPublishedDocumentsQuery(new Date(), null, null, false);
+    query += " AND ASPECT:\"vgr:failedRenditionSource\"";
+
     SearchParameters parameters = new SearchParameters();
     parameters.setLanguage(SearchService.LANGUAGE_FTS_ALFRESCO);
     parameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
-    parameters.setQuery("TYPE:\"vgr:document\" AND ASPECT:\"vgr:published\" AND ASPECT:\"vgr:failedRenditionSource\"");
-    // parameters.setQuery("TYPE:\"vgr:document\" AND ASPECT:\"vgr:published\"");
+    parameters.setQuery(query);
 
     ResultSet result = _searchService.query(parameters);
 
@@ -89,6 +95,10 @@ public class Index extends AbstractIndex {
 
     try {
       for (NodeRef node : result.getNodeRefs()) {
+        if (!_publishingService.isPublished(node)) {
+          continue;
+        }
+        
         Map<String, Serializable> nodeMap = new TreeMap<String, Serializable>();
 
         String name = (String) _nodeService.getProperty(node, ContentModel.PROP_NAME);
