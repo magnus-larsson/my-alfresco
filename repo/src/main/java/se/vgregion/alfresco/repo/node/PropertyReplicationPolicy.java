@@ -29,6 +29,9 @@ public class PropertyReplicationPolicy extends AbstractPolicy implements OnUpdat
 
   @Override
   public void onUpdateProperties(final NodeRef nodeRef, final Map<QName, Serializable> before, final Map<QName, Serializable> after) {
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("onUpdateProperties for " + nodeRef);
+    }
     // Run as system user to prevent certain access restriction errors which may
     // appear when property updates are made by alfresco when new renditions are
     // created
@@ -49,25 +52,31 @@ public class PropertyReplicationPolicy extends AbstractPolicy implements OnUpdat
   }
 
   private void updateProperties(final NodeRef nodeRef) {
+
     if (!_nodeService.exists(nodeRef)) {
+      LOG.trace("Aborting. Node does not exist");
       return;
     }
 
     // if it isn't the document library, just exit
     if (!isDocumentLibrary(nodeRef)) {
+      LOG.trace("Aborting. Node is not in document library");
       return;
     }
 
     // don't do this for working copies
     if (_nodeService.hasAspect(nodeRef, ContentModel.ASPECT_WORKING_COPY)) {
+      LOG.trace("Aborting. Node is a working copy");
       return;
     }
 
     if (!StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.equals(nodeRef.getStoreRef())) {
+      LOG.trace("Aborting. Node is not within workspace store");
       return;
     }
 
     if (_lockService.getLockStatus(nodeRef) != LockStatus.NO_LOCK) {
+      LOG.trace("Aborting. Node is locked");
       return;
     }
 
@@ -84,9 +93,6 @@ public class PropertyReplicationPolicy extends AbstractPolicy implements OnUpdat
     setVersion(nodeRef);
     setCmName(nodeRef);
 
-    if (LOG.isDebugEnabled()) {
-      LOG.debug(this.getClass().getName());
-    }
   }
 
   private void setDescription(NodeRef nodeRef) {
@@ -128,6 +134,22 @@ public class PropertyReplicationPolicy extends AbstractPolicy implements OnUpdat
     _serviceUtils.replicateVersion(nodeRef, version);
   }
 
+  private String trimIllegalCharacters(String str) {
+    int lengthBefore = -1;
+    int lengthAfter = -2;
+    while (lengthBefore != lengthAfter) {
+      lengthBefore = str.length();
+      if (StringUtils.isNotBlank(str)) {
+        // trim the string
+        str = str.trim();
+        // remove all trailing dots
+        str = str.replaceAll("\\.+$", "");
+      }
+      lengthAfter = str.length();
+    }
+    return str;
+  }
+
   /**
    * Replicate the title only if it's not set.
    * 
@@ -137,13 +159,10 @@ public class PropertyReplicationPolicy extends AbstractPolicy implements OnUpdat
     String title = _serviceUtils.getStringValue(nodeRef, VgrModel.PROP_TITLE);
 
     if (StringUtils.isNotBlank(title)) {
-      // trim the string
-      title = title.trim();
-
-      // remove all trailing dots
-      title = title.replaceAll("\\.+$", "");
+      title = trimIllegalCharacters(title);
 
       // if the title is set, replicate it to cm:title
+      _nodeService.setProperty(nodeRef, VgrModel.PROP_TITLE, title);
       _nodeService.setProperty(nodeRef, ContentModel.PROP_TITLE, title);
 
       return;
@@ -155,11 +174,7 @@ public class PropertyReplicationPolicy extends AbstractPolicy implements OnUpdat
     // remove the extension
     name = FilenameUtils.removeExtension(name);
 
-    // trim the string
-    name = name.trim();
-
-    // remove all trailing dots
-    name = name.replaceAll("\\.+$", "");
+    name = trimIllegalCharacters(name);
 
     _nodeService.setProperty(nodeRef, VgrModel.PROP_TITLE, name);
     _nodeService.setProperty(nodeRef, ContentModel.PROP_TITLE, name);

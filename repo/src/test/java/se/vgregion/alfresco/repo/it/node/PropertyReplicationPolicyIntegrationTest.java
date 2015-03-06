@@ -48,7 +48,8 @@ public class PropertyReplicationPolicyIntegrationTest extends AbstractVgrRepoInt
     assertEquals("doc", _nodeService.getProperty(document, VgrModel.PROP_FORMAT_EXTENT_EXTENSION));
 
     // Verify that when title is updated, name is also updated
-    _nodeService.setProperty(document, VgrModel.PROP_TITLE, "test2");
+    _nodeService.setProperty(document, VgrModel.PROP_TITLE, "test2 ...   . . ..  ");
+    assertEquals("test2", _nodeService.getProperty(document, VgrModel.PROP_TITLE));
     assertEquals("test2", _nodeService.getProperty(document, ContentModel.PROP_TITLE));
     assertEquals("test2.doc", _nodeService.getProperty(document, ContentModel.PROP_NAME));
 
