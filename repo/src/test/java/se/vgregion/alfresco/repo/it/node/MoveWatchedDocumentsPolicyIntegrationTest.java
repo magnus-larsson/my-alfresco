@@ -164,7 +164,7 @@ public class MoveWatchedDocumentsPolicyIntegrationTest extends AbstractVgrRepoIn
     projects.add("Testproject");
 
     final Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
-    properties.put(VgrModel.PROP_TITLE, "title");
+    properties.put(VgrModel.PROP_TITLE, "title...    ... .. .   ");
     properties.put(VgrModel.PROP_TYPE_RECORD, "type record");
     properties.put(VgrModel.PROP_TYPE_RECORD_ID, "type.record.id");
     properties.put(VgrModel.PROP_PUBLISHER_PROJECT_ASSIGNMENT, (Serializable) projects);
