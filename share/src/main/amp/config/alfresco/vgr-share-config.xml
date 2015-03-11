@@ -55,7 +55,7 @@
   </config>
 
   <!-- share help urls -->
-  <config evaluator="string-compare" condition="HelpPages">
+  <config evaluator="string-compare" condition="HelpPages" replace="true">
     <help-pages>
       <share-help-external>http://www.vgregion.se/alfresco</share-help-external>
       <share-help-internal>http://intra.vgregion.se/alfresco</share-help-internal>
