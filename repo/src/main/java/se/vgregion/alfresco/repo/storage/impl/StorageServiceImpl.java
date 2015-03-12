@@ -1069,7 +1069,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
         
         final SearchParameters searchParameters = new SearchParameters();
 
-        searchParameters.setLanguage(SearchService.LANGUAGE_LUCENE);
+        searchParameters.setLanguage(SearchService.LANGUAGE_FTS_ALFRESCO);
         searchParameters.setQuery(query);
         searchParameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
         searchParameters.setMaxItems(-1);
