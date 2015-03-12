@@ -63,7 +63,7 @@ public class EnableMetadataWriterPolicy extends AbstractPolicy implements OnChec
 
       @Override
       public void execute() {
-        if (!_nodeService.exists(workingCopy)) {
+        if (workingCopy == null || !_nodeService.exists(workingCopy)) {
           return;
         }
 

@@ -34,6 +34,9 @@ public class AddPdfaPolicy extends AbstractPolicy implements OnContentUpdatePoli
     if (LOG.isTraceEnabled()) {
       LOG.trace(this.getClass().getName() + " - onCreateNode begin");
     }
+    if (nodeRef == null || !_nodeService.exists(nodeRef)) {
+      return;
+    }
     
     runSafe(new DefaultRunSafe(nodeRef) {
 
@@ -51,7 +54,7 @@ public class AddPdfaPolicy extends AbstractPolicy implements OnContentUpdatePoli
 
   private void doContentUpdate(NodeRef nodeRef, boolean newContent) {
     // exit if node is not yet saved
-    if (!_nodeService.exists(nodeRef)) {
+    if (nodeRef == null || !_nodeService.exists(nodeRef)) {
       return;
     }
 

@@ -57,7 +57,7 @@ public class WatchedDocumentUpdatePolicy extends AbstractPolicy implements Initi
   }
 
   private void doCheckIn(NodeRef nodeRef) {
-    if (!_nodeService.exists(nodeRef)) {
+    if (nodeRef == null || !_nodeService.exists(nodeRef)) {
       return;
     }
 

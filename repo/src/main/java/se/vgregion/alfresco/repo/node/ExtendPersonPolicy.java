@@ -63,7 +63,7 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
       @Override
       public Boolean doWork() throws Exception {
         // if the node is gone, exit
-        if (!_nodeService.exists(nodeRef)) {
+        if (nodeRef == null || !_nodeService.exists(nodeRef)) {
           return null;
         }
 
@@ -146,7 +146,7 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
       @Override
       public Void doWork() throws Exception {
         // if the node is gone, exit
-        if (!_nodeService.exists(nodeRef)) {
+        if (nodeRef == null || !_nodeService.exists(nodeRef)) {
           return null;
         }
 
@@ -184,6 +184,14 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
 
       @Override
       public Void doWork() throws Exception {
+        if (personNodeRef == null || !_nodeService.exists(personNodeRef)) {
+          return null;
+        }
+
+        if (!_nodeService.getType(personNodeRef).isMatch(ContentModel.TYPE_PERSON)) {
+          return null;
+        }
+        
         try {
           String username = (String) _nodeService.getProperty(personNodeRef, ContentModel.PROP_USERNAME);
 

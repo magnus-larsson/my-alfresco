@@ -147,6 +147,10 @@ public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPoli
 
   @Override
   public void beforeCreateVersion(final NodeRef nodeRef) {
+    if (nodeRef == null || !_nodeService.exists(nodeRef)) {
+      return;
+    }
+    
     // if it's not a VGR Document, don't save nodeRef for later use, i.e.
     // calculate version
     QName nodeType = _nodeService.getType(nodeRef);

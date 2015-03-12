@@ -79,7 +79,7 @@ public abstract class AbstractPolicy implements InitializingBean {
 
   protected boolean shouldSkipPolicy(final NodeRef nodeRef) {
     // if the node does not exist, exit
-    if (!_nodeService.exists(nodeRef)) {
+    if (nodeRef == null || !_nodeService.exists(nodeRef)) {
       return true;
     }
 
