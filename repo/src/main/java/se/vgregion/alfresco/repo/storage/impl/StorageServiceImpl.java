@@ -1064,11 +1064,12 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
       @Override
       public Integer doWork() throws Exception {
-        final String query = "TYPE:\"vgr:document\" AND ASPECT:\"vgr:published\"";
-
+        String query = _publishingService.findPublishedDocumentsQuery(new Date(), null, null, false);
+        query += " AND ASPECT:\"vgr:failedRenditionSource\"";
+        
         final SearchParameters searchParameters = new SearchParameters();
 
-        searchParameters.setLanguage(SearchService.LANGUAGE_LUCENE);
+        searchParameters.setLanguage(SearchService.LANGUAGE_FTS_ALFRESCO);
         searchParameters.setQuery(query);
         searchParameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
         searchParameters.setMaxItems(-1);

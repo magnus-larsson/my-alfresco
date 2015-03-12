@@ -21,6 +21,7 @@
     <testframework.version>1.0.5</testframework.version>
     <java.source.version>1.7</java.source.version>
     <java.target.version>1.7</java.target.version>
+    <alfresco-cluster-probe.version>1.0.4</alfresco-cluster-probe.version>
   </properties>
 
   <modules>
@@ -69,7 +70,7 @@
       <dependency>
         <groupId>org.redpill-linpro.alfresco</groupId>
         <artifactId>alfresco-cluster-probe</artifactId>
-        <version>1.0.4</version>
+        <version>${alfresco-cluster-probe.version}</version>
         <scope>runtime</scope>
         <exclusions>
           <exclusion>
