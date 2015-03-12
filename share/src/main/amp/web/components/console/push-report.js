@@ -153,7 +153,7 @@ if (typeof RL == "undefined" || !RL) {
           }
           
           function onSentinelButtonClick(p_oEvent) {
-            var url = this.options.sentinelUrl.replace("#placeholder#", nodeRef);
+            var url = parent.options.sentinelUrl.replace("#placeholder#", nodeRef);
             var win=window.open(url, '_blank');
             win.focus();
             
