@@ -265,7 +265,9 @@ h4 .lighter
 .dashlet .title
 {
    border-bottom: 1px solid #ccc;
-   background-color: #eee;
+   background-color: #9ec0ff;
+   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAwCAIAAABfUYfWAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wMNBzML/IAMagAAAEhJREFUCNdljjsWgEAMAvO4/y1tLTzAMljsR12rTOARUsd5yUROZOdh8tWHBlGbHojU4kbklGz6ZGbe3nZ/ZLtWnVfvtvP77wafa4kLQgeCBAAAAABJRU5ErkJggg==);
+   background-repeat: repeat-x;
    border-top-left-radius: 6px;
    border-top-right-radius: 6px;
    color: #000;
