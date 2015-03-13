@@ -1971,18 +1971,8 @@ table td.thumbnail img
    background-color: #0066a5 !important;
 }
 
-/* Text settings in top menu */
-.alfresco-share a.alfresco-menus-_AlfMenuItemMixin {
-   color: #FFFFFF !important;
-   font-weight: bold !important;
-}
 /* Text settings (drop downs) in top menu */
 .alfresco-share .alf-header .dijitReset.dijitInline.dijitMenuItemLabel.dijitMenuItem {
-   color: #FFFFFF !important;
-   font-weight: bold !important;
-}
-
-.alfresco-share .dijitMenu .dijitMenuItem td {
    color: #FFFFFF !important;
    font-weight: bold !important;
 }
@@ -2039,4 +2029,19 @@ table td.thumbnail img
 .alfresco-share .dijitPopup.Popup .alf-header-cascading-menu .dijitMenuItemHover,
 .alfresco-share .dijitPopup.Popup .alf-header-cascading-menu .dijitMenuItemSelected {
   background-color: #0066a5 !important;
+}
+
+
+/*
+---------------------------------------------------------------------------------------------
+| Site component navigation 
+---------------------------------------------------------------------------------------------
+*/
+
+.alf-menu-bar {
+   font-weight: bold !important;
+}
+
+.alfresco-share .alf-menu-bar .dijitMenuItemSelected {
+   color: #FFFFFF !important;
 }
