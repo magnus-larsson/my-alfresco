@@ -387,7 +387,13 @@ function main()
          
          // TODO (THOR-175) - review
          // Ensure the file is versionable (autoVersion = true, autoVersionProps = false)
-         newFile.ensureVersioningEnabled(true, false);
+         
+         // DISABLE that the first version is always a major version
+         // Default version number is 1.0 from 4.2 and onwards. Temporarily disabling this behaviour until fixed. 
+         // Support case: #00344284
+         // PATCH BEGIN
+         //newFile.ensureVersioningEnabled(true, false);
+         // PATCH END
 
          // NOTE: Removal of first request for thumbnails to improve upload performance
          //       Thumbnails are still requested by Share on first render of the doclist image.
