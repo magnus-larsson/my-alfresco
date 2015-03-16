@@ -59,3 +59,25 @@
     this.deferredReady.fulfil("onPermissionsLoaded");
 	};
 }(Alfresco.component.ManagePermissions.prototype.onPermissionsLoaded));
+
+//Set undeletable roles to only include Site Managers
+Alfresco.component.ManagePermissions.prototype.options.unDeletableRoles = [ "_SiteManager$" ];
+
+//Show translated names of site groups (roles)
+(function(_fnRenderPermissionCellText) {
+
+  Alfresco.component.ManagePermissions.prototype.fnRenderPermissionCellText = function Permissions_fnRenderPermissionCellText() {
+    var scope = this;
+    var res = _fnRenderPermissionCellText.call(this);
+    return function Permissions_renderPermissionCellText(elCell, oRecord, oColumn, oData) {
+      res(elCell, oRecord, oColumn, oData);
+      if (oData.indexOf("site_")===0) {
+        var startIdx = oData.lastIndexOf("_");
+        var roleName = oData.substr(startIdx + 1);
+        elCell.innerHTML = scope._i18nRole(roleName);
+      } else if (oData.indexOf("EVERYONE")===0) {
+        elCell.innerHTML = scope.msg("group.everyone");
+      }
+    };
+  };
+}(Alfresco.component.ManagePermissions.prototype.fnRenderPermissionCellText));
