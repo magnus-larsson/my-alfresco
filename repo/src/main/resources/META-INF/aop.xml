@@ -4,6 +4,7 @@
 
   <weaver options="-verbose -showWeaveInfo">
     <exclude within="org.apache.felix.framework.*" />
+    <exclude within="com.vaadin.*" />
   </weaver>
 
   <aspects>
