@@ -41,7 +41,7 @@
      indicator.addClass('status-icon');
      //indicator.addClass('hidden');
      indicator.set('id', "vgr-publish-status-placeholder");
-     //indicator.set('src', Alfresco.constants.URL_RESCONTEXT + "components/documentlibrary/indicators/loading.gif");
+     indicator.set('src', Alfresco.constants.URL_RESCONTEXT + "js/lib/dojo-1.9.0/dojo/resources/blank.gif");
      return indicator;
    }
 

@@ -36,7 +36,7 @@
     //Patch begin
     var newSettable = new Array();
     for (var i=0; i<data.settable.length;i++) {
-      if (data.settable[i].startsWith("Site")) {
+      if (data.settable[i].indexOf("Site")===0) {
         newSettable.push(data.settable[i]);
       }
     }
