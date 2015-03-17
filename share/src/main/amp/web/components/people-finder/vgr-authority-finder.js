@@ -1,7 +1,7 @@
 // @overridden projects/slingshot/source/web/components/people-finder/authority-finder.js
 
 (function (_performSearch) {
-  
+  //Show translated names of site groups (roles)
   Alfresco.AuthorityFinder.prototype._performSearch = function (searchTerm) {
     var old = this.widgets.dataTable.onDataReturnInitializeTable;
     var scope = this;

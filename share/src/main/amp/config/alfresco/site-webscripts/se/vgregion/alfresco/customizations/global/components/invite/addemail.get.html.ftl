@@ -2,5 +2,5 @@
 
 <@markup id="vgr-js" target="js" action="after">
 <#-- JavaScript Dependencies -->
-  <@script type="text/javascript" src="${url.context}/res/components/invite/vgr-addemail.js"></@script>
+  <@script type="text/javascript" src="${url.context}/res/components/invite/vgr-addemail.js" group="invite"></@script>
 </@>
