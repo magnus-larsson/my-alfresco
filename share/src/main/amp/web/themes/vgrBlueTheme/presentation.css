@@ -2042,6 +2042,7 @@ table td.thumbnail img
    font-weight: bold !important;
 }
 
-.alfresco-share .alf-menu-bar .dijitMenuItemSelected {
+.alfresco-share .alf-menu-bar .dijitMenuItemSelected,
+.alfresco-share .alf-menu-group .dijitMenuPassive .dijitMenuItemHover {
    color: #FFFFFF !important;
 }
