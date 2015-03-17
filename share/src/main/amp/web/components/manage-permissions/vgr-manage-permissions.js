@@ -81,3 +81,11 @@ Alfresco.component.ManagePermissions.prototype.options.unDeletableRoles = [ "_Si
     };
   };
 }(Alfresco.component.ManagePermissions.prototype.fnRenderPermissionCellText));
+
+//Perform a 0-size search on open
+(function(_onAddUserGroupButton) {
+  Alfresco.component.ManagePermissions.prototype.onAddUserGroupButton = function (e, args) {
+    _onAddUserGroupButton.call(this, e, args);
+    this.modules.authorityFinder._performSearch("XXXXXXXXXXXXXXXXXX");
+  };
+}(Alfresco.component.ManagePermissions.prototype.onAddUserGroupButton));

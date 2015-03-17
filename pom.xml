@@ -22,6 +22,7 @@
     <java.source.version>1.7</java.source.version>
     <java.target.version>1.7</java.target.version>
     <alfresco-cluster-probe.version>1.0.4</alfresco-cluster-probe.version>
+    <alfresco-clamav.version>1.1.1</alfresco-clamav.version>
   </properties>
 
   <modules>
@@ -78,6 +79,16 @@
             <groupId>org.springframework.extensions.surf</groupId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.redpill-linpro.alfresco.clamav</groupId>
+        <artifactId>clamav-share</artifactId>
+        <version>${alfresco-clamav.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.redpill-linpro.alfresco.clamav</groupId>
+        <artifactId>clamav-repository</artifactId>
+        <version>${alfresco-clamav.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

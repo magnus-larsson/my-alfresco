@@ -62,6 +62,7 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
 
       @Override
       public Boolean doWork() throws Exception {
+
         // if the node is gone, exit
         if (nodeRef == null || !_nodeService.exists(nodeRef)) {
           return null;
@@ -71,7 +72,8 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
 
         if (property != null && property.length() > 0) {
           _behaviourFilter.disableBehaviour();
-
+          String fullyAuthenticatedUser = AuthenticationUtil.getFullyAuthenticatedUser();
+          AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.SYSTEM_USER_NAME);
           if (!_nodeService.hasAspect(nodeRef, ContentModel.ASPECT_PREFERENCES)) {
             _nodeService.addAspect(nodeRef, ContentModel.ASPECT_PREFERENCES, null);
           }
@@ -113,7 +115,7 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
 
           // Add an avatar association for backwards compatability
           _nodeService.createAssociation(nodeRef, imageNodeRef, ContentModel.ASSOC_AVATAR);
-
+          AuthenticationUtil.setFullyAuthenticatedUser(fullyAuthenticatedUser);
           _behaviourFilter.enableBehaviour();
 
           return true;
@@ -191,7 +193,7 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
         if (!_nodeService.getType(personNodeRef).isMatch(ContentModel.TYPE_PERSON)) {
           return null;
         }
-        
+
         try {
           String username = (String) _nodeService.getProperty(personNodeRef, ContentModel.PROP_USERNAME);
 

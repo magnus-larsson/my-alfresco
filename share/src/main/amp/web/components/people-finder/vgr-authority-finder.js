@@ -1,6 +1,7 @@
 // @overridden projects/slingshot/source/web/components/people-finder/authority-finder.js
 
 (function (_performSearch) {
+  
   //Show translated names of site groups (roles)
   Alfresco.AuthorityFinder.prototype._performSearch = function (searchTerm) {
     var old = this.widgets.dataTable.onDataReturnInitializeTable;
@@ -13,11 +14,12 @@
           var roleName = oResponse.results[i].displayName.substr(startIdx + 1);
           oResponse.results[i].displayName = scope.msg("roles." + roleName.toLocaleLowerCase());
         }
-      }
+      }      
 
       old.call(this, sRequest, oResponse, oPayload);
     }
-
-    _performSearch.call(this,searchTerm);
+    
+    _performSearch.call(this, searchTerm);
   };
 }(Alfresco.AuthorityFinder.prototype._performSearch));
+
