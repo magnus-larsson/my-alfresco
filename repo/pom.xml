@@ -173,7 +173,8 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!-- Added correct version of jcl-overslf4j to override Spring-ldap-core-tigers version Maybe not needed. Excluded <dependency> <groupId>org.slf4j</groupId> <artifactId>jcl-over-slf4j</artifactId> <version>1.5.11</version> </dependency> -->
+    <!-- Added correct version of jcl-overslf4j to override Spring-ldap-core-tigers version Maybe not needed. Excluded <dependency> <groupId>org.slf4j</groupId> <artifactId>jcl-over-slf4j</artifactId> 
+      <version>1.5.11</version> </dependency> -->
     <dependency>
       <groupId>org.redpill-linpro.alfresco.module</groupId>
       <artifactId>metadatawriter</artifactId>
@@ -359,6 +360,12 @@
     <dependency>
       <groupId>org.redpill-linpro.alfresco.translations</groupId>
       <artifactId>alfresco-swedish-repo</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.redpill-linpro.alfresco.clamav</groupId>
+      <artifactId>clamav-repository</artifactId>
+      <version>1.1.1</version>
     </dependency>
   </dependencies>
 
