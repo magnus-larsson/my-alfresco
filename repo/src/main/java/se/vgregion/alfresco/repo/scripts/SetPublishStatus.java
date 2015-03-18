@@ -8,13 +8,14 @@ import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.util.ParameterCheck;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.extensions.webscripts.Cache;
 import org.springframework.extensions.webscripts.DeclarativeWebScript;
 import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.WebScriptRequest;
-import org.springframework.util.Assert;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
 
@@ -22,8 +23,8 @@ public class SetPublishStatus extends DeclarativeWebScript implements Initializi
 
   private static final String TYPE_PUBLISH_STATUS = "publish";
   private static final String TYPE_UNPUBLISH_STATUS = "unpublish";
-  private NodeService nodeService;
-  private Properties globalProperties;
+  private NodeService _nodeService;
+  private Properties _globalProperties;
   private BehaviourFilter _behaviourFilter;
   private static final Logger LOG = Logger.getLogger(SetPublishStatus.class);
 
@@ -32,14 +33,16 @@ public class SetPublishStatus extends DeclarativeWebScript implements Initializi
     Map<String, Object> model = new HashMap<String, Object>();
     String fullyAuthenticatedUser = AuthenticationUtil.getFullyAuthenticatedUser();
 
-    String allowedUsersProperty = globalProperties.getProperty("vgr.publishstatus.allowedUsers", "admin");
+    String allowedUsersProperty = _globalProperties.getProperty("vgr.publishstatus.allowedUsers", "admin");
     String[] allowedUsers;
+
     if (allowedUsersProperty.contains(",")) {
       allowedUsers = allowedUsersProperty.split(",");
     } else {
       allowedUsers = new String[1];
       allowedUsers[0] = allowedUsersProperty;
     }
+
     boolean userIsAllowed = false;
     for (String allowedUser : allowedUsers) {
       if (fullyAuthenticatedUser.equalsIgnoreCase(allowedUser)) {
@@ -69,8 +72,10 @@ public class SetPublishStatus extends DeclarativeWebScript implements Initializi
     String documentId = storeType + "://" + storeId + "/" + nodeId;
 
     final String publishingStatus = req.getParameter("status");
-    String type = req.getParameter("type");
-    if (documentId == null || documentId.length() == 0) {
+
+    final String type = req.getParameter("type");
+
+    if (StringUtils.isBlank(documentId)) {
       LOG.error("The required parameter documentId is not set.");
       status.setCode(Status.STATUS_BAD_REQUEST);
       status.setMessage("The required parameter documentId is not set.");
@@ -78,7 +83,8 @@ public class SetPublishStatus extends DeclarativeWebScript implements Initializi
       model.put("result", "ERROR");
       return model;
     }
-    NodeRef nodeRef = null;
+
+    final NodeRef nodeRef;
 
     try {
       nodeRef = new NodeRef(documentId);
@@ -90,7 +96,8 @@ public class SetPublishStatus extends DeclarativeWebScript implements Initializi
       model.put("result", "ERROR");
       return model;
     }
-    if (!nodeService.exists(nodeRef)) {
+
+    if (!_nodeService.exists(nodeRef)) {
       LOG.error("Document with id " + documentId + " does not exist.");
       status.setCode(Status.STATUS_BAD_REQUEST);
       status.setMessage("Document with id " + documentId + " does not exist.");
@@ -99,7 +106,7 @@ public class SetPublishStatus extends DeclarativeWebScript implements Initializi
       return model;
     }
 
-    if (publishingStatus == null || publishingStatus.length() == 0) {
+    if (StringUtils.isBlank(publishingStatus)) {
       LOG.error("The required parameter status is not set.");
       status.setCode(Status.STATUS_BAD_REQUEST);
       status.setMessage("The required parameter status is not set.");
@@ -108,11 +115,7 @@ public class SetPublishStatus extends DeclarativeWebScript implements Initializi
       return model;
     }
 
-    if (TYPE_PUBLISH_STATUS.equalsIgnoreCase(type)) {
-      type = TYPE_PUBLISH_STATUS;
-    } else if (TYPE_UNPUBLISH_STATUS.equalsIgnoreCase(type)) {
-      type = TYPE_UNPUBLISH_STATUS;
-    } else {
+    if (!TYPE_PUBLISH_STATUS.equalsIgnoreCase(type) && !TYPE_UNPUBLISH_STATUS.equalsIgnoreCase(type)) {
       LOG.error("The required parameter type is invalid: " + type + ". Expected " + TYPE_PUBLISH_STATUS + " or " + TYPE_UNPUBLISH_STATUS);
       status.setCode(Status.STATUS_BAD_REQUEST);
       status.setMessage("The required parameter type is invalid: " + type + ". Expected " + TYPE_PUBLISH_STATUS + " or " + TYPE_UNPUBLISH_STATUS);
@@ -121,53 +124,61 @@ public class SetPublishStatus extends DeclarativeWebScript implements Initializi
       return model;
     }
 
-    if (!nodeService.hasAspect(nodeRef, VgrModel.ASPECT_PUBLISHED)) {
+    if (!_nodeService.hasAspect(nodeRef, VgrModel.ASPECT_PUBLISHED)) {
       LOG.error("Document " + documentId + " does not have the required aspect " + VgrModel.ASPECT_PUBLISHED.toPrefixString());
       status.setCode(Status.STATUS_BAD_REQUEST);
       status.setMessage("Document " + documentId + " does not have the required aspect " + VgrModel.ASPECT_PUBLISHED.toPrefixString());
       status.setRedirect(true);
       model.put("result", "ERROR");
       return model;
-    } else {
-      final String aType = type;
-      final NodeRef aNodeRef = nodeRef;
-      AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>() {
-
-        @Override
-        public Void doWork() throws Exception {
-          _behaviourFilter.disableBehaviour();
-          if (TYPE_PUBLISH_STATUS.equals(aType)) {
-            nodeService.setProperty(aNodeRef, VgrModel.PROP_PUBLISH_STATUS, publishingStatus);
-          } else {
-            nodeService.setProperty(aNodeRef, VgrModel.PROP_UNPUBLISH_STATUS, publishingStatus);
-          }
-          _behaviourFilter.enableBehaviour();
-          return null;
-        }
-      }, AuthenticationUtil.getSystemUserName());
     }
+
+    AuthenticationUtil.runAsSystem(new AuthenticationUtil.RunAsWork<Void>() {
+
+      @Override
+      public Void doWork() throws Exception {
+        _behaviourFilter.disableBehaviour(nodeRef);
+
+        try {
+          if (TYPE_PUBLISH_STATUS.equals(type)) {
+            _nodeService.setProperty(nodeRef, VgrModel.PROP_PUBLISH_STATUS, publishingStatus);
+          } else {
+            _nodeService.setProperty(nodeRef, VgrModel.PROP_UNPUBLISH_STATUS, publishingStatus);
+          }
+        } finally {
+          _behaviourFilter.enableBehaviour(nodeRef);
+        }
+
+        return null;
+      }
+    });
+
     model.put("result", "OK");
-    if (LOG.isDebugEnabled())
+
+    if (LOG.isDebugEnabled()) {
       LOG.debug("Setting " + type + " status " + publishingStatus + " for node " + nodeRef);
+    }
+
     return model;
   }
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    Assert.notNull(nodeService);
-    Assert.notNull(globalProperties);
+    ParameterCheck.mandatory("nodeService", _nodeService);
+    ParameterCheck.mandatory("globalProperties", _globalProperties);
+    ParameterCheck.mandatory("behaviourFilter", _behaviourFilter);
   }
 
   public void setNodeService(NodeService nodeService) {
-    this.nodeService = nodeService;
+    _nodeService = nodeService;
   }
 
   public void setGlobalProperties(Properties globalProperties) {
-    this.globalProperties = globalProperties;
+    _globalProperties = globalProperties;
   }
 
-  public void setBehaviourFilter(BehaviourFilter _behaviourFilter) {
-    this._behaviourFilter = _behaviourFilter;
+  public void setBehaviourFilter(BehaviourFilter behaviourFilter) {
+    _behaviourFilter = behaviourFilter;
   }
 
 }
