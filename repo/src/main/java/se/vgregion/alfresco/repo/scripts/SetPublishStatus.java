@@ -133,7 +133,7 @@ public class SetPublishStatus extends DeclarativeWebScript implements Initializi
       return model;
     }
 
-    AuthenticationUtil.runAsSystem(new AuthenticationUtil.RunAsWork<Void>() {
+    AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>() {
 
       @Override
       public Void doWork() throws Exception {
@@ -151,7 +151,7 @@ public class SetPublishStatus extends DeclarativeWebScript implements Initializi
 
         return null;
       }
-    });
+    }, VgrModel.SYSTEM_USER_NAME);
 
     model.put("result", "OK");
 

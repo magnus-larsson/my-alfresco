@@ -105,4 +105,21 @@
             </props>
         </property>
     </bean>
+    
+  <!-- ************************************************************************** -->
+  <!-- Bootstraps a system user with admin rights that can be used in runAs calls -->
+  <!-- The regular system user doesn't trigger audit logs, so this can be used instead  -->
+  <!-- ************************************************************************** -->
+  <bean id="vgr.patch.addSystemUser" class="se.vgregion.alfresco.repo.admin.patch.impl.AddSystemUserPatch" parent="basePatch">
+    <property name="id" value="vgr.patch.addSystemUser" />
+    <property name="description" value="vgr.patch.addSystemUser.description" />
+    <property name="fixesFromSchema" value="0" />
+    <property name="fixesToSchema" value="6026" />
+    <property name="targetSchema" value="6027" />
+    <property name="force" value="true" />
+    <property name="personService" ref="PersonService" />
+    <property name="authorityService" ref="AuthorityService" />
+    <property name="authenticationService" ref="AuthenticationService" />
+  </bean>
+    
 </beans>

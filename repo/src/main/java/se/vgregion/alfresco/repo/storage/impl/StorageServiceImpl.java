@@ -120,18 +120,18 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
   private LockService _lockService;
 
-  private boolean pdfaPilotEnabled = false;
+  private boolean _pdfaPilotEnabled = false;
 
   public void setLockService(LockService lockService) {
-    this._lockService = lockService;
+    _lockService = lockService;
   }
 
   public void setPdfaPilotEnabled(boolean pdfaPilotEnabled) {
-    this.pdfaPilotEnabled = pdfaPilotEnabled;
+    _pdfaPilotEnabled = pdfaPilotEnabled;
   }
 
   public void setRepository(Repository repository) {
-    this._repository = repository;
+    _repository = repository;
   }
 
   public void setNodeService(final NodeService nodeService) {
@@ -803,7 +803,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
   protected boolean createPdfaRendition(final NodeRef nodeRef, final boolean async, Long timeout) {
     // Check if pdfapilot is enabled
-    if (!pdfaPilotEnabled) {
+    if (!_pdfaPilotEnabled) {
       LOG.warn("PDF/A pilot not enabled. Skipping creation of PDF/A rendition");
       return false;
     }

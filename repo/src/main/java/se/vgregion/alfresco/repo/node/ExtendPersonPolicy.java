@@ -62,7 +62,6 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
 
       @Override
       public Boolean doWork() throws Exception {
-
         // if the node is gone, exit
         if (nodeRef == null || !_nodeService.exists(nodeRef)) {
           return null;
@@ -70,10 +69,17 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
 
         String property = (String) _nodeService.getProperty(nodeRef, VgrModel.PROP_THUMBNAIL_PHOTO);
 
-        if (property != null && property.length() > 0) {
-          _behaviourFilter.disableBehaviour();
-          String fullyAuthenticatedUser = AuthenticationUtil.getFullyAuthenticatedUser();
-          AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.SYSTEM_USER_NAME);
+        if (StringUtils.isBlank(property)) {
+          return false;
+        }
+
+        _behaviourFilter.disableBehaviour();
+        
+        String fullyAuthenticatedUser = AuthenticationUtil.getFullyAuthenticatedUser();
+
+        try {
+          AuthenticationUtil.setFullyAuthenticatedUser(VgrModel.SYSTEM_USER_NAME);
+          
           if (!_nodeService.hasAspect(nodeRef, ContentModel.ASPECT_PREFERENCES)) {
             _nodeService.addAspect(nodeRef, ContentModel.ASPECT_PREFERENCES, null);
           }
@@ -115,15 +121,15 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
 
           // Add an avatar association for backwards compatability
           _nodeService.createAssociation(nodeRef, imageNodeRef, ContentModel.ASSOC_AVATAR);
-          AuthenticationUtil.setFullyAuthenticatedUser(fullyAuthenticatedUser);
-          _behaviourFilter.enableBehaviour();
 
           return true;
+        } finally {
+          AuthenticationUtil.setFullyAuthenticatedUser(fullyAuthenticatedUser);
+          
+          _behaviourFilter.enableBehaviour();
         }
-
-        return false;
       }
-    }, AuthenticationUtil.getSystemUserName());
+    }, VgrModel.SYSTEM_USER_NAME);
 
     if (hasThumbnail == null) {
       LOG.debug("User does not exist");
@@ -134,7 +140,6 @@ public class ExtendPersonPolicy extends AbstractPolicy implements OnUpdateNodePo
         LOG.info("User have a thumbnail photo ");
       }
     }
-
   }
 
   /**
