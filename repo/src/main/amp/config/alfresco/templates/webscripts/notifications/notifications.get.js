@@ -22,7 +22,7 @@ var minimal = function(txt) {
    txt = txt.replace(white,'')
             .replace(strong,'<strong>$1</strong>')
             .replace(em,'<em>$1</em>')
-            .replace(link,'<a href="$2">$1</a>');
+            .replace(link,'<a href="$2"><u>$1</u></a>');
    return txt;
 }; 
 
