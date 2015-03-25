@@ -382,6 +382,8 @@ public class ServiceUtilsImpl implements InitializingBean, ServiceUtils {
         result = new ArrayList<SiteInfo>(results.length());
 
         for (final NodeRef site : results.getNodeRefs()) {
+          if (site == null || !_nodeService.exists(site))
+            continue;
           // Ignore any node type that is not a "site"
           final QName siteClassName = _nodeService.getType(site);
 
