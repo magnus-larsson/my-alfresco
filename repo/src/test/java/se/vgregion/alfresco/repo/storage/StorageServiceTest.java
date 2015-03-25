@@ -8,6 +8,7 @@ import java.util.Date;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.model.Repository;
 import org.alfresco.repo.policy.BehaviourFilter;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -103,6 +104,9 @@ public class StorageServiceTest {
         will(returnValue(storageNodeRef));
       }
     });
+    AuthenticationUtil AU = new AuthenticationUtil();
+    AU.setDefaultGuestUserName("guest");
+    AU.afterPropertiesSet();
   }
 
   @After
