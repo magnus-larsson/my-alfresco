@@ -20,28 +20,29 @@ import org.springframework.util.Assert;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.storage.StorageService;
+import se.vgregion.alfresco.repo.utils.ServiceUtils;
 import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class GetPublishStatus extends DeclarativeWebScript implements InitializingBean {
 
   private NodeService nodeService;
   private StorageService storageService;
-  private ServiceUtilsImpl serviceUtils;
+  private ServiceUtils serviceUtils;
 
   private static final Logger LOG = Logger.getLogger(GetPublishStatus.class);
-  private static final String OK = "ok";
-  private static final String ERROR = "error";
+  public static final String OK = "ok";
+  public static final String ERROR = "error";
 
-  private static final String STATUS_ERROR = "ERROR";
-  private static final String STATUS_PUBLISH_ERROR = "PUBLISH_ERROR";
-  private static final String STATUS_UNPUBLISH_ERROR = "UNPUBLISH_ERROR";
-  private static final String STATUS_PUBLISHED = "PUBLISHED";
-  private static final String STATUS_UNPUBLISHED = "UNPUBLISHED";
-  private static final String STATUS_SENT_FOR_PUBLISH = "SENT_FOR_PUBLISH";
-  private static final String STATUS_SENT_FOR_UNPUBLISH = "SENT_FOR_UNPUBLISH";
-  private static final String STATUS_NOT_PUBLISHED = "NOT_PUBLISHED";
-  private static final String STATUS_PREVIOUSLY_PUBLISHED = "PREVIOUSLY_PUBLISHED";
-  private static final String STATUS_PREVIOUS_VERSION_PUBLISHED = "PREVIOUS_VERSION_PUBLISHED";
+  public static final String STATUS_ERROR = "ERROR";
+  public static final String STATUS_PUBLISH_ERROR = "PUBLISH_ERROR";
+  public static final String STATUS_UNPUBLISH_ERROR = "UNPUBLISH_ERROR";
+  public static final String STATUS_PUBLISHED = "PUBLISHED";
+  public static final String STATUS_UNPUBLISHED = "UNPUBLISHED";
+  public static final String STATUS_SENT_FOR_PUBLISH = "SENT_FOR_PUBLISH";
+  public static final String STATUS_SENT_FOR_UNPUBLISH = "SENT_FOR_UNPUBLISH";
+  public static final String STATUS_NOT_PUBLISHED = "NOT_PUBLISHED";
+  public static final String STATUS_PREVIOUSLY_PUBLISHED = "PREVIOUSLY_PUBLISHED";
+  public static final String STATUS_PREVIOUS_VERSION_PUBLISHED = "PREVIOUS_VERSION_PUBLISHED";
 
   @Override
   protected Map<String, Object> executeImpl(final WebScriptRequest req, final Status status, final Cache cache) {
@@ -183,7 +184,7 @@ public class GetPublishStatus extends DeclarativeWebScript implements Initializi
           }
         } else if (storageVersions.size() > 1 && someVersionIsPublished) {
           model.put("result", STATUS_PREVIOUS_VERSION_PUBLISHED);
-        } if (storageVersions.size() > 0 && !someVersionIsPublished) {
+        } else if (storageVersions.size() > 0 && !someVersionIsPublished) {
           model.put("result", STATUS_PREVIOUSLY_PUBLISHED);
         } else if (storageVersions.size() > 0) {
           model.put("result", STATUS_SENT_FOR_PUBLISH);
@@ -211,7 +212,7 @@ public class GetPublishStatus extends DeclarativeWebScript implements Initializi
     this.storageService = storageService;
   }
 
-  public void setServiceUtils(ServiceUtilsImpl serviceUtils) {
+  public void setServiceUtils(ServiceUtils serviceUtils) {
     this.serviceUtils = serviceUtils;
   }
 
