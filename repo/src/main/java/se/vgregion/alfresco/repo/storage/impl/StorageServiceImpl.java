@@ -337,7 +337,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
       return publishedNodeRef;
     } finally {
-      AuthenticationUtil.setFullyAuthenticatedUser(fullyAuthenticatedUser);
+      AuthenticationUtil.setFullyAuthenticatedUser((fullyAuthenticatedUser != null) ? fullyAuthenticatedUser : AuthenticationUtil.getGuestUserName());
     }
   }
 
@@ -577,7 +577,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
         storage = nodeRef;
       } finally {
-        AuthenticationUtil.setFullyAuthenticatedUser(fullyAuthenticatedUser);
+        AuthenticationUtil.setFullyAuthenticatedUser((fullyAuthenticatedUser != null) ? fullyAuthenticatedUser : AuthenticationUtil.getGuestUserName());
       }
     }
     return storage;
@@ -725,7 +725,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
       }
 
     } finally {
-      AuthenticationUtil.setFullyAuthenticatedUser(fullyAuthenticatedUser);
+      AuthenticationUtil.setFullyAuthenticatedUser((fullyAuthenticatedUser != null) ? fullyAuthenticatedUser : AuthenticationUtil.getGuestUserName());
     }
   }
 
@@ -747,7 +747,6 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
       // unpublish all the old versions except this one...
       unpublishFromStorage(sourceDocumentId, currentVersion);
 
-        
       // set a new name to avoid clashes
       final String oldName = (String) _nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
       final String newName = getUniqueName(finalFolder, oldName);
@@ -772,7 +771,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
       // remove the owner of the document to prevent deletion and stuff
       _ownableService.setOwner(nodeRef, VgrModel.SYSTEM_USER_NAME);
-      
+
       // create a PDF/A rendition
       createPdfaRendition(nodeRef);
 
@@ -782,7 +781,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     } catch (final Exception ex) {
       throw new RuntimeException(ex);
     } finally {
-      AuthenticationUtil.setFullyAuthenticatedUser(fullyAuthenticatedUser);
+      AuthenticationUtil.setFullyAuthenticatedUser((fullyAuthenticatedUser != null) ? fullyAuthenticatedUser : AuthenticationUtil.getGuestUserName());
     }
   }
 
@@ -922,7 +921,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
       _actionService.executeAction(mailAction, null);
 
     } finally {
-      AuthenticationUtil.setFullyAuthenticatedUser(fullyAuthenticatedUser);
+      AuthenticationUtil.setFullyAuthenticatedUser((fullyAuthenticatedUser != null) ? fullyAuthenticatedUser : AuthenticationUtil.getGuestUserName());
     }
   }
 
@@ -1101,7 +1100,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
       }
 
     } finally {
-      AuthenticationUtil.setFullyAuthenticatedUser(fullyAuthenticatedUser);
+      AuthenticationUtil.setFullyAuthenticatedUser((fullyAuthenticatedUser != null) ? fullyAuthenticatedUser : AuthenticationUtil.getGuestUserName());
     }
     return count;
   }

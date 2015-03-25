@@ -59,7 +59,7 @@ public class RepushToPubSubHubBubServer extends ClusteredExecuter {
           AuthenticationUtil.setFullyAuthenticatedUser(VgrModel.SYSTEM_USER_NAME);
           doExecute();
         } finally {
-          AuthenticationUtil.setFullyAuthenticatedUser(fullyAuthenticatedUser);
+          AuthenticationUtil.setFullyAuthenticatedUser((fullyAuthenticatedUser != null) ? fullyAuthenticatedUser : AuthenticationUtil.getGuestUserName());
         }
         return null;
       }

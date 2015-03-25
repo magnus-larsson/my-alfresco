@@ -56,7 +56,7 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
       AuthenticationUtil.setFullyAuthenticatedUser(VgrModel.SYSTEM_USER_NAME);
       _transactionService.getRetryingTransactionHelper().doInTransaction(executionJms, false, true);
     } finally {
-      AuthenticationUtil.setFullyAuthenticatedUser(fullyAuthenticatedUser);
+      AuthenticationUtil.setFullyAuthenticatedUser((fullyAuthenticatedUser != null) ? fullyAuthenticatedUser : AuthenticationUtil.getGuestUserName());
     }
   }
 
