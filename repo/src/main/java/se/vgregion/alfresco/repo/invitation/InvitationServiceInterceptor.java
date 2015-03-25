@@ -8,7 +8,6 @@ import org.alfresco.repo.invitation.InvitationServiceImpl;
 import org.alfresco.service.cmr.invitation.Invitation;
 import org.alfresco.service.cmr.invitation.Invitation.ResourceType;
 import org.alfresco.service.cmr.invitation.InvitationException;
-import org.alfresco.service.cmr.invitation.InvitationService;
 import org.alfresco.service.cmr.invitation.NominatedInvitation;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -29,9 +28,9 @@ public class InvitationServiceInterceptor implements MethodInterceptor, Initiali
   private PersonService _personService;
 
   private NodeService _nodeService;
-  
+
   private InvitationNotificationHelper _inviteNotificationHelper;
-  
+
   public void setNodeService(NodeService nodeService) {
     this._nodeService = nodeService;
   }
@@ -69,7 +68,7 @@ public class InvitationServiceInterceptor implements MethodInterceptor, Initiali
           Invitation inv = (Invitation) methodInvocation.proceed();
           // Send mail
           LOG.trace("APPROVE3");
-          _inviteNotificationHelper.generateModeratedApproveMail(inv, (String) methodInvocation.getArguments()[1]);
+          _inviteNotificationHelper.generateModeratedApproveMail(inv.getInviteeUserName(), inv.getResourceName());
           return inv;
         }
       }
@@ -81,20 +80,21 @@ public class InvitationServiceInterceptor implements MethodInterceptor, Initiali
       Object[] arguments = methodInvocation.getArguments();
       if (arguments.length == 2) {
         LOG.trace("REJECT2");
-        if (arguments[0].getClass().equals(String.class) && arguments[1].getClass().equals(String.class)) {          
+        if (arguments[0].getClass().equals(String.class) && arguments[1].getClass().equals(String.class)) {
           InvitationServiceImpl invImpl = (InvitationServiceImpl) methodInvocation.getThis();
-          //boolean sendEmail = invImpl.isSendEmails();
-          //invImpl.setSendEmails(false);          
+          // boolean sendEmail = invImpl.isSendEmails();
+          // invImpl.setSendEmails(false);
           Invitation inv = (Invitation) methodInvocation.proceed();
-          //invImpl.setSendEmails(sendEmail);
+          // invImpl.setSendEmails(sendEmail);
           // Send mail
           LOG.trace("REJECT3");
-          _inviteNotificationHelper.generateModeratedRejectMail(inv, (String) methodInvocation.getArguments()[1]);
+
+          _inviteNotificationHelper.generateModeratedRejectMail(inv.getInviteeUserName(), inv.getResourceName());
           return inv;
         }
       }
     }
-    
+
     return methodInvocation.proceed();
   }
 

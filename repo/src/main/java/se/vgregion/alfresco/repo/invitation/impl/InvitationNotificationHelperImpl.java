@@ -87,20 +87,19 @@ public class InvitationNotificationHelperImpl implements InvitationNotificationH
     return mailSettings;
   }
 
-  protected Map<String, Serializable> getBasicTemplateArgs(Invitation invitation, String message) {
-    NodeRef inviteeNodeRef = personService.getPersonOrNull(invitation.getInviteeUserName());
+  protected Map<String, Serializable> getBasicTemplateArgs(String username, String siteShortName) {
+    NodeRef inviteeNodeRef = personService.getPersonOrNull(username);
     NodeRef inviterNodeRef = personService.getPersonOrNull(AuthenticationUtil.getFullyAuthenticatedUser());
     Map<QName, Serializable> inviteeProperties = nodeService.getProperties(inviteeNodeRef);
     Map<QName, Serializable> inviterProperties = nodeService.getProperties(inviterNodeRef);
-    String shortName = invitation.getResourceName();
-    SiteInfo site = siteService.getSite(shortName);
+    SiteInfo site = siteService.getSite(siteShortName);
     Map<String, Serializable> templateArgs = new HashMap<String, Serializable>();
     templateArgs.put("siteName", site.getTitle());
     templateArgs.put("inviteeFirstName", inviteeProperties.get(ContentModel.PROP_FIRSTNAME));
     templateArgs.put("inviteeLastName", inviteeProperties.get(ContentModel.PROP_LASTNAME));
     templateArgs.put("inviterFirstName", inviterProperties.get(ContentModel.PROP_FIRSTNAME));
     templateArgs.put("inviterLastName", inviterProperties.get(ContentModel.PROP_LASTNAME));
-    templateArgs.put("message", message);
+    //templateArgs.put("message", message);
     return templateArgs;
   }
 
@@ -113,13 +112,13 @@ public class InvitationNotificationHelperImpl implements InvitationNotificationH
   }
 
   @Override
-  public void generateModeratedApproveMail(Invitation invitation, String message) {
-    NodeRef inviteeNodeRef = personService.getPersonOrNull(invitation.getInviteeUserName());
+  public void generateModeratedApproveMail(String username, String siteShortName) {
+    NodeRef inviteeNodeRef = personService.getPersonOrNull(username);
     if (inviteeNodeRef != null) {
       Map<QName, Serializable> personProperties = nodeService.getProperties(inviteeNodeRef);
       Map<String, Serializable> mailSettings = getBasicMailSettings(SUBJECT_APPROVED, APPROVE_TEMPLATE_PATH, (String) personProperties.get(ContentModel.PROP_EMAIL));
       // Template args
-      Map<String, Serializable> templateArgs = getBasicTemplateArgs(invitation, message);
+      Map<String, Serializable> templateArgs = getBasicTemplateArgs(username, siteShortName);
       
       addTemplateArgsToMailSettings(mailSettings, templateArgs);
 
@@ -131,21 +130,21 @@ public class InvitationNotificationHelperImpl implements InvitationNotificationH
       } catch (Exception ex) {
         LOG.error("Error while sending mail", ex);
       }
-      LOG.debug("Sent out approval of site invitation email for username " + invitation.getInviteeUserName());
+      LOG.debug("Sent out approval of site invitation email for username " + username);
     } else {
-      LOG.warn("Could not find user with username " + invitation.getInviteeUserName());
+      LOG.warn("Could not find user with username " + username);
     }
 
   }
 
   @Override
-  public void generateModeratedRejectMail(Invitation invitation, String message) {
-    NodeRef inviteeNodeRef = personService.getPersonOrNull(invitation.getInviteeUserName());
+  public void generateModeratedRejectMail(String username, String siteShortName) {
+    NodeRef inviteeNodeRef = personService.getPersonOrNull(username);
     if (inviteeNodeRef != null) {
       Map<QName, Serializable> personProperties = nodeService.getProperties(inviteeNodeRef);
       Map<String, Serializable> mailSettings = getBasicMailSettings(SUBJECT_REJECTED, REJECT_TEMPLATE_PATH, (String) personProperties.get(ContentModel.PROP_EMAIL));
       // Template args
-      Map<String, Serializable> templateArgs = getBasicTemplateArgs(invitation, message);
+      Map<String, Serializable> templateArgs = getBasicTemplateArgs(username, siteShortName);
       
       addTemplateArgsToMailSettings(mailSettings, templateArgs);
 
@@ -157,9 +156,9 @@ public class InvitationNotificationHelperImpl implements InvitationNotificationH
       } catch (Exception ex) {
         LOG.error("Error while sending mail", ex);
       }
-      LOG.debug("Sent out reject of site invitation email for username " + invitation.getInviteeUserName());
+      LOG.debug("Sent out reject of site invitation email for username " + username);
     } else {
-      LOG.warn("Could not find user with username " + invitation.getInviteeUserName());
+      LOG.warn("Could not find user with username " + username);
     }
   }
 

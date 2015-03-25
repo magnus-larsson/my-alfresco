@@ -1,6 +1,5 @@
 package se.vgregion.alfresco.repo.invitation;
 
-import org.alfresco.service.cmr.invitation.Invitation;
 
 public interface InvitationNotificationHelper {
 
@@ -9,11 +8,11 @@ public interface InvitationNotificationHelper {
    * @param invitation
    * @param message
    */
-  public void generateModeratedApproveMail(Invitation invitation, String message);
+  public void generateModeratedApproveMail(String username, String siteShortName);
   /**
    * Generate an email when a request to join a site is rejected
    * @param invitation
    * @param message
    */
-  public void generateModeratedRejectMail(Invitation invitation, String message);
+  public void generateModeratedRejectMail(String username, String siteShortName);
 }
