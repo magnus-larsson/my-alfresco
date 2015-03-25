@@ -4,7 +4,7 @@
   <parent>
     <artifactId>alfresco-vgr</artifactId>
     <groupId>se.vgregion.alfresco</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.0</version>
   </parent>
 
   <artifactId>alfresco-vgr-migration</artifactId>
