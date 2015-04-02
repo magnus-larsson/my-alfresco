@@ -218,6 +218,7 @@
     <property name="searchService" ref="SearchService" />
     <property name="nodeService" ref="NodeService" />
     <property name="sendMailService" ref="vgr.sendMailService" />
+    <property name="behaviourFilter" ref="policyBehaviourFilter" />
     <property name="mailFrom" value="${mail.from.default}" />
     <property name="emails">
       <list>
@@ -248,7 +249,8 @@
     <property name="jobDetail" ref="vgr.validityCheckerJobDetail" />
     <property name="scheduler" ref="schedulerFactory" />
     <!-- cron expression is set to fire at 08:00 every day -->
-    <property name="cronExpression" value="0 0 08 1/1 * ? *" />
+    <property name="cronExpression" value="${vgr.mail.validity-checker.cron}" />
+    <property name="enabled" value="${vgr.mail.validity-checker.enabled}" />
   </bean>
   
    <!-- ****************************************************************** -->

@@ -7,6 +7,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -38,7 +39,14 @@ public class ValidityChecker extends ClusteredExecuter {
   private String _mailFrom;
 
   private List<Map<String, ?>> _emails;
+  
+  private BehaviourFilter _behaviourFilter;
 
+  
+  public void setBehaviourFilter(BehaviourFilter behaviourFilter) {
+    this._behaviourFilter = behaviourFilter;
+  }
+  
   public void setSearchService(SearchService searchService) {
     _searchService = searchService;
   }
@@ -101,8 +109,14 @@ public class ValidityChecker extends ClusteredExecuter {
         String body = I18NUtil.getMessage((String) mail.get("body"), daysBefore, source, identifier, title);
 
         _sendMailService.sendTextMail(subject, _mailFrom, to, body);
-
+        boolean enabled = _behaviourFilter.isEnabled(node);
+        if (enabled) {
+          _behaviourFilter.disableBehaviour(node);
+        }
         _nodeService.setProperty(node, VgrModel.PROP_SENT_EMAILS, 1);
+        if (enabled) {
+          _behaviourFilter.enableBehaviour(node);
+        }
       }
     } finally {
       ServiceUtilsImpl.closeQuietly(result);
@@ -237,6 +251,7 @@ public class ValidityChecker extends ClusteredExecuter {
     Assert.notNull(_searchService);
     Assert.notNull(_sendMailService);
     Assert.hasText(_mailFrom);
+    Assert.notNull(_behaviourFilter);
   }
 
 }
