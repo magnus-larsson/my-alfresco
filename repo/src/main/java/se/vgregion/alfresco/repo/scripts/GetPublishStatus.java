@@ -21,7 +21,6 @@ import org.springframework.util.Assert;
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.storage.StorageService;
 import se.vgregion.alfresco.repo.utils.ServiceUtils;
-import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
 
 public class GetPublishStatus extends DeclarativeWebScript implements InitializingBean {
 
@@ -72,10 +71,10 @@ public class GetPublishStatus extends DeclarativeWebScript implements Initializi
       return model;
     }
     NodeRef nodeRef = null;
-    
+
     List<NodeRef> storageVersions = storageService.getStorageVersions(documentId);
     NodeRef latestPublishedStorageVersion = storageVersions.size() > 0 ? storageVersions.get(0) : null;
-    
+
     if (documentId.contains("workspace://SpacesStore")) {
       try {
         nodeRef = new NodeRef(documentId);
@@ -89,9 +88,9 @@ public class GetPublishStatus extends DeclarativeWebScript implements Initializi
       }
     } else {
       nodeRef = latestPublishedStorageVersion;
-      
+
     }
-    
+
     if (nodeRef == null || !nodeService.exists(nodeRef)) {
       LOG.error("Document with id " + documentId + " does not exist.");
       status.setCode(Status.STATUS_BAD_REQUEST);
@@ -100,7 +99,7 @@ public class GetPublishStatus extends DeclarativeWebScript implements Initializi
       model.put("result", STATUS_ERROR);
       return model;
     }
-    
+
     if (latestPublishedStorageVersion == null || !nodeService.exists(latestPublishedStorageVersion)) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Document in storage with id " + latestPublishedStorageVersion + " does not exist. Document id is " + documentId);
