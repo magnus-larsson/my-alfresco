@@ -303,6 +303,9 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
         // inherit permissions
         _permissionService.setInheritParentPermissions(newNode, true);
+        
+        // remove the owner of the document to prevent deletion and stuff
+        _ownableService.setOwner(newNode, VgrModel.SYSTEM_USER_NAME);
 
         // set the modified property and the date saved
         _nodeService.setProperty(newNode, ContentModel.PROP_MODIFIED, now);
