@@ -49,13 +49,7 @@
   </bean>
 
   <!-- Controller for the web script Clear Cache -->
-  <bean id="webscript.clearcache.clearcache.get" class="se.vgregion.alfresco.repo.scripts.ClearCache" parent="webscript">
-    <property name="cacheManagers">
-      <list>
-        <ref bean="internalEHCacheManager" />
-      </list>
-    </property>
-  </bean>
+  <bean id="webscript.clearcache.clearcache.get" class="se.vgregion.alfresco.repo.scripts.ClearCache" parent="webscript" />
 
   <!-- Controller for the web script Published -->
   <bean id="webscript.feed.document.published.get" class="se.vgregion.alfresco.repo.scripts.Published" parent="webscript">
@@ -93,25 +87,6 @@
         <value>alfresco.module.vgr-repo.context.messages.vgr-patches</value>
         <value>alfresco.module.vgr-repo.context.messages.vgr-mail</value>
         <value>alfresco.module.vgr-repo.context.messages.vgr-data-list-model</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean id="invitationResourceBundles" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
-    <property name="resourceBundles">
-      <list>
-        <value>alfresco.module.vgr-repo.context.messages.invitation-service</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean id="activitiesResourceBundles" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
-    <property name="resourceBundles">
-      <list>
-        <value>alfresco.messages.activities-service</value>
-        <value>alfresco.messages.activity-list</value>
-        <value>alfresco.module.vgr-repo.context.messages.activity-list</value>
-        <value>alfresco.messages.slingshot</value>
       </list>
     </property>
   </bean>
@@ -502,13 +477,40 @@
     p:workflowService-ref="WorkflowService" p:personService-ref="PersonService" p:permissionService-ref="PermissionService" p:siteService-ref="SiteService" p:nodeService-ref="NodeService" p:userSynchronizer-ref="vgr.userSynchronizer" p:userRegistrySynchronizer-ref="userRegistrySynchronizer"
     p:serviceUtils-ref="vgr.serviceUtils" />
 
-  <bean id="vgr.invitationServiceInterceptor" class="se.vgregion.alfresco.repo.invitation.InvitationServiceInterceptor" p:externalActivation="${vgr.external.activation}" p:externalUsersInvitationService-ref="vgr.externalUsersInvitationService" />
+  <bean id="vgr.inviteNotificationHelper" class="se.vgregion.alfresco.repo.invitation.impl.InvitationNotificationHelperImpl">
+    <property name="sysAdminParams" ref="sysAdminParams" />
+    <property name="globalProperties" ref="global-properties" />
+    <property name="personService" ref="PersonService" />
+    <property name="actionService" ref="ActionService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="siteService" ref="SiteService" />
+    <property name="repository" ref="repositoryHelper" />
+    <property name="serviceRegistry" ref="ServiceRegistry" />
+  </bean>
 
-  <bean id="InvitationService" class="org.springframework.aop.framework.ProxyFactoryBean" p:targetName="invitationService">
+  <bean id="vgr.invitationServiceInterceptor" class="se.vgregion.alfresco.repo.invitation.InvitationServiceInterceptor">
+    <property name="externalActivation" value="${vgr.external.activation}" />
+    <property name="externalUsersInvitationService" ref="vgr.externalUsersInvitationService" />
+    <property name="personService" ref="PersonService" />
+    <property name="nodeService" ref="NodeService" />
+    <property name="inviteNotificationHelper" ref="vgr.inviteNotificationHelper" />
+  </bean>
+
+  <bean id="InviteHelper" class="org.alfresco.repo.invitation.CustomInviteHelper">
+    <property name="serviceRegistry" ref="ServiceRegistry" />
+    <property name="repositoryHelper" ref="repositoryHelper" />
+    <property name="messageService" ref="messageService" />
+    <property name="invitationNotificationHelper" ref="vgr.inviteNotificationHelper" />
+  </bean>
+
+  <bean id="InvitationService" class="org.springframework.aop.framework.ProxyFactoryBean">
     <property name="proxyInterfaces">
       <list>
         <value>org.alfresco.service.cmr.invitation.InvitationService</value>
       </list>
+    </property>
+    <property name="targetName">
+      <value>invitationService</value>
     </property>
     <property name="interceptorNames">
       <list>
@@ -516,7 +518,7 @@
         <idref bean="AuditMethodInterceptor" />
         <idref bean="exceptionTranslator" />
         <idref bean="InvitationService_security" />
-        <idref local="vgr.invitationServiceInterceptor" />
+        <idref bean="vgr.invitationServiceInterceptor" />
       </list>
     </property>
   </bean>
@@ -722,6 +724,46 @@
   <bean id="vgr.failedPdfaRenditionEmailTemplateLocation" class="org.alfresco.repo.dictionary.RepositoryLocation">
     <property name="path">
       <value>/app:company_home/app:dictionary/app:email_templates/cm:failedPdfaRenditionEmailTemplate/cm:failed-pdfa-rendition-email.ftl</value>
+    </property>
+  </bean>
+
+  <!-- *************************************************************** -->
+  <!-- Override of version service to allow for initial minor versions -->
+  <!-- *************************************************************** -->
+
+  <bean id="versionService" class="org.alfresco.repo.version.CustomVersion2ServiceImpl" init-method="initialise">
+    <property name="nodeService">
+      <ref bean="NodeService" />
+    </property>
+    <property name="dbNodeService">
+      <ref bean="mtAwareNodeService" />
+    </property>
+    <property name="searcher">
+      <ref bean="versionSearchService" />
+    </property>
+    <property name="dictionaryService">
+      <ref bean="dictionaryService" />
+    </property>
+    <property name="policyComponent">
+      <ref bean="policyComponent" />
+    </property>
+    <property name="policyBehaviourFilter">
+      <ref bean="policyBehaviourFilter" />
+    </property>
+    <property name="permissionService">
+      <ref bean="permissionService" />
+    </property>
+    <property name="onlyUseDeprecatedV1">
+      <value>${version.store.onlyUseDeprecatedV1}</value>
+    </property>
+    <property name="versionMigrator">
+      <ref bean="versionMigrator" />
+    </property>
+    <property name="versionComparatorClass">
+      <value>${version.store.versionComparatorClass}</value>
+    </property>
+    <property name="defaultVersionIsMajorVersion">
+      <value>${version.defaultVersionIsMajorVersion}</value>
     </property>
   </bean>
 

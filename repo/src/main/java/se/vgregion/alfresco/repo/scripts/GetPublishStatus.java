@@ -20,28 +20,28 @@ import org.springframework.util.Assert;
 
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.storage.StorageService;
-import se.vgregion.alfresco.repo.utils.impl.ServiceUtilsImpl;
+import se.vgregion.alfresco.repo.utils.ServiceUtils;
 
 public class GetPublishStatus extends DeclarativeWebScript implements InitializingBean {
 
   private NodeService nodeService;
   private StorageService storageService;
-  private ServiceUtilsImpl serviceUtils;
+  private ServiceUtils serviceUtils;
 
   private static final Logger LOG = Logger.getLogger(GetPublishStatus.class);
-  private static final String OK = "ok";
-  private static final String ERROR = "error";
+  public static final String OK = "ok";
+  public static final String ERROR = "error";
 
-  private static final String STATUS_ERROR = "ERROR";
-  private static final String STATUS_PUBLISH_ERROR = "PUBLISH_ERROR";
-  private static final String STATUS_UNPUBLISH_ERROR = "UNPUBLISH_ERROR";
-  private static final String STATUS_PUBLISHED = "PUBLISHED";
-  private static final String STATUS_UNPUBLISHED = "UNPUBLISHED";
-  private static final String STATUS_SENT_FOR_PUBLISH = "SENT_FOR_PUBLISH";
-  private static final String STATUS_SENT_FOR_UNPUBLISH = "SENT_FOR_UNPUBLISH";
-  private static final String STATUS_NOT_PUBLISHED = "NOT_PUBLISHED";
-  private static final String STATUS_PREVIOUSLY_PUBLISHED = "PREVIOUSLY_PUBLISHED";
-  private static final String STATUS_PREVIOUS_VERSION_PUBLISHED = "PREVIOUS_VERSION_PUBLISHED";
+  public static final String STATUS_ERROR = "ERROR";
+  public static final String STATUS_PUBLISH_ERROR = "PUBLISH_ERROR";
+  public static final String STATUS_UNPUBLISH_ERROR = "UNPUBLISH_ERROR";
+  public static final String STATUS_PUBLISHED = "PUBLISHED";
+  public static final String STATUS_UNPUBLISHED = "UNPUBLISHED";
+  public static final String STATUS_SENT_FOR_PUBLISH = "SENT_FOR_PUBLISH";
+  public static final String STATUS_SENT_FOR_UNPUBLISH = "SENT_FOR_UNPUBLISH";
+  public static final String STATUS_NOT_PUBLISHED = "NOT_PUBLISHED";
+  public static final String STATUS_PREVIOUSLY_PUBLISHED = "PREVIOUSLY_PUBLISHED";
+  public static final String STATUS_PREVIOUS_VERSION_PUBLISHED = "PREVIOUS_VERSION_PUBLISHED";
 
   @Override
   protected Map<String, Object> executeImpl(final WebScriptRequest req, final Status status, final Cache cache) {
@@ -71,10 +71,10 @@ public class GetPublishStatus extends DeclarativeWebScript implements Initializi
       return model;
     }
     NodeRef nodeRef = null;
-    
+
     List<NodeRef> storageVersions = storageService.getStorageVersions(documentId);
     NodeRef latestPublishedStorageVersion = storageVersions.size() > 0 ? storageVersions.get(0) : null;
-    
+
     if (documentId.contains("workspace://SpacesStore")) {
       try {
         nodeRef = new NodeRef(documentId);
@@ -88,9 +88,9 @@ public class GetPublishStatus extends DeclarativeWebScript implements Initializi
       }
     } else {
       nodeRef = latestPublishedStorageVersion;
-      
+
     }
-    
+
     if (nodeRef == null || !nodeService.exists(nodeRef)) {
       LOG.error("Document with id " + documentId + " does not exist.");
       status.setCode(Status.STATUS_BAD_REQUEST);
@@ -99,7 +99,7 @@ public class GetPublishStatus extends DeclarativeWebScript implements Initializi
       model.put("result", STATUS_ERROR);
       return model;
     }
-    
+
     if (latestPublishedStorageVersion == null || !nodeService.exists(latestPublishedStorageVersion)) {
       if (LOG.isTraceEnabled()) {
         LOG.trace("Document in storage with id " + latestPublishedStorageVersion + " does not exist. Document id is " + documentId);
@@ -181,10 +181,12 @@ public class GetPublishStatus extends DeclarativeWebScript implements Initializi
               model.put("result", STATUS_SENT_FOR_PUBLISH);
             }
           }
-        } else if (storageVersions.size() > 0 && !someVersionIsPublished) {
-          model.put("result", STATUS_SENT_FOR_PUBLISH);
-        } else if (storageVersions.size() > 0 && someVersionIsPublished) {
+        } else if (storageVersions.size() > 1 && someVersionIsPublished) {
           model.put("result", STATUS_PREVIOUS_VERSION_PUBLISHED);
+        } else if (storageVersions.size() > 0 && !someVersionIsPublished) {
+          model.put("result", STATUS_PREVIOUSLY_PUBLISHED);
+        } else if (storageVersions.size() > 0) {
+          model.put("result", STATUS_SENT_FOR_PUBLISH);
         } else {
           model.put("result", STATUS_NOT_PUBLISHED);
         }
@@ -209,7 +211,7 @@ public class GetPublishStatus extends DeclarativeWebScript implements Initializi
     this.storageService = storageService;
   }
 
-  public void setServiceUtils(ServiceUtilsImpl serviceUtils) {
+  public void setServiceUtils(ServiceUtils serviceUtils) {
     this.serviceUtils = serviceUtils;
   }
 

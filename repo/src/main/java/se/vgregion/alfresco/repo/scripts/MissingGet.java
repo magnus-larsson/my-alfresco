@@ -169,6 +169,46 @@ public class MissingGet extends DeclarativeWebScript {
 
     public String nodeRef;
 
+    public String getNodeRef() {
+      return nodeRef;
+    }
+
+    public void setNodeRef(String nodeRef) {
+      this.nodeRef = nodeRef;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String name) {
+      this.name = name;
+    }
+
+    public String getSourcePath() {
+      return sourcePath;
+    }
+
+    public void setSourcePath(String sourcePath) {
+      this.sourcePath = sourcePath;
+    }
+
+    public String getStoragePath() {
+      return storagePath;
+    }
+
+    public void setStoragePath(String storagePath) {
+      this.storagePath = storagePath;
+    }
+
+    public String getFilename() {
+      return filename;
+    }
+
+    public void setFilename(String filename) {
+      this.filename = filename;
+    }
+
     public String name;
 
     public String sourcePath;

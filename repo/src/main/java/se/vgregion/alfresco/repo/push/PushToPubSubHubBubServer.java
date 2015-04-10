@@ -51,14 +51,13 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
       }
     };
 
-    AuthenticationUtil.runAsSystem(new AuthenticationUtil.RunAsWork<Void>() {
-
-      @Override
-      public Void doWork() throws Exception {
-        return _transactionService.getRetryingTransactionHelper().doInTransaction(executionJms, false, true);
-      }
-
-    });
+    final String fullyAuthenticatedUser = AuthenticationUtil.getFullyAuthenticatedUser();
+    try {
+      AuthenticationUtil.setFullyAuthenticatedUser(VgrModel.SYSTEM_USER_NAME);
+      _transactionService.getRetryingTransactionHelper().doInTransaction(executionJms, false, true);
+    } finally {
+      AuthenticationUtil.setFullyAuthenticatedUser((fullyAuthenticatedUser != null) ? fullyAuthenticatedUser : AuthenticationUtil.getGuestUserName());
+    }
   }
 
   private void handleUnpublishedDocuments(final Date now) {
@@ -69,9 +68,9 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
         refreshLock();
 
         PushLogger.logBeforePush(nodeRef, now, _nodeService);
-        
+
         executeUpdate(nodeRef, VgrModel.PROP_PUSHED_FOR_UNPUBLISH);
-        
+
         PushLogger.logAfterPush(nodeRef, _nodeService);
 
         _pushJmsService.pushToJms(nodeRef, VgrModel.PROP_PUSHED_FOR_UNPUBLISH);
@@ -85,12 +84,18 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
 
       @Override
       public void processNodeRef(NodeRef nodeRef) {
+        if (_transactionService.isReadOnly()) {
+          LOG.debug(getJobName() + " bypassed; the system is read-only.");
+
+          return;
+        }
+
         refreshLock();
 
         PushLogger.logBeforePush(nodeRef, now, _nodeService);
-        
+
         executeUpdate(nodeRef, VgrModel.PROP_PUSHED_FOR_PUBLISH);
-        
+
         PushLogger.logAfterPush(nodeRef, _nodeService);
 
         _pushJmsService.pushToJms(nodeRef, VgrModel.PROP_PUSHED_FOR_PUBLISH);
@@ -105,15 +110,14 @@ public class PushToPubSubHubBubServer extends ClusteredExecuter {
     // this...
     _behaviourFilter.disableBehaviour();
 
-    
     try {
-      	
+
       setUpdatedProperty(nodeRef);
 
       setPublishStatusProperties(nodeRef, property);
 
       increasePushedCount(nodeRef);
-      
+
     } finally {
       _behaviourFilter.enableBehaviour();
     }

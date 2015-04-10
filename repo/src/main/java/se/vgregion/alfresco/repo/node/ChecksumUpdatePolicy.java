@@ -45,7 +45,7 @@ public class ChecksumUpdatePolicy extends AbstractPolicy implements OnContentPro
     }
 
     // if by some chance the version does not exist, do nothing
-    if (!_nodeService.exists(nodeRef)) {
+    if (nodeRef == null || !_nodeService.exists(nodeRef)) {
       return;
     }
 

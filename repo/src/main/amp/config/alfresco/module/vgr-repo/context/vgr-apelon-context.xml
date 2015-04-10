@@ -15,7 +15,7 @@
     <property name="vocabularyService" ref="vgr.VocabularyService" />
     <property name="searchService" ref="SearchService" />
     <property name="nodeService" ref="NodeService" />
-    <property name="cache" ref="apelonCache" />
+    <property name="cache" ref="vgr.apelonCache" />
     <property name="keywordService" ref="vgr.KeywordService" />
   </bean>
 
@@ -99,10 +99,8 @@
     <property name="path" value="SweMeSH/SweMeSH" />
   </bean>
 
-  <bean name="apelonCache" class="org.alfresco.repo.cache.EhCacheAdapter">
-    <property name="cache">
-      <bean class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheManager-ref="internalEHCacheManager" p:cacheName="se.vgregion.alfresco.repo.cache.APELON_CACHE" />
-    </property>
-  </bean>
+   <bean name="vgr.apelonCache" factory-bean="cacheFactory" factory-method="createCache">
+      <constructor-arg value="cache.vgr.apelonCache"/>
+   </bean>
 
 </beans>

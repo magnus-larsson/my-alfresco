@@ -1,6 +1,6 @@
 /**
  * RL root namespace.
- * 
+ *
  * @namespace RL
  */
 // Ensure RL root object exists
@@ -10,7 +10,7 @@ if (typeof RL == "undefined" || !RL) {
 
 /**
  * Admin Console PuSH Report
- * 
+ *
  * @namespace Alfresco
  * @class RL.PushReport
  */
@@ -24,7 +24,7 @@ if (typeof RL == "undefined" || !RL) {
 
   /**
    * PushReport constructor.
-   * 
+   *
    * @param {String}
    *          htmlId The HTML id of the parent element
    * @return {RL.PushReport} The new PushReport instance
@@ -51,7 +51,7 @@ if (typeof RL == "undefined" || !RL) {
     YAHOO.extend(ListPanelHandler, Alfresco.ConsolePanelHandler, {
       /**
        * Called by the ConsolePanelHandler when this panel shall be loaded
-       * 
+       *
        * @method onLoad
        */
       onLoad : function onLoad() {
@@ -151,12 +151,12 @@ if (typeof RL == "undefined" || !RL) {
               }
             });
           }
-          
+
           function onSentinelButtonClick(p_oEvent) {
-            var url = sentinelUrl.replace("#placeholder#", nodeRef);
+            var url = parent.options.sentinelUrl.replace("#placeholder#", nodeRef);
             var win=window.open(url, '_blank');
             win.focus();
-            
+
           }
 
           cell.innerHTML = '<div id="actionbuttons' + (pushButtonCounter) + '-container"></div>';
@@ -243,10 +243,6 @@ if (typeof RL == "undefined" || !RL) {
         };
 
         parent.widgets.dataTable = new YAHOO.widget.DataTable(parent.id + "-result", columnDefinitions, parent.widgets.dataSource, {
-          sortedBy : {
-            key : "title",
-            dir : "asc"
-          },
           MSG_EMPTY : parent.msg("message.empty"),
           dynamicData : true,
           generateRequest : generateRequest,
@@ -270,10 +266,27 @@ if (typeof RL == "undefined" || !RL) {
   YAHOO.extend(RL.PushReport, Alfresco.ConsoleTool, {
 
     /**
+     * Set multiple initialization options at once.
+     *
+     * @method setOptions
+     * @param obj {object} Object literal specifying a set of options
+     */
+    setOptions: function ReplaceAssignee_setOptions(obj)
+    {
+       this.options = YAHOO.lang.merge(this.options, obj);
+       return this;
+    },
+
+    options:
+    {
+      sentinelUrl : null
+    },
+
+    /**
      * Fired by YUI when parent element is available for scripting. Component
      * initialisation, including instantiation of YUI widgets and event listener
      * binding.
-     * 
+     *
      * @method onReady
      */
     onReady : function PR_onReady() {
@@ -357,9 +370,9 @@ if (typeof RL == "undefined" || !RL) {
 
     /**
      * Resets the YUI DataTable errors to our custom messages
-     * 
+     *
      * NOTE: Scope could be YAHOO.widget.DataTable, so can't use "this"
-     * 
+     *
      * @method _setDefaultDataTableErrors
      * @param dataTable
      *          {object} Instance of the DataTable

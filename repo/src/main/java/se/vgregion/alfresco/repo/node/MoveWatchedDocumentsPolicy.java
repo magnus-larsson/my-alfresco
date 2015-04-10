@@ -30,7 +30,7 @@ public class MoveWatchedDocumentsPolicy extends AbstractPolicy implements OnCrea
       @Override
       public void execute() {
         // if the node does not exist, don't do anything...
-        if (!_nodeService.exists(fileNodeRef)) {
+        if (fileNodeRef == null || !_nodeService.exists(fileNodeRef)) {
           return;
         }
 

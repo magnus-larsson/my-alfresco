@@ -1,12 +1,27 @@
+<@markup id="css" >
+  <#-- CSS Dependencies -->
+  <@link href="${url.context}/res/components/console/pdfa-console.css" group="console"/>  
+  <@link href="${url.context}/res/modules/documentlibrary/global-folder.css" group="console"/>
+</@>
+
+<@markup id="js">
+  <@script type="text/javascript" src="${url.context}/res/yui/datasource/datasource.js" group="console" />
+  <@script type="text/javascript" src="${url.context}/res/components/console/consoletool.js" group="console" />
+  <@script type="text/javascript" src="${url.context}/res/components/console/pdfa-console.js" group="console" />
+  <@script type="text/javascript" src="${url.context}/res/modules/documentlibrary/global-folder.js" group="console" />
+  <@script type="text/javascript" src="${url.context}/res/yui/datasource/datasource.js" group="console" />
+  <@script type="text/javascript" src="${url.context}/res/yui/resize/resize.js" group="console" />
+  
+</@>
+
+<@markup id="widgets">
+  <@createWidgets group="console"/>
+</@>
+
+
 <#compress>
 
 <#assign el=args.htmlid?html>
-
-<script type="text/javascript">
-    //<![CDATA[
-        new RL.PdfaConsole("${el}").setMessages(${messages});
-    //]]>
-</script>
 
 <div id="${el}-body" class="pdfa-console">
     <div id="${el}-main" class="hidden">

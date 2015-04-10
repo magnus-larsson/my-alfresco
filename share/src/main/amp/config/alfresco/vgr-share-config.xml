@@ -14,74 +14,6 @@
   <config replace="true">
     <probe-host>localhost</probe-host>
 
-    <flags>
-      <!-- Developer debugging setting to turn on DEBUG mode for client scripts in the browser -->
-      <client-debug>true</client-debug>
-
-      <!-- LOGGING can always be toggled at runtime when in DEBUG mode (Ctrl, Ctrl, Shift, Shift). This flag automatically activates logging on page load. -->
-      <client-debug-autologging>false</client-debug-autologging>
-    </flags>
-
-    <!-- override menu so that repository can be hidden when not admin -->
-    <header>
-      <app-items>
-        <!-- defaults: icon="{id}.png" label="header.{id}.label" description="header.{id}.description" -->
-        <item type="link" id="my-dashboard">{userdashboardpage}</item>
-        <item type="js" id="sites">Alfresco.module.Sites</item>
-        <item type="link" id="people">/people-finder</item>
-        <item type="link" id="repository" condition="conditionRepositoryRootNode" permission="admin">/repository</item>
-        <item type="container" id="more">
-          <container-group id="my">
-            <!-- <item type="link" id="my-tasks">/my-tasks</item> -->
-            <!-- <item type="link" id="my-workflows">/my-workflows</item> -->
-            <item type="link" id="my-content">/user/user-content</item>
-            <item type="link" id="my-sites">/user/user-sites</item>
-            <item type="link" id="my-profile">{userprofilepage}</item>
-            <!-- <item type="js" id="saved-searches" condition="false">Alfresco.module.SavedSearches</item> -->
-          </container-group>
-          <container-group id="tools" permission="admin">
-            <item type="link" id="application">/console/admin-console/application</item>
-            <item type="link" id="groups">/console/admin-console/groups</item>
-            <item type="link" id="replication-jobs" condition="!conditionEditionTeam">/console/admin-console/replication-jobs</item>
-            <item type="link" id="repository">/console/admin-console/repository</item>
-            <item type="link" id="users">/console/admin-console/users</item>
-            <item type="link" id="trashcan">/console/admin-console/trashcan</item>
-            <item type="link" id="more">/console/admin-console/</item>
-          </container-group>
-        </item>
-        <item type="link" id="my-sites">/user/user-sites</item>
-      </app-items>
-      <user-items>
-        <item type="container" id="user" icon="" description="">
-          <container-group id="usermenu" label="">
-            <item type="user" id="status">{userprofilepage}</item>
-            <item type="link" id="my-profile">{userprofilepage}</item>
-            <item type="link" id="change-password" condition="user.capabilities.isMutable">/user/change-password</item>
-            <item type="external-link" id="help-external" icon="help.png">{share-help-external}</item>
-            <item type="external-link" id="help-internal" icon="help.png">{share-help-internal}</item>
-            <item type="post" id="logout" condition="!context.externalAuthentication">dologout</item>
-          </container-group>
-        </item>
-        <item type="js" id="tycktill" label="Tyck till" icon="">Alfresco.thirdparty.module.TyckTill</item>
-        <item type="container" id="help" icon="">
-          <container-group id="helpmenu" label="">
-            <item type="external-link" id="help-external" icon="help.png">{share-help-external}</item>
-            <item type="external-link" id="help-internal" icon="help.png">{share-help-internal}</item>
-          </container-group>
-        </item>
-      </user-items>
-      <dependencies>
-        <css src="/modules/create-site.css" />
-        <css src="/modules/vgr-create-site.css" />
-        <css src="/modules/header/sites.css" />
-        <js src="/modules/create-site.js" />
-        <js src="/modules/vgr-create-site.js" />
-        <js src="/modules/header/sites.js" />
-        <js src="/modules/header/vgr-sites.js" />
-        <js src="/modules/header/tycktill.js" />
-      </dependencies>
-    </header>
-
     <!-- misc configuration -->
     <kivurl>http://sokikiv.vgregion.se/sokikiv/visaperson?vgrid={id}</kivurl>
   </config>
@@ -96,19 +28,6 @@
 
   <config evaluator="string-compare" condition="WebFramework">
     <web-framework>
-      <!-- SpringSurf Autowire Runtime Settings -->
-      <!-- Developers can set mode to 'development' to disable; SpringSurf caches, FreeMarker template caching and Rhino JavaScript compilation. -->
-      <autowire>
-        <!-- Pick the mode: "production" or "development" -->
-        <mode>development</mode>
-      </autowire>
-
-      <module-deployment>
-        <!-- Allow extension modules with <auto-deploy> set to true to be automatically deployed -->
-        <mode>manual</mode>
-        <enable-auto-deploy-modules>true</enable-auto-deploy-modules>
-      </module-deployment>
-
       <!-- This is the user factory we use to provide the user object in share with the specific properties for VGR -->
       <defaults>
         <user-factory>webframework.factory.user.vgr</user-factory>
@@ -124,84 +43,6 @@
     </advanced-search>
   </config>
 
-  <!-- Document Library config section -->
-  <config evaluator="string-compare" condition="DocumentLibrary">
-
-    <!-- <tree> -->
-    <!-- Whether the folder Tree component should enumerate child folders or not. This is a relatively expensive operation, so should be set to "false" for Repositories with broad folder structures. -->
-    <!-- <evaluate-child-folders>false</evaluate-child-folders> -->
-
-    <!-- Optionally limit the number of folders shown in treeview throughout Share. -->
-    <!-- <maximum-folder-count>-1</maximum-folder-count> -->
-    <!-- </tree> -->
-
-    <!-- Used by the "Manage Aspects" action For custom aspects, remember to also add the relevant i18n string(s) cm_myaspect=My Aspect -->
-    <aspects>
-      <!-- Aspects that a user can see -->
-      <visible>
-
-      </visible>
-
-      <!-- Aspects that a user can add. Same as "visible" if left empty -->
-      <addable></addable>
-
-      <!-- Aspects that a user can remove. Same as "visible" if left empty -->
-      <removeable></removeable>
-    </aspects>
-
-    <!-- Used by the "Change Type" action Define valid subtypes using the following example: <type name="cm:content"> <subtype name="cm:mysubtype" /> </type> Remember to also add the relevant i18n string(s): 
-      cm_mysubtype=My SubType -->
-    <types>
-      <type name="cm:content">
-        <subtype name="vgr:document" />
-      </type>
-
-      <!-- <type name="cm:folder"> </type> -->
-    </types>
-
-    <!-- If set, will present a WebDAV link for the current item on the Document and Folder details pages. Also used to generate the "View in Alfresco Explorer" action for folders. -->
-    <!-- <repository-url>http://localhost:8080/alfresco</repository-url> -->
-
-    <!-- Google Docs™ integration -->
-    <google-docs>
-      <!-- Enable/disable the Google Docs UI integration (Extra types on Create Content menu, Google Docs actions). -->
-      <enabled>false</enabled>
-
-      <!-- The mimetypes of documents Google Docs allows you to create via the Share interface. The I18N label is created from the "type" attribute, e.g. google-docs.doc=Google Docs&trade; Document -->
-      <creatable-types>
-        <creatable type="doc">application/msword</creatable>
-        <creatable type="xls">application/vnd.ms-excel</creatable>
-        <creatable type="ppt">application/vnd.ms-powerpoint</creatable>
-      </creatable-types>
-    </google-docs>
-
-    <!-- File upload configuration -->
-    <file-upload>
-      <!-- Adobe Flash™ In certain environments, an HTTP request originating from Flash cannot be authenticated using an existing session. See: http://bugs.adobe.com/jira/browse/FP-4830 For these cases, 
-        it is useful to disable the Flash-based uploader for Share Document Libraries. -->
-      <adobe-flash-enabled>true</adobe-flash-enabled>
-    </file-upload>
-
-    <indicators>
-      <indicator id="vgr-publish-status-placeholder" index="39" icon="loading.gif">
-        <evaluator>evaluator.doclib.indicator.vgr-publish-status</evaluator>
-      </indicator>
-      <indicator id="auto-publish-all-versions" index="39">
-        <evaluator>evaluator.doclib.indicator.auto-publish-all-versions</evaluator>
-      </indicator>
-      <indicator id="auto-publish-major-version" index="39">
-        <evaluator>evaluator.doclib.indicator.auto-publish-major-version</evaluator>
-      </indicator>
-    </indicators>
-  </config>
-
-  <!-- DocLibCustom section -->
-  <config evaluator="string-compare" condition="DocLibCustom">
-    <dependencies>
-      <js src="/components/documentlibrary/vgr-publish-status.js" />
-    </dependencies>
-  </config>
-
   <!-- Repository Library config section -->
   <config evaluator="string-compare" condition="RepositoryLibrary" replace="true">
     <!-- Root nodeRef or xpath expression for top-level folder. e.g. alfresco://user/home, /app:company_home/st:sites/cm:site1 If using an xpath expression, ensure it is properly ISO9075 encoded here. -->
@@ -210,14 +51,11 @@
     <tree>
       <!-- Whether the folder Tree component should enumerate child folders or not. This is a relatively expensive operation, so should be set to "false" for Repositories with broad folder structures. -->
       <evaluate-child-folders>false</evaluate-child-folders>
-
-      <!-- Optionally limit the number of folders shown in treeview throughout Share. -->
-      <!-- <maximum-folder-count>500</maximum-folder-count> -->
     </tree>
   </config>
 
   <!-- share help urls -->
-  <config evaluator="string-compare" condition="HelpPages">
+  <config evaluator="string-compare" condition="HelpPages" replace="true">
     <help-pages>
       <share-help-external>http://www.vgregion.se/alfresco</share-help-external>
       <share-help-internal>http://intra.vgregion.se/alfresco</share-help-internal>
@@ -237,6 +75,7 @@
       </action>
 
       <action id="action-header-edit" type="header">
+        <param name="foobar">{foobar}</param>
         <permissions>
           <permission allow="true">Write</permission>
         </permissions>
@@ -244,6 +83,7 @@
       </action>
 
       <action id="action-header-publish" type="header">
+        <param name="foobar">{foobar}</param>
         <permissions>
           <permission allow="true">Write</permission>
         </permissions>
@@ -253,9 +93,12 @@
         <evaluator negate="true">evaluator.doclib.metadata.isLocked</evaluator>
       </action>
 
-      <action id="action-header-manage" type="header" />
+      <action id="action-header-manage" type="header">
+        <param name="foobar">{foobar}</param>
+      </action>
 
       <action id="action-header-origin" type="header">
+        <param name="foobar">{foobar}</param>
         <evaluator>evaluator.doclib.action.isWorkingCopy</evaluator>
       </action>
 

@@ -1,10 +1,10 @@
 { 
   "status" : "${result!}", 
   "tempFilename" : "${tempFilename!?js_string}", 
-  "filename": "${filename!?js_string}",
+  "fileName": "${filename!?js_string}",
   "nodeRef":  "${nodeRef!}",
-  "updateNodeRef": "${nodeRef!}",
+  "updateNodeRef": "${updateNodeRef!}",
   "majorVersion": ${majorVersion!"false"},
-  "description": "${description!?js_string}"
+  "description": "${description!?js_string}",
+  "mimetype": "${mimetype!?js_string}"
 }
-

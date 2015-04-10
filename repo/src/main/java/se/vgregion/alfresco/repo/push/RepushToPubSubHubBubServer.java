@@ -6,7 +6,6 @@ import java.util.List;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
-import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -28,11 +27,12 @@ public class RepushToPubSubHubBubServer extends ClusteredExecuter {
   private BehaviourFilter _behaviourFilter;
 
   private int _maxRepushCount = 10;
-  
+
   private boolean _enabled = true;
 
   /**
-   * The minimum time (in minutes) that must have passed for a document before a re-push is tried. Default time is set to 20 minutes.
+   * The minimum time (in minutes) that must have passed for a document before a
+   * re-push is tried. Default time is set to 20 minutes.
    */
   private int _minimumPushAge = 20;
 
@@ -47,21 +47,21 @@ public class RepushToPubSubHubBubServer extends ClusteredExecuter {
       if (LOG.isDebugEnabled()) {
         LOG.debug("RepushToPubSubHubBubServer is not enabled, exiting...");
       }
+      return;
     }
-    
+
     RetryingTransactionCallback<Void> callback = new RetryingTransactionCallback<Void>() {
 
       @Override
       public Void execute() throws Throwable {
-        return AuthenticationUtil.runAsSystem(new RunAsWork<Void>() {
-
-          @Override
-          public Void doWork() throws Exception {
-            doExecute();
-
-            return null;
-          }
-        });
+        final String fullyAuthenticatedUser = AuthenticationUtil.getFullyAuthenticatedUser();
+        try {
+          AuthenticationUtil.setFullyAuthenticatedUser(VgrModel.SYSTEM_USER_NAME);
+          doExecute();
+        } finally {
+          AuthenticationUtil.setFullyAuthenticatedUser((fullyAuthenticatedUser != null) ? fullyAuthenticatedUser : AuthenticationUtil.getGuestUserName());
+        }
+        return null;
       }
     };
 
@@ -85,7 +85,7 @@ public class RepushToPubSubHubBubServer extends ClusteredExecuter {
       }
 
       PushLogger.logNodeForRepush(nodeRef, _nodeService);
-      
+
       _behaviourFilter.disableBehaviour();
       try {
         // null the pushed for publish/unpublish properties to force a re-push
@@ -95,7 +95,7 @@ public class RepushToPubSubHubBubServer extends ClusteredExecuter {
       } finally {
         _behaviourFilter.enableBehaviour();
       }
-      
+
     }
   }
 
@@ -118,7 +118,7 @@ public class RepushToPubSubHubBubServer extends ClusteredExecuter {
   public void setMinimumPushAge(int minimumPushAge) {
     _minimumPushAge = minimumPushAge;
   }
-  
+
   public void setEnabled(boolean enabled) {
     _enabled = enabled;
   }

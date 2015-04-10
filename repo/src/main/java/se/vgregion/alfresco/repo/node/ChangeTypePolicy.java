@@ -44,7 +44,7 @@ public class ChangeTypePolicy extends AbstractPolicy implements OnCreateNodePoli
 
   private void doCreateNode(NodeRef nodeRef) {
     // if the node does not exist, exit
-    if (!_nodeService.exists(nodeRef)) {
+    if (nodeRef == null || !_nodeService.exists(nodeRef)) {
       return;
     }
 

@@ -12,11 +12,13 @@ import org.alfresco.service.cmr.lock.LockType;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.site.SiteInfo;
 import org.apache.chemistry.opencmis.server.support.query.CmisQlExtParser_CmisBaseGrammar.null_predicate_return;
+import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import se.vgregion.alfresco.repo.it.AbstractVgrRepoIntegrationTest;
+import se.vgregion.alfresco.repo.it.node.AddPdfaPolicyIntegrationTest;
 import se.vgregion.alfresco.repo.model.VgrModel;
 import se.vgregion.alfresco.repo.storage.StorageService;
 
@@ -26,6 +28,7 @@ import se.vgregion.alfresco.repo.storage.StorageService;
  * @author Niklas Ekman (niklas.ekman@redpill-linpro.com)
  */
 public class PublishToStorageIntegrationTest extends AbstractVgrRepoIntegrationTest {
+  private static final Logger LOG = Logger.getLogger(PublishToStorageIntegrationTest.class);
 
   private static final String DEFAULT_USERNAME = "testuser";
 
@@ -67,6 +70,9 @@ public class PublishToStorageIntegrationTest extends AbstractVgrRepoIntegrationT
 
   @Test
   public void testPublish() {
+    LOG.info("================================================");
+    LOG.info("= testPublish begin                            =");
+    LOG.info("================================================");
     setRequiresNew(true);
 
     // this happens if pdfaPilot is not enabled and isn't around to do the work
@@ -100,6 +106,7 @@ public class PublishToStorageIntegrationTest extends AbstractVgrRepoIntegrationT
 
       @Override
       public NodeRef execute() throws Throwable {
+        LOG.info("Publishing document first time");
         return _storageService.publishToStorage(sourceDocument, false);
       }
     }, false, true);
@@ -111,6 +118,7 @@ public class PublishToStorageIntegrationTest extends AbstractVgrRepoIntegrationT
 
         @Override
         public NodeRef execute() throws Throwable {
+          LOG.info("Publishing document second time");
           return _storageService.publishToStorage(sourceDocument, false);
         }
       }, false, true);
@@ -118,7 +126,9 @@ public class PublishToStorageIntegrationTest extends AbstractVgrRepoIntegrationT
     } catch (Exception e) {
 
     }
-
+    LOG.info("================================================");
+    LOG.info("= testPublish end                              =");
+    LOG.info("================================================");
   }
 
   @Test

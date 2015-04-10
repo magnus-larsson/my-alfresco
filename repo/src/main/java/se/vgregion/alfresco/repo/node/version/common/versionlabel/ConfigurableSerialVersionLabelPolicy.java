@@ -34,8 +34,8 @@ public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPoli
   private final static String START_MINOR_KEY = "startminor";
 
   private final static String DEFAULT_DELIMITER = ".";
-  private final static int DEFAULT_START_MAJOR = 1;
-  private final static int DEFAULT_START_MINOR = 0;
+  private final static int DEFAULT_START_MAJOR = 0;
+  private final static int DEFAULT_START_MINOR = 1;
 
   private final String delimiter;
   private final int startMinor;
@@ -147,6 +147,10 @@ public class ConfigurableSerialVersionLabelPolicy extends SerialVersionLabelPoli
 
   @Override
   public void beforeCreateVersion(final NodeRef nodeRef) {
+    if (nodeRef == null || !_nodeService.exists(nodeRef)) {
+      return;
+    }
+    
     // if it's not a VGR Document, don't save nodeRef for later use, i.e.
     // calculate version
     QName nodeType = _nodeService.getType(nodeRef);

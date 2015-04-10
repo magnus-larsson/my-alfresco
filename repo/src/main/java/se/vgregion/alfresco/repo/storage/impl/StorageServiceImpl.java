@@ -23,7 +23,6 @@ import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.rendition.executer.AbstractRenderingEngine;
 import org.alfresco.repo.rendition.executer.AbstractTransformationRenderingEngine;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
-import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
@@ -120,18 +119,18 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
   private LockService _lockService;
 
-  private boolean pdfaPilotEnabled = false;
+  private boolean _pdfaPilotEnabled = false;
 
   public void setLockService(LockService lockService) {
-    this._lockService = lockService;
+    _lockService = lockService;
   }
 
   public void setPdfaPilotEnabled(boolean pdfaPilotEnabled) {
-    this.pdfaPilotEnabled = pdfaPilotEnabled;
+    _pdfaPilotEnabled = pdfaPilotEnabled;
   }
 
   public void setRepository(Repository repository) {
-    this._repository = repository;
+    _repository = repository;
   }
 
   public void setNodeService(final NodeService nodeService) {
@@ -259,88 +258,90 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     // get and set the correct publisher string
     _nodeService.setProperty(nodeRef, VgrModel.PROP_PUBLISHER, _serviceUtils.getRepresentation(username));
     _nodeService.setProperty(nodeRef, VgrModel.PROP_PUBLISHER_ID, username);
+    final String fullyAuthenticatedUser = AuthenticationUtil.getFullyAuthenticatedUser();
+    try {
+      AuthenticationUtil.setFullyAuthenticatedUser(VgrModel.SYSTEM_USER_NAME);
 
-    return AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<NodeRef>() {
+      // check if this file has been published before, i.e. we've published
+      // it, then revoked it, and are now publishing again
+      NodeRef publishedNodeRef = getPublishedNodeRef(nodeRef);
 
-      @Override
-      public NodeRef doWork() throws Exception {
-        // check if this file has been published before, i.e. we've published
-        // it, then revoked it, and are now publishing again
-        NodeRef publishedNodeRef = getPublishedNodeRef(nodeRef);
+      if (publishedNodeRef != null) {
+        // then we need to update the copy's properties as well
+        _nodeService.setProperty(publishedNodeRef, VgrModel.PROP_DATE_ISSUED, now);
+        _nodeService.setProperty(publishedNodeRef, VgrModel.PROP_DATE_AVAILABLE_FROM, _nodeService.getProperty(nodeRef, VgrModel.PROP_DATE_AVAILABLE_FROM));
+        _nodeService.setProperty(publishedNodeRef, VgrModel.PROP_PUBLISHER, _serviceUtils.getRepresentation(username));
+        _nodeService.setProperty(publishedNodeRef, VgrModel.PROP_PUBLISHER_ID, username);
+      } else {
+        // new publication! let's copy the node to storage
 
-        if (publishedNodeRef != null) {
-          // then we need to update the copy's properties as well
-          _nodeService.setProperty(publishedNodeRef, VgrModel.PROP_DATE_ISSUED, now);
-          _nodeService.setProperty(publishedNodeRef, VgrModel.PROP_DATE_AVAILABLE_FROM, _nodeService.getProperty(nodeRef, VgrModel.PROP_DATE_AVAILABLE_FROM));
-          _nodeService.setProperty(publishedNodeRef, VgrModel.PROP_PUBLISHER, _serviceUtils.getRepresentation(username));
-          _nodeService.setProperty(publishedNodeRef, VgrModel.PROP_PUBLISHER_ID, username);
-        } else {
-          // new publication! let's copy the node to storage
+        // unpublish all old documents
+        unpublishFromStorage(nodeRef.toString());
 
-          // unpublish all old documents
-          unpublishFromStorage(nodeRef.toString());
+        // make a copy of the source and rename it...
+        final NodeRef newNode = _copyService.copyAndRename(nodeRef, finalFolder, ContentModel.ASSOC_CONTAINS, null, true);
 
-          // make a copy of the source and rename it...
-          final NodeRef newNode = _copyService.copyAndRename(nodeRef, finalFolder, ContentModel.ASSOC_CONTAINS, null, true);
+        // remove all old published associations
+        removePublishedAssocs(newNode);
 
-          // remove all old published associations
-          removePublishedAssocs(newNode);
+        // set the new node name
+        _nodeService.setProperty(newNode, ContentModel.PROP_NAME, newName);
 
-          // set the new node name
-          _nodeService.setProperty(newNode, ContentModel.PROP_NAME, newName);
+        // set the nodeRef to document.id
+        _nodeService.setProperty(newNode, VgrModel.PROP_IDENTIFIER_DOCUMENTID, newNode.toString());
+        _nodeService.setProperty(nodeRef, VgrModel.PROP_IDENTIFIER_DOCUMENTID, newNode.toString());
 
-          // set the nodeRef to document.id
-          _nodeService.setProperty(newNode, VgrModel.PROP_IDENTIFIER_DOCUMENTID, newNode.toString());
-          _nodeService.setProperty(nodeRef, VgrModel.PROP_IDENTIFIER_DOCUMENTID, newNode.toString());
+        // create an association between the two nodes
+        _nodeService.createAssociation(nodeRef, newNode, VgrModel.ASSOC_PUBLISHED_TO_STORAGE);
 
-          // create an association between the two nodes
-          _nodeService.createAssociation(nodeRef, newNode, VgrModel.ASSOC_PUBLISHED_TO_STORAGE);
-
-          if (LOG.isDebugEnabled()) {
-            LOG.debug("Version to publish: " + _nodeService.getProperty(newNode, VgrModel.PROP_IDENTIFIER_VERSION));
-          }
-
-          // add a published aspect to the storage node
-          _nodeService.addAspect(newNode, VgrModel.ASPECT_PUBLISHED, null);
-
-          // inherit permissions
-          _permissionService.setInheritParentPermissions(newNode, true);
-
-          // set the modified property and the date saved
-          final Date now = new Date();
-          _nodeService.setProperty(newNode, ContentModel.PROP_MODIFIED, now);
-          _serviceUtils.setDateSaved(newNode);
-
-          // set the field "DC.source.documentid" when publishing
-          _nodeService.setProperty(newNode, VgrModel.PROP_SOURCE_DOCUMENTID, nodeRef.toString());
-          _nodeService.setProperty(nodeRef, VgrModel.PROP_SOURCE_DOCUMENTID, nodeRef.toString());
-
-          // set the field "DC.identifier" & "DC.identifier.native" when
-          // publishing
-          String identifier = _serviceUtils.getDocumentIdentifier(newNode);
-          String nativeIdentifier = _serviceUtils.getDocumentIdentifier(newNode, true);
-          _nodeService.setProperty(newNode, VgrModel.PROP_IDENTIFIER, identifier);
-          _nodeService.setProperty(newNode, VgrModel.PROP_IDENTIFIER_NATIVE, nativeIdentifier);
-          _nodeService.setProperty(nodeRef, VgrModel.PROP_IDENTIFIER, identifier);
-
-          // set the field "DC.source" when publishing on the source
-          // nodeRef,
-          // this is a link to the document in "Lagret"
-          final String documentSource = _serviceUtils.getDocumentSource(nodeRef);
-          _nodeService.setProperty(newNode, VgrModel.PROP_SOURCE, documentSource);
-          _nodeService.setProperty(nodeRef, VgrModel.PROP_SOURCE, documentSource);
-
-          deleteRenditions(newNode);
-
-          // create a PDF/A rendition of the nodeRef
-          createPdfaRendition(newNode, async);
-
-          publishedNodeRef = newNode;
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Version to publish: " + _nodeService.getProperty(newNode, VgrModel.PROP_IDENTIFIER_VERSION));
         }
 
-        return publishedNodeRef;
+        // add a published aspect to the storage node
+        _nodeService.addAspect(newNode, VgrModel.ASPECT_PUBLISHED, null);
+
+        // inherit permissions
+        _permissionService.setInheritParentPermissions(newNode, true);
+        
+        // remove the owner of the document to prevent deletion and stuff
+        _ownableService.setOwner(newNode, VgrModel.SYSTEM_USER_NAME);
+
+        // set the modified property and the date saved
+        _nodeService.setProperty(newNode, ContentModel.PROP_MODIFIED, now);
+        _serviceUtils.setDateSaved(newNode);
+
+        // set the field "DC.source.documentid" when publishing
+        _nodeService.setProperty(newNode, VgrModel.PROP_SOURCE_DOCUMENTID, nodeRef.toString());
+        _nodeService.setProperty(nodeRef, VgrModel.PROP_SOURCE_DOCUMENTID, nodeRef.toString());
+
+        // set the field "DC.identifier" & "DC.identifier.native" when
+        // publishing
+        String identifier = _serviceUtils.getDocumentIdentifier(newNode);
+        String nativeIdentifier = _serviceUtils.getDocumentIdentifier(newNode, true);
+        _nodeService.setProperty(newNode, VgrModel.PROP_IDENTIFIER, identifier);
+        _nodeService.setProperty(newNode, VgrModel.PROP_IDENTIFIER_NATIVE, nativeIdentifier);
+        _nodeService.setProperty(nodeRef, VgrModel.PROP_IDENTIFIER, identifier);
+
+        // set the field "DC.source" when publishing on the source
+        // nodeRef,
+        // this is a link to the document in "Lagret"
+        final String documentSource = _serviceUtils.getDocumentSource(nodeRef);
+        _nodeService.setProperty(newNode, VgrModel.PROP_SOURCE, documentSource);
+        _nodeService.setProperty(nodeRef, VgrModel.PROP_SOURCE, documentSource);
+
+        deleteRenditions(newNode);
+
+        // create a PDF/A rendition of the nodeRef
+        createPdfaRendition(newNode, async);
+
+        publishedNodeRef = newNode;
       }
-    }, AuthenticationUtil.getSystemUserName());
+
+      return publishedNodeRef;
+    } finally {
+      AuthenticationUtil.setFullyAuthenticatedUser((fullyAuthenticatedUser != null) ? fullyAuthenticatedUser : AuthenticationUtil.getGuestUserName());
+    }
   }
 
   protected void deleteRenditions(final NodeRef newNode) {
@@ -568,19 +569,19 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     NodeRef storage = _fileFolderService.searchSimple(companyHome, STORAGE_LAGRET);
 
     if (storage == null) {
-      storage = AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<NodeRef>() {
-        @Override
-        public NodeRef doWork() throws Exception {
-          NodeRef nodeRef = _fileFolderService.create(companyHome, STORAGE_LAGRET, ContentModel.TYPE_FOLDER).getNodeRef();
+      final String fullyAuthenticatedUser = AuthenticationUtil.getFullyAuthenticatedUser();
+      try {
+        AuthenticationUtil.setFullyAuthenticatedUser(VgrModel.SYSTEM_USER_NAME);
+        NodeRef nodeRef = _fileFolderService.create(companyHome, STORAGE_LAGRET, ContentModel.TYPE_FOLDER).getNodeRef();
 
-          _permissionService.setInheritParentPermissions(nodeRef, false);
-          _permissionService.setPermission(nodeRef, PermissionService.ALL_AUTHORITIES, PermissionService.CONSUMER, true);
-          _permissionService.setPermission(nodeRef, "guest", PermissionService.CONSUMER, true);
+        _permissionService.setInheritParentPermissions(nodeRef, false);
+        _permissionService.setPermission(nodeRef, PermissionService.ALL_AUTHORITIES, PermissionService.CONSUMER, true);
+        _permissionService.setPermission(nodeRef, "guest", PermissionService.CONSUMER, true);
 
-          return nodeRef;
-        }
-
-      }, AuthenticationUtil.getSystemUserName());
+        storage = nodeRef;
+      } finally {
+        AuthenticationUtil.setFullyAuthenticatedUser((fullyAuthenticatedUser != null) ? fullyAuthenticatedUser : AuthenticationUtil.getGuestUserName());
+      }
     }
     return storage;
 
@@ -592,21 +593,22 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     NodeRef subFolderNodeRef;
 
     if (existingFolder == null) {
-      subFolderNodeRef = AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<NodeRef>() {
+      final String fullyAuthenticatedUser = AuthenticationUtil.getFullyAuthenticatedUser();
+      try {
+        AuthenticationUtil.setFullyAuthenticatedUser(VgrModel.SYSTEM_USER_NAME);
 
-        @Override
-        public NodeRef doWork() throws Exception {
-          final FileInfo fileInfo = _fileFolderService.create(parentNodeRef, subFolder, ContentModel.TYPE_FOLDER);
+        final FileInfo fileInfo = _fileFolderService.create(parentNodeRef, subFolder, ContentModel.TYPE_FOLDER);
 
-          final NodeRef nodeRef = fileInfo.getNodeRef();
+        final NodeRef nodeRef = fileInfo.getNodeRef();
 
-          // inherit permissions
-          _permissionService.setInheritParentPermissions(nodeRef, true);
+        // inherit permissions
+        _permissionService.setInheritParentPermissions(nodeRef, true);
 
-          return nodeRef;
-        }
+        subFolderNodeRef = nodeRef;
 
-      }, AuthenticationUtil.getSystemUserName());
+      } finally {
+        AuthenticationUtil.setFullyAuthenticatedUser((fullyAuthenticatedUser != null) ? fullyAuthenticatedUser : AuthenticationUtil.getGuestUserName());
+      }
     } else {
       subFolderNodeRef = existingFolder;
     }
@@ -677,54 +679,57 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   private void unpublishFromStorage(final String sourceDocumentId, final String currentVersion) {
     Assert.hasText(sourceDocumentId, "Source document id can't be empty.");
 
-    AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>() {
-
-      @Override
-      public Void doWork() throws Exception {
+    final String fullyAuthenticatedUser = AuthenticationUtil.getFullyAuthenticatedUser();
+    try {
+      AuthenticationUtil.setFullyAuthenticatedUser(VgrModel.SYSTEM_USER_NAME);
+      boolean versioningWasEnabled = _behaviourFilter.isEnabled(ContentModel.ASPECT_VERSIONABLE);
+      if (versioningWasEnabled)
         _behaviourFilter.disableBehaviour(ContentModel.ASPECT_VERSIONABLE);
 
-        try {
-          Date now = new Date();
+      try {
+        Date now = new Date();
 
-          final Set<NodeRef> previouslyPublished = findPublishedDocuments(sourceDocumentId);
+        final Set<NodeRef> previouslyPublished = findPublishedDocuments(sourceDocumentId);
 
-          if (previouslyPublished.isEmpty()) {
-            return null;
-          }
-
-          for (NodeRef published : previouslyPublished) {
-            String version = (String) _nodeService.getProperty(published, VgrModel.PROP_IDENTIFIER_VERSION);
-
-            // if currentVersion is passed, that one should NOT be unpublished
-            if (StringUtils.isNotBlank(currentVersion) && version.equals(currentVersion)) {
-              continue;
-            }
-
-            // check if it's still published
-            final Date availiable = (Date) _nodeService.getProperty(published, VgrModel.PROP_DATE_AVAILABLE_TO);
-
-            if (availiable == null || now.equals(availiable) || now.before(availiable)) {
-              // find storage copy and alter it too
-              _nodeService.setProperty(published, VgrModel.PROP_DATE_AVAILABLE_TO, now);
-
-              // must set modified time stamp so that the feed gets the correct
-              // <update> value
-              _nodeService.setProperty(published, ContentModel.PROP_MODIFIED, now);
-
-              _serviceUtils.setDateSaved(published);
-            }
-          }
-        } catch (final Exception ex) {
-          LOG.error(ex.getMessage(), ex);
-          throw new RuntimeException(ex);
-        } finally {
-          _behaviourFilter.enableBehaviour(ContentModel.ASPECT_VERSIONABLE);
+        if (previouslyPublished.isEmpty()) {
+          if (versioningWasEnabled)
+            _behaviourFilter.enableBehaviour(ContentModel.ASPECT_VERSIONABLE);
+          return;
         }
 
-        return null;
+        for (NodeRef published : previouslyPublished) {
+          String version = (String) _nodeService.getProperty(published, VgrModel.PROP_IDENTIFIER_VERSION);
+
+          // if currentVersion is passed, that one should NOT be unpublished
+          if (StringUtils.isNotBlank(currentVersion) && version.equals(currentVersion)) {
+            continue;
+          }
+
+          // check if it's still published
+          final Date availiable = (Date) _nodeService.getProperty(published, VgrModel.PROP_DATE_AVAILABLE_TO);
+
+          if (availiable == null || now.equals(availiable) || now.before(availiable)) {
+            // find storage copy and alter it too
+            _nodeService.setProperty(published, VgrModel.PROP_DATE_AVAILABLE_TO, now);
+
+            // must set modified time stamp so that the feed gets the correct
+            // <update> value
+            _nodeService.setProperty(published, ContentModel.PROP_MODIFIED, now);
+
+            _serviceUtils.setDateSaved(published);
+          }
+        }
+      } catch (final Exception ex) {
+        LOG.error(ex.getMessage(), ex);
+        throw new RuntimeException(ex);
+      } finally {
+        if (versioningWasEnabled)
+          _behaviourFilter.enableBehaviour(ContentModel.ASPECT_VERSIONABLE);
       }
 
-    }, AuthenticationUtil.getSystemUserName());
+    } finally {
+      AuthenticationUtil.setFullyAuthenticatedUser((fullyAuthenticatedUser != null) ? fullyAuthenticatedUser : AuthenticationUtil.getGuestUserName());
+    }
   }
 
   @Override
@@ -735,7 +740,9 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
     // create the folder structure <year>/<month>/<day>
     final NodeRef finalFolder = createFolderStructure(nodeRef);
+    final String fullyAuthenticatedUser = AuthenticationUtil.getFullyAuthenticatedUser();
     try {
+      AuthenticationUtil.setFullyAuthenticatedUser(VgrModel.SYSTEM_USER_NAME);
       String sourceDocumentId = (String) _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_DOCUMENTID);
 
       String currentVersion = (String) _nodeService.getProperty(nodeRef, VgrModel.PROP_IDENTIFIER_VERSION);
@@ -766,7 +773,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
       _nodeService.setProperty(nodeRef, VgrModel.PROP_IDENTIFIER, identifier);
 
       // remove the owner of the document to prevent deletion and stuff
-      _ownableService.setOwner(nodeRef, AuthenticationUtil.getSystemUserName());
+      _ownableService.setOwner(nodeRef, VgrModel.SYSTEM_USER_NAME);
 
       // create a PDF/A rendition
       createPdfaRendition(nodeRef);
@@ -776,6 +783,8 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
       }
     } catch (final Exception ex) {
       throw new RuntimeException(ex);
+    } finally {
+      AuthenticationUtil.setFullyAuthenticatedUser((fullyAuthenticatedUser != null) ? fullyAuthenticatedUser : AuthenticationUtil.getGuestUserName());
     }
   }
 
@@ -803,7 +812,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
   protected boolean createPdfaRendition(final NodeRef nodeRef, final boolean async, Long timeout) {
     // Check if pdfapilot is enabled
-    if (!pdfaPilotEnabled) {
+    if (!_pdfaPilotEnabled) {
       LOG.warn("PDF/A pilot not enabled. Skipping creation of PDF/A rendition");
       return false;
     }
@@ -884,41 +893,39 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
   }
 
   protected void handleFailedPdfaRendition(final NodeRef nodeRef, final Throwable t) {
-    AuthenticationUtil.runAsSystem(new RunAsWork<Void>() {
+    final String fullyAuthenticatedUser = AuthenticationUtil.getFullyAuthenticatedUser();
+    try {
+      AuthenticationUtil.setFullyAuthenticatedUser(VgrModel.SYSTEM_USER_NAME);
+      Map<String, Object> model = new HashMap<String, Object>();
 
-      @Override
-      public Void doWork() throws Exception {
-        Map<String, Object> model = new HashMap<String, Object>();
+      String username = (String) _nodeService.getProperty(nodeRef, VgrModel.PROP_PUBLISHER_ID);
 
-        String username = (String) _nodeService.getProperty(nodeRef, VgrModel.PROP_PUBLISHER_ID);
+      NodeRef user = _personService.getPerson(username);
 
-        NodeRef user = _personService.getPerson(username);
+      model.put("nodeRef", nodeRef);
+      model.put("name", _nodeService.getProperty(nodeRef, ContentModel.PROP_NAME));
+      model.put("source", _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE));
+      model.put("origin", _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_ORIGIN));
+      model.put("stacktrace", _serviceUtils.isAdmin(username) ? ExceptionUtils.getStackTrace(t) : "");
 
-        model.put("nodeRef", nodeRef);
-        model.put("name", _nodeService.getProperty(nodeRef, ContentModel.PROP_NAME));
-        model.put("source", _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE));
-        model.put("origin", _nodeService.getProperty(nodeRef, VgrModel.PROP_SOURCE_ORIGIN));
-        model.put("stacktrace", _serviceUtils.isAdmin(username) ? ExceptionUtils.getStackTrace(t) : "");
+      Action mailAction = _actionService.createAction(MailActionExecuter.NAME);
+      mailAction.setExecuteAsynchronously(false);
 
-        Action mailAction = _actionService.createAction(MailActionExecuter.NAME);
-        mailAction.setExecuteAsynchronously(false);
+      String to = (String) _nodeService.getProperty(user, ContentModel.PROP_EMAIL);
+      // String subject = I18NUtil.getMessage("failed.pdfa.email.subject",
+      // "failed.pdfa.email.subject");
+      String subject = "Foobar";
 
-        String to = (String) _nodeService.getProperty(user, ContentModel.PROP_EMAIL);
-        // String subject = I18NUtil.getMessage("failed.pdfa.email.subject",
-        // "failed.pdfa.email.subject");
-        String subject = "Foobar";
+      mailAction.setParameterValue(MailActionExecuter.PARAM_TO, to);
+      mailAction.setParameterValue(MailActionExecuter.PARAM_SUBJECT, subject);
+      mailAction.setParameterValue(MailActionExecuter.PARAM_TEMPLATE, getFailedPdfaRenditionEmailTemplateRef());
+      mailAction.setParameterValue(MailActionExecuter.PARAM_TEMPLATE_MODEL, (Serializable) model);
 
-        mailAction.setParameterValue(MailActionExecuter.PARAM_TO, to);
-        mailAction.setParameterValue(MailActionExecuter.PARAM_SUBJECT, subject);
-        mailAction.setParameterValue(MailActionExecuter.PARAM_TEMPLATE, getFailedPdfaRenditionEmailTemplateRef());
-        mailAction.setParameterValue(MailActionExecuter.PARAM_TEMPLATE_MODEL, (Serializable) model);
+      _actionService.executeAction(mailAction, null);
 
-        _actionService.executeAction(mailAction, null);
-
-        return null;
-      }
-
-    });
+    } finally {
+      AuthenticationUtil.setFullyAuthenticatedUser((fullyAuthenticatedUser != null) ? fullyAuthenticatedUser : AuthenticationUtil.getGuestUserName());
+    }
   }
 
   private NodeRef getFailedPdfaRenditionEmailTemplateRef() {
@@ -1060,47 +1067,44 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
   @Override
   public int createMissingPdfRenditions(final CreationCallback creationCallback) {
-    final int count = AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Integer>() {
+    final String fullyAuthenticatedUser = AuthenticationUtil.getFullyAuthenticatedUser();
+    int count = 0;
+    try {
+      AuthenticationUtil.setFullyAuthenticatedUser(VgrModel.SYSTEM_USER_NAME);
 
-      @Override
-      public Integer doWork() throws Exception {
-        String query = _publishingService.findPublishedDocumentsQuery(new Date(), null, null, false);
-        query += " AND ASPECT:\"vgr:failedRenditionSource\"";
-        
-        final SearchParameters searchParameters = new SearchParameters();
+      String query = _publishingService.findPublishedDocumentsQuery(new Date(), null, null, false);
+      query += " AND ASPECT:\"vgr:failedRenditionSource\"";
 
-        searchParameters.setLanguage(SearchService.LANGUAGE_FTS_ALFRESCO);
-        searchParameters.setQuery(query);
-        searchParameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
-        searchParameters.setMaxItems(-1);
+      final SearchParameters searchParameters = new SearchParameters();
 
-        final ResultSet documents = _searchService.query(searchParameters);
+      searchParameters.setLanguage(SearchService.LANGUAGE_FTS_ALFRESCO);
+      searchParameters.setQuery(query);
+      searchParameters.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
+      searchParameters.setMaxItems(-1);
 
-        int count = 0;
+      final ResultSet documents = _searchService.query(searchParameters);
 
-        try {
-          LOG.info("Documents to maybe generate PDF/A for: " + documents.length());
+      try {
+        LOG.info("Documents to maybe generate PDF/A for: " + documents.length());
 
-          for (final ResultSetRow document : documents) {
-            try {
-              count = createMissingPdfRendition(document) ? count + 1 : count;
+        for (final ResultSetRow document : documents) {
+          try {
+            count = createMissingPdfRendition(document) ? count + 1 : count;
 
-              if (creationCallback != null) {
-                creationCallback.execute();
-              }
-            } catch (final Exception ex) {
-              continue;
+            if (creationCallback != null) {
+              creationCallback.execute();
             }
+          } catch (final Exception ex) {
+            continue;
           }
-        } finally {
-          ServiceUtilsImpl.closeQuietly(documents);
         }
-
-        return count;
+      } finally {
+        ServiceUtilsImpl.closeQuietly(documents);
       }
 
-    }, AuthenticationUtil.getSystemUserName());
-
+    } finally {
+      AuthenticationUtil.setFullyAuthenticatedUser((fullyAuthenticatedUser != null) ? fullyAuthenticatedUser : AuthenticationUtil.getGuestUserName());
+    }
     return count;
   }
 

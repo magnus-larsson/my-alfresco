@@ -9,6 +9,7 @@ public interface VgrModel {
   public static final String VGR_SHORT = "vgr";
   public static final String APELON_URI = "http://www.vgregion.se/apelon/1.0";
   public static final String KIV_URI = "http://www.vgregion.se/kiv/1.0";
+  public static final String SYSTEM_USER_NAME = "SystemUser";
 
   public static final QName TYPE_VGR_DOCUMENT = QName.createQName(VGR_URI, "document");
   public static final QName TYPE_APELON_DOCUMENTTYPE = QName.createQName(APELON_URI, "documentType");

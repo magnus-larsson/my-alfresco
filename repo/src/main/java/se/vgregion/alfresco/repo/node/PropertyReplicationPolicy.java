@@ -53,7 +53,7 @@ public class PropertyReplicationPolicy extends AbstractPolicy implements OnUpdat
 
   private void updateProperties(final NodeRef nodeRef) {
 
-    if (!_nodeService.exists(nodeRef)) {
+    if (nodeRef == null || !_nodeService.exists(nodeRef)) {
       LOG.trace("Aborting. Node does not exist");
       return;
     }

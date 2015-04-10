@@ -24,6 +24,10 @@ public class CreateSiteFolderPolicy extends AbstractPolicy implements OnCreateNo
   public void onCreateNode(final ChildAssociationRef childAssocRef) {
     final NodeRef folderNodeRef = childAssocRef.getChildRef();
 
+    if (folderNodeRef == null || !_nodeService.exists(folderNodeRef)) {
+      return;
+    }
+    
     // if the node isn't in any documentLibrary, exit
     if (!isDocumentLibrary(folderNodeRef)) {
       return;

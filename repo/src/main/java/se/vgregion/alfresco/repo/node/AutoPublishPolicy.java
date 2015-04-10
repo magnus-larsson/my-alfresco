@@ -3,8 +3,6 @@ package se.vgregion.alfresco.repo.node;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
-
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
@@ -47,7 +45,10 @@ public class AutoPublishPolicy extends AbstractPolicy implements OnCreateNodePol
   @Override
   public void onCreateNode(ChildAssociationRef childAssocRef) {
     NodeRef folderNodeRef = childAssocRef.getParentRef();
-
+    
+    if (folderNodeRef == null || !_nodeService.exists(folderNodeRef)) {
+      return;
+    }
     FileInfo folder = getFileInfo(folderNodeRef);
 
     if (folder == null) {
@@ -113,7 +114,7 @@ public class AutoPublishPolicy extends AbstractPolicy implements OnCreateNodePol
       AlfrescoTransactionSupport.bindResource(KEY_NODE_INFO, nodeRefs);
     }
     Pair<NodeRef, NodeRef> pair = new Pair<NodeRef, NodeRef>(folderNodeRef, fileNodeRef);
-    nodeRefs.add(pair); 
+    nodeRefs.add(pair);
   }
 
   private class AutoPublishTransactionListener extends TransactionListenerAdapter {

@@ -5,19 +5,24 @@
   <parent>
     <groupId>com.redpill-linpro.alfresco</groupId>
     <artifactId>alfresco-base</artifactId>
-    <version>1.1.1.6</version>
+    <version>1.1.1.7</version>
   </parent>
 
   <groupId>se.vgregion.alfresco</groupId>
   <artifactId>alfresco-vgr</artifactId>
-  <version>2.1.10</version>
+  <version>3.0.0</version>
   <packaging>pom</packaging>
   <name>VGR Alfresco Base Project</name>
 
   <properties>
-    <alfresco.version>4.1.9.6</alfresco.version>
-    <alfresco.groupId>org.alfresco.enterprise</alfresco.groupId>
+    <alfresco.version>4.2.4</alfresco.version>
+    <alfresco.groupId>org.alfresco</alfresco.groupId>
+    <languagepack.version>5.0.2</languagepack.version>
+    <testframework.version>1.0.5</testframework.version>
+    <java.source.version>1.7</java.source.version>
+    <java.target.version>1.7</java.target.version>
     <alfresco-cluster-probe.version>1.0.4</alfresco-cluster-probe.version>
+    <alfresco-clamav.version>1.1.3</alfresco-clamav.version>
   </properties>
 
   <modules>
@@ -26,67 +31,66 @@
     <!-- <module>toolkit</module> -->
   </modules>
 
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>com.sourcesense.maven</groupId>
-                    <artifactId>maven-nosnapshot-plugin</artifactId>
-                    <versionRange>[0.0.7-SNAPSHOT,)</versionRange>
-                    <goals>
-                      <goal>strip</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <execute />
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <versionRange>[2.4,)</versionRange>
-                    <goals>
-                      <goal>copy-dependencies</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>net.alchim31.maven</groupId>
-                    <artifactId>yuicompressor-maven-plugin</artifactId>
-                    <versionRange>[1.1,)</versionRange>
-                    <goals>
-                      <goal>compress</goal>
-                      <goal>jslint</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
   <repositories>
     <repository>
-      <id>alfresco-hotfix-releases</id>
-      <url>https://artifacts.alfresco.com/nexus/content/repositories/hotfix-releases</url>
+      <id>redpill-public</id>
+      <url>https://maven.redpill-linpro.com/nexus/content/groups/public</url>
     </repository>
   </repositories>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.redpill-linpro.alfresco.translations</groupId>
+        <artifactId>alfresco-swedish-repo</artifactId>
+        <version>${languagepack.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.redpill-linpro.alfresco.translations</groupId>
+        <artifactId>alfresco-swedish-share</artifactId>
+        <version>${languagepack.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.redpill-linpro.alfresco</groupId>
+        <artifactId>alfresco-test-repo</artifactId>
+        <version>${testframework.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.redpill-linpro.alfresco</groupId>
+        <artifactId>alfresco-test-share</artifactId>
+        <version>${testframework.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.sharextras</groupId>
+        <artifactId>media-viewers</artifactId>
+        <version>2.6.0</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.redpill-linpro.alfresco</groupId>
+        <artifactId>alfresco-cluster-probe</artifactId>
+        <version>${alfresco-cluster-probe.version}</version>
+        <scope>runtime</scope>
+        <exclusions>
+          <exclusion>
+            <artifactId>spring-surf</artifactId>
+            <groupId>org.springframework.extensions.surf</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.redpill-linpro.alfresco.clamav</groupId>
+        <artifactId>clamav-share</artifactId>
+        <version>${alfresco-clamav.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.redpill-linpro.alfresco.clamav</groupId>
+        <artifactId>clamav-repository</artifactId>
+        <version>${alfresco-clamav.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
 </project>

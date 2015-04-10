@@ -17,6 +17,8 @@
 	"url": "${url.serviceContext + "/api/sites/" + site.shortName + "/memberships/" + authority.fullName!""}"
 <#else>
 <#-- this is a person authority type -->
+<#-- nested directive is used to add custom info about a person.e.g. if he belongs to a group? -->
+   <#nested>
 	"authority":
 	{
 		"authorityType": "USER",
@@ -28,7 +30,9 @@
 		"zone": "${zone}",
 	</#if>
 	<#if authority.assocs["cm:avatar"]??>
-		"avatar": "${"api/node/" + authority.assocs["cm:avatar"][0].nodeRef?string?replace('://','/') + "/content/thumbnails/avatar"}",
+	   <#assign avatarNodeRef=authority.assocs["cm:avatar"][0].nodeRef?string/>
+		"avatar": "api/node/${avatarNodeRef?replace('://','/')}/content/thumbnails/avatar",
+		"avatarNode": "${avatarNodeRef}",
 	</#if>
 	<#if authority.properties.jobtitle??>
 		"jobtitle": "${authority.properties.jobtitle}",

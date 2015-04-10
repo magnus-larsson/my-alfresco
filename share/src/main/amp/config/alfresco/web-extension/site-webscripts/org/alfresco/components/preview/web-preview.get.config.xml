@@ -9,7 +9,7 @@
       When a condition matches the nodes' mimeType and/or thumbails its list of plugins are tested from the top.
       Every plugin will be created and get an opportunity to decide if it may be used in the users browser environment.
       If the plugin can't be used it will give a report back to the user that will be displayed if neither of the
-      plugins in the list can be used.
+      plugins in the list can be used.     
    -->
 
    <plugin-conditions>
@@ -195,6 +195,7 @@
          <plugin>FlashFox</plugin>
          <plugin>Video</plugin>
       </condition>
+
       <condition mimeType="video/x-flv">
          <plugin>StrobeMediaPlayback</plugin>
          <plugin>FlashFox</plugin>
@@ -238,15 +239,15 @@
       <!-- Images in real size (if they didn't have a imgpreview) -->
 
       <condition mimeType="image/jpeg">
-         <plugin srcMaxSize="500000">Image</plugin>
+         <plugin srcMaxSize="2000000">Image</plugin>
       </condition>
 
       <condition mimeType="image/png">
-         <plugin srcMaxSize="500000">Image</plugin>
+         <plugin srcMaxSize="2000000">Image</plugin>
       </condition>
 
       <condition mimeType="image/gif">
-         <plugin srcMaxSize="500000">Image</plugin>
+         <plugin srcMaxSize="2000000">Image</plugin>
       </condition>
 
       <condition mimeType="application/x-shockwave-flash">

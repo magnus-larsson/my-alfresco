@@ -257,5 +257,21 @@
       </props>
     </property>
   </bean>
+  
+  <!-- Patch that adds swedish (duolingual) email notification templates to the dictionary, if an updates needs to be done
+       to one of the templates, just increase the property id value by one. -->
+   <bean id="patch.addSwedishEmailTemplatesPatch" class="se.vgregion.alfresco.repo.admin.patch.impl.AddSwedishEmailTemplatesPatch" parent="basePatch">
+        <property name="id"><value>patch.addSwedishEmailTemplatesPatch_v2</value></property>
+        <property name="description"><value>patch.addSwedishEmailTemplatesPatch.description</value></property>
+        <property name="fixesFromSchema"><value>0</value></property>
+        <property name="fixesToSchema"><value>${version.schema}</value></property>
+        <property name="targetSchema"><value>10000</value></property>
+        <property name="force" value="true"/>
+        <property name="requiresTransaction"><value>true</value></property>
+        <property name="applyToTenants"><value>true</value></property>
+        <property name="contentService" ref="ContentService"/>
+        <property name="fileFolderService" ref="FileFolderService"/>
+        <property name="repository" ref="repositoryHelper"/>
+    </bean>  
  
 </beans>

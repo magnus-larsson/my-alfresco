@@ -42,16 +42,20 @@
 
       // Re-register with our own name
       this.name = "Alfresco.module.DoclibCopyMoveTo";
-      Alfresco.util.ComponentManager.reregister(this);
+      var DLGF = Alfresco.module.DoclibGlobalFolder;
 
+      Alfresco.util.ComponentManager.reregister(this);
 
       this.options = YAHOO.lang.merge(this.options,
       {
          allowedViewModes:
          [
-            Alfresco.module.DoclibGlobalFolder.VIEW_MODE_SITE,
-            Alfresco.module.DoclibGlobalFolder.VIEW_MODE_REPOSITORY,
-            Alfresco.module.DoclibGlobalFolder.VIEW_MODE_USERHOME
+            DLGF.VIEW_MODE_SITE,
+            DLGF.VIEW_MODE_RECENT_SITES,
+            DLGF.VIEW_MODE_FAVOURITE_SITES,
+            DLGF.VIEW_MODE_SHARED,
+            DLGF.VIEW_MODE_REPOSITORY,
+            DLGF.VIEW_MODE_USERHOME
          ],
          extendedTemplateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/copy-move-to",
          checkInheritanceUrl: Alfresco.constants.PROXY_URI + "vgr/inheritance/check",
@@ -89,7 +93,7 @@
             myOptions.dataWebScript = dataWebScripts[obj.mode];
          }
          
-         myOptions.viewMode = Alfresco.util.isValueSet(this.options.siteId) ? Alfresco.module.DoclibGlobalFolder.VIEW_MODE_SITE : Alfresco.module.DoclibGlobalFolder.VIEW_MODE_REPOSITORY;
+         myOptions.viewMode = Alfresco.util.isValueSet(this.options.siteId) ? Alfresco.module.DoclibGlobalFolder.VIEW_MODE_RECENT_SITES : Alfresco.module.DoclibGlobalFolder.VIEW_MODE_REPOSITORY;
          // Actions module
          this.modules.actions = new Alfresco.module.DoclibActions();
 
@@ -151,17 +155,25 @@
        */
       onOK: function DLCMT_onOK(e, p_obj)
       {
-         var files, multipleFiles = [], i, j;
-         var target = this.selectedNode.data.nodeRef;
+         var files, multipleFiles = [], params, i, j,
+            eventSuffix =
+            {
+               copy: "Copied",
+               move: "Moved"
+            };
+	 var target = this.selectedNode.data.nodeRef;
 
          // Single/multi files into array of nodeRefs
-         if (YAHOO.lang.isArray(this.options.files)) {
+         if (YAHOO.lang.isArray(this.options.files))
+         {
             files = this.options.files;
-         } else {
+         }
+         else
+         {
             files = [this.options.files];
          }
-         
-         for (i = 0, j = files.length; i < j; i++) {
+         for (i = 0, j = files.length; i < j; i++)
+         {
             multipleFiles.push(files[i].node.nodeRef);
          }
          
@@ -374,10 +386,30 @@
             // Did the operation succeed?
             if (!p_data.json.overallSuccess)
             {
+               //MNT-7514 Uninformational error message on move when file name conflicts
+               var message = "message.failure";
+               for (var i = 0, j = p_data.json.totalResults; i < j; i++)
+               {
+                  result = p_data.json.results[i];
+               
+                  if (!result.success && result.fileExist)
+                  {
+                     if ("folder" == result.type)
+                     {
+                        message = "message.exists.failure.folder";
+                     }
+                     else
+                     {
+                        message = "message.exists.failure.file";
+                     }
+                  }
+               }
+				
                Alfresco.util.PopupManager.displayMessage(
                {
-                  text: this.msg("message.failure")
+                  text: this.msg(message)
                });
+			   
                return;
             }
 
@@ -407,13 +439,23 @@
                   });
                }
             }
-
-            Alfresco.util.PopupManager.displayMessage(
+            // ALF-18501 - Redirect on successful moves of documents within the details view.
+            if (this.options.mode == "move" &&
+                window.location.pathname.lastIndexOf("document-details") === (window.location.pathname.length - "document-details".length))
             {
-               text: this.msg("message.success", successCount)
-            });
-            
-            YAHOO.Bubbling.fire("metadataRefresh");
+               // By reloading the page, the node-header will detect that the node is located in a different
+               // site and cause a redirect. The down-side to this is that it causes two page loads but this
+               // is most likely quite an edge case and it does ensure that we're re-using a consistent code path
+               window.location.reload();
+            }
+            else
+            {
+               Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: this.msg("message.success", successCount)
+               });
+               YAHOO.Bubbling.fire("metadataRefresh");
+            }
          };
 
          // Failure callback function
@@ -429,7 +471,7 @@
 
          // Construct webscript URI based on current viewMode
          var webscriptName = this.options.dataWebScript + "/node/{nodeRef}",
-            nodeRef = new Alfresco.util.NodeRef(target);
+            nodeRef = new Alfresco.util.NodeRef(this.selectedNode.data.nodeRef);
          
          // Construct the data object for the genericAction call
          this.modules.actions.genericAction(
@@ -469,7 +511,7 @@
                dataObj:
                {
                   nodeRefs: multipleFiles,
-                    parentId: this.options.parentId
+		  parentId: this.options.parentId
                }
             }
          });

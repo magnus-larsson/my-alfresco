@@ -66,7 +66,7 @@ public class UpdateSiteFolderMetadataPolicy extends AbstractPolicy implements On
 
   private void updateFolderProperties(final NodeRef folderNodeRef, final Map<QName, Serializable> before, final Map<QName, Serializable> after) {
     // first check if the folder exists
-    if (!_nodeService.exists(folderNodeRef)) {
+    if (folderNodeRef == null || !_nodeService.exists(folderNodeRef)) {
       return;
     }
 

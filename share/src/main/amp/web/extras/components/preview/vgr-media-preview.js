@@ -9,7 +9,7 @@
 
       onReady.call(this);
 
-      if (this.plugin instanceof Alfresco.WebPreview.prototype.Plugins.Embed) {
+      if (Alfresco.WebPreview.prototype.Plugins.Embed!==undefined && this.plugin instanceof Alfresco.WebPreview.prototype.Plugins.Embed) {
          var timeout = this.plugin.attributes.timeout ? this.plugin.attributes.timeout : 10;
 
          // first add the toolbar to the src for Adobe Acrobat plugin
@@ -96,7 +96,7 @@
          Alfresco.thirdparty.addMaximiseButton(this);
       }
 
-      if (this.plugin instanceof Alfresco.WebPreview.prototype.Plugins.PdfJs) {
+      if (Alfresco.WebPreview.prototype.Plugins.PdfJs!==undefined && this.plugin instanceof Alfresco.WebPreview.prototype.Plugins.PdfJs) {
          var timeout = this.plugin.attributes.timeout ? this.plugin.attributes.timeout : 10;
 
          var self = this;

@@ -14,8 +14,8 @@ function main() {
    if (json.has('tempFilename')) {
       tempFilename = json.get('tempFilename');
    }
-   if (json.has('filename')) {
-      filename = json.get('filename');
+   if (json.has('fileName')) {
+      filename = json.get('fileName');
    }
    if (json.has('majorVersion')) { // java.lang.Bool
       majorVersion = ('' + json.get('majorVersion')) == 'true';

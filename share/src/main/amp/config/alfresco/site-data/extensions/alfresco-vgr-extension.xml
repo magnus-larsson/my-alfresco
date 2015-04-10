@@ -3,13 +3,14 @@
 
     <module>
       <id>VGR Global</id>
+      <version>${project.version}</version>
       <auto-deploy>true</auto-deploy>
 
       <!-- Base evaluator that decides if any of the component bindings should be used at all -->
       <evaluator type="site.module.evaluator">
         <params>
           <sites>.*</sites>
-          <sitePresets>site-dashboard</sitePresets>
+          <sitePresets>.*</sitePresets>
           <applyForNonSites>true</applyForNonSites>
         </params>
       </evaluator>
@@ -18,20 +19,79 @@
       <customizations>
         <customization>
           <targetPackageRoot>org.alfresco</targetPackageRoot>
-          <sourcePackageRoot>se.vgregion.alfresco.customizations</sourcePackageRoot>
+          <sourcePackageRoot>se.vgregion.alfresco.customizations.global</sourcePackageRoot>
         </customization>
       </customizations>
 
       <configurations>
+        <!-- Replace -->
         <config evaluator="string-compare" condition="DocumentLibrary" replace="true">
+          <!-- Used by the "Manage Aspects" action For custom aspects, remember to also add the relevant i18n string(s) cm_myaspect=My Aspect -->
+          <aspects>
+            <!-- Aspects that a user can see -->
+            <visible></visible>
+            <!-- Aspects that a user can add. Same as "visible" if left empty -->
+            <addable></addable>
+            <!-- Aspects that a user can remove. Same as "visible" if left empty -->
+            <removeable></removeable>
+          </aspects>
+          <!-- File upload configuration -->
+          <file-upload>
+            <!-- Adobe Flash™ In certain environments, an HTTP request originating from Flash cannot be authenticated using an existing session. See: http://bugs.adobe.com/jira/browse/FP-4830 For these cases, it is useful to disable the Flash-based uploader for Share Document Libraries. -->
+            <adobe-flash-enabled>true</adobe-flash-enabled>
+          </file-upload>
+
+          <!-- Used by the "Change Type" action Define valid subtypes using the following example: <type name="cm:content"> <subtype name="cm:mysubtype" /> </type> Remember to also add the relevant i18n string(s): cm_mysubtype=My SubType -->
+          <types>
+            <type name="cm:content">
+              <subtype name="vgr:document" />
+            </type>
+          </types>
+
           <create-content>
             <content id="document" label="menu.create-content.vgr-document" type="pagelink" index="10" icon="text">
               <param name="page">create-content?destination={nodeRef}&amp;itemId=vgr:document</param>
             </content>
+            <content id="folder" label="create-content.folder" icon="folder" index="5" type="javascript">
+              <param name="function">onNewFolder</param>
+            </content>
           </create-content>
 
           <create-content-by-template>false</create-content-by-template>
+
+          <multi-select>
+            <action type="action-link" id="onActionDownload" label="menu.selected-items.download" />
+            <action type="action-link" id="onActionCopyTo" label="menu.selected-items.copy" />
+            <action type="action-link" id="onActionMoveTo" permission="Delete" label="menu.selected-items.move" />
+            <!-- <action type="action-link" id="onActionAssignWorkflow" asset="document" label="menu.selected-items.assign-workflow" /> -->
+            <action type="action-link" id="onActionDelete" permission="Delete" label="menu.selected-items.delete" notAspect="hwf:hybridWorkflow" />
+            <action type="action-link" id="onActionCloudSync" asset="document" permission="CreateChildren" label="menu.selected-items.cloudSync" notAspect="sync:syncSetMemberNode" syncMode="ON_PREMISE" />
+            <action type="action-link" id="onActionCloudSyncRequest" label="menu.selected-items.cloudRequestSync" hasAspect="sync:syncSetMemberNode" syncMode="ON_PREMISE" />
+          </multi-select>
         </config>
+
+        <!-- Extend -->
+        <config evaluator="string-compare" condition="DocumentLibrary" replace="false">
+          <indicators>
+            <indicator id="vgr-publish-status-placeholder" index="39" icon="loading.gif">
+              <evaluator>evaluator.doclib.indicator.vgr-publish-status</evaluator>
+            </indicator>
+            <indicator id="auto-publish-all-versions" index="39">
+              <evaluator>evaluator.doclib.indicator.auto-publish-all-versions</evaluator>
+            </indicator>
+            <indicator id="auto-publish-major-version" index="39">
+              <evaluator>evaluator.doclib.indicator.auto-publish-major-version</evaluator>
+            </indicator>
+          </indicators>
+        </config>
+
+        <!-- DocLibCustom section -->
+        <config evaluator="string-compare" condition="DocLibCustom">
+          <dependencies>
+            <js src="/components/documentlibrary/vgr-publish-status.js" />
+          </dependencies>
+        </config>
+
       </configurations>
 
       <components>
@@ -118,9 +178,271 @@
             </sub-component>
           </sub-components>
         </component>
+
+        <component>
+          <scope>global</scope>
+          <region-id>additional-content</region-id>
+          <source-id>global</source-id>
+          <sub-components>
+            <sub-component id="vgr-file-upload">
+              <evaluations>
+                <evaluation id="vgr-file-upload">
+                  <url>/components/upload/file-upload</url>
+                </evaluation>
+              </evaluations>
+            </sub-component>
+            <sub-component id="vgr-html-upload">
+              <evaluations>
+                <evaluation id="vgr-html-upload">
+                  <url>/components/upload/html-upload</url>
+                </evaluation>
+              </evaluations>
+            </sub-component>
+            <sub-component id="vgr-flash-upload">
+              <evaluations>
+                <evaluation id="vgr-flash-upload">
+                  <url>/components/upload/flash-upload</url>
+                </evaluation>
+              </evaluations>
+            </sub-component>
+            <!-- You can't pick content-type in Drag & Drop, so disable this one -->
+            <sub-component id="vgr-dnd-upload">
+              <evaluations>
+                <evaluation id="vgr-dnd-upload">
+                  <url>/components/upload/dnd-upload</url>
+                </evaluation>
+              </evaluations>
+            </sub-component>
+          </sub-components>
+        </component>
       </components>
 
     </module>
 
+    <module>
+      <id>VGR Site</id>
+      <version>${project.version}</version>
+      <auto-deploy>true</auto-deploy>
+
+      <!-- Base evaluator that decides if any of the component bindings should be used at all -->
+      <evaluator type="site.module.evaluator">
+        <params>
+          <sites>.*</sites>
+          <sitePresets>.*</sitePresets>
+          <applyForNonSites>false</applyForNonSites>
+        </params>
+      </evaluator>
+
+      <!-- Apply the following customizations when the base evaluator above passes -->
+      <customizations>
+        <customization>
+          <targetPackageRoot>org.alfresco</targetPackageRoot>
+          <sourcePackageRoot>se.vgregion.alfresco.customizations.site</sourcePackageRoot>
+        </customization>
+      </customizations>
+      <configurations>
+        <!-- Extend -->
+        <config evaluator="string-compare" condition="DocumentLibrary" replace="false">
+          <multi-select>
+            <action type="action-link" id="onActionPublishToStorage" permission="Write" label="actions.document.publish-to-storage" notAspect="vgr:published" />
+            <action type="action-link" id="onActionUnpublishFromStorage" permission="Write" label="actions.document.unpublish-from-storage" notAspect="vgr:published" />
+          </multi-select>
+        </config>
+      </configurations>
+    </module>
+    <module>
+      <id>VGR Header menu - Tyck till</id>
+      <version>${project.version}</version>
+      <auto-deploy>false</auto-deploy>
+
+      <!-- Base evaluator that decides if any of the component bindings should be used at all -->
+      <evaluator type="site.module.evaluator">
+        <params>
+          <sites>.*</sites>
+          <sitePresets>.*</sitePresets>
+          <applyForNonSites>true</applyForNonSites>
+        </params>
+      </evaluator>
+
+      <!-- Apply the following customizations when the base evaluator above passes -->
+      <customizations>
+        <customization>
+          <targetPackageRoot>org.alfresco</targetPackageRoot>
+          <sourcePackageRoot>se.vgregion.alfresco.customizations.headermenu-tycktill</sourcePackageRoot>
+        </customization>
+      </customizations>
+
+
+      <configurations>
+        <config evaluator="string-compare" condition="WebFramework" replace="false">
+          <web-framework>
+            <dojo-pages>
+              <packages>
+                <package name="tycktill" location="js/vgr/tycktill" />
+              </packages>
+            </dojo-pages>
+          </web-framework>
+        </config>
+      </configurations>
+    </module>
+
+    <module>
+      <id>VGR Header menu - Hide my files</id>
+      <version>${project.version}</version>
+      <auto-deploy>false</auto-deploy>
+      <!-- Base evaluator that decides if any of the component bindings should be used at all -->
+      <evaluator type="site.module.evaluator">
+        <params>
+          <sites>.*</sites>
+          <sitePresets>.*</sitePresets>
+          <applyForNonSites>true</applyForNonSites>
+        </params>
+      </evaluator>
+
+      <!-- Apply the following customizations when the base evaluator above passes -->
+      <customizations>
+        <customization>
+          <targetPackageRoot>org.alfresco</targetPackageRoot>
+          <sourcePackageRoot>se.vgregion.alfresco.customizations.headermenu-hidemyfiles</sourcePackageRoot>
+        </customization>
+      </customizations>
+    </module>
+
+    <module>
+      <id>VGR Header menu - Hide shared files</id>
+      <version>${project.version}</version>
+      <auto-deploy>false</auto-deploy>
+      <!-- Base evaluator that decides if any of the component bindings should be used at all -->
+      <evaluator type="site.module.evaluator">
+        <params>
+          <sites>.*</sites>
+          <sitePresets>.*</sitePresets>
+          <applyForNonSites>true</applyForNonSites>
+        </params>
+      </evaluator>
+
+      <!-- Apply the following customizations when the base evaluator above passes -->
+      <customizations>
+        <customization>
+          <targetPackageRoot>org.alfresco</targetPackageRoot>
+          <sourcePackageRoot>se.vgregion.alfresco.customizations.headermenu-hidesharedfiles</sourcePackageRoot>
+        </customization>
+      </customizations>
+    </module>
+
+    <module>
+      <id>VGR Header menu - Hide tasks</id>
+      <version>${project.version}</version>
+      <auto-deploy>false</auto-deploy>
+      <!-- Base evaluator that decides if any of the component bindings should be used at all -->
+      <evaluator type="site.module.evaluator">
+        <params>
+          <sites>.*</sites>
+          <sitePresets>.*</sitePresets>
+          <applyForNonSites>true</applyForNonSites>
+        </params>
+      </evaluator>
+
+      <!-- Apply the following customizations when the base evaluator above passes -->
+      <customizations>
+        <customization>
+          <targetPackageRoot>org.alfresco</targetPackageRoot>
+          <sourcePackageRoot>se.vgregion.alfresco.customizations.headermenu-hidetasks</sourcePackageRoot>
+        </customization>
+      </customizations>
+    </module>
+
+    <module>
+      <id>VGR Header menu - Help</id>
+      <version>${project.version}</version>
+      <auto-deploy>false</auto-deploy>
+      <!-- Base evaluator that decides if any of the component bindings should be used at all -->
+      <evaluator type="site.module.evaluator">
+        <params>
+          <sites>.*</sites>
+          <sitePresets>.*</sitePresets>
+          <applyForNonSites>true</applyForNonSites>
+        </params>
+      </evaluator>
+
+      <!-- Apply the following customizations when the base evaluator above passes -->
+      <customizations>
+        <customization>
+          <targetPackageRoot>org.alfresco</targetPackageRoot>
+          <sourcePackageRoot>se.vgregion.alfresco.customizations.headermenu-help</sourcePackageRoot>
+        </customization>
+      </customizations>
+    </module>
+
+    <module>
+      <id>VGR Piwik</id>
+      <version>${project.version}</version>
+      <auto-deploy>false</auto-deploy>
+      <!-- Base evaluator that decides if any of the component bindings should be used at all -->
+      <evaluator type="site.module.evaluator">
+        <params>
+          <sites>.*</sites>
+          <sitePresets>.*</sitePresets>
+          <applyForNonSites>true</applyForNonSites>
+        </params>
+      </evaluator>
+      <components>
+
+        <!-- General Share pages -->
+        <component>
+          <region-id>footer</region-id>
+          <source-id>global</source-id>
+          <scope>global</scope>
+          <sub-components>
+            <!-- The 'default' sub-component will have an index of 50 -->
+            <sub-component id="piwik-footer" index="60">
+              <url>/components/piwik-footer</url>
+            </sub-component>
+          </sub-components>
+        </component>
+
+        <!-- Login page -->
+        <component>
+          <region-id>components</region-id>
+          <source-id>slingshot-login</source-id>
+          <scope>page</scope>
+          <sub-components>
+            <!-- The 'default' sub-component will have an index of 50 -->
+            <sub-component id="analytics-footer" index="60">
+              <url>/components/piwik-footer</url>
+            </sub-component>
+          </sub-components>
+        </component>
+      </components>
+    </module>
+
+    <module>
+      <id>VGR Site - Default Redirect</id>
+      <version>${project.version}</version>
+      <auto-deploy>false</auto-deploy>
+      <!-- Base evaluator that decides if any of the component bindings should be used at all -->
+      <evaluator type="site.module.evaluator">
+        <params>
+          <sites>.*</sites>
+          <sitePresets>.*</sitePresets>
+          <applyForNonSites>true</applyForNonSites>
+        </params>
+      </evaluator>
+
+      <!-- Extension consists of: -->
+      <!-- site-data/template-instances/default-redirect.xml -->
+      <!-- site-data/pages/default-redirect.xml -->
+      <!-- customizations/site-default-redirect  --> 
+      <!-- vgr-defaultredirect-my-sites.js -->
+      <!-- vgr-defaultredirect-site-finder.js -->
+      
+      <!-- Apply the following customizations when the base evaluator above passes -->
+      <customizations>
+        <customization>
+          <targetPackageRoot>org.alfresco</targetPackageRoot>
+          <sourcePackageRoot>se.vgregion.alfresco.customizations.site-defaultredirect</sourcePackageRoot>
+        </customization>
+      </customizations>
+    </module>
   </modules>
 </extension>

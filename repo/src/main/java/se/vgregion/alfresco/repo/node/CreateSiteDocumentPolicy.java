@@ -83,11 +83,11 @@ public class CreateSiteDocumentPolicy extends AbstractPolicy implements OnCreate
   }
 
   private void doCreateOrMoveNode(NodeRef fileNodeRef, NodeRef folderNodeRef) {
-    if (!_nodeService.exists(fileNodeRef)) {
+    if (fileNodeRef == null || !_nodeService.exists(fileNodeRef)) {
       return;
     }
 
-    if (!_nodeService.exists(folderNodeRef)) {
+    if (folderNodeRef == null || !_nodeService.exists(folderNodeRef)) {
       return;
     }
 
