@@ -5,7 +5,7 @@
   <parent>
     <artifactId>alfresco-vgr</artifactId>
     <groupId>se.vgregion.alfresco</groupId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
   </parent>
 
   <artifactId>alfresco-vgr-cmisclient</artifactId>
