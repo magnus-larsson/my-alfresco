@@ -6,10 +6,10 @@
 		http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd">
 
   <!-- A Jax WS proxy factory for the Vocabulary Service -->
-  <jaxws:client id="vgr.VocabularyService" serviceClass="vocabularyservices.wsdl.metaservice_vgr_se.v2.VocabularyService" address="http://metadataservice.vgregion.se/vocabularyservice/VocabularyService" />
+  <jaxws:client id="vgr.VocabularyService" serviceClass="vocabularyservices.wsdl.metaservice_vgr_se.v2.VocabularyService" address="${vgr.apelon.vocabularyservice.url}" />
 
   <!-- A Jax WS proxy factory for the Keyword Service -->
-  <jaxws:client id="vgr.KeywordService" serviceClass="keywordservices.wsdl.metaservice_vgr_se.v2.KeywordService" address="http://metadataservice.vgregion.se/keywordservice/KeywordService" />
+  <jaxws:client id="vgr.KeywordService" serviceClass="keywordservices.wsdl.metaservice_vgr_se.v2.KeywordService" address="${vgr.apelon.keywordservice.url}" />
 
   <bean id="vgr.apelonService" class="se.vgregion.alfresco.repo.constraints.impl.ApelonServiceImpl">
     <property name="vocabularyService" ref="vgr.VocabularyService" />
