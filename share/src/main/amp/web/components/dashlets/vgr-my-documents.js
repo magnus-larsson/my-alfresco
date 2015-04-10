@@ -59,4 +59,9 @@
       });
    };
 
+   Alfresco.dashlet.MyDocuments.prototype.getWebscriptUrl = function SimpleDocList_getWebscriptUrl()
+   {
+      return Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/documents/node/alfresco/sites/home?max=50";
+   };
+
 }(Alfresco.dashlet.MyDocuments.prototype.onReady));

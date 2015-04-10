@@ -138,7 +138,7 @@ public class InvitationServiceInterceptorIntegrationTest extends AbstractVgrRepo
     inviteNotificationHelperMock = m.mock(InvitationNotificationHelper.class);
     m.checking(new Expectations() {
       {
-        oneOf(inviteNotificationHelperMock).generateModeratedApproveMail(with(any(Invitation.class)), with("ok"));
+        oneOf(inviteNotificationHelperMock).generateModeratedApproveMail(with(any(String.class)), with(any(String.class)));
       }
     });
 
@@ -160,7 +160,7 @@ public class InvitationServiceInterceptorIntegrationTest extends AbstractVgrRepo
     inviteNotificationHelperMock = m.mock(InvitationNotificationHelper.class);
     m.checking(new Expectations() {
       {
-        oneOf(inviteNotificationHelperMock).generateModeratedRejectMail(with(any(Invitation.class)), with("not_ok"));
+        oneOf(inviteNotificationHelperMock).generateModeratedRejectMail(with(any(String.class)), with(any(String.class)));
       }
     });
 

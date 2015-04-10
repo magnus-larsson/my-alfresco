@@ -119,7 +119,7 @@ public abstract class AbstractPolicy implements InitializingBean {
     }
 
     try {
-      String user = StringUtils.isNotBlank(runSafe.getUser()) ? runSafe.getUser() : AuthenticationUtil.getSystemUserName();
+      String user = StringUtils.isNotBlank(runSafe.getUser()) ? runSafe.getUser() : VgrModel.SYSTEM_USER_NAME;
 
       AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>() {
         @Override
