@@ -303,7 +303,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
         // inherit permissions
         _permissionService.setInheritParentPermissions(newNode, true);
-        
+
         // remove the owner of the document to prevent deletion and stuff
         _ownableService.setOwner(newNode, VgrModel.SYSTEM_USER_NAME);
 
@@ -840,6 +840,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
         @Override
         public void handleSuccessfulRendition(ChildAssociationRef primaryParentOfNewRendition) {
+          repushAfterNewPdfa(nodeRef);
         }
 
         @Override
@@ -859,6 +860,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
         }
 
         _renditionService.render(nodeRef, renditionDefinition);
+        repushAfterNewPdfa(nodeRef);
       } catch (RenditionServiceException ex) {
         // handleFailedPdfaRendition(nodeRef, ex);
 
@@ -873,6 +875,10 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
       }
     }
 
+    return true;
+  }
+
+  protected void repushAfterNewPdfa(NodeRef nodeRef) {
     // TODO if we get to this point we should send the file to index again.
     if (_publishingService.isPublished(nodeRef)) {
       // Clear publish flags and push again
@@ -889,7 +895,6 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
         _behaviourFilter.enableBehaviour();
       }
     }
-    return true;
   }
 
   protected void handleFailedPdfaRendition(final NodeRef nodeRef, final Throwable t) {
@@ -1314,28 +1319,34 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     }
 
     // if no failed ones exist, try to create a new PDF/A rendition
+    final String fullyAuthenticatedUser = AuthenticationUtil.getFullyAuthenticatedUser();
     try {
-      createPdfaRendition(nodeRef, false);
+      AuthenticationUtil.setFullyAuthenticatedUser(VgrModel.SYSTEM_USER_NAME);
+      try {
+        createPdfaRendition(nodeRef, false);
 
-      // get the newly created one
-      pdfRendition = getPdfaRendition(nodeRef);
+        // get the newly created one
+        pdfRendition = getPdfaRendition(nodeRef);
 
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("PDF/A rendition exists (didn't before), returning it: " + pdfRendition);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("PDF/A rendition exists (didn't before), returning it: " + pdfRendition);
+        }
+      } catch (Exception ex) {
+        LOG.error(ex.getMessage(), ex);
+
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Didn't manage to create new PDF/A rendition, therefore returns native document for '" + nodeRef + "'");
+        }
+
+        // if this fails here, something is fishy and the original node should
+        // be returned.
+        pdfRendition = null;
       }
-    } catch (Exception ex) {
-      LOG.error(ex.getMessage(), ex);
 
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Didn't manage to create new PDF/A rendition, therefore returns native document for '" + nodeRef + "'");
-      }
-
-      // if this fails here, something is fishy and the original node should
-      // be returned.
-      pdfRendition = null;
+      return pdfRendition != null ? pdfRendition : nodeRef;
+    } finally {
+      AuthenticationUtil.setFullyAuthenticatedUser((fullyAuthenticatedUser != null) ? fullyAuthenticatedUser : AuthenticationUtil.getGuestUserName());
     }
-
-    return pdfRendition != null ? pdfRendition : nodeRef;
   }
 
   protected boolean bariumDocumentExists(String id, String version, String origin) {
