@@ -23,6 +23,7 @@ import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.rendition.executer.AbstractRenderingEngine;
 import org.alfresco.repo.rendition.executer.AbstractTransformationRenderingEngine;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
@@ -878,23 +879,32 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
     return true;
   }
 
-  protected void repushAfterNewPdfa(NodeRef nodeRef) {
-    // TODO if we get to this point we should send the file to index again.
-    if (_publishingService.isPublished(nodeRef)) {
-      // Clear publish flags and push again
-      PushLogger.logNodeForRepushAfterNewPdfa(nodeRef, _nodeService);
+  protected void repushAfterNewPdfa(final NodeRef nodeRef) {
+    AuthenticationUtil.runAs(new RunAsWork<Void>() {
 
-      _behaviourFilter.disableBehaviour();
-      try {
-        // null the pushed for publish/unpublish properties to force a re-push
-        _nodeService.setProperty(nodeRef, ContentModel.PROP_MODIFIED, new Date());
-        _nodeService.setProperty(nodeRef, VgrModel.PROP_PUSHED_FOR_PUBLISH, null);
-        _nodeService.setProperty(nodeRef, VgrModel.PROP_PUSHED_FOR_UNPUBLISH, null);
-        _nodeService.setProperty(nodeRef, VgrModel.PROP_PUSHED_COUNT, null);
-      } finally {
-        _behaviourFilter.enableBehaviour();
+      @Override
+      public Void doWork() throws Exception {
+        // TODO if we get to this point we should send the file to index again.
+        if (_publishingService.isPublished(nodeRef)) {
+          // Clear publish flags and push again
+          PushLogger.logNodeForRepushAfterNewPdfa(nodeRef, _nodeService);
+
+          _behaviourFilter.disableBehaviour();
+          try {
+            // null the pushed for publish/unpublish properties to force a
+            // re-push
+            _nodeService.setProperty(nodeRef, ContentModel.PROP_MODIFIED, new Date());
+            _nodeService.setProperty(nodeRef, VgrModel.PROP_PUSHED_FOR_PUBLISH, null);
+            _nodeService.setProperty(nodeRef, VgrModel.PROP_PUSHED_FOR_UNPUBLISH, null);
+            _nodeService.setProperty(nodeRef, VgrModel.PROP_PUSHED_COUNT, null);
+          } finally {
+            _behaviourFilter.enableBehaviour();
+          }
+        }
+
+        return null;
       }
-    }
+    }, VgrModel.SYSTEM_USER_NAME);
   }
 
   protected void handleFailedPdfaRendition(final NodeRef nodeRef, final Throwable t) {
