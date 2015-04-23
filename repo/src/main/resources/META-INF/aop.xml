@@ -12,6 +12,7 @@
     <aspect name="se.vgregion.alfresco.repo.interceptors.RestrictAccessAspect" />
     <aspect name="se.vgregion.alfresco.repo.interceptors.LDAPUserRegistryAspect" />
     <aspect name="se.vgregion.alfresco.repo.interceptors.CTFootnotesAspect" />
+    <aspect name="se.vgregion.alfresco.repo.interceptors.BasicAuthenticationHandlerInterceptor" />
   </aspects>
 
 </aspectj>

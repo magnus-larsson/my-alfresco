@@ -4,7 +4,7 @@
   <parent>
     <groupId>se.vgregion.alfresco</groupId>
     <artifactId>alfresco-vgr</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
   </parent>
 
   <artifactId>alfresco-vgr-share</artifactId>
@@ -49,18 +49,34 @@
       <artifactId>commons-lang</artifactId>
       <version>2.6</version>
     </dependency>
+    
     <dependency>
       <groupId>org.sharextras</groupId>
       <artifactId>media-viewers</artifactId>
     </dependency>
+    
     <dependency>
       <groupId>org.redpill-linpro.alfresco.translations</groupId>
       <artifactId>alfresco-swedish-share</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.redpill-linpro.alfresco.clamav</groupId>
       <artifactId>clamav-share</artifactId>
+    </dependency>
+
+    <!-- Hazelcast VM adn Client added to have session replication -->
+    <dependency>
+      <groupId>com.hazelcast</groupId>
+      <artifactId>hazelcast-wm</artifactId>
+      <version>2.4</version>
+    </dependency>
+
+    <!-- There is a bug in ClientConfigBuilder that's fixed in 2.4.1 -->
+    <dependency>
+      <groupId>com.hazelcast</groupId>
+      <artifactId>hazelcast-client</artifactId>
+      <version>2.4.1</version>
     </dependency>
   </dependencies>
 
