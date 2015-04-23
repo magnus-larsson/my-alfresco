@@ -58,7 +58,7 @@
   </bean>
 
   <!-- Controller for the web script Published -->
-  <bean id="webscript.probe.probe.get" class="org.redpill.alfresco.clusterprobe.repo.ProbeScript" parent="webscript.org.redpill.alfresco.clusterprobe.probe.get" />
+  <bean id="webscript.probe.probe.get" class="org.redpill.alfresco.clusterprobe.repo.ProbeGet" parent="webscript.org.redpill.alfresco.clusterprobe.probe.get" />
 
   <!-- Need to override the "registerContentWithVersionService" to replace the version label calculation done for cm:content alternatively create a new bean for all custom content types. -->
 
