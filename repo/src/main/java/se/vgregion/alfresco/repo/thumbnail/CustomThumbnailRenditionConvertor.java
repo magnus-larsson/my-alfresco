@@ -6,7 +6,7 @@ import java.util.Map;
 import org.alfresco.repo.thumbnail.ThumbnailRenditionConvertor;
 import org.alfresco.service.cmr.repository.TransformationOptions;
 import org.alfresco.service.cmr.thumbnail.ThumbnailParentAssociationDetails;
-import org.redpill.alfresco.repo.content.transform.PdfaPilotTransformationOptions;
+import org.redpill.alfresco.pdfapilot.worker.PdfaPilotTransformationOptions;
 
 import se.vgregion.alfresco.repo.content.transform.OpenOfficeTransformationOptions;
 import se.vgregion.alfresco.repo.rendition.executer.PdfaPilotRenderingEngine;

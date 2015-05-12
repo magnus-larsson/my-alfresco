@@ -62,7 +62,7 @@ import org.alfresco.util.VersionNumber;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
-import org.redpill.alfresco.repo.content.transform.PdfaPilotTransformationOptions;
+import org.redpill.alfresco.pdfapilot.worker.PdfaPilotTransformationOptions;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.extensions.surf.util.I18NUtil;
 import org.springframework.util.Assert;
