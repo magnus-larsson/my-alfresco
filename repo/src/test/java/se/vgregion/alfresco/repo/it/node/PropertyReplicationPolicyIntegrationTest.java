@@ -16,6 +16,7 @@ import se.vgregion.alfresco.repo.model.VgrModel;
 /**
  * 
  * @author Niklas Ekman (niklas.ekman@redpill-linpro.com)
+ * @author Marcus Svensson (marcus.svensson@redpill-linpro.com)
  */
 public class PropertyReplicationPolicyIntegrationTest extends AbstractVgrRepoIntegrationTest {
 
@@ -47,16 +48,16 @@ public class PropertyReplicationPolicyIntegrationTest extends AbstractVgrRepoInt
     assertEquals("test.doc", _nodeService.getProperty(document, VgrModel.PROP_TITLE_FILENAME));
     assertEquals("doc", _nodeService.getProperty(document, VgrModel.PROP_FORMAT_EXTENT_EXTENSION));
 
-    // Verify that when title is updated, name is also updated
-    _nodeService.setProperty(document, VgrModel.PROP_TITLE, "test2 ...   . . ..  ");
-    assertEquals("test2", _nodeService.getProperty(document, VgrModel.PROP_TITLE));
-    assertEquals("test2", _nodeService.getProperty(document, ContentModel.PROP_TITLE));
-    assertEquals("test2.doc", _nodeService.getProperty(document, ContentModel.PROP_NAME));
+    // Verify that when title is updated, name is NOT updated and that the title field can contain special characters
+    _nodeService.setProperty(document, VgrModel.PROP_TITLE, "test2 ... /*3:?  . . ..  ");
+    assertEquals("test2 ... /*3:?  . . ..  ", _nodeService.getProperty(document, VgrModel.PROP_TITLE));
+    assertEquals("test2 ... /*3:?  . . ..  ", _nodeService.getProperty(document, ContentModel.PROP_TITLE));
+    assertEquals("test.doc", _nodeService.getProperty(document, ContentModel.PROP_NAME));
 
-    // Do not allow changing prop_name
+    // Do allow allow changing prop_name
     _nodeService.setProperty(document, ContentModel.PROP_NAME, "test3.doc");
-    assertEquals("test2", _nodeService.getProperty(document, ContentModel.PROP_TITLE));
-    assertEquals("test2.doc", _nodeService.getProperty(document, ContentModel.PROP_NAME));
+    assertEquals("test2 ... /*3:?  . . ..  ", _nodeService.getProperty(document, ContentModel.PROP_TITLE));
+    assertEquals("test3.doc", _nodeService.getProperty(document, ContentModel.PROP_NAME));
 
     // Test that description is replicated
     _nodeService.setProperty(document, VgrModel.PROP_DESCRIPTION, "desc");
@@ -85,12 +86,11 @@ public class PropertyReplicationPolicyIntegrationTest extends AbstractVgrRepoInt
     _nodeService.setProperty(document, ContentModel.PROP_NAME, "test5.pdf");
     assertEquals("doc", _nodeService.getProperty(document, VgrModel.PROP_FORMAT_EXTENT_EXTENSION));
     assertEquals("application/msword", _nodeService.getProperty(document, VgrModel.PROP_FORMAT_EXTENT_MIMETYPE));
-    assertEquals("test4.doc", _nodeService.getProperty(document, ContentModel.PROP_NAME));
+    assertEquals("test5.doc", _nodeService.getProperty(document, ContentModel.PROP_NAME));
 
-    // Test that extension is not replicated to name if changed (extension is
-    // calculated from name)
+    // Test that extension is replicated to name if changed
     _nodeService.setProperty(document, VgrModel.PROP_FORMAT_EXTENT_EXTENSION, "pdf");
-    assertEquals("test4.pdf", _nodeService.getProperty(document, ContentModel.PROP_NAME));
+    assertEquals("test5.pdf", _nodeService.getProperty(document, ContentModel.PROP_NAME));
   }
 
 }

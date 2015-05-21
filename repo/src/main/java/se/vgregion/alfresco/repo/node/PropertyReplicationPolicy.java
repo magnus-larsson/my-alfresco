@@ -102,25 +102,17 @@ public class PropertyReplicationPolicy extends AbstractPolicy implements OnUpdat
   }
 
   private void setCmName(final NodeRef nodeRef) {
-    final String title = _serviceUtils.getStringValue(nodeRef, VgrModel.PROP_TITLE);
-
+    final String filename = _serviceUtils.getStringValue(nodeRef, ContentModel.PROP_NAME);
+    String baseName = FilenameUtils.getBaseName(filename);
     String extension = _serviceUtils.getStringValue(nodeRef, VgrModel.PROP_FORMAT_EXTENT_EXTENSION_NATIVE);
-
     if (StringUtils.isBlank(extension)) {
       extension = _serviceUtils.getStringValue(nodeRef, VgrModel.PROP_FORMAT_EXTENT_EXTENSION);
     }
-
-    if (StringUtils.isBlank(title)) {
-      return;
-    }
-
-    String name = title;
-
     if (StringUtils.isNotBlank(extension)) {
-      name += "." + extension;
+      String newFileName = baseName + "." + extension;
+      _nodeService.setProperty(nodeRef, ContentModel.PROP_NAME, newFileName);
     }
 
-    _nodeService.setProperty(nodeRef, ContentModel.PROP_NAME, name);
   }
 
   private void setVersion(final NodeRef nodeRef) {
@@ -134,22 +126,6 @@ public class PropertyReplicationPolicy extends AbstractPolicy implements OnUpdat
     _serviceUtils.replicateVersion(nodeRef, version);
   }
 
-  private String trimIllegalCharacters(String str) {
-    int lengthBefore = -1;
-    int lengthAfter = -2;
-    while (lengthBefore != lengthAfter) {
-      lengthBefore = str.length();
-      if (StringUtils.isNotBlank(str)) {
-        // trim the string
-        str = str.trim();
-        // remove all trailing dots
-        str = str.replaceAll("\\.+$", "");
-      }
-      lengthAfter = str.length();
-    }
-    return str;
-  }
-
   /**
    * Replicate the title only if it's not set.
    * 
@@ -159,7 +135,7 @@ public class PropertyReplicationPolicy extends AbstractPolicy implements OnUpdat
     String title = _serviceUtils.getStringValue(nodeRef, VgrModel.PROP_TITLE);
 
     if (StringUtils.isNotBlank(title)) {
-      title = trimIllegalCharacters(title);
+      //title = trimIllegalCharacters(title);
 
       // if the title is set, replicate it to cm:title
       _nodeService.setProperty(nodeRef, VgrModel.PROP_TITLE, title);
@@ -174,7 +150,7 @@ public class PropertyReplicationPolicy extends AbstractPolicy implements OnUpdat
     // remove the extension
     name = FilenameUtils.removeExtension(name);
 
-    name = trimIllegalCharacters(name);
+    //name = trimIllegalCharacters(name);
 
     _nodeService.setProperty(nodeRef, VgrModel.PROP_TITLE, name);
     _nodeService.setProperty(nodeRef, ContentModel.PROP_TITLE, name);

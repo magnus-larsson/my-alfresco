@@ -373,9 +373,6 @@
 
         <property name="vgr:dc.title">
           <type>d:text</type>
-          <constraints>
-            <constraint ref="cm:filename" />
-          </constraints>
         </property>
         <property name="vgr:dc.title.alternative">
           <type>d:text</type>
