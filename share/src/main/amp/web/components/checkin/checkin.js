@@ -408,7 +408,7 @@
     */
    Alfresco.thirdparty.onActionCheckInNewVersion = function(record, msg_scope, callback, scope, options) {
       var upload = Alfresco.thirdparty.getCheckInInstance();
-      //upload.setOptions(options);
+      upload.setOptions(options);
 
       // do a little dance with the message scope to get messages working
       if (msg_scope) {

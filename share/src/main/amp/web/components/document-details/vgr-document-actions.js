@@ -57,3 +57,5 @@
    };
 
 }(Alfresco.DocumentActions.prototype.onActionCheckInNewVersion));
+
+
