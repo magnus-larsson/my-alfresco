@@ -10,6 +10,7 @@ import java.util.Map;
 import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
+import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -39,14 +40,13 @@ public class ValidityChecker extends ClusteredExecuter {
   private String _mailFrom;
 
   private List<Map<String, ?>> _emails;
-  
+
   private BehaviourFilter _behaviourFilter;
 
-  
   public void setBehaviourFilter(BehaviourFilter behaviourFilter) {
     this._behaviourFilter = behaviourFilter;
   }
-  
+
   public void setSearchService(SearchService searchService) {
     _searchService = searchService;
   }
@@ -78,9 +78,16 @@ public class ValidityChecker extends ClusteredExecuter {
 
       @Override
       public Void doWork() throws Exception {
-        sendFirstEmail();
+        _transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Void>() {
 
-        sendSecondEmail();
+          @Override
+          public Void execute() throws Throwable {
+            sendFirstEmail();
+
+            sendSecondEmail();
+            return null;
+          }
+        }, false, false);
 
         return null;
       }
@@ -101,9 +108,9 @@ public class ValidityChecker extends ClusteredExecuter {
         List<String> to = new ArrayList<String>(new LinkedHashSet<String>(getFirstEmailRecipients(node)));
 
         String source = (String) _nodeService.getProperty(node, VgrModel.PROP_SOURCE);
-        
+
         String identifier = (String) _nodeService.getProperty(node, VgrModel.PROP_IDENTIFIER);
-        
+
         String title = (String) _nodeService.getProperty(node, VgrModel.PROP_TITLE);
 
         String body = I18NUtil.getMessage((String) mail.get("body"), daysBefore, source, identifier, title);
@@ -139,7 +146,7 @@ public class ValidityChecker extends ClusteredExecuter {
         String source = (String) _nodeService.getProperty(node, VgrModel.PROP_SOURCE);
 
         String identifier = (String) _nodeService.getProperty(node, VgrModel.PROP_IDENTIFIER);
-        
+
         String title = (String) _nodeService.getProperty(node, VgrModel.PROP_TITLE);
 
         String body = I18NUtil.getMessage((String) mail.get("body"), daysBefore, source, identifier, title);

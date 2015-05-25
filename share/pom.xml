@@ -59,7 +59,7 @@
       <groupId>org.redpill-linpro.alfresco.translations</groupId>
       <artifactId>alfresco-swedish-share</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.redpill-linpro.alfresco.clamav</groupId>
       <artifactId>clamav-share</artifactId>

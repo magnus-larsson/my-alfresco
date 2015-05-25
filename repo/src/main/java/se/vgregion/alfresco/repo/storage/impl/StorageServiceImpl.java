@@ -1165,7 +1165,7 @@ public class StorageServiceImpl implements StorageService, InitializingBean {
 
         _behaviourFilter.enableBehaviour();
 
-        LOG.info("Create PDF/A for: " + nodeRef);
+        LOG.info("Created PDF/A for: " + nodeRef);
 
         return result;
       }

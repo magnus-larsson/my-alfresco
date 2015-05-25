@@ -1,4 +1,4 @@
-<#-- @overridden projects/remote-api/config/alfresco/templates/webscripts/org/alfresco/slingshot/search/search.get.html.ftl -->
+<#-- @overridden projects/remote-api/config/alfresco/templates/webscripts/org/alfresco/slingshot/search/search.get.json.ftl -->
 
 <#compress>
 
