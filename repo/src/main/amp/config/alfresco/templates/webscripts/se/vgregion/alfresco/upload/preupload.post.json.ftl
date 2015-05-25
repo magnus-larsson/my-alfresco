@@ -5,6 +5,6 @@
   "nodeRef":  "${nodeRef!}",
   "updateNodeRef": "${updateNodeRef!}",
   "majorVersion": ${majorVersion!"false"},
-  "description": "${description!?js_string}",
+  "description": "${description!?js_string?replace("\\'","'")}",
   "mimetype": "${mimetype!?js_string}"
 }
